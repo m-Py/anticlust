@@ -1,0 +1,17 @@
+Package: anticlust
+Type: Package
+Title: Exact and heuristic methods for anticlustering and clustering
+Version: 0.1.0
+Author: Martin Papenberg
+Maintainer: Martin Papenberg <martin.papenberg@hhu.de>
+Description: `anticlust` is an R package to solve the anticlustering problem,
+    i.e., assigning elements to groups in such a way that the groups are as
+    similar as possible. The package also offers methods to solve traditional
+    clustering problems. 
+Encoding: UTF-8
+License: Undecided
+LazyData: true
+RoxygenNote: 6.1.0
+Imports: dplyr, reshape2, Matrix
+Suggests: gurobi, Rglpk, Rcplex
+
