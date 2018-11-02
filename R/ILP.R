@@ -128,7 +128,7 @@ equality_identifiers <- function(solver) {
 }
 
 
-#' Function that returns a data.frame that contains vectorized weights
+#' Convert matrix of distances into vector of distances
 #'
 #' @param distances A distance matrix
 #' @return A data.frame having the following columns:
@@ -138,7 +138,6 @@ equality_identifiers <- function(solver) {
 #'    `pair` A string of form x_ij identifying the item pair
 vectorize_weights <- function(distances) {
   ## Problem: I have matrix of costs but need vector for ILP
-  ## formulation.
   costs_m <- as.matrix(distances)
   ## Make vector of costs in data.frame (makes each cost identifiable)
   costs <- expand.grid(1:ncol(costs_m), 1:nrow(costs_m))
@@ -146,46 +145,57 @@ vectorize_weights <- function(distances) {
   costs$costs <- c(costs_m)
   ## remove redundant or self distances:
   costs <- subset(costs, i < j)
-  ## TODO: add "_" to the names, i.e. xi_j, to avoid ambiguity when we
-  ## have more than 100 items (which cannot be solved exactly
-  ## probably, but we should have the option)
-  costs$pair <- paste0("x", paste0(costs$i, costs$j))
+  costs$pair <- paste0("x", paste0(costs$i, "_", costs$j))
   rownames(costs) <- NULL
-  ## `costs` now contains the vectorized distances
   return(costs)
 }
 
-# Insert the coefficients of the triangular constraints into the constraint matrix
+# Indices for construction of sparse constraint matrix
 vectorized_triangular <- function(n_items, pair_names) {
-  row_indices <- vector(length = choose(n_items, 3) * 10)
+  triangular_constraints <- choose(n_items, 3) * 3
+  coef_per_constraint <- 3
+  # number of coefficients in constraint matrix:
+  triangular_coefficients <- triangular_constraints * coef_per_constraint
+  group_coefficients <- 3 * n_items
+  row_indices <- vector(length = triangular_coefficients)
   col_indices <- row_indices
   xes         <- row_indices
-  ## (1) Triangular constraints
+  row_indices[1:triangular_coefficients] <- rep(1:(3*n_items), each = 3)
+  ## (1) Triangular constraints - columns and coefficients
   counter <- 1
   for (i in 1:n_items) {
     for (j in 2:n_items) {
       for (k in 3:n_items) {
         ## ensure that only legal constraints are inserted:
         if (!(i < j) | !(j < k)) next
-        ## Offset for addressing the constraints
-        offset_row <- (counter - 1) * 3 # for saying which row the constraint is in
-        offset <- (counter - 1) * 10 # for targetting the vector
-        ## triangular constraint 1
-        row_indices[offset + c(1, 5, 8)]  <- offset_row + 1:3
-        row_indices[offset + c(2, 6, 9)]  <- offset_row + 1:3
-        row_indices[offset + c(3, 7, 10)] <- offset_row + 1:3
-        row_indices[offset + 4] <- offset_row + 1
-
-        col_indices[offset + c(1, 5, 8)] <- which(paste0("x", i, j) == pair_names)
-        col_indices[offset + c(2, 6, 9)] <- which(paste0("x", i, k) == pair_names)
-        col_indices[offset + c(3, 7, 10)] <- which(paste0("x", j, k) == pair_names)
-        print(paste0("y", k))
-        col_indices[offset + 4] <- which(paste0("y", k) == pair_names)
-
-        xes[offset + c(1, 5, 8)] <- c(-1, 1, 1)
-        xes[offset + c(2, 6, 9)] <- c(1, -1, 1)
-        xes[offset + c(3, 7, 10)] <- c(1, 1, -1)
-        xes[offset + 4] <- 1
+        ## Offset for addressing the index vectors
+        offset <- (counter - 1) * coef_per_constraint * 3
+        ## Construct indices
+        col_indices[offset + c(1, 4, 7)] <- which(paste0("x", i, "_", j) == pair_names)
+        col_indices[offset + c(2, 5, 8)] <- which(paste0("x", i, "_", k) == pair_names)
+        col_indices[offset + c(3, 6, 9)] <- which(paste0("x", j, "_", k) == pair_names)
+        ## Values of the triangular coefficients
+        xes[offset + c(1, 4, 7)] <- c(-1, 1, 1)
+        xes[offset + c(2, 5, 8)] <- c(1, -1, 1)
+        xes[offset + c(3, 6, 9)] <- c(1, 1, -1)
+        counter <- counter + 1
+      }
+    }
+  }
+  ## (2) Group constraints (this is still buggy; rework)
+  counter <- 0
+  for (i in 1:n_items) { ## i: current item that may be a cluster leader
+    for (j in 1:n_items) {
+      if (i < j) {
+        row_indices[triangular_coefficients + counter] <- triangular_constraints + counter
+        col_indices[triangular_coefficients + counter] <- which(paste0("x", i, "_", j) == pair_names)
+        xes[triangular_coefficients + counter]         <- 1
+        counter <- counter + 1
+      }
+      if (j < i) {# i may be lower or higher index!)
+        row_indices[triangular_coefficients + counter] <- triangular_constraints + counter
+        col_indices[triangular_coefficients + counter] <- which(paste0("x", j, "_", i) == pair_names)
+        xes[triangular_coefficients + counter]         <- 1
         counter <- counter + 1
       }
     }
@@ -193,6 +203,17 @@ vectorized_triangular <- function(n_items, pair_names) {
   return(list(i = row_indices, j = col_indices, x = xes))
 }
 
+# for creating all indices for group size constraint; to replace the inner for-loop
+# in group size constraints above
+all_connections <- function(i, n) {
+  connections <- expand.grid(i, setdiff(1:n, i))
+  # put lower index in first column
+  wrongorder <- connections[, 1] > connections[, 2]
+  temp <- connections[, 2][wrongorder]
+  connections[, 2][wrongorder] <- connections[, 1][wrongorder]
+  connections[, 1][wrongorder] <- temp
+  return(connections)
+}
 
 # Insert the coefficients of the triangular constraints into the constraint matrix
 triangular_constraints <- function(constraints, n_items) {
@@ -206,18 +227,18 @@ triangular_constraints <- function(constraints, n_items) {
         ## offset for addressing the data.frame:
         offset <- (counter - 1) * 3
         ## triangular constraint 1
-        constraints[offset + 1, paste0("x", i, j)] <- -1
-        constraints[offset + 1, paste0("x", i, k)] <- 1
-        constraints[offset + 1, paste0("x", j, k)] <- 1
+        constraints[offset + 1, paste0("x", i, "_", j)] <- -1
+        constraints[offset + 1, paste0("x", i, "_", k)] <- 1
+        constraints[offset + 1, paste0("x", j, "_", k)] <- 1
         constraints[offset + 1, paste0("y", k)] <- 1
         ## triangular constraint 2
-        constraints[offset + 2, paste0("x", i, j)] <- 1
-        constraints[offset + 2, paste0("x", i, k)] <- -1
-        constraints[offset + 2, paste0("x", j, k)] <- 1
+        constraints[offset + 2, paste0("x", i, "_", j)] <- 1
+        constraints[offset + 2, paste0("x", i, "_", k)] <- -1
+        constraints[offset + 2, paste0("x", j, "_", k)] <- 1
         ## triangular constraint 3
-        constraints[offset + 3, paste0("x", i, j)] <- 1
-        constraints[offset + 3, paste0("x", i, k)] <- 1
-        constraints[offset + 3, paste0("x", j, k)] <- -1
+        constraints[offset + 3, paste0("x", i, "_", j)] <- 1
+        constraints[offset + 3, paste0("x", i, "_", k)] <- 1
+        constraints[offset + 3, paste0("x", j, "_", k)] <- -1
         ## increase counter
         counter <- counter + 1
       }
@@ -237,7 +258,7 @@ group_contraints <- function(constraints, n_items, group_size) {
   for (i in 1:n_items) {
     for (j in 2:n_items) {
       if (i >= j) next
-      constraints[paste0("c6_", counter), paste0("x", i, j)] <- 1
+      constraints[paste0("c6_", counter), paste0("x", i, "_", j)] <- 1
       constraints[paste0("c6_", counter), paste0("y", j)] <- 1
       counter <- counter + 1
     }
@@ -248,7 +269,7 @@ group_contraints <- function(constraints, n_items, group_size) {
     constraints[paste0("c7_", counter), paste0("y", j)] <- 1
     for (i in 1:n_items) {
       if (i >= j) next
-      constraints[paste0("c7_", counter), paste0("x", i, j)] <- 1
+      constraints[paste0("c7_", counter), paste0("x", i, "_", j)] <- 1
     }
     counter <- counter + 1
   }
@@ -259,9 +280,9 @@ group_contraints <- function(constraints, n_items, group_size) {
   for (i in 1:n_items) { ## i: current item that may be a cluster leader
     for (j in 1:n_items) {
       if (i < j)
-        constraints[paste0("c9_", i), paste0("x", i, j)] <- 1
+        constraints[paste0("c9_", i), paste0("x", i, "_", j)] <- 1
       if (j < i) # i may be lower or higher index!)
-        constraints[paste0("c9_", i), paste0("x", j, i)] <- 1
+        constraints[paste0("c9_", i), paste0("x", j, "_", i)] <- 1
     }
   }
   return(constraints)
