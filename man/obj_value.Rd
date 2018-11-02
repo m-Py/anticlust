@@ -4,15 +4,16 @@
 \alias{obj_value}
 \title{Get the objective function from an assignment object}
 \usage{
-obj_value(assignment)
+obj_value(assignment, features)
 }
 \arguments{
-\item{assignment}{A data.frame that represents a clustering
-assingment. Usually, the return value of `ilp_to_groups` or
-`equal_sized_clustering` will be the input.}
+\item{assignment}{A vector representing the group assignment}
+
+\item{features}{A data.frame representing the features that were used
+in the assignment.}
 }
 \value{
-The objective value
+Scalar: the objective value.
 }
 \description{
 Get the objective function from an assignment object

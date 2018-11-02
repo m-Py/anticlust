@@ -5,7 +5,7 @@
 \title{Return group membership based on ILP solution for an item assignment
 instance}
 \usage{
-ilp_to_groups(ilp, solution, items)
+ilp_to_groups(ilp, solution)
 }
 \arguments{
 \item{ilp}{An ILP representation of the item assignment problem
@@ -13,9 +13,6 @@ ilp_to_groups(ilp, solution, items)
 
 \item{solution}{The solution of the instance returned by the function
 `solve_ilp`.}
-
-\item{items}{The data.frame that was originally passed to
-item_assignment containing all item features.}
 }
 \value{
 A data.frame containing one column of item ids (here, the id
@@ -24,6 +21,6 @@ A data.frame containing one column of item ids (here, the id
     returned as columns of the data.frame.
 }
 \description{
-This function is primarily called from within the function
-`item_assignment`.
+This function is primarily called from within other functions and probably
+should not be called directly.
 }

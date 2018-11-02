@@ -5,7 +5,7 @@
 \title{Solve an instance of item assignment}
 \usage{
 item_assignment(items, n_groups, solver, standardize = FALSE,
-  heuristic = 2)
+  heuristic = 1)
 }
 \arguments{
 \item{items}{A data.frame of item features. Rows must correspond to
@@ -13,7 +13,7 @@ items and columns to features.}
 
 \item{n_groups}{How many groups are to be created.}
 
-\item{solver}{A string identifing the solver to be used ("Rglpk",
+\item{solver}{A string identifying the solver to be used ("glpk",
 "gurobi", or "cplex")}
 
 \item{standardize}{Boolean - should the feature values be
@@ -31,11 +31,17 @@ assignment is no longer done using exact ILP item assignment, but
 instead using a simple random assignment.}
 }
 \value{
-A data.frame containing one column of item ids (here, the id
-    corresponds to the order of the items) and one column contains the
-    group assignments of the items. The original items are also
-    returned as columns of the data.frame.
+A vector representing the new group assignment.
 }
 \description{
 Solve an instance of item assignment
+}
+\details{
+To use this function, a linear programming solver must
+ be installed and usable from R. The open source GNU linear
+ programming kit (called from the package `Rglpk`) or one of the
+ commercial solvers gurobi (called from the package `gurobi`) or
+ IBM CPLEX (called from the package `Rcplex`) can be used. A license
+ is needed for the commercial solvers. One of the interface packages
+ must be installed.
 }

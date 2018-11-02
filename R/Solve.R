@@ -19,10 +19,7 @@
 #'   assignment is no longer done using exact ILP item assignment, but
 #'   instead using a simple random assignment.
 #'
-#' @return A data.frame containing one column of item ids (here, the id
-#'     corresponds to the order of the items) and one column contains the
-#'     group assignments of the items. The original items are also
-#'     returned as columns of the data.frame.
+#' @return A vector representing the new group assignment.
 #'
 #' @details To use this function, a linear programming solver must
 #'  be installed and usable from R. The open source GNU linear
@@ -35,15 +32,13 @@
 #' @export
 #'
 item_assignment <- function(items, n_groups, solver, standardize = FALSE,
-                            heuristic = 2) {
+                            heuristic = 1) {
 
   ## some input handling
   if (!(heuristic %in% 0:3)) {
     stop("argument heuristic must have a value between 0 and 3")
   }
 
-  ## standardize feature values? Save old values to be returned
-  items_old <- items
   if (standardize) {
     items <- scale(items)
   }
@@ -56,7 +51,7 @@ item_assignment <- function(items, n_groups, solver, standardize = FALSE,
     ilp <- item_assign_ilp(distances, n_items / n_groups,
                            solver = solver)
     solution <- solve_ilp(ilp, solver, "min")
-    assignment <- ilp_to_groups(ilp, solution, items)
+    assignment <- ilp_to_groups(ilp, solution)
     ## 2. Fix distances - ensure that the most similar items are put
     ## to different groups
     distances <- edit_distances(distances, assignment)
@@ -66,7 +61,7 @@ item_assignment <- function(items, n_groups, solver, standardize = FALSE,
   }
 
   if (heuristic == 3) {
-    assignment <- heuristic_item_assignment(assignment)
+    assignment <- heuristic_item_assignment(items, assignment)
     return(assignment)
   }
 
@@ -74,7 +69,7 @@ item_assignment <- function(items, n_groups, solver, standardize = FALSE,
   ## solves it:
   ilp <- item_assign_ilp(distances, n_groups, solver = solver)
   solution <- solve_ilp(ilp, solver)
-  assignment <- ilp_to_groups(ilp, solution, items_old)
+  assignment <- ilp_to_groups(ilp, solution)
   return(assignment)
 }
 

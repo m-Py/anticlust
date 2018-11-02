@@ -10,7 +10,7 @@ solve_ilp(ilp, solver, objective = "max")
 \item{ilp}{An object representing the ILP formulation of the
 instance, returned by `item_assign_ilp`}
 
-\item{solver}{A string identifing the solver to be used ("Rglpk",
+\item{solver}{A string identifing the solver to be used ("glpk",
 "gurobi", or "cplex")}
 
 \item{objective}{A string identifying whether the objective function
@@ -28,4 +28,13 @@ A `list` having two entries: `x` is the vector of optimal
 Usually it will be advised to call the higher level function
 `item_assignment` By setting the `objective` parameter to "min", this
 function solves weighted cluster editing instead of item assignment.
+}
+\details{
+To use this function, a linear programming solver must
+ be installed and usable from R. The open source GNU linear
+ programming kit (called from the package `Rglpk`) or one of the
+ commercial solvers gurobi (called from the package `gurobi`) or
+ IBM CPLEX (called from the package `Rcplex`) can be used. A license
+ is needed for the commercial solvers. One of the interface packages
+ must be installed.
 }

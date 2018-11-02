@@ -4,7 +4,7 @@
 \alias{item_assign_ilp}
 \title{Construct the ILP represenation of an item assignment problem}
 \usage{
-item_assign_ilp(distances, p, solver = "Rglpk")
+item_assign_ilp(distances, p, solver = "glpk")
 }
 \arguments{
 \item{distances}{An distance object or matrix representing the
@@ -12,12 +12,34 @@ distances between items}
 
 \item{p}{The number of groups to be created}
 
-\item{solver}{A string identifing the solver to be used ("Rglpk",
+\item{solver}{A string identifing the solver to be used ("glpk",
 "gurobi", or "cplex")}
 }
 \value{
-A list representing ILP formulation of the instance
+A list representing the ILP formulation of the instance
 }
 \description{
 Construct the ILP represenation of an item assignment problem
+}
+\details{
+To use this function, a linear programming solver must
+ be installed and usable from R. The open source GNU linear
+ programming kit (called from the package `Rglpk`) or one of the
+ commercial solvers gurobi (called from the package `gurobi`) or
+ IBM CPLEX (called from the package `Rcplex`) can be used. A license
+ is needed for the commercial solvers. One of the interface packages
+ must be installed.
+}
+\references{
+T. Bulhões, G. F. de Sousa Filho, A. Subramanian, and F. C. Lucídio
+dos Anjos, “Branch-and-cut approaches for p-cluster editing,”
+Discrete Applied Mathematics, vol. 219, pp. 51–64, 2017.
+
+T. Bulhões, A. Subramanian, G. F. Sousa Filho, and F. C. Lucídio dos
+Anjos, “Branch-and-price for p-cluster editing,” Computational
+Optimization and Applications, vol. 67, no. 2, pp. 293–316, 2017.
+
+M. Grötschel and Y. Wakabayashi, “A cutting plane algorithm for a
+clustering problem,” Mathematical Programming, vol. 45, nos. 1-3, pp.
+59–96, 1989.
 }

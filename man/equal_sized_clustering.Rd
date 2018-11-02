@@ -15,10 +15,7 @@ columns correspond to features.}
 factor of the number of items.}
 }
 \value{
-A data.frame containing one column of item ids (here, the id
-    corresponds to the order of the items) and one column contains the
-    group assignments of the items. The original items are also
-    returned as columns of the data.frame.
+A vector representing the clustering
 }
 \description{
 Uses kmeans algorithm to initiate cluster centers and then

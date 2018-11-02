@@ -10,18 +10,14 @@ edit_distances(distances, assignment, value = -1e+06)
 \item{distances}{A distance object or matrix of
 between-item-distances.}
 
-\item{assignment}{A data.frame containing two columns: `group`
-contains the cluster assignment and `item` is the item id. The
-item id must correctly correspond to the rows in argument
-distances! The data.frame is usually created using exact cluster
-editing (i.e., using the function `solve_ilp` and setting the
-parameter `objective` to "min"), or by the function
-`equal_sized_clustering`.}
-
-\item{value}{The value that is assigned to each fixed distance.
+\item{value}{The value that is assigned to the fixed distances.
 Defaults to -1,000,000 currently.}
 }
 \value{
+A vector representing the group assignment; objects that
+  are part of the same group as indicated by this vector are assigned
+  a new distance.
+
 A distance object containing the fixed distances. For items
     that are part of the same cluster (as specified in the
     `data.frame` `assignment`), the between-item-distances are set to

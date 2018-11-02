@@ -1,53 +1,51 @@
 
-#' Based on a preclustering, this function creates a heuristic item assignment
+#' Based on a preclustering, create a heuristic item assignment
 #'
-#' @param assignment A data.frame that represents the preclustering assingment.
-#'   Usually, the return value of `ilp_to_groups` or `equal_sized_clustering`
-#'   will be the input.
+#' @param features A data.frame representing the features that were used
+#'   in the assignment.
+#' @param assignment A vector representing the pre-group assignment
 #'
-#' @return The data.frame assigment that was passed, but now the column
-#'   `group` contains the groups as determined for the item assignment
-#'   problem.
+#' @return A vector representing the new group assignment.
 #'
-#'   @export
+#' @export
 #'
-heuristic_item_assignment <- function(assignment, nrep = 100) {
-  assignment <- dplyr::arrange(assignment, assignment$group)
+heuristic_item_assignment <- function(features, assignment, nrep = 100) {
+  ## sort by group, later sort back by item and return group
+  dat <- data.frame(group = assignment, features, item = 1:nrow(features))
+  dat <- dplyr::arrange(dat, dat$group)
+  ## start optimizing
   best_obj <- -Inf
-  n_items <- nrow(assignment)
-  n_groups <- n_items / length(unique(assignment$group))
-
+  n_items <- nrow(dat)
+  n_groups <- n_items / length(unique(dat$group))
   ## sequentially try out random assignments that place pregrouped
-  ## items in different groups. This procedure can be refined I guess
+  ## items in different groups
   for (i in 1:nrep) {
-    assignment$group <- unlist(replicate(n_items / n_groups,
-                                         sample(1:n_groups),
-                                         simplify = FALSE))
-    cur_obj <- obj_value(assignment)
+    group <- unlist(replicate(n_items / n_groups, sample(1:n_groups), simplify = FALSE))
+    cur_obj <- obj_value(group, features)
     if (cur_obj > best_obj) {
-      best_assignment <- assignment$group
+      best_assignment <- group
       best_obj <- cur_obj
     }
   }
-  assignment$group <- best_assignment
-  assignment <- dplyr::arrange(assignment, assignment$item)
-  return(assignment)
+  dat$group <- best_assignment
+  dat <- dplyr::arrange(dat, dat$item)
+  return(dat$group)
 }
 
 #' Get the objective function from an assignment object
 #'
-#' @param assignment A data.frame that represents a clustering
-#'   assingment. Usually, the return value of `ilp_to_groups` or
-#'   `equal_sized_clustering` will be the input.
+#' @param assignment A vector representing the group assignment
+#' @param features A data.frame representing the features that were used
+#'   in the assignment.
 #'
-#' @return The objective value
+#' @return Scalar: the objective value.
 #'
 #' @export
 #'
 
-obj_value <- function(assignment) {
+obj_value <- function(assignment, features) {
   ## determine distances within each group
-  distances <- by(assignment[,3:ncol(assignment)], assignment$group, dist)
+  distances <- by(features, assignment, dist)
   ## determine objective as the sum of all distances per group
   objective <- sum(sapply(distances, sum))
   return(objective)
@@ -67,10 +65,7 @@ obj_value <- function(assignment) {
 #' @param nclusters The number of clusters to be created. Must be a
 #'     factor of the number of items.
 #'
-#' @return A data.frame containing one column of item ids (here, the id
-#'     corresponds to the order of the items) and one column contains the
-#'     group assignments of the items. The original items are also
-#'     returned as columns of the data.frame.
+#' @return A vector representing the clustering
 #'
 #' @export
 #'
@@ -113,7 +108,7 @@ equal_sized_clustering <- function(items, nclusters) {
   assignments <- dplyr::arrange(assignments, item)
   ## return feature values as well:
   assignments <- data.frame(assignments, items)
-  return(assignments)
+  return(assignments$group)
 }
 
 
@@ -165,8 +160,6 @@ dist_one_center <- function(points, center) {
   return(distances)
 }
 
-
-
 #' Edit distances of very close neighbours (similar items)
 #'
 #' Based on a preclustering, distances between items of the same cluster
@@ -177,14 +170,10 @@ dist_one_center <- function(points, center) {
 #'
 #' @param distances A distance object or matrix of
 #'     between-item-distances.
-#' @param assignment A data.frame containing two columns: `group`
-#'     contains the cluster assignment and `item` is the item id. The
-#'     item id must correctly correspond to the rows in argument
-#'     distances! The data.frame is usually created using exact cluster
-#'     editing (i.e., using the function `solve_ilp` and setting the
-#'     parameter `objective` to "min"), or by the function
-#'     `equal_sized_clustering`.
-#' @param value The value that is assigned to each fixed distance.
+#' @return A vector representing the group assignment; objects that
+#'   are part of the same group as indicated by this vector are assigned
+#'   a new distance.
+#' @param value The value that is assigned to the fixed distances.
 #'   Defaults to -1,000,000 currently.
 #'
 #' @return A distance object containing the fixed distances. For items
@@ -198,16 +187,15 @@ dist_one_center <- function(points, center) {
 #' @export
 
 edit_distances <- function(distances, assignment, value = -1000000) {
-  n_groups <- length(unique(assignment$group))
+  n_groups <- length(unique(assignment))
   distances <- as.matrix(distances)
   for (i in 1:n_groups) {
-    ith_group <- subset(assignment, group == i)
-    items <- ith_group$item ## which items are in the i'th cluster
+    items <- which(assignment == i) ## which items are in the i'th cluster
     ## two for-loops to tap all pairwise distances that may require
     ## fixing (a lot of unnecessary iterations, probably)
     for (j in 1:(length(items) - 1)) {
       for (t in 2:length(items)) {
-        distances[items[j], items[t]] <- value # this is only a hack
+        distances[items[j], items[t]] <- value
         distances[items[t], items[j]] <- value
       }
     }

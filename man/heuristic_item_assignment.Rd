@@ -2,22 +2,19 @@
 % Please edit documentation in R/Heuristic.R
 \name{heuristic_item_assignment}
 \alias{heuristic_item_assignment}
-\title{Based on a preclustering, this function creates a heuristic item assignment}
+\title{Based on a preclustering, create a heuristic item assignment}
 \usage{
-heuristic_item_assignment(assignment, nrep = 100)
+heuristic_item_assignment(features, assignment, nrep = 100)
 }
 \arguments{
-\item{assignment}{A data.frame that represents the preclustering assingment.
-Usually, the return value of `ilp_to_groups` or `equal_sized_clustering`
-will be the input.}
+\item{features}{A data.frame representing the features that were used
+in the assignment.}
+
+\item{assignment}{A vector representing the pre-group assignment}
 }
 \value{
-The data.frame assigment that was passed, but now the column
-  `group` contains the groups as determined for the item assignment
-  problem.
-
-  @export
+A vector representing the new group assignment.
 }
 \description{
-Based on a preclustering, this function creates a heuristic item assignment
+Based on a preclustering, create a heuristic item assignment
 }
