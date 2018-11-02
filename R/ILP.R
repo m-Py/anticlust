@@ -136,8 +136,6 @@ equality_identifiers <- function(solver) {
 #'    `i` the first index of the item pair that is connected
 #'    `j` the second index of the item pair that is connected
 #'    `pair` A string of form x_ij identifying the item pair
-#'    TODO: make this different, maybe only return a vector!
-
 vectorize_weights <- function(distances) {
   ## Problem: I have matrix of costs but need vector for ILP
   ## formulation.
@@ -146,16 +144,55 @@ vectorize_weights <- function(distances) {
   costs <- expand.grid(1:ncol(costs_m), 1:nrow(costs_m))
   colnames(costs) <- c("i", "j")
   costs$costs <- c(costs_m)
+  ## remove redundant or self distances:
+  costs <- subset(costs, i < j)
   ## TODO: add "_" to the names, i.e. xi_j, to avoid ambiguity when we
   ## have more than 100 items (which cannot be solved exactly
   ## probably, but we should have the option)
   costs$pair <- paste0("x", paste0(costs$i, costs$j))
-  ## remove all cases where j >= i, i.e. remove redundant or self distances
-  costs <- subset(costs, i < j)
   rownames(costs) <- NULL
   ## `costs` now contains the vectorized distances
   return(costs)
 }
+
+# Insert the coefficients of the triangular constraints into the constraint matrix
+vectorized_triangular <- function(n_items, pair_names) {
+  row_indices <- vector(length = choose(n_items, 3) * 10)
+  col_indices <- row_indices
+  xes         <- row_indices
+  ## (1) Triangular constraints
+  counter <- 1
+  for (i in 1:n_items) {
+    for (j in 2:n_items) {
+      for (k in 3:n_items) {
+        ## ensure that only legal constraints are inserted:
+        if (!(i < j) | !(j < k)) next
+        ## Offset for addressing the constraints
+        offset_row <- (counter - 1) * 3 # for saying which row the constraint is in
+        offset <- (counter - 1) * 10 # for targetting the vector
+        ## triangular constraint 1
+        row_indices[offset + c(1, 5, 8)]  <- offset_row + 1:3
+        row_indices[offset + c(2, 6, 9)]  <- offset_row + 1:3
+        row_indices[offset + c(3, 7, 10)] <- offset_row + 1:3
+        row_indices[offset + 4] <- offset_row + 1
+
+        col_indices[offset + c(1, 5, 8)] <- which(paste0("x", i, j) == pair_names)
+        col_indices[offset + c(2, 6, 9)] <- which(paste0("x", i, k) == pair_names)
+        col_indices[offset + c(3, 7, 10)] <- which(paste0("x", j, k) == pair_names)
+        print(paste0("y", k))
+        col_indices[offset + 4] <- which(paste0("y", k) == pair_names)
+
+        xes[offset + c(1, 5, 8)] <- c(-1, 1, 1)
+        xes[offset + c(2, 6, 9)] <- c(1, -1, 1)
+        xes[offset + c(3, 7, 10)] <- c(1, 1, -1)
+        xes[offset + 4] <- 1
+        counter <- counter + 1
+      }
+    }
+  }
+  return(list(i = row_indices, j = col_indices, x = xes))
+}
+
 
 # Insert the coefficients of the triangular constraints into the constraint matrix
 triangular_constraints <- function(constraints, n_items) {
@@ -189,6 +226,7 @@ triangular_constraints <- function(constraints, n_items) {
   return(constraints)
 }
 
+## TODO next: vectorize group constraints (maybe only use group size constraint for a first test)
 ## Inserts constraints specifying cluster number and cluster size
 group_contraints <- function(constraints, n_items, group_size) {
   ## The numbers are taken from Bulhoes et al. 2017 ("Branch-and-price")
