@@ -3,21 +3,17 @@
 
 ## The following functions take a solution of the item assignment
 ## problem and return an assignment of items to groups as a data.frame.
-## (function `ilp_to_groups` is the highest level function that should
-## be called)
 
 #' Return group membership based on ILP solution for an item assignment
 #' instance
 #'
-#' This function is primarily called from within the function
-#' `item_assignment`.
+#' This function is primarily called from within other functions and probably
+#' should not be called directly.
 #'
 #' @param ilp An ILP representation of the item assignment problem
 #'     (returned by rom `item_assign_ilp`)
 #' @param solution The solution of the instance returned by the function
 #'     `solve_ilp`.
-#' @param items The data.frame that was originally passed to
-#'     item_assignment containing all item features.
 #'
 #' @return A data.frame containing one column of item ids (here, the id
 #'     corresponds to the order of the items) and one column contains the
@@ -26,17 +22,14 @@
 #' @export
 #'
 
-ilp_to_groups <- function(ilp, solution, items) {
+ilp_to_groups <- function(ilp, solution) {
   assignment <- fill_groups_wce(ilp, solution)
-  ## the following works because correct order of items is ensured
-  ## through function group_assignment, that sorts by item
-  assignment <- data.frame(assignment, items)
-  return(assignment)
+  return(assignment$group)
 }
 
 
 ## TODO: better name and comment the functions below; they replace
-## several previous functions that were made obsolete by the more
+## several previous functions that were made obsolete by a more
 ## general functions
 
 #' Return group membership based on ILP solution for a weighted cluster
@@ -50,7 +43,6 @@ ilp_to_groups <- function(ilp, solution, items) {
 #' @return A data.frame containing one column of item ids (here, the id
 #'     corresponds to the order of the items); one column contains the
 #'     group assignments of the items.
-#' @export
 #'
 fill_groups_wce <- function(ilp, solution) {
   assignment_list <- fill_groups_wce_(ilp, solution$x)
@@ -63,9 +55,7 @@ fill_groups_wce <- function(ilp, solution) {
 }
 
 
-## extract groups from a weighted cluster editing instance (i.e., there
-## are no cluster leaders an groups may differ in length). It actually calls
-## `fill_groups_` and cleans the output.
+## Extract groups from a the information of pairwise connectivity of items
 fill_groups_wce_ <- function(ilp, variable_assignment) {
   ## as long as this function is not in the package: I have to load
   ## the functions in file ILP.R manually first
@@ -96,7 +86,6 @@ fill_groups_wce_ <- function(ilp, variable_assignment) {
   }
 
   ## Third step: Remove marked duplicates
-
   marked <- sapply(groups, function(x) identical(x, 0))
   groups <- groups[!marked]
 
