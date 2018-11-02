@@ -70,3 +70,5 @@ functions.
 - do not create the ILP twice for heuristic assignment 
 - make consistent return value for the different assignment methods
 - port functions from minDiff
+- Function `obj_value` should take two input parameters: one for the
+  assignment, and another one that represents the item distances

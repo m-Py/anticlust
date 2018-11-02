@@ -4,10 +4,18 @@
 #' @param distances An distance object or matrix representing the
 #'   distances between items
 #' @param p The number of groups to be created
-#' @param solver A string identifing the solver to be used ("Rglpk",
+#' @param solver A string identifing the solver to be used ("glpk",
 #'   "gurobi", or "cplex")
 #'
-#' @return A list representing ILP formulation of the instance
+#' @return A list representing the ILP formulation of the instance
+#'
+#' @details To use this function, a linear programming solver must
+#'  be installed and usable from R. The open source GNU linear
+#'  programming kit (called from the package `Rglpk`) or one of the
+#'  commercial solvers gurobi (called from the package `gurobi`) or
+#'  IBM CPLEX (called from the package `Rcplex`) can be used. A license
+#'  is needed for the commercial solvers. One of the interface packages
+#'  must be installed.
 #'
 #' @importFrom Matrix Matrix
 #'
@@ -22,12 +30,16 @@
 #' T. Bulhões, A. Subramanian, G. F. Sousa Filho, and F. C. Lucídio dos
 #' Anjos, “Branch-and-price for p-cluster editing,” Computational
 #' Optimization and Applications, vol. 67, no. 2, pp. 293–316, 2017.
+#'
+#' M. Grötschel and Y. Wakabayashi, “A cutting plane algorithm for a
+#' clustering problem,” Mathematical Programming, vol. 45, nos. 1-3, pp.
+#' 59–96, 1989.
 
-item_assign_ilp <- function(distances, p, solver = "Rglpk") {
+item_assign_ilp <- function(distances, p, solver = "glpk") {
 
   ## identify solver because they use different identifiers for
   ## equality:
-  if (solver == "Rglpk") {
+  if (solver == "glpk") {
     equal_sign <- "=="
     lower_sign <- "<="
     greater_sign <- ">="
@@ -40,7 +52,7 @@ item_assign_ilp <- function(distances, p, solver = "Rglpk") {
     lower_sign <- "L"
     greater_sign <- "G"
   } else {
-    stop("solver must be 'cplex', 'Rglpk', or 'gurobi'")
+    stop("solver must be 'cplex', 'glpk', or 'gurobi'")
   }
 
   ## Problem: I have matrix of costs but need vector for ILP

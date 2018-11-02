@@ -54,7 +54,6 @@ obj_value <- function(assignment) {
 }
 
 
-
 #' Heuristic clustering algorithm creating equal-sized clusters
 #'
 #' Uses kmeans algorithm to initiate cluster centers and then

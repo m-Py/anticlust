@@ -4,7 +4,7 @@
 #' @param items A data.frame of item features. Rows must correspond to
 #'     items and columns to features.
 #' @param n_groups How many groups are to be created.
-#' @param solver A string identifing the solver to be used ("Rglpk",
+#' @param solver A string identifying the solver to be used ("glpk",
 #'   "gurobi", or "cplex")
 #' @param standardize Boolean - should the feature values be
 #'     standardized before groups are created? Defaults to FALSE.
@@ -23,6 +23,14 @@
 #'     corresponds to the order of the items) and one column contains the
 #'     group assignments of the items. The original items are also
 #'     returned as columns of the data.frame.
+#'
+#' @details To use this function, a linear programming solver must
+#'  be installed and usable from R. The open source GNU linear
+#'  programming kit (called from the package `Rglpk`) or one of the
+#'  commercial solvers gurobi (called from the package `gurobi`) or
+#'  IBM CPLEX (called from the package `Rcplex`) can be used. A license
+#'  is needed for the commercial solvers. One of the interface packages
+#'  must be installed.
 #'
 #' @export
 #'
@@ -78,7 +86,7 @@ item_assignment <- function(items, n_groups, solver, standardize = FALSE,
 #'
 #' @param ilp An object representing the ILP formulation of the
 #'     instance, returned by `item_assign_ilp`
-#' @param solver A string identifing the solver to be used ("Rglpk",
+#' @param solver A string identifing the solver to be used ("glpk",
 #'   "gurobi", or "cplex")
 #' @param objective A string identifying whether the objective function
 #'     of the ILP should be maximized ("max") or minimized
@@ -90,6 +98,14 @@ item_assignment <- function(items, n_groups, solver, standardize = FALSE,
 #'   coefficients for all decision variables. `obj` is the optimal
 #'   objective value.
 #'
+#' @details To use this function, a linear programming solver must
+#'  be installed and usable from R. The open source GNU linear
+#'  programming kit (called from the package `Rglpk`) or one of the
+#'  commercial solvers gurobi (called from the package `gurobi`) or
+#'  IBM CPLEX (called from the package `Rcplex`) can be used. A license
+#'  is needed for the commercial solvers. One of the interface packages
+#'  must be installed.
+#'
 #' @export
 #'
 
@@ -97,7 +113,7 @@ solve_ilp <- function(ilp, solver, objective = "max") {
 
   ret_list <- list() # return the optimal value and the variable assignment
 
-  if (solver == "Rglpk") {
+  if (solver == "glpk") {
     max <- FALSE
     if (objective == "max")
       max <- TRUE
