@@ -172,6 +172,7 @@ triangular_constraints <- function(constraints, n_items) {
         constraints[offset + 1, paste0("x", i, j)] <- -1
         constraints[offset + 1, paste0("x", i, k)] <- 1
         constraints[offset + 1, paste0("x", j, k)] <- 1
+        constraints[offset + 1, paste0("y", k)] <- 1
         ## triangular constraint 2
         constraints[offset + 2, paste0("x", i, j)] <- 1
         constraints[offset + 2, paste0("x", i, k)] <- -1
