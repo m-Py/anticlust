@@ -1,11 +1,4 @@
-
-#######
-
-## The following functions take a solution of the item assignment
-## problem and return an assignment of items to groups as a data.frame.
-
-#' Return group membership based on ILP solution for an item assignment
-#' instance
+#' Return group membership based on ILP solution for item assignment
 #'
 #' This function is primarily called from within other functions and probably
 #' should not be called directly.
@@ -21,7 +14,6 @@
 #'     returned as columns of the data.frame.
 #' @export
 #'
-
 ilp_to_groups <- function(ilp, solution) {
   assignment <- fill_groups_wce(ilp, solution)
   return(assignment$group)
@@ -95,14 +87,10 @@ fill_groups_wce_ <- function(ilp, variable_assignment) {
 ## This finds which items are in the same cluster, but
 ## it possibly returns duplicates
 fill_groups_ <- function(ilp, variable_assignment, groups) {
-  select <- grepl("x", names(variable_assignment)) ## disregard cluster leader variables
-  ## connections = assignment of all x_ij decision variables
-  connections <- variable_assignment[select]
-  ## check out what items each cluster leader is connected to
   for (i in 1:length(groups)) {
     leader <- groups[[i]][1]
-    ## select all edges of the leader:
-    edges  <- subset(ilp$costs, (i == leader | j == leader) & connections == 1)
+    ## select all edges of the "leader"
+    edges  <- subset(ilp$costs, (i == leader | j == leader) & variable_assignment == 1)
     group_elements <- unique(c(edges$i, edges$j))
     groups[[i]] <- group_elements
   }
