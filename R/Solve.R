@@ -47,14 +47,22 @@ item_assignment <- function(items, n_groups, solver, standardize = FALSE,
   distances <- dist(items)
 
   if (heuristic == 1) {
-    ## 1. Clustering
+    ## Preclustering
     ilp <- item_assign_ilp(distances, n_items / n_groups,
                            solver = solver)
     solution <- solve_ilp(ilp, solver, "min")
     assignment <- ilp_to_groups(ilp, solution)
-    ## 2. Fix distances - ensure that the most similar items are put
+    ## Fix distances - ensures that the most similar items are assigned
     ## to different groups
     distances <- edit_distances(distances, assignment)
+    ## Edit ILP - objective function and group sizes
+    ilp$obj_function <- vectorize_weights(distances)$costs
+    ilp$rhs <- c(rep(1, choose(n_items, 3) * 3),
+                 rep((n_items / n_groups) - 1, n_items))
+    ## Solve edited ILP to solve heuristic item assignment
+    solution <- solve_ilp(ilp, solver)
+    assignment <- ilp_to_groups(ilp, solution)
+    return(assignment)
   } else if (heuristic > 1) {
     assignment <- equal_sized_clustering(data.frame(items), n_items / n_groups)
     distances  <- edit_distances(distances, assignment)

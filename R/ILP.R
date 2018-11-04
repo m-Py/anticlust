@@ -33,9 +33,8 @@ item_assign_ilp <- function(distances, p, solver = "glpk") {
   group_size     <- n_items / p
   costs          <- vectorize_weights(distances)
 
-  ## Specify the number of constraints:
-  n_tris <- choose(n_items, 3) * 3 # triangular constraints
-  n_c9 <- n_items # number of group constraints
+  ## Specify the number of triangular constraints:
+  n_tris <- choose(n_items, 3) * 3
 
   ## Construct ILP constraint matrix
   constraints <- sparse_constraints(n_items, costs$pair)
@@ -43,10 +42,10 @@ item_assign_ilp <- function(distances, p, solver = "glpk") {
 
   ## Directions of the constraints:
   equalities <- c(rep(equality_signs$l, n_tris),
-                  rep(equality_signs$e, n_c9))
+                  rep(equality_signs$e, n_items))
 
   # Right-hand-side of ILP
-  rhs <- c(rep(1, n_tris), rep(group_size - 1, n_c9)) #  p = number of clusters
+  rhs <- c(rep(1, n_tris), rep(group_size - 1, n_items)) #  p = number of clusters
 
   # Objective function of the ILP
   obj_function <- costs$costs
