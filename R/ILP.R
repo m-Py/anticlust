@@ -21,14 +21,6 @@
 #'
 #' @references
 #'
-#' T. Bulhões, G. F. de Sousa Filho, A. Subramanian, and F. C. Lucídio
-#' dos Anjos, “Branch-and-cut approaches for p-cluster editing,”
-#' Discrete Applied Mathematics, vol. 219, pp. 51–64, 2017.
-#'
-#' T. Bulhões, A. Subramanian, G. F. Sousa Filho, and F. C. Lucídio dos
-#' Anjos, “Branch-and-price for p-cluster editing,” Computational
-#' Optimization and Applications, vol. 67, no. 2, pp. 293–316, 2017.
-#'
 #' M. Grötschel and Y. Wakabayashi, “A cutting plane algorithm for a
 #' clustering problem,” Mathematical Programming, vol. 45, nos. 1-3, pp.
 #' 59–96, 1989.
@@ -37,9 +29,9 @@ item_assign_ilp <- function(distances, p, solver = "glpk") {
 
   ## Initialize some constant variables:
   equality_signs <- equality_identifiers(solver)
-  n_items <- nrow(as.matrix(distances))
-  group_size = n_items / p
-  costs <- vectorize_weights(distances)
+  n_items        <- nrow(as.matrix(distances))
+  group_size     <- n_items / p
+  costs          <- vectorize_weights(distances)
 
   ## Specify the number of constraints:
   n_tris <- choose(n_items, 3) * 3 # triangular constraints
@@ -127,7 +119,7 @@ vectorize_weights <- function(distances) {
   return(costs)
 }
 
-#' Construct indices for a sparse matrix representation of triangular constraints
+#' Construct a sparse matrix representing the ILP constraints
 #' @param n_items How many items are there
 #' @param pair_names A character vector of names representing the item pairs.
 #'   Must have the form that is contained in the ILP data.frame costs$pair.
