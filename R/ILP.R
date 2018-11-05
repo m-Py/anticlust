@@ -184,6 +184,7 @@ vectorized_group <- function(n_items, pair_names) {
 
 #' Get character representation of item connections
 #' @param connections a data.frame returned by `all_connections`
+#' @return A character vector representing item connections.
 connections_to_pair <- function(connections) {
   apply(connections, 1, function(x) paste0("x", paste0(x, collapse = "_")))
 }
