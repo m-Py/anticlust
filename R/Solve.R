@@ -19,7 +19,7 @@
 #'   assignment is no longer done using exact ILP item assignment, but
 #'   instead using a repeated random assignment.
 #'
-#' @return A vector representing the new group assignment.
+#' @return A vector representing the group assignment.
 #'
 #' @details To use this function, a linear programming solver must
 #'  be installed and usable from R. The open source GNU linear
@@ -80,6 +80,33 @@ item_assignment <- function(items, n_groups, solver, standardize = FALSE,
   assignment <- ilp_to_groups(ilp, solution)
   return(assignment)
 }
+
+#' Solve exact equal-sized cluster editing
+#'
+#' @param items A data.frame of item features. Rows must correspond to
+#'     items and columns to features.
+#' @param n_groups How many clusters are to be created.
+#' @param solver A string identifing the solver to be used ("Rglpk",
+#'   "gurobi", or "cplex")
+#' @param standardize Boolean - should the feature values be
+#'     standardized before groups are created? Defaults to FALSE.
+#'
+#' @return A vector representing the clustering.
+#'
+#' @export
+#'
+equal_sized_cluster_editing <- function(items, n_groups, solver,
+                                        standardize = FALSE) {
+  if (standardize) {
+    items <- scale(items)
+  }
+  distances <- dist(items)
+  ilp <- item_assign_ilp(distances, n_groups, solver = solver)
+  solution <- solve_ilp(ilp, solver, "min")
+  assignment <- ilp_to_groups(ilp, solution)
+  return(assignment)
+}
+
 
 #' Solve the ILP formulation of the item assignment problem
 #'

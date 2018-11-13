@@ -28,10 +28,10 @@ cluster editing; Level 2 does this preclustering using a heuristic
 based on k-means clustering. On Level 3, preclustering is also done
 using the heuristic based on k-means clustering, and the final
 assignment is no longer done using exact ILP item assignment, but
-instead using a simple random assignment.}
+instead using a repeated random assignment.}
 }
 \value{
-A vector representing the new group assignment.
+A vector representing the group assignment.
 }
 \description{
 Solve an instance of item assignment

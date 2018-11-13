@@ -1,7 +1,7 @@
 Package: anticlust
 Type: Package
 Title: Exact and heuristic methods for anticlustering and clustering
-Version: 0.1.1
+Version: 0.1.2
 Author: Martin Papenberg
 Maintainer: Martin Papenberg <martin.papenberg@hhu.de>
 Description: `anticlust` is an R package to solve the anticlustering problem,

@@ -31,14 +31,6 @@ To use this function, a linear programming solver must
  must be installed.
 }
 \references{
-T. Bulhões, G. F. de Sousa Filho, A. Subramanian, and F. C. Lucídio
-dos Anjos, “Branch-and-cut approaches for p-cluster editing,”
-Discrete Applied Mathematics, vol. 219, pp. 51–64, 2017.
-
-T. Bulhões, A. Subramanian, G. F. Sousa Filho, and F. C. Lucídio dos
-Anjos, “Branch-and-price for p-cluster editing,” Computational
-Optimization and Applications, vol. 67, no. 2, pp. 293–316, 2017.
-
 M. Grötschel and Y. Wakabayashi, “A cutting plane algorithm for a
 clustering problem,” Mathematical Programming, vol. 45, nos. 1-3, pp.
 59–96, 1989.

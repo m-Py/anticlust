@@ -2,8 +2,7 @@
 % Please edit documentation in R/ILP_TO_GROUP.R
 \name{ilp_to_groups}
 \alias{ilp_to_groups}
-\title{Return group membership based on ILP solution for an item assignment
-instance}
+\title{Return group membership based on ILP solution for item assignment}
 \usage{
 ilp_to_groups(ilp, solution)
 }
