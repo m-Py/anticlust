@@ -137,11 +137,11 @@ euc_dist <- function(x1, x2)
 dist_from_centers <- function(points, centers)
 {
   points <- matrix(points)
-  z <- matrix(NA, nrow = nrow(points), ncol = nrow(centers))
+  ret <- matrix(NA, nrow = nrow(points), ncol = nrow(centers))
   for (k in 1:nrow(centers)) {
-    z[, k] <- sqrt( colSums((t(points) - centers[k,])^2) )
+    ret[, k] <- sqrt(colSums((t(points) - centers[k, ])^2))
   }
-  z
+  ret
 }
 
 #' Edit distances of very close neighbours (similar items)
