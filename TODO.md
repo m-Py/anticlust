@@ -66,9 +66,5 @@ functions.
 # TODO implementation 
 
 - tidy up function `item_assign_ilp`
-- implement the constraint ILP matrix as sparse matrix
-- do not create the ILP twice for heuristic assignment 
 - make consistent return value for the different assignment methods
 - port functions from minDiff
-- Function `obj_value` should take two input parameters: one for the
-  assignment, and another one that represents the item distances
