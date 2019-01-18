@@ -134,30 +134,14 @@ euc_dist <- function(x1, x2)
 #     (`equal_sized_clustering`). The other columns represent clusters
 #     and contain the distance to the respective column for each item.
 #
-dist_from_centers <- function(points, centers) {
-  points <- data.frame(points) # if points is only a vector
-  ## store all distances from centers
-  storage <- matrix(ncol = nrow(centers), nrow = nrow(points))
-  ## determine distances from all cluster centers:
-  for (i in 1:ncol(storage)) {
-    storage[, i] <- dist_one_center(points, centers[i, ])
+dist_from_centers <- function(points, centers)
+{
+  points <- matrix(points)
+  z <- matrix(NA, nrow = nrow(points), ncol = nrow(centers))
+  for (k in 1:nrow(centers)) {
+    z[, k] <- sqrt( colSums((t(points) - centers[k,])^2) )
   }
-  ## add item number
-  storage <- cbind(1:nrow(points), storage)
-  ## add column names
-  colnames(storage) <- c("item", paste0("cluster", 1:nrow(centers)))
-  return(data.frame(storage))
-}
-
-## compute the distances of a vector (or matrix or data.frame) of points
-## to a cluster center. points has the same form as in the function
-## above.
-dist_one_center <- function(points, center) {
-  distances <- vector(length = nrow(points))
-  for (i in 1:nrow(points)) {
-    distances[i] <- euc_dist(points[i, ], center)
-  }
-  return(distances)
+  z
 }
 
 #' Edit distances of very close neighbours (similar items)
