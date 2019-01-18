@@ -16,7 +16,7 @@ distances <- dist(anti$value)
 
 #' Minimum distances to elements of other anticlusters
 #'
-#' @param distances A matrix or dist object representing distances
+#' @param distances A matrix representing distances
 #'   between all elements
 #' @param anticlusters A numeric vector indicating anticluster membership
 #'   for each element
@@ -29,9 +29,8 @@ distances <- dist(anti$value)
 #' mindist_elementwise(distances, rep(1:5, 2))
 mindist_elementwise <- function(distances, anticlusters) {
   ## Some error handling
-  if (nrow(distances) != length(anticluster))
+  if (nrow(distances) != length(anticlusters))
     stop("Error: Distances and anticlusters indicate a different number of elements.")
-  distances <- as.matrix(distances)
   N <- nrow(distances)
   # Initialize vector to store minima for each anticluster
   minima <- matrix(nrow = N, ncol = 4)
@@ -62,7 +61,7 @@ mindist_elementwise <- function(distances, anticlusters) {
 
 #' Minimum distances per anticluster
 #'
-#' @param distances A matrix or dist object representing distances
+#' @param distances A matrix representing distances
 #'   between all elements
 #' @param anticlusters A numeric vector indicating anticluster membership
 #'   for each element
@@ -83,7 +82,7 @@ mindist_anticluster <- function(distances, anticlusters) {
 
 #' Information which clusters should be merged
 #'
-#' @param distances A matrix or dist object representing distances
+#' @param distances A matrix representing distances
 #'   between all elements
 #' @param anticlusters A numeric vector indicating anticluster membership
 #'   for each element
@@ -96,8 +95,47 @@ merge_which <- function(distances, anticlusters) {
   unlist(minima[where_maxmin, c("anticluster", "target_anticluster")])
 }
 
-distances <- dist(rnorm(8))
-anticlusters <- c(rep(2:4, 2), 2, 2)
+#' Hierarchical anticlustering to extablish similar sets
+#'
+#' @param distances A matrix or dist object representing distances
+#'   between all elements
+#' @param p The number of groups to be created
+#'
+#' @return The anticlusters
+#'
+hierarchical_anticlustering <- function(distances, p) {
+  distances <- as.matrix(distances)
+  N <- nrow(distances)
+  anticlusters <- 1:N
+  n_anticlusters <- N
+  while (n_anticlusters != p) {
+    to_be_merged <- merge_which(distances, anticlusters)
+    ## Remove one anticluster:
+    anticlusters[anticlusters == to_be_merged[2]] <- to_be_merged[1]
+    n_anticlusters <- n_anticlusters - 1
+  }
+  return(anticlusters)
+}
+
+
+dist_to_sim <- function(x) {
+  return(1 / (1 + x)) # https://stats.stackexchange.com/questions/53068/euclidean-distance-score-and-similarity
+}
+
+N <- 20
+items <- rnorm(N)
+distances <- as.matrix(dist(items))
+anticlusters <- 1:N
 mindist_elementwise(distances, anticlusters)
 mindist_anticluster(distances, anticlusters)
 merge_which(distances, anticlusters)
+tt <- hierarchical_anticlustering(distances, 2)
+
+tapply(items, tt, mean)
+c(mean(sort(items)[c(TRUE, FALSE)]) ,mean(sort(items)[c(FALSE, TRUE)]))
+
+dplyr::arrange(data.frame(items, tt), tt, items)
+
+items[tt]
+
+## Why does anticlustering cluster??
