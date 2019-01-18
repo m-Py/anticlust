@@ -122,7 +122,7 @@ dist_to_sim <- function(x) {
   return(1 / (1 + x)) # https://stats.stackexchange.com/questions/53068/euclidean-distance-score-and-similarity
 }
 
-N <- 20
+N <- 9
 items <- rnorm(N)
 distances <- as.matrix(dist(items))
 anticlusters <- 1:N
@@ -132,10 +132,38 @@ merge_which(distances, anticlusters)
 tt <- hierarchical_anticlustering(distances, 2)
 
 tapply(items, tt, mean)
+tapply(items, rep(1:2, N/2), mean)
 c(mean(sort(items)[c(TRUE, FALSE)]) ,mean(sort(items)[c(FALSE, TRUE)]))
 
 dplyr::arrange(data.frame(items, tt), tt, items)
 
-items[tt]
-
 ## Why does anticlustering cluster??
+
+set.seed(42)
+
+N <- 8
+items <- rnorm(N)
+distances <- as.matrix(dist(items))
+anticlusters <- 1:N
+mindist_anticluster(distances, anticlusters)
+merge_which(distances, anticlusters)
+anticlusters[anticlusters == 6] <- 2
+mindist_anticluster(distances, anticlusters)
+merge_which(distances, anticlusters)
+anticlusters[anticlusters == 5] <- 4
+mindist_anticluster(distances, anticlusters)
+merge_which(distances, anticlusters)
+anticlusters[anticlusters == 7] <- 1
+mindist_anticluster(distances, anticlusters)
+merge_which(distances, anticlusters)
+anticlusters[anticlusters == 4] <- 1
+mindist_anticluster(distances, anticlusters)
+merge_which(distances, anticlusters)
+anticlusters[anticlusters == 3] <- 1
+mindist_anticluster(distances, anticlusters)
+merge_which(distances, anticlusters)
+anticlusters[anticlusters == 8] <- 1
+
+tapply(items, anticlusters, mean)
+
+c(mean(sort(items)[c(TRUE, FALSE)]) ,mean(sort(items)[c(FALSE, TRUE)]))
