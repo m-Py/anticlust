@@ -11,43 +11,45 @@
 # finally passing through all the objects until no further improvement
 # occurs.
 
-
-## all is chaos:
-
-N <- 10
-items <- as.matrix(data.frame(rnorm(N), rnorm(N)))
-#distances <- as.matrix(dist(items))
-anticlusters <- rep(1:2, N/2)
-
-squared_distances <- dist_from_centers(items, matrix(means, ncol = 1))
-obj_value(anticlusters, squared_distances)
-
-as.matrix(compute_centers(items, anticlusters))
-
-#' Get feature centers given anticluster grouping
-compute_centers <- function(items, anticlusters) {
-  by(as.matrix(items), anticlusters, colMeans)
-}
-
-obj_value <- function(anticlusters, squared_distances) {
-  ## determine distances within each group
-  summed_distances <- by(squared_distances, INDICES = anticlusters, sum)
-  ## determine objective as the sum of all distances per group
-  return(sum(summed_distances))
-}
-
-#' Check if a data point should be shifted
+#' Compute cluster centers
 #'
-#' @return The anticluster the data point should be shifted to
-shift <- function(point, items, anticlusters, current_best) {
-  items <- matrix(items)
-  ## Select all anticlusters the current point is not part of
-  other_clusters <- setdiff(anticlusters, point)
-  for (i in seq_along(other_clusters)) {
-    # flip item and check if objective is improved
-    tmp <- items
-    tmp
-  }
+#' @param features A data matrix of element features
+#' @param clusters A numeric vector indicating cluster membership
+#'   of each element
+#'
+#' @return A matrix of cluster centers. Rows represent clusters and
+#'   columns represent features
+
+cluster_centers <- function(features, clusters) {
+  features <- as.matrix(features) #  if features is a vector
+  legal_number_of_clusters(features, clusters) # check input
+  centers <- by(features, clusters, colMeans)
+  do.call(rbind, as.list(centers)) # as.list for the case of only one feature
 }
 
-shift(1, items, anticlusters, obj_value(anticlusters, squared_distances))
+# Determine distances of n data points to m cluster centers
+#
+# The data basis for the clustering algorithm implemented in function
+# `equal_sized_clustering`.
+#
+# @param points A vector, matrix or data.frame of data points. If a
+#     matrix or data.frame is passed, rows correspond to items and
+#     columns to features.
+# @param centers A matrix of cluster centers. Each row corresponds to a
+#     cluster and each column corresponds to a feature (this format is,
+#     for example, returned by the function `stats::kmeans` through the
+#     element `centers`).
+#
+# @return A `data.frame`. The first column is named `item` and it just
+#     contains a numbering of the rows (this is needed for the function
+#     (`equal_sized_clustering`). The other columns represent clusters
+#     and contain the distance to the respective column for each item.
+#
+dist_from_centers <- function(features, centers) {
+  features <- matrix(features)
+  distances <- matrix(NA, nrow = nrow(features), ncol = nrow(centers))
+  for (k in 1:nrow(centers)) {
+    distances[, k] <- sqrt(colSums((t(features) - centers[k, ])^2))
+  }
+  distances
+}

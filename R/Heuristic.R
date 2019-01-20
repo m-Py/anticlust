@@ -1,17 +1,18 @@
 
 #' Based on a preclustering, create a heuristic item assignment
 #'
-#' @param features A data.frame representing the features that were used
+#' @param features A data.frame representing the features that are used
 #'   in the assignment.
-#' @param assignment A vector representing the pre-group assignment
+#' @param clustering A vector representing the clustering of elements
 #'
 #' @return A vector representing the new group assignment.
 #'
 #' @export
 #'
-heuristic_item_assignment <- function(features, assignment, nrep = 100) {
+heuristic_item_assignment <- function(features, clustering, nrep = 100) {
+
   ## sort by group, later sort back by item and return group
-  dat <- data.frame(group = assignment, features, item = 1:nrow(features))
+  dat <- data.frame(group = clustering, features, item = 1:nrow(features))
   dat <- dat[order(dat$group), ]
   ## start optimizing
   best_obj <- -Inf
@@ -61,9 +62,8 @@ obj_value <- function(assignment, features) {
 #' item to it. This ensures that each cluster is filled with the same
 #' number of items.
 #'
-#' @param items A vector, matrix or data.frame of data points. If a
-#'     matrix or data.frame is passed, rows correspond to items and
-#'     columns correspond to features.
+#' @param items A vector, matrix or data.frame of data points.
+#'     Rows correspond to items and columns correspond to features.
 #' @param nclusters The number of clusters to be created. Must be a
 #'     factor of the number of items.
 #'
@@ -111,34 +111,6 @@ equal_sized_clustering <- function(items, nclusters) {
   ## return feature values as well:
   assignments <- data.frame(assignments, items)
   return(assignments$group)
-}
-
-# Determine distances of n data points to m cluster centers
-#
-# The data basis for the clustering algorithm implemented in function
-# `equal_sized_clustering`.
-#
-# @param points A vector, matrix or data.frame of data points. If a
-#     matrix or data.frame is passed, rows correspond to items and
-#     columns to features.
-# @param centers A matrix of cluster centers. Each row corresponds to a
-#     cluster and each column corresponds to a feature (this format is,
-#     for example, returned by the function `stats::kmeans` through the
-#     element `centers`).
-#
-# @return A `data.frame`. The first column is named `item` and it just
-#     contains a numbering of the rows (this is needed for the function
-#     (`equal_sized_clustering`). The other columns represent clusters
-#     and contain the distance to the respective column for each item.
-#
-dist_from_centers <- function(points, centers)
-{
-  points <- matrix(points)
-  ret <- matrix(NA, nrow = nrow(points), ncol = nrow(centers))
-  for (k in 1:nrow(centers)) {
-    ret[, k] <- sqrt(colSums((t(points) - centers[k, ])^2))
-  }
-  ret
 }
 
 #' Edit distances of very close neighbours (similar items)
