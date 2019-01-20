@@ -4,13 +4,13 @@
 \alias{heuristic_item_assignment}
 \title{Based on a preclustering, create a heuristic item assignment}
 \usage{
-heuristic_item_assignment(features, assignment, nrep = 100)
+heuristic_item_assignment(features, clustering, nrep = 100)
 }
 \arguments{
-\item{features}{A data.frame representing the features that were used
+\item{features}{A data.frame representing the features that are used
 in the assignment.}
 
-\item{assignment}{A vector representing the pre-group assignment}
+\item{clustering}{A vector representing the clustering of elements}
 }
 \value{
 A vector representing the new group assignment.

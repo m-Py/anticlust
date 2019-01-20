@@ -13,5 +13,5 @@ License: Undecided
 LazyData: true
 RoxygenNote: 6.1.0
 Imports: dplyr, reshape2, Matrix
-Suggests: gurobi, Rglpk, Rcplex
+Suggests: gurobi, Rglpk, Rcplex, testthat
 

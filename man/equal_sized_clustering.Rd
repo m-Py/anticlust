@@ -7,9 +7,8 @@
 equal_sized_clustering(items, nclusters)
 }
 \arguments{
-\item{items}{A vector, matrix or data.frame of data points. If a
-matrix or data.frame is passed, rows correspond to items and
-columns correspond to features.}
+\item{items}{A vector, matrix or data.frame of data points.
+Rows correspond to items and columns correspond to features.}
 
 \item{nclusters}{The number of clusters to be created. Must be a
 factor of the number of items.}

@@ -14,7 +14,7 @@ context("KMeans-Maximizing")
 # 4. Matrix, distances from points to anticluster centers,
 #    p columns, n rows
 
-test_that("computation of cluster centers has correct output", {
+test_that("computation of cluster centers and distances to centers is correct", {
   ## Vary number of features
   for (m in 1:4) {
     m_features <- m
@@ -35,8 +35,35 @@ test_that("computation of cluster centers has correct output", {
       for (i in 1:m) {
         expect_equal(all(centers[, i] == tapply(features[, i], anticlusters, mean)), TRUE)
       }
+
+      ## Now also check if distances to cluster centers are computed correctly
+      distances <- dist_from_centers(features, centers)
+      expect_equal(class(distances), "matrix")
+      expect_equal(dim(distances)[1], n_elements)
+      expect_equal(dim(distances)[2], p_anticlusters)
+      ## Check distance output for all points
+      for (f in 1:n_elements) {
+        for (c in 1:p_anticlusters) {
+          expect_equal(distances[f, c], euc_dist(features[f, ], centers[c, ]))
+        }
+      }
     }
   }
 })
 
-## TODO next: implement test for computation of distances from cluster centers
+test_that("objective value for variance criterion is computed correctly", {
+  for (m in 1:4) {
+    m_features <- m
+    ## vary number of anticlusters
+    for (p in 2:5) {
+      p_anticlusters <- p
+      n_elements <- p * 3 # n-elements must be multiplier of p
+      features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
+      cl <- kmeans(features, p_anticlusters)
+      obj_kmeans <- cl$tot.withinss
+      obj_mine  <- obj_value_variance(features, cl$cluster)
+      expect_equal(obj_kmeans, obj_mine)
+    }
+  }
+})
+

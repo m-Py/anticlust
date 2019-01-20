@@ -22,7 +22,7 @@ heuristic_item_assignment <- function(features, clustering, nrep = 100) {
   ## items in different groups
   for (i in 1:nrep) {
     group <- unlist(replicate(n_items / n_groups, sample(1:n_groups), simplify = FALSE))
-    cur_obj <- obj_value(group, features)
+    cur_obj <- obj_value_dist(group, features)
     if (cur_obj > best_obj) {
       best_assignment <- group
       best_obj <- cur_obj
@@ -33,20 +33,20 @@ heuristic_item_assignment <- function(features, clustering, nrep = 100) {
   return(dat$group)
 }
 
-#' Objective value for an assignment of anticlusters
+#' Objective value for the distance criterion
 #'
 #' Computes the objective value for the summed distances criterion
 #'
-#' @param assignment A vector representing the group assignment
-#' @param features A data.frame representing the features that were used
-#'   in the assignment.
+#' @param features A data.frame, matrix or vector representing the
+#'   features that are used in the assignment.
+#' @param anticlusters A vector representing the anticluster affiliation
 #'
 #' @return Scalar: the objective value.
 #'
 #' @export
 #'
 
-obj_value <- function(assignment, features) {
+obj_value_distance <- function(features, anticlusters) {
   ## determine distances within each group
   distances <- by(features, assignment, dist)
   ## determine objective as the sum of all distances per group
