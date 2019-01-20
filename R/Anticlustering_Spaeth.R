@@ -32,7 +32,7 @@ cluster_centers <- function(features, clusters) {
 # The data basis for the clustering algorithm implemented in function
 # `equal_sized_clustering`.
 #
-# @param points A vector, matrix or data.frame of data points. If a
+# @param features A vector, matrix or data.frame of data points. If a
 #     matrix or data.frame is passed, rows correspond to items and
 #     columns to features.
 # @param centers A matrix of cluster centers. Each row corresponds to a
@@ -40,16 +40,33 @@ cluster_centers <- function(features, clusters) {
 #     for example, returned by the function `stats::kmeans` through the
 #     element `centers`).
 #
-# @return A `data.frame`. The first column is named `item` and it just
-#     contains a numbering of the rows (this is needed for the function
-#     (`equal_sized_clustering`). The other columns represent clusters
-#     and contain the distance to the respective column for each item.
+# @return A data matrix; columns represent clusters
+#     and contain the distance to the respective cluster for each item.
 #
 dist_from_centers <- function(features, centers) {
-  features <- matrix(features)
-  distances <- matrix(NA, nrow = nrow(features), ncol = nrow(centers))
-  for (k in 1:nrow(centers)) {
-    distances[, k] <- sqrt(colSums((t(features) - centers[k, ])^2))
+  features <- as.matrix(features) # if points is only a vector
+  ## store all distances from centers
+  storage <- matrix(ncol = nrow(centers), nrow = nrow(features))
+  ## determine distances from all cluster centers:
+  for (i in 1:ncol(storage)) {
+    storage[, i] <- dist_one_center(features, centers[i, ])
   }
-  distances
+  return(storage)
+}
+
+## compute the distances of a vector (or matrix or data.frame) of points
+## to a cluster center. points has the same form as in the function
+## above.
+dist_one_center <- function(points, center) {
+  distances <- vector(length = nrow(points))
+  for (i in 1:nrow(points)) {
+    distances[i] <- euc_dist(points[i, ], center)
+  }
+  return(distances)
+}
+
+
+## A standard euclidian distance between two data points
+euc_dist <- function(x1, x2) {
+  sqrt(sum((x1 - x2)^2))
 }

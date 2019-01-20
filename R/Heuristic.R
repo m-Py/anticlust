@@ -108,8 +108,6 @@ equal_sized_clustering <- function(items, nclusters) {
   assignments <- assignments[, -1] # first column useless
   colnames(assignments) <- c("group", "item")
   assignments <- dplyr::arrange(assignments, item)
-  ## return feature values as well:
-  assignments <- data.frame(assignments, items)
   return(assignments$group)
 }
 
