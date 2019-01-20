@@ -12,7 +12,7 @@
 heuristic_item_assignment <- function(features, assignment, nrep = 100) {
   ## sort by group, later sort back by item and return group
   dat <- data.frame(group = assignment, features, item = 1:nrow(features))
-  dat <- dplyr::arrange(dat, dat$group)
+  dat <- dat[order(dat$group), ]
   ## start optimizing
   best_obj <- -Inf
   n_items <- nrow(dat)
@@ -28,11 +28,13 @@ heuristic_item_assignment <- function(features, assignment, nrep = 100) {
     }
   }
   dat$group <- best_assignment
-  dat <- dplyr::arrange(dat, dat$item)
+  dat <- dat[order(dat$item), ]
   return(dat$group)
 }
 
-#' Get the objective function from an assignment object
+#' Objective value for an assignment of anticlusters
+#'
+#' Computes the objective value for the summed distances criterion
 #'
 #' @param assignment A vector representing the group assignment
 #' @param features A data.frame representing the features that were used
@@ -110,11 +112,6 @@ equal_sized_clustering <- function(items, nclusters) {
   assignments <- data.frame(assignments, items)
   return(assignments$group)
 }
-
-
-## A standard euclidian distance between two data points
-euc_dist <- function(x1, x2)
-  sqrt(sum((x1 - x2)^2))
 
 # Determine distances of n data points to m cluster centers
 #
