@@ -5,21 +5,21 @@
 
 #' Anticlustering based on a heuristic
 #'
-#' @param features A data.frame, matrix or vector representing the features
-#'   that are used.
-#' @param clustering A vector representing the preclustering of elements.
-#'   See Details.
+#' @param features A data.frame, matrix or vector representing the
+#'     features that are used.
+#' @param clustering A vector representing the preclustering of
+#'     elements.  See Details.
 #'
 #' @return A vector representing the anticlustering.
 #'
-#' @details
-#' The heuristic approach to anticlustering forbids elements that are
-#' part of the same
-#' precluster to be assigned to the same group. The preclustering should be accomplished by one of the clustering
-#' functions, `equal_sized_cluster_editing` (an exact method that minimizes
-#' distance criterion under the restriction of equal group sizes) or
-#' `equal_sized_clustering` (a heuristic method that tries to minimize
-#' the variance criterion under the restriction of equal group sizes).
+#' @details The heuristic approach to anticlustering forbids elements
+#'     that are part of the same precluster to be assigned to the same
+#'     group. The preclustering should be accomplished by one of the
+#'     clustering functions, `equal_sized_cluster_editing` (an exact
+#'     method that minimizes distance criterion under the restriction of
+#'     equal group sizes) or `equal_sized_clustering` (a heuristic
+#'     method that tries to minimize the variance criterion under the
+#'     restriction of equal group sizes).
 #'
 #' @export
 #'
@@ -70,13 +70,12 @@ obj_value_distance <- function(features, anticlusters) {
 
 #' Heuristic clustering algorithm to create equal-sized clusters
 #'
-#' Uses kmeans algorithm to initiate cluster centers, then
-#' sequentially chooses a cluster center and assigns the closest
-#' element to it, ensuring that each cluster is filled with the same
-#' number of items.
+#' Uses kmeans algorithm to initiate cluster centers, then sequentially
+#' chooses a cluster center and assigns the closest element to it,
+#' ensuring that each cluster is filled with the same number of items.
 #'
-#' @param features A vector, matrix or data.frame of data points.
-#'     Rows correspond to items and columns correspond to features.
+#' @param features A vector, matrix or data.frame of data points.  Rows
+#'     correspond to items and columns correspond to features.
 #' @param nclusters The number of clusters to be created. Must be a
 #'     factor of the number of items.
 #'
@@ -99,9 +98,9 @@ equal_sized_kmeans <- function(features, nclusters) {
   return(clusters_to_long(assignments))
 }
 
-## Called from within `equal_sized_kmeans`. Assigns elements to clusters,
-## sequentially fills elements to the closest cluster center, fills the same
-## number of elements into each cluster
+## Called from within `equal_sized_kmeans`. Assigns elements to
+## clusters, sequentially fills elements to the closest cluster center,
+## fills the same number of elements into each cluster
 heuristic_cluster_assignment <- function(clust_dist) {
   ## Variables that encode relevant dimensions
   nclusters <- ncol(clust_dist)
@@ -154,11 +153,11 @@ clusters_to_long <- function(assignments) {
 #'
 #' @param distances A distance object or matrix of
 #'     between-item-distances.
-#' @return A vector representing the group assignment; objects that
-#'   are part of the same group as indicated by this vector are assigned
-#'   a new distance.
+#' @return A vector representing the group assignment; objects that are
+#'     part of the same group as indicated by this vector are assigned a
+#'     new distance.
 #' @param value The value that is assigned to the fixed distances.
-#'   Defaults to -1,000,000 currently.
+#'     Defaults to -1,000,000 currently.
 #'
 #' @return A distance object containing the fixed distances. For items
 #'     that are part of the same cluster (as specified in the
