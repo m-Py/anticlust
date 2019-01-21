@@ -17,7 +17,7 @@
 #'   features that are used in the assignment.
 #' @param anticlusters A vector representing the anticluster affiliation
 #'
-#' @return Scalar: the objective value
+#' @return Scalar, the total within-cluster variance.
 #'
 #' @export
 #'
@@ -81,6 +81,7 @@ dist_from_centers <- function(features, centers, squared) {
 }
 
 ## A standard (or squared) euclidean distance between two data points
+## Currently, this function is only used in the test files.
 euc_dist <- function(x1, x2, squared = FALSE) {
   if (squared)
     return(sum((x1 - x2)^2))

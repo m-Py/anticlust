@@ -48,13 +48,12 @@ heuristic_anticlustering <- function(features, clustering, nrep = 100) {
 
 #' Objective value for the distance criterion
 #'
-#' Computes the objective value for the summed distances criterion
-#'
 #' @param features A data.frame, matrix or vector representing the
 #'   features that are used in the assignment.
 #' @param anticlusters A vector representing the anticluster affiliation
 #'
-#' @return Scalar: the objective value.
+#' @return Scalar, the total sum of within-cluster
+#'   pointwise distances.
 #'
 #' @export
 #'
@@ -108,7 +107,7 @@ heuristic_cluster_assignment <- function(clust_dist) {
   elements_per_cluster <- N / nclusters
   ## Include element ID as column of input because rows are later
   ## removed from matrix
-  clust_dist <- cbind(clust_dist, 1:nrow(clust_dist))
+  clust_dist <- cbind(clust_dist, 1:N)
   colnames(clust_dist) <- c(paste0("cluster", 1:nclusters), "item")
   ## Storage of cluster assignments (Columns = clusters; cells indicate the
   ## index of the element that is assigned to the respective cluster)
@@ -116,7 +115,7 @@ heuristic_cluster_assignment <- function(clust_dist) {
   for (i in 1:elements_per_cluster) {
     ## iterate over clusters in random order
     for (j in sample(nclusters)) {
-      ## 1. Choose element that is closest to cluster j:
+      ## 1. Choose element that is closest to center of cluster j:
       min_index <- which.min(clust_dist[, j])
       element <- clust_dist[min_index, "item"]
       ## 2. Add this element to cluster j:
@@ -125,13 +124,11 @@ heuristic_cluster_assignment <- function(clust_dist) {
       clust_dist <- clust_dist[-min_index, , drop = FALSE] # drop = FALSE !
     }
   }
-  ## return assignments in correct format
   return(assignments)
 }
 
-## Called from within `heuristic_cluster_assignment`. Turns a matrix
-## into long format and extracts cluster assignment for each item in
-## correct order
+## Called from within `equal_sized_kmeans`. Turns a matrix of cluster
+## assignments into long format.
 clusters_to_long <- function(assignments) {
   P <- ncol(assignments) # number of clusters
   N <- P * nrow(assignments)

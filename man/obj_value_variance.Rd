@@ -13,7 +13,7 @@ features that are used in the assignment.}
 \item{anticlusters}{A vector representing the anticluster affiliation}
 }
 \value{
-Scalar: the objective value
+Scalar, the total within-cluster variance.
 }
 \description{
 Compute objective value for variance criterion

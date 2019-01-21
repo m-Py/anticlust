@@ -7,11 +7,11 @@
 heuristic_anticlustering(features, clustering, nrep = 100)
 }
 \arguments{
-\item{features}{A data.frame, matrix or vector representing the features
-that are used.}
+\item{features}{A data.frame, matrix or vector representing the
+features that are used.}
 
-\item{clustering}{A vector representing the preclustering of elements.
-See Details.}
+\item{clustering}{A vector representing the preclustering of
+elements.  See Details.}
 }
 \value{
 A vector representing the anticlustering.
@@ -20,11 +20,12 @@ A vector representing the anticlustering.
 Anticlustering based on a heuristic
 }
 \details{
-The heuristic approach to anticlustering forbids elements that are
-part of the same
-precluster to be assigned to the same group. The preclustering should be accomplished by one of the clustering
-functions, `equal_sized_cluster_editing` (an exact method that minimizes
-distance criterion under the restriction of equal group sizes) or
-`equal_sized_clustering` (a heuristic method that tries to minimize
-the variance criterion under the restriction of equal group sizes).
+The heuristic approach to anticlustering forbids elements
+    that are part of the same precluster to be assigned to the same
+    group. The preclustering should be accomplished by one of the
+    clustering functions, `equal_sized_cluster_editing` (an exact
+    method that minimizes distance criterion under the restriction of
+    equal group sizes) or `equal_sized_clustering` (a heuristic
+    method that tries to minimize the variance criterion under the
+    restriction of equal group sizes).
 }

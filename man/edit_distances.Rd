@@ -14,9 +14,9 @@ between-item-distances.}
 Defaults to -1,000,000 currently.}
 }
 \value{
-A vector representing the group assignment; objects that
-  are part of the same group as indicated by this vector are assigned
-  a new distance.
+A vector representing the group assignment; objects that are
+    part of the same group as indicated by this vector are assigned a
+    new distance.
 
 A distance object containing the fixed distances. For items
     that are part of the same cluster (as specified in the

@@ -7,8 +7,8 @@
 equal_sized_kmeans(features, nclusters)
 }
 \arguments{
-\item{features}{A vector, matrix or data.frame of data points.
-Rows correspond to items and columns correspond to features.}
+\item{features}{A vector, matrix or data.frame of data points.  Rows
+correspond to items and columns correspond to features.}
 
 \item{nclusters}{The number of clusters to be created. Must be a
 factor of the number of items.}
@@ -17,8 +17,7 @@ factor of the number of items.}
 A vector representing the clustering
 }
 \description{
-Uses kmeans algorithm to initiate cluster centers, then
-sequentially chooses a cluster center and assigns the closest
-element to it, ensuring that each cluster is filled with the same
-number of items.
+Uses kmeans algorithm to initiate cluster centers, then sequentially
+chooses a cluster center and assigns the closest element to it,
+ensuring that each cluster is filled with the same number of items.
 }
