@@ -64,28 +64,21 @@ cluster_centers <- function(features, clusters) {
 # @return A data matrix; columns represent clusters
 #     and contain the distance to the respective cluster for each item.
 #
+# @details
+# This code was published in Leisch (2006). "A Toolbox for
+# K-Centroids Cluster Analysis". Computational Statistics and Data
+# Analysis, 51(2), 526–544.
+#
 dist_from_centers <- function(features, centers, squared) {
-  features <- as.matrix(features) # if points is only a vector
-  ## store all distances from centers
-  storage <- matrix(ncol = nrow(centers), nrow = nrow(features))
-  ## determine distances from all cluster centers:
-  for (i in 1:ncol(storage)) {
-    storage[, i] <- dist_one_center(features, centers[i, ], squared)
+  z <- matrix(0, nrow = nrow(features), ncol = nrow(centers))
+  for (k in 1:nrow(centers)) {
+    if (squared)
+      z[,k] <- colSums((t(features) - centers[k,])^2)
+    else
+      z[,k] <- sqrt( colSums((t(features) - centers[k,])^2) )
   }
-  return(storage)
+  z
 }
-
-## compute the distances of a vector (or matrix or data.frame) of points
-## to a cluster center. points has the same form as in the function
-## TODO: this should be doable without for-loop to be faster!
-dist_one_center <- function(points, center, squared) {
-  distances <- vector(length = nrow(points))
-  for (i in 1:nrow(points)) {
-    distances[i] <- euc_dist(points[i, ], center, squared)
-  }
-  return(distances)
-}
-
 
 ## A standard (or squared) euclidean distance between two data points
 euc_dist <- function(x1, x2, squared = FALSE) {
