@@ -5,6 +5,8 @@
 #'     features that are used.
 #' @param clustering A vector representing the preclustering of
 #'     elements.  See Details.
+#' @param objective What objective should be maximized, either
+#'     "distance" (default) or "variance".
 #'
 #' @return A vector representing the anticlustering.
 #'
@@ -31,7 +33,7 @@ heuristic_anticlustering <- function(features, clustering, nrep = 100) {
   ## items in different groups
   for (i in 1:nrep) {
     anticlusters <- unlist(replicate(n_items / n_groups, sample(1:n_groups), simplify = FALSE))
-    cur_obj <- obj_value_dist(features, anticlusters)
+    cur_obj <- call(paste0("obj_value_", objective), features, anticlusters)
     if (cur_obj > best_obj) {
       best_assignment <- anticlusters
       best_obj <- cur_obj
