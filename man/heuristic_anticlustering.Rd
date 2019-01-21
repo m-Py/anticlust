@@ -12,7 +12,10 @@ heuristic_anticlustering(features, clustering, nrep = 100,
 features that are used.}
 
 \item{clustering}{A vector representing the preclustering of
-elements.  See Details.}
+elements. See Details.}
+
+\item{nrep}{The number of repetitions tried when assigning
+elements to anticlusters.}
 
 \item{objective}{What objective should be maximized, either
 "distance" (default) or "variance".}
@@ -25,13 +28,14 @@ Anticlustering based on a heuristic
 }
 \details{
 The heuristic approach to anticlustering forbids elements
-    that are part of the same precluster to be assigned to the same
-    group. The preclustering should be accomplished by one of the
+    belonging to the same precluster to be assigned to the same
+    anticluster. The preclustering should be accomplished by one of the
     clustering functions, `equal_sized_cluster_editing` (an exact
     method that minimizes distance criterion under the restriction of
     equal group sizes) or `equal_sized_clustering` (a heuristic
     method that tries to minimize the variance criterion under the
-    restriction of equal group sizes).
+    restriction of equal group sizes). Anticlustering can be done via
+    maximizinz the distance or the variance criterion.
 }
 \examples{
 
@@ -51,4 +55,8 @@ tapply(features[, 2], anticlusters, sd)
 
 anticlusters <- heuristic_anticlustering(features, preclusters, objective = "variance")
 
+}
+\references{
+H. Späth, “Anticlustering: Maximizing the variance criterion,”
+Control and Cybernetics, vol. 15, no. 2, pp. 213–218, 1986.
 }

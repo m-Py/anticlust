@@ -4,20 +4,23 @@
 #' @param features A data.frame, matrix or vector representing the
 #'     features that are used.
 #' @param clustering A vector representing the preclustering of
-#'     elements.  See Details.
+#'     elements. See Details.
+#' @param nrep The number of repetitions tried when assigning
+#'     elements to anticlusters.
 #' @param objective What objective should be maximized, either
 #'     "distance" (default) or "variance".
 #'
 #' @return A vector representing the anticlustering.
 #'
 #' @details The heuristic approach to anticlustering forbids elements
-#'     that are part of the same precluster to be assigned to the same
-#'     group. The preclustering should be accomplished by one of the
+#'     belonging to the same precluster to be assigned to the same
+#'     anticluster. The preclustering should be accomplished by one of the
 #'     clustering functions, `equal_sized_cluster_editing` (an exact
 #'     method that minimizes distance criterion under the restriction of
 #'     equal group sizes) or `equal_sized_clustering` (a heuristic
 #'     method that tries to minimize the variance criterion under the
-#'     restriction of equal group sizes).
+#'     restriction of equal group sizes). Anticlustering can be done via
+#'     maximizinz the distance or the variance criterion.
 #'
 #' @export
 #'
@@ -39,6 +42,10 @@
 #'
 #' anticlusters <- heuristic_anticlustering(features, preclusters, objective = "variance")
 #'
+#' @references
+#' H. Späth, “Anticlustering: Maximizing the variance criterion,”
+#' Control and Cybernetics, vol. 15, no. 2, pp. 213–218, 1986.
+
 heuristic_anticlustering <- function(features, clustering, nrep = 100,
                                      objective = "distance") {
   if (!objective %in% c("distance", "variance"))
