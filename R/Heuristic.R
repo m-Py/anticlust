@@ -1,16 +1,29 @@
 
-#' Based on a preclustering, create a heuristic item assignment
+## TODO: Implement exchange and random sampling method for distance and
+## variance criterion. They might work better than my own heuristic
+## methods.
+
+#' Anticlustering based on a heuristic
 #'
-#' @param features A data.frame representing the features that are used
-#'   in the assignment.
-#' @param clustering A vector representing the clustering of elements
+#' @param features A data.frame, matrix or vector representing the features
+#'   that are used.
+#' @param clustering A vector representing the preclustering of elements.
+#'   See Details.
 #'
-#' @return A vector representing the new group assignment.
+#' @return A vector representing the anticlustering.
+#'
+#' @details
+#' The heuristic approach to anticlustering forbids elements that are
+#' part of the same
+#' precluster to be assigned to the same group. The preclustering should be accomplished by one of the clustering
+#' functions, `equal_sized_cluster_editing` (an exact method that minimizes
+#' distance criterion under the restriction of equal group sizes) or
+#' `equal_sized_clustering` (a heuristic method that tries to minimize
+#' the variance criterion under the restriction of equal group sizes).
 #'
 #' @export
 #'
-heuristic_item_assignment <- function(features, clustering, nrep = 100) {
-
+heuristic_anticlustering <- function(features, clustering, nrep = 100) {
   ## sort by group, later sort back by item and return group
   dat <- data.frame(group = clustering, features, item = 1:nrow(features))
   dat <- dat[order(dat$group), ]
@@ -21,10 +34,10 @@ heuristic_item_assignment <- function(features, clustering, nrep = 100) {
   ## sequentially try out random assignments that place pregrouped
   ## items in different groups
   for (i in 1:nrep) {
-    group <- unlist(replicate(n_items / n_groups, sample(1:n_groups), simplify = FALSE))
-    cur_obj <- obj_value_dist(group, features)
+    anticlusters <- unlist(replicate(n_items / n_groups, sample(1:n_groups), simplify = FALSE))
+    cur_obj <- obj_value_dist(features, anticlusters)
     if (cur_obj > best_obj) {
-      best_assignment <- group
+      best_assignment <- anticlusters
       best_obj <- cur_obj
     }
   }
@@ -55,14 +68,14 @@ obj_value_distance <- function(features, anticlusters) {
 }
 
 
-#' Heuristic clustering algorithm creating equal-sized clusters
+#' Heuristic clustering algorithm to create equal-sized clusters
 #'
-#' Uses kmeans algorithm to initiate cluster centers and then
-#' sequentially chooses a cluster center and assigns assigns the closest
-#' item to it. This ensures that each cluster is filled with the same
+#' Uses kmeans algorithm to initiate cluster centers, then
+#' sequentially chooses a cluster center and assigns the closest
+#' element to it, ensuring that each cluster is filled with the same
 #' number of items.
 #'
-#' @param items A vector, matrix or data.frame of data points.
+#' @param features A vector, matrix or data.frame of data points.
 #'     Rows correspond to items and columns correspond to features.
 #' @param nclusters The number of clusters to be created. Must be a
 #'     factor of the number of items.
@@ -71,47 +84,67 @@ obj_value_distance <- function(features, anticlusters) {
 #'
 #' @export
 #'
-#' @importFrom reshape2 melt
-#' @importFrom dplyr arrange
 #' @importFrom stats kmeans
 #'
-equal_sized_clustering <- function(items, nclusters) {
+equal_sized_kmeans <- function(features, nclusters) {
+  if (nclusters <= 1 | nrow(features) %% nclusters != 0)
+    stop("The number of features must be a multiplier of nclusters")
+  features <- as.matrix(features) #  if features is a vector
   ## initialize cluster centers using kmeans
-  centers <- stats::kmeans(items, nclusters)$centers
+  centers <- stats::kmeans(features, nclusters)$centers
   ## determine distances between all items and all cluster centers:
-  clust_dist <- dist_from_centers(items, centers)
-  ## How often must I iterate to assign items to clusters? nitems /
-  ## ncluster -> This is actually the number of groups in item
-  ## assignment.
-  nruns <- nrow(items) / nclusters
-  ## storage of cluster assignments:
-  assignments <- matrix(nrow = nrow(items) / nclusters, ncol = nclusters)
-  ## iterate over runs (= number of groups in the item assignment
-  ## problem)
-  ## TODO: check if the two loops can be made faster
-  for (i in 1:nruns) {
-    ## iterate over clusters in random order
-    for (j in sample(nclusters)) {
-      # which cluster is addressed (using the random sequence):
-      column <- paste0("cluster", j)
-      ## which row has item that is closest:
-      min_index <- which.min(clust_dist[, column])
-      item <- clust_dist[min_index, ]$item
-      ## remove the item from data.frame clust_dist:
-      clust_dist <- clust_dist[-min_index, ]
-      ## add item to cluster j
-      assignments[i, j] <- item
-    }
-  }
+  clust_dist <- dist_from_centers(features, centers, squared = TRUE)
+  assignments <- heuristic_cluster_assignment(clust_dist)
   ## return in long format that is consistent with return of ILP
-  assignments <- reshape2::melt(assignments)
-  assignments <- assignments[, -1] # first column useless
-  colnames(assignments) <- c("group", "item")
-  assignments <- dplyr::arrange(assignments, item)
-  return(assignments$group)
+  return(clusters_to_long(assignments))
 }
 
-#' Edit distances of very close neighbours (similar items)
+## Called from within `equal_sized_kmeans`. Assigns elements to clusters,
+## sequentially fills elements to the closest cluster center, fills the same
+## number of elements into each cluster
+heuristic_cluster_assignment <- function(clust_dist) {
+  ## Variables that encode relevant dimensions
+  nclusters <- ncol(clust_dist)
+  N <- nrow(clust_dist)
+  elements_per_cluster <- N / nclusters
+  ## Include element ID as column of input because rows are later
+  ## removed from matrix
+  clust_dist <- cbind(clust_dist, 1:nrow(clust_dist))
+  colnames(clust_dist) <- c(paste0("cluster", 1:nclusters), "item")
+  ## Storage of cluster assignments (Columns = clusters; cells indicate the
+  ## index of the element that is assigned to the respective cluster)
+  assignments <- matrix(nrow = elements_per_cluster, ncol = nclusters)
+  for (i in 1:elements_per_cluster) {
+    ## iterate over clusters in random order
+    for (j in sample(nclusters)) {
+      ## 1. Choose element that is closest to cluster j:
+      min_index <- which.min(clust_dist[, j])
+      element <- clust_dist[min_index, "item"]
+      ## 2. Add this element to cluster j:
+      assignments[i, j] <- element
+      ## 3. Remove this element to prevent further assignments:
+      clust_dist <- clust_dist[-min_index, , drop = FALSE] # drop = FALSE !
+    }
+  }
+  ## return assignments in correct format
+  return(assignments)
+}
+
+## Called from within `heuristic_cluster_assignment`. Turns a matrix
+## into long format and extracts cluster assignment for each item in
+## correct order
+clusters_to_long <- function(assignments) {
+  P <- ncol(assignments) # number of clusters
+  N <- P * nrow(assignments)
+  N_PER_CLUSTER <- N / P
+  long_clusters <- cbind(c(assignments), rep(1:P, each = N_PER_CLUSTER))
+  ## Make in correct order:
+  long_clusters <- long_clusters[order(long_clusters[, 1]), ]
+  return(long_clusters[, 2])
+}
+
+
+#' Edit distances of neighbours
 #'
 #' Based on a preclustering, distances between items of the same cluster
 #' are set to a large negative value. By considering a preclustering of
