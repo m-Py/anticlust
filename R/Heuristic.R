@@ -17,7 +17,7 @@
 #'     anticluster. The preclustering should be accomplished by one of the
 #'     clustering functions, `equal_sized_cluster_editing` (an exact
 #'     method that minimizes distance criterion under the restriction of
-#'     equal group sizes) or `equal_sized_clustering` (a heuristic
+#'     equal group sizes) or `equal_sized_kmeans` (a heuristic
 #'     method that tries to minimize the variance criterion under the
 #'     restriction of equal group sizes). Anticlustering can be done via
 #'     maximizinz the distance or the variance criterion.
