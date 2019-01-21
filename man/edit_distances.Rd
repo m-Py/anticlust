@@ -2,7 +2,7 @@
 % Please edit documentation in R/Heuristic.R
 \name{edit_distances}
 \alias{edit_distances}
-\title{Edit distances of very close neighbours (similar items)}
+\title{Edit distances of neighbours}
 \usage{
 edit_distances(distances, assignment, value = -1e+06)
 }
