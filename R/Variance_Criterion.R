@@ -25,11 +25,10 @@ obj_value_variance <- function(features, anticlusters) {
   ## 1. Compute cluster centers
   centers <- cluster_centers(features, anticlusters)
   ## 2. For each item, compute distance to each cluster center
-  distances <- dist_from_centers(features, centers)
-  ## 3. Determine distances to cluster centers within each anticluster
-  summed_distances <- by(distances, INDICES = anticlusters, sum) # DOES NOT WORK AS EXPECTED!
-  ## 4. Objective value is the sum of all distances per group
-  return(sum(summed_distances))
+  distances <- dist_from_centers(features, centers, squared = TRUE)
+  ## 3. Use two-column matrix to select relevant distances
+  distances <- distances[cbind(1:nrow(distances), anticlusters)]
+  return(sum(distances))
 }
 
 #' Compute cluster centers
@@ -40,6 +39,7 @@ obj_value_variance <- function(features, anticlusters) {
 #'
 #' @return A matrix of cluster centers. Rows represent clusters and
 #'   columns represent features
+#'
 
 cluster_centers <- function(features, clusters) {
   features <- as.matrix(features) #  if features is a vector
@@ -59,17 +59,18 @@ cluster_centers <- function(features, clusters) {
 #     cluster and each column corresponds to a feature (this format is,
 #     for example, returned by the function `stats::kmeans` through the
 #     element `centers`).
+# @param squared Boolean - compute the squared euclidean distance?
 #
 # @return A data matrix; columns represent clusters
 #     and contain the distance to the respective cluster for each item.
 #
-dist_from_centers <- function(features, centers) {
+dist_from_centers <- function(features, centers, squared) {
   features <- as.matrix(features) # if points is only a vector
   ## store all distances from centers
   storage <- matrix(ncol = nrow(centers), nrow = nrow(features))
   ## determine distances from all cluster centers:
   for (i in 1:ncol(storage)) {
-    storage[, i] <- dist_one_center(features, centers[i, ])
+    storage[, i] <- dist_one_center(features, centers[i, ], squared)
   }
   return(storage)
 }
@@ -77,16 +78,18 @@ dist_from_centers <- function(features, centers) {
 ## compute the distances of a vector (or matrix or data.frame) of points
 ## to a cluster center. points has the same form as in the function
 ## TODO: this should be doable without for-loop to be faster!
-dist_one_center <- function(points, center) {
+dist_one_center <- function(points, center, squared) {
   distances <- vector(length = nrow(points))
   for (i in 1:nrow(points)) {
-    distances[i] <- euc_dist(points[i, ], center)
+    distances[i] <- euc_dist(points[i, ], center, squared)
   }
   return(distances)
 }
 
 
-## A standard euclidian distance between two data points
-euc_dist <- function(x1, x2) {
+## A standard (or squared) euclidean distance between two data points
+euc_dist <- function(x1, x2, squared = FALSE) {
+  if (squared)
+    return(sum((x1 - x2)^2))
   sqrt(sum((x1 - x2)^2))
 }

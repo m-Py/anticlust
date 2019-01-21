@@ -37,7 +37,7 @@ test_that("computation of cluster centers and distances to centers is correct", 
       }
 
       ## Now also check if distances to cluster centers are computed correctly
-      distances <- dist_from_centers(features, centers)
+      distances <- dist_from_centers(features, centers, squared = FALSE)
       expect_equal(class(distances), "matrix")
       expect_equal(dim(distances)[1], n_elements)
       expect_equal(dim(distances)[2], p_anticlusters)
@@ -66,4 +66,3 @@ test_that("objective value for variance criterion is computed correctly", {
     }
   }
 })
-
