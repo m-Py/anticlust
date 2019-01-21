@@ -1,16 +1,4 @@
 
-## Try implementing Spaeth's (1987) algorithm
-
-# Uses an "exchange method":
-
-# "That method, applied for (2), improves some (random) initial
-# partition by successively moving on trial each object from
-# its cluster to all the other ones, and by shifting it, if there is
-# any reduction at all, to that one where the first term on the right
-# side of (4) decreases most, otherwise taking the next object and
-# finally passing through all the objects until no further improvement
-# occurs.
-
 #' Compute objective value for variance criterion
 #'
 #' @param features A data.frame, matrix or vector representing the

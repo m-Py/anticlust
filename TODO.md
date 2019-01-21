@@ -57,14 +57,48 @@ What function will be suggested to the user at first?
 
 ## Return value
 
-Do I return a `data.frame` where that contains the group assignment as
-an additional column (this is currently implemented in most functions
-and also in the package minDiff) or only a vector? Maybe a simple vector
-is the way to go that can be easily implemented consistently across
-functions.
+Just a vector representing anticluster affiliation
 
 # TODO implementation 
 
-- tidy up function `item_assign_ilp`
-- make consistent return value for the different assignment methods
-- port functions from minDiff
+- make function names and argument names consistent
+   + data = features (or x?)
+   + no item assignment, just anticlustering
+   + differentiate functions by objective (distance - variance) rather 
+     than by exact - heuristic? not sure though, maybe both is needed
+- port functions from minDiff, i.e. repeated random sampling. BUT: use different 
+  objectives, i.e. distance and variance objective, abolish self-hacked 
+  objective from minDiff
+- In addition to repeated random sampling: exchange method / simulated annealing?
+  -> both for variance as well as distance criterion
+- Tests for all functions. Maybe for ILP function:
+    + Test dimensionality of matrices (e.g., constraint matrix)
+    + use first version (v 1.0) as benchmark for exact solution; meaning: 
+      load all old functions in test files?
+- Think about implementing anticlustering algorithms by Valev (1998), even though
+  the first I implemented did not seem to really work (see file Stuff.R; this will 
+  have to be removed eventually)
+- Check: are all dependencies for dplyr and reshape2 removed? Include tests for 
+  functions that used these
+    + What are the dependencies remaining, just Matrix? How to deal with ILP
+      dependencies?
+- find out: where did I try out the additional heuristic for distance 
+  anticlustering? (the one where I computed max distances and forced these items 
+  to be in the same cluster; that was really nice; probably in folder for thesis)
+
+---
+
+- With regard to implementing max-variance anticlustering:
+
+## Try implementing Spaeth's (1987) algorithm
+
+# Uses an "exchange method":
+
+# "That method, applied for (2), improves some (random) initial
+# partition by successively moving on trial each object from
+# its cluster to all the other ones, and by shifting it, if there is
+# any reduction at all, to that one where the first term on the right
+# side of (4) decreases most, otherwise taking the next object and
+# finally passing through all the objects until no further improvement
+# occurs.
+

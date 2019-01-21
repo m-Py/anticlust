@@ -1,8 +1,4 @@
 
-## TODO: Implement exchange and random sampling method for distance and
-## variance criterion. They might work better than my own heuristic
-## methods.
-
 #' Anticlustering based on a heuristic
 #'
 #' @param features A data.frame, matrix or vector representing the
