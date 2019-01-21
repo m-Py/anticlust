@@ -21,7 +21,29 @@
 #'
 #' @export
 #'
-heuristic_anticlustering <- function(features, clustering, nrep = 100) {
+#' @examples
+#'
+#' features <- matrix(rnorm(1000, 100, 10), ncol = 2)
+#' n_anticlusters <- 4
+#' # Precluster cases
+#' n_preclusters <- nrow(features) / n_anticlusters
+#' preclusters <- equal_sized_kmeans(features, n_preclusters)
+#' # Use preclustering as resticting information in anticlustering
+#' anticlusters <- heuristic_anticlustering(features, preclusters)
+#' # Check out results
+#' plot(features, col = anticlusters, pch = 19)
+#' tapply(features[, 1], anticlusters, mean)
+#' tapply(features[, 1], anticlusters, sd)
+#' tapply(features[, 2], anticlusters, mean)
+#' tapply(features[, 2], anticlusters, sd)
+#'
+#' anticlusters <- heuristic_anticlustering(features, preclusters, objective = "variance")
+#'
+heuristic_anticlustering <- function(features, clustering, nrep = 100,
+                                     objective = "distance") {
+  if (!objective %in% c("distance", "variance"))
+    stop("Argument objective must be 'distance' or 'variance'.")
+  legal_number_of_clusters(features, clustering)
   ## sort by group, later sort back by item and return group
   dat <- data.frame(group = clustering, features, item = 1:nrow(features))
   dat <- dat[order(dat$group), ]
@@ -58,14 +80,14 @@ heuristic_anticlustering <- function(features, clustering, nrep = 100) {
 
 obj_value_distance <- function(features, anticlusters) {
   ## determine distances within each group
-  distances <- by(features, assignment, dist)
+  distances <- by(features, anticlusters, dist)
   ## determine objective as the sum of all distances per group
   objective <- sum(sapply(distances, sum))
   return(objective)
 }
 
 
-#' Heuristic clustering algorithm to create equal-sized clusters
+#' Heuristic algorithm creating equal-sized clusters
 #'
 #' Uses kmeans algorithm to initiate cluster centers, then sequentially
 #' chooses a cluster center and assigns the closest element to it,
@@ -73,19 +95,36 @@ obj_value_distance <- function(features, anticlusters) {
 #'
 #' @param features A vector, matrix or data.frame of data points.  Rows
 #'     correspond to items and columns correspond to features.
-#' @param nclusters The number of clusters to be created. Must be a
-#'     factor of the number of items.
+#' @param nclusters The number of clusters to be created.
 #'
 #' @return A vector representing the clustering
 #'
 #' @export
 #'
+#' @examples
+#'
+#' # Equal-sized k-means
+#' clusters1 <- equal_sized_kmeans(iris[- 5], 3)
+#' table(clusters1)
+#' table(clusters1, iris[, 5])
+#' plot(iris[, 1], iris[, 2], col = clusters1, pch = 19)
+#' # Compare to classical k-means
+#' clusters2 <- kmeans(iris[- 5], 3)$cl
+#' table(clusters2)
+#' table(clusters2, iris[, 5])
+#' plot(iris[, 1], iris[, 2], col = clusters2, pch = 19)
+#'
 #' @importFrom stats kmeans
 #'
 equal_sized_kmeans <- function(features, nclusters) {
+  ## kmeans does not deal with missing values
+  if (any(is.na(features)))
+    stop("The features include missing values.")
   if (nclusters <= 1 | nrow(features) %% nclusters != 0)
     stop("The number of features must be a multiplier of nclusters")
   features <- as.matrix(features) #  if features is a vector
+  if (mode(features) != "numeric")
+    stop("Features must be of type numeric")
   ## initialize cluster centers using kmeans
   centers <- stats::kmeans(features, nclusters)$centers
   ## determine distances between all items and all cluster centers:
