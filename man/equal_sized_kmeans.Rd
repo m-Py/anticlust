@@ -2,7 +2,7 @@
 % Please edit documentation in R/Heuristic.R
 \name{equal_sized_kmeans}
 \alias{equal_sized_kmeans}
-\title{Heuristic clustering algorithm to create equal-sized clusters}
+\title{Heuristic algorithm creating equal-sized clusters}
 \usage{
 equal_sized_kmeans(features, nclusters)
 }
@@ -10,8 +10,7 @@ equal_sized_kmeans(features, nclusters)
 \item{features}{A vector, matrix or data.frame of data points.  Rows
 correspond to items and columns correspond to features.}
 
-\item{nclusters}{The number of clusters to be created. Must be a
-factor of the number of items.}
+\item{nclusters}{The number of clusters to be created.}
 }
 \value{
 A vector representing the clustering
@@ -20,4 +19,18 @@ A vector representing the clustering
 Uses kmeans algorithm to initiate cluster centers, then sequentially
 chooses a cluster center and assigns the closest element to it,
 ensuring that each cluster is filled with the same number of items.
+}
+\examples{
+
+# Equal-sized k-means
+clusters1 <- equal_sized_kmeans(iris[- 5], 3)
+table(clusters1)
+table(clusters1, iris[, 5])
+plot(iris[, 1], iris[, 2], col = clusters1, pch = 19)
+# Compare to classical k-means
+clusters2 <- kmeans(iris[- 5], 3)$cl
+table(clusters2)
+table(clusters2, iris[, 5])
+plot(iris[, 1], iris[, 2], col = clusters2, pch = 19)
+
 }

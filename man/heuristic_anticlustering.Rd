@@ -4,7 +4,8 @@
 \alias{heuristic_anticlustering}
 \title{Anticlustering based on a heuristic}
 \usage{
-heuristic_anticlustering(features, clustering, nrep = 100)
+heuristic_anticlustering(features, clustering, nrep = 100,
+  objective = "distance")
 }
 \arguments{
 \item{features}{A data.frame, matrix or vector representing the
@@ -12,6 +13,9 @@ features that are used.}
 
 \item{clustering}{A vector representing the preclustering of
 elements.  See Details.}
+
+\item{objective}{What objective should be maximized, either
+"distance" (default) or "variance".}
 }
 \value{
 A vector representing the anticlustering.
@@ -28,4 +32,23 @@ The heuristic approach to anticlustering forbids elements
     equal group sizes) or `equal_sized_clustering` (a heuristic
     method that tries to minimize the variance criterion under the
     restriction of equal group sizes).
+}
+\examples{
+
+features <- matrix(rnorm(1000, 100, 10), ncol = 2)
+n_anticlusters <- 4
+# Precluster cases
+n_preclusters <- nrow(features) / n_anticlusters
+preclusters <- equal_sized_kmeans(features, n_preclusters)
+# Use preclustering as resticting information in anticlustering
+anticlusters <- heuristic_anticlustering(features, preclusters)
+# Check out results
+plot(features, col = anticlusters, pch = 19)
+tapply(features[, 1], anticlusters, mean)
+tapply(features[, 1], anticlusters, sd)
+tapply(features[, 2], anticlusters, mean)
+tapply(features[, 2], anticlusters, sd)
+
+anticlusters <- heuristic_anticlustering(features, preclusters, objective = "variance")
+
 }
