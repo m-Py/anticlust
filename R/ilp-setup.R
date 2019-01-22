@@ -1,5 +1,5 @@
 
-#' Construct the ILP represenation of an item assignment problem
+#' Construct the ILP represenation of a anticlustering problem
 
 #' @param distances An distance object or matrix representing the
 #'   distances between items
@@ -10,7 +10,7 @@
 #' @return A list representing the ILP formulation of the instance
 #'
 #' @details To use this function, a linear programming solver must
-#'  be installed and usable in R. Available are: the open source GNU linear
+#'  be installed and usable in R. You can use the open source GNU linear
 #'  programming kit (called from the package `Rglpk`) or one of the
 #'  commercial solvers gurobi (called from the package `gurobi`) or
 #'  IBM CPLEX (called from the package `Rcplex`). A license
@@ -25,7 +25,7 @@
 #' clustering problem,” Mathematical Programming, vol. 45, nos. 1-3, pp.
 #' 59–96, 1989.
 
-item_assign_ilp <- function(distances, p, solver = "glpk") {
+anticlustering_ilp <- function(distances, p, solver = "glpk") {
 
   ## Initialize some constant variables:
   equality_signs <- equality_identifiers(solver)
@@ -113,7 +113,7 @@ vectorize_weights <- function(distances) {
   colnames(costs) <- c("i", "j")
   costs$costs <- c(costs_m)
   ## remove redundant or self distances:
-  costs <- subset(costs, i < j)
+  costs <- costs[costs$i < costs$j, ]
   costs$pair <- paste0("x", paste0(costs$i, "_", costs$j))
   rownames(costs) <- NULL
   return(costs)
@@ -127,6 +127,7 @@ vectorize_weights <- function(distances) {
 #'
 #' @importFrom Matrix sparseMatrix
 sparse_constraints <- function(n_items, pair_names) {
+  ## Generate indices for sparse matrix matrix
   tri <- vectorized_triangular(n_items, pair_names)
   gr  <- vectorized_group(n_items, pair_names)
   return(Matrix::sparseMatrix(c(tri$i, gr$i), c(tri$j, gr$j), x = c(tri$x, gr$x)))

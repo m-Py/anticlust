@@ -62,7 +62,7 @@ test_that("heuristic clustering produces expected output", {
 
 test_that("heuristic anticlustering produces expected output", {
   conditions <- expand.grid(m = 1:4, p = 2:4)
-  for (i in nrow(conditions)) {
+  for (i in 1:nrow(conditions)) {
     m_features <- conditions[i, "m"]
     p_anticlusters <- conditions[i, "p"]
     n_elements <- p_anticlusters * 5 # n must be multiplier of p

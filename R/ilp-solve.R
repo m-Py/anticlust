@@ -1,13 +1,13 @@
 
-#' Solve an instance of item assignment
+#' Solve anticlustering using the distance criterion
 #'
-#' @param items A data.frame of item features. Rows must correspond to
-#'     items and columns to features.
-#' @param n_groups How many groups are to be created.
+#' @param features A vector, matrix or data.frame of data points.  Rows
+#'     correspond to items and columns correspond to features.
+#' @param n_anticlusters How many anticlusters should be created.
 #' @param solver A string identifying the solver to be used ("glpk",
 #'   "gurobi", or "cplex")
 #' @param standardize Boolean - should the feature values be
-#'     standardized before groups are created? Defaults to FALSE.
+#'     standardized before groups are created? Defaults to TRUE
 #' @param heuristic Set the level of "heuristicism" by setting a numeric
 #'   value of 0 to 3. Set to 0 to obtain the exact solution for the item
 #'   assignment instance. Levels 1 to 3 will in a first step identify
@@ -19,20 +19,24 @@
 #'   assignment is no longer done using exact ILP item assignment, but
 #'   instead using a repeated random assignment.
 #'
-#' @return A vector representing the group assignment.
+#' @return A vector representing the anticluster affiliation of elements.
 #'
-#' @details To use this function, a linear programming solver must
-#'  be installed and usable from R. The open source GNU linear
+#' @details This function includes an exact approach to solving anticlustering
+#'  using the distance criterion. To use this functionality, a linear
+#'  programming solver must be installed and usable from R. The open source GNU linear
 #'  programming kit (called from the package `Rglpk`) or one of the
 #'  commercial solvers gurobi (called from the package `gurobi`) or
 #'  IBM CPLEX (called from the package `Rcplex`) can be used. A license
 #'  is needed for the commercial solvers. One of the interface packages
-#'  must be installed.
+#'  must be installed. To improve run time, some restrictions can be
+#'  enforced (see argument heuristic); the solution is still found through
+#'  an ILP but the solution need not be optimal, though it often still is.
+#'
 #'
 #' @export
 #'
-item_assignment <- function(items, n_groups, solver, standardize = FALSE,
-                            heuristic = 1) {
+distance_anticlustering <- function(features, n_groups, solver,
+                                    standardize = TRUE, heuristic = 1) {
 
   ## some input handling
   if (!(heuristic %in% 0:3)) {
@@ -40,16 +44,16 @@ item_assignment <- function(items, n_groups, solver, standardize = FALSE,
   }
 
   if (standardize) {
-    items <- scale(items)
+    features <- scale(features)
   }
 
-  n_items <- nrow(items)
-  distances <- dist(items)
+  n_items <- nrow(features)
+  distances <- dist(features)
 
   if (heuristic == 1) {
     ## Preclustering
-    ilp <- item_assign_ilp(distances, n_items / n_groups,
-                           solver = solver)
+    ilp <- anticlustering_ilp(distances, n_items / n_groups,
+                              solver = solver)
     solution <- solve_ilp(ilp, solver, "min")
     assignment <- ilp_to_groups(ilp, solution)
     ## Fix distances - ensures that the most similar items are assigned
@@ -64,18 +68,18 @@ item_assignment <- function(items, n_groups, solver, standardize = FALSE,
     assignment <- ilp_to_groups(ilp, solution)
     return(assignment)
   } else if (heuristic > 1) {
-    assignment <- equal_sized_clustering(data.frame(items), n_items / n_groups)
+    assignment <- equal_sized_kmeans(data.frame(features), n_items / n_groups)
     distances  <- edit_distances(distances, assignment)
   }
 
   if (heuristic == 3) {
-    assignment <- heuristic_item_assignment(items, assignment)
+    assignment <- heuristic_anticlustering(features, assignment)
     return(assignment)
   }
 
   ## The following creates the item assignment ILP formulation and
   ## solves it:
-  ilp <- item_assign_ilp(distances, n_groups, solver = solver)
+  ilp <- anticlustering_ilp(distances, n_groups, solver = solver)
   solution <- solve_ilp(ilp, solver)
   assignment <- ilp_to_groups(ilp, solution)
   return(assignment)
@@ -192,7 +196,6 @@ solve_ilp <- function(ilp, solver, objective = "max") {
     max <- FALSE
     if (objective == "max")
       max <- TRUE
-    start <- Sys.time()
     ilp_solution <- Rglpk::Rglpk_solve_LP(obj = ilp$obj_function,
                                    mat = ilp$constraints,
                                    dir = ilp$equalities,
@@ -201,8 +204,6 @@ solve_ilp <- function(ilp, solver, objective = "max") {
                                    max = max)
     ret_list$x <- ilp_solution$solution
     ret_list$obj <- ilp_solution$optimum
-    end <- Sys.time()
-    print(end - start)
   } else if (solver == "gurobi") {
     ## build model
     model <- list()

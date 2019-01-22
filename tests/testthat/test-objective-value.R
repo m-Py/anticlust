@@ -3,7 +3,7 @@
 context("Test computation of objective values")
 library("anticlust")
 
-test_that("output has correct structure", {
+test_that("output of objective value functions has correct structure", {
   conditions <- expand.grid(m = 1:4, p = 2:4)
   for (i in nrow(conditions)) {
     m_features <- conditions[i, "m"]
@@ -40,5 +40,21 @@ test_that("objective value for variance criterion is computed correctly", {
       obj_mine  <- obj_value_variance(features, cl$cluster)
       expect_equal(obj_kmeans, obj_mine)
     }
+  }
+})
+
+test_that("objective value for distance criterion is computed correctly", {
+  conditions <- expand.grid(m = 1:4, p = 2:3)
+  for (k in 1:nrow(conditions)) {
+    m_features <- conditions[k, "m"]
+    p_anticlusters <- conditions[k, "p"]
+    n_elements <- p_anticlusters * 3 # n must be multiplier of p
+    features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
+    distances <- dist(features)
+    solver <- "glpk"
+    ilp <- anticlustering_ilp(distances, p_anticlusters, solver)
+    solution <- solve_ilp(ilp, solver, "min")
+    anticlusters <- ilp_to_groups(ilp, solution)
+    expect_equal(solution$obj, get_objective(features, anticlusters, "distance"))
   }
 })
