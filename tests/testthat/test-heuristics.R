@@ -26,7 +26,7 @@ test_that("heuristic clustering fails for false input", {
   expect_error(equal_sized_kmeans(features, 1))
 })
 
-test_that("heuristic cluster assignment produces expected output", {
+test_that("heuristic clustering produces expected output", {
   ## Vary number of features
   for (m in 1:4) {
     m_features <- m
@@ -59,3 +59,34 @@ test_that("heuristic cluster assignment produces expected output", {
     }
   }
 })
+
+test_that("heuristic anticlustering produces expected output", {
+  conditions <- expand.grid(m = 1:4, p = 2:4)
+  for (i in nrow(conditions)) {
+    m_features <- conditions[i, "m"]
+    p_anticlusters <- conditions[i, "p"]
+    n_elements <- p_anticlusters * 5 # n must be multiplier of p
+    features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
+
+    ## First: heuristic preclustering
+    n_preclusters <- n_elements / p_anticlusters
+    preclusters <- equal_sized_kmeans(features, n_preclusters)
+    ## Legal number of preclusters?
+    expect_equal(legal_number_of_clusters(features, preclusters), NULL)
+    ## Expected number of preclusters?
+    expect_equal(as.numeric(table(preclusters)[1]), n_elements / n_preclusters)
+
+    ## Now: anticlustering:
+    anticlusters <- heuristic_anticlustering(features, preclusters)
+    ## Legal number of anticlusters?
+    expect_equal(legal_number_of_clusters(features, anticlusters), NULL)
+    ## Expected number of anticlusters?
+    expect_equal(as.numeric(table(anticlusters)[1]), n_elements / p_anticlusters)
+  }
+})
+
+
+
+#test_that("heuristic anticlustering throws an error when it should", {
+#  expect_error(heuristic_anticlustering(rnorm(100)
+#})
