@@ -23,10 +23,10 @@ Construct the ILP represenation of an item assignment problem
 }
 \details{
 To use this function, a linear programming solver must
- be installed and usable from R. The open source GNU linear
+ be installed and usable in R. Available are: the open source GNU linear
  programming kit (called from the package `Rglpk`) or one of the
  commercial solvers gurobi (called from the package `gurobi`) or
- IBM CPLEX (called from the package `Rcplex`) can be used. A license
+ IBM CPLEX (called from the package `Rcplex`). A license
  is needed for the commercial solvers. One of the interface packages
  must be installed.
 }

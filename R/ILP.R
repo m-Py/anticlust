@@ -10,10 +10,10 @@
 #' @return A list representing the ILP formulation of the instance
 #'
 #' @details To use this function, a linear programming solver must
-#'  be installed and usable from R. The open source GNU linear
+#'  be installed and usable in R. Available are: the open source GNU linear
 #'  programming kit (called from the package `Rglpk`) or one of the
 #'  commercial solvers gurobi (called from the package `gurobi`) or
-#'  IBM CPLEX (called from the package `Rcplex`) can be used. A license
+#'  IBM CPLEX (called from the package `Rcplex`). A license
 #'  is needed for the commercial solvers. One of the interface packages
 #'  must be installed.
 #'
@@ -68,6 +68,7 @@ item_assign_ilp <- function(distances, p, solver = "glpk") {
 }
 
 #' Based on the solver, return identifiers for equality relationships
+#'
 #' @param solver A string identifing the solver to be used ("Rglpk",
 #'   "gurobi", or "cplex")
 #'
