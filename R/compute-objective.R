@@ -30,6 +30,7 @@
 #' get_objective(features, anticlusters, "variance")
 #'
 get_objective <- function(features, anticlusters, objective) {
+  features <- as.matrix(features)
   if (!objective %in% c("distance", "variance"))
     stop("Argument objective must be 'distance' or 'variance'.")
   if (objective == "distance")

@@ -87,6 +87,7 @@ test_that("heuristic anticlustering produces expected output", {
 
 
 
-#test_that("heuristic anticlustering throws an error when it should", {
-#  expect_error(heuristic_anticlustering(rnorm(100)
-#})
+test_that("heuristic anticlustering throws an error when it should", {
+  expect_error(heuristic_anticlustering(rnorm(100), rep(1:50, 2), objective = "bla"))
+  expect_error(heuristic_anticlustering(rnorm(100), rep(1:50, 2), objective = 123))
+})

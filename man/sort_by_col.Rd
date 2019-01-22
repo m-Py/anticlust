@@ -2,20 +2,21 @@
 % Please edit documentation in R/util-sort.R
 \name{sort_by_col}
 \alias{sort_by_col}
-\title{Utility function to sort a matrix or data frame by one column}
+\title{Sort a matrix or data frame by one column}
 \usage{
 sort_by_col(x, col)
 }
 \arguments{
 \item{x}{A matrix or data frame}
 
-\item{row}{An index for row selection (numeric; character; logical)}
+\item{row}{An numeric index or character vector for selecting
+the column by which the table is sorted. Needs to have length 1.}
 }
 \value{
 The matrix or data frame sorted by `row`
 }
 \description{
-Utility function to sort a matrix or data frame by one column
+Sort a matrix or data frame by one column
 }
 \examples{
 mat <- cbind(10:1, 1:10)

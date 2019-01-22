@@ -51,19 +51,3 @@ test_that("computation of cluster centers and distances to centers is correct", 
     }
   }
 })
-
-test_that("objective value for variance criterion is computed correctly", {
-  for (m in 1:4) {
-    m_features <- m
-    ## vary number of anticlusters
-    for (p in 2:5) {
-      p_anticlusters <- p
-      n_elements <- p * 3 # n-elements must be multiplier of p
-      features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
-      cl <- kmeans(features, p_anticlusters)
-      obj_kmeans <- cl$tot.withinss
-      obj_mine  <- obj_value_variance(features, cl$cluster)
-      expect_equal(obj_kmeans, obj_mine)
-    }
-  }
-})
