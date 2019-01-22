@@ -33,7 +33,8 @@ test_that("computation of cluster centers and distances to centers is correct", 
       expect_equal(dim(centers)[2], m_features)
       ## Check that means are computed correctly for all features
       for (i in 1:m) {
-        expect_equal(all(centers[, i] == tapply(features[, i], anticlusters, mean)), TRUE)
+        expect_equal(as.numeric(centers[, i]),
+                     as.numeric(tapply(features[, i], anticlusters, mean)))
       }
 
       ## Now also check if distances to cluster centers are computed correctly
