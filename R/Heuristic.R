@@ -26,7 +26,7 @@
 #'
 #' @examples
 #'
-#' features <- matrix(rnorm(1000, 100, 10), ncol = 2)
+#' features <- matrix(rnorm(1000, 100, 15), ncol = 2)
 #' n_anticlusters <- 4
 #' # Precluster cases
 #' n_preclusters <- nrow(features) / n_anticlusters
@@ -46,31 +46,53 @@
 #' H. Späth, “Anticlustering: Maximizing the variance criterion,”
 #' Control and Cybernetics, vol. 15, no. 2, pp. 213–218, 1986.
 
-heuristic_anticlustering <- function(features, clustering, nrep = 100,
-                                     objective = "distance") {
+heuristic_anticlustering <- function(features, clustering, objective = "distance",
+                                     nrep = 100) {
+
+  ## Some input handling
+  features <- as.matrix(features) # if only one feature is passed
   if (!objective %in% c("distance", "variance"))
     stop("Argument objective must be 'distance' or 'variance'.")
   legal_number_of_clusters(features, clustering)
-  ## sort by group, later sort back by item and return group
-  dat <- data.frame(group = clustering, features, item = 1:nrow(features))
-  dat <- dat[order(dat$group), ]
-  ## start optimizing
+
+  ## Initialize variables
+  n_elements <- nrow(features)
+  n_preclusters <- length(unique(clustering))
+  n_anticlusters <- n_elements / n_preclusters
+
+  ## Store all data as a matrix for sorting. First column:
+  ## Cluster affiliation; Second column: Original order of elements
+  dat <- cbind(clustering, 1:n_elements, features)
+  ## Order by precluster to ensure that each element from the same
+  ## precluster is assigned to a different anticluster
+  dat <- dat[order(dat[, 1]), ]
+
+  ## Start optimizing
   best_obj <- -Inf
-  n_items <- nrow(dat)
-  n_groups <- n_items / length(unique(dat$group))
-  ## sequentially try out random assignments that place pregrouped
-  ## items in different groups
+
   for (i in 1:nrep) {
-    anticlusters <- unlist(replicate(n_items / n_groups, sample(1:n_groups), simplify = FALSE))
-    cur_obj <- call(paste0("obj_value_", objective), features, anticlusters)
+    anticlusters <- replicate_sample(n_preclusters, n_anticlusters)
+    cur_obj <- get_objective(objective, dat[, -(1:2)], anticlusters)
     if (cur_obj > best_obj) {
       best_assignment <- anticlusters
       best_obj <- cur_obj
     }
   }
-  dat$group <- best_assignment
-  dat <- dat[order(dat$item), ]
-  return(dat$group)
+  ## Return anticluster assignment in original order
+  dat[, 1] <- best_assignment
+  dat <- dat[order(dat[, 2]), ]
+  return(dat[, 1])
+}
+
+## Random anticluster assignment, replicated per precluster; called
+## from within `heuristic_anticlustering`
+replicate_sample <- function(times, N) {
+  c(replicate(times, sample(N)))
+}
+
+## Call to objective value function from within `heuristic_anticlustering`
+get_objective <- function(objective, features, anticlusters) {
+  call(paste0("obj_value_", objective), features, anticlusters)
 }
 
 #' Objective value for the distance criterion
