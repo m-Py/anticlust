@@ -5,10 +5,10 @@
 #'     features that are used.
 #' @param clustering A vector representing the preclustering of
 #'     elements. See Details.
+#' @param objective The objective to be maximized, either
+#'     "distance" (default) or "variance".
 #' @param nrep The number of repetitions tried when assigning
 #'     elements to anticlusters.
-#' @param objective What objective should be maximized, either
-#'     "distance" (default) or "variance".
 #'
 #' @return A vector representing the anticlustering.
 #'
@@ -65,14 +65,14 @@ heuristic_anticlustering <- function(features, clustering, objective = "distance
   dat <- cbind(clustering, 1:n_elements, features)
   ## Order by precluster to ensure that each element from the same
   ## precluster is assigned to a different anticluster
-  dat <- dat[order(dat[, 1]), ]
+  dat <- sort_by_col(dat, 1)
 
   ## Start optimizing
   best_obj <- -Inf
 
   for (i in 1:nrep) {
     anticlusters <- replicate_sample(n_preclusters, n_anticlusters)
-    cur_obj <- get_objective(objective, dat[, -(1:2)], anticlusters)
+    cur_obj <- get_objective(dat[, -(1:2)], anticlusters, objective)
     if (cur_obj > best_obj) {
       best_assignment <- anticlusters
       best_obj <- cur_obj
@@ -80,7 +80,7 @@ heuristic_anticlustering <- function(features, clustering, objective = "distance
   }
   ## Return anticluster assignment in original order
   dat[, 1] <- best_assignment
-  dat <- dat[order(dat[, 2]), ]
+  dat <- sort_by_col(dat, 2)
   return(dat[, 1])
 }
 
@@ -88,121 +88,6 @@ heuristic_anticlustering <- function(features, clustering, objective = "distance
 ## from within `heuristic_anticlustering`
 replicate_sample <- function(times, N) {
   c(replicate(times, sample(N)))
-}
-
-## Call to objective value function from within `heuristic_anticlustering`
-get_objective <- function(objective, features, anticlusters) {
-  call(paste0("obj_value_", objective), features, anticlusters)
-}
-
-#' Objective value for the distance criterion
-#'
-#' @param features A data.frame, matrix or vector representing the
-#'   features that are used in the assignment.
-#' @param anticlusters A vector representing the anticluster affiliation
-#'
-#' @return Scalar, the total sum of within-cluster
-#'   pointwise distances.
-#'
-#' @export
-#'
-
-obj_value_distance <- function(features, anticlusters) {
-  ## determine distances within each group
-  distances <- by(features, anticlusters, dist)
-  ## determine objective as the sum of all distances per group
-  objective <- sum(sapply(distances, sum))
-  return(objective)
-}
-
-
-#' Heuristic algorithm creating equal-sized clusters
-#'
-#' Uses kmeans algorithm to initiate cluster centers, then sequentially
-#' chooses a cluster center and assigns the closest element to it,
-#' ensuring that each cluster is filled with the same number of items.
-#'
-#' @param features A vector, matrix or data.frame of data points.  Rows
-#'     correspond to items and columns correspond to features.
-#' @param nclusters The number of clusters to be created.
-#'
-#' @return A vector representing the clustering
-#'
-#' @export
-#'
-#' @examples
-#'
-#' # Equal-sized k-means
-#' clusters1 <- equal_sized_kmeans(iris[- 5], 3)
-#' table(clusters1)
-#' table(clusters1, iris[, 5])
-#' plot(iris[, 1], iris[, 2], col = clusters1, pch = 19)
-#' # Compare to classical k-means
-#' clusters2 <- kmeans(iris[- 5], 3)$cl
-#' table(clusters2)
-#' table(clusters2, iris[, 5])
-#' plot(iris[, 1], iris[, 2], col = clusters2, pch = 19)
-#'
-#' @importFrom stats kmeans
-#'
-equal_sized_kmeans <- function(features, nclusters) {
-  ## kmeans does not deal with missing values
-  if (any(is.na(features)))
-    stop("The features include missing values.")
-  if (nclusters <= 1 | nrow(features) %% nclusters != 0)
-    stop("The number of features must be a multiplier of nclusters")
-  features <- as.matrix(features) #  if features is a vector
-  if (mode(features) != "numeric")
-    stop("Features must be of type numeric")
-  ## initialize cluster centers using kmeans
-  centers <- stats::kmeans(features, nclusters)$centers
-  ## determine distances between all items and all cluster centers:
-  clust_dist <- dist_from_centers(features, centers, squared = TRUE)
-  assignments <- heuristic_cluster_assignment(clust_dist)
-  ## return in long format that is consistent with return of ILP
-  return(clusters_to_long(assignments))
-}
-
-## Called from within `equal_sized_kmeans`. Assigns elements to
-## clusters, sequentially fills elements to the closest cluster center,
-## fills the same number of elements into each cluster
-heuristic_cluster_assignment <- function(clust_dist) {
-  ## Variables that encode relevant dimensions
-  nclusters <- ncol(clust_dist)
-  N <- nrow(clust_dist)
-  elements_per_cluster <- N / nclusters
-  ## Include element ID as column of input because rows are later
-  ## removed from matrix
-  clust_dist <- cbind(clust_dist, 1:N)
-  colnames(clust_dist) <- c(paste0("cluster", 1:nclusters), "item")
-  ## Storage of cluster assignments (Columns = clusters; cells indicate the
-  ## index of the element that is assigned to the respective cluster)
-  assignments <- matrix(nrow = elements_per_cluster, ncol = nclusters)
-  for (i in 1:elements_per_cluster) {
-    ## iterate over clusters in random order
-    for (j in sample(nclusters)) {
-      ## 1. Choose element that is closest to center of cluster j:
-      min_index <- which.min(clust_dist[, j])
-      element <- clust_dist[min_index, "item"]
-      ## 2. Add this element to cluster j:
-      assignments[i, j] <- element
-      ## 3. Remove this element to prevent further assignments:
-      clust_dist <- clust_dist[-min_index, , drop = FALSE] # drop = FALSE !
-    }
-  }
-  return(assignments)
-}
-
-## Called from within `equal_sized_kmeans`. Turns a matrix of cluster
-## assignments into long format.
-clusters_to_long <- function(assignments) {
-  P <- ncol(assignments) # number of clusters
-  N <- P * nrow(assignments)
-  N_PER_CLUSTER <- N / P
-  long_clusters <- cbind(c(assignments), rep(1:P, each = N_PER_CLUSTER))
-  ## Make in correct order:
-  long_clusters <- long_clusters[order(long_clusters[, 1]), ]
-  return(long_clusters[, 2])
 }
 
 

@@ -41,7 +41,7 @@ fill_groups_wce <- function(ilp, solution) {
   ret <- data.frame(item = unlist(assignment_list),
                     group = rep(1:length(assignment_list),
                                 list_length(assignment_list)))
-  ret <- ret[order(ret$item), ]
+  ret <- sort_by_col(ret, "item")
   rownames(ret) <- NULL
   return(ret)
 }
