@@ -4,7 +4,7 @@
 \alias{anticlustering_ilp}
 \title{Construct the ILP represenation of a anticlustering problem}
 \usage{
-anticlustering_ilp(distances, p, solver = "glpk")
+anticlustering_ilp(distances, p, solver = "Rglpk")
 }
 \arguments{
 \item{distances}{An distance object or matrix representing the
@@ -12,8 +12,8 @@ distances between items}
 
 \item{p}{The number of groups to be created}
 
-\item{solver}{A string identifing the solver to be used ("glpk",
-"gurobi", or "cplex")}
+\item{solver}{A string identifing the solver to be used ("Rglpk",
+"gurobi", or "Rcplex")}
 }
 \value{
 A list representing the ILP formulation of the instance
