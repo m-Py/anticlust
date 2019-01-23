@@ -3,6 +3,7 @@
 export(anticlustering)
 export(anticlustering_ilp)
 export(distance_anticlustering)
+export(draw_assignment)
 export(edit_distances)
 export(equal_sized_cluster_editing)
 export(equal_sized_kmeans)

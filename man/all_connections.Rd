@@ -4,7 +4,7 @@
 \alias{all_connections}
 \title{Find all connections of an element}
 \usage{
-all_connections(i, n)
+all_connections(x, y)
 }
 \arguments{
 \item{i}{The point for which the connections are sought (must be in 1...n)}

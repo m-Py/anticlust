@@ -1,22 +1,25 @@
 
 #' Visualize a clustering of two features
-#' 
+#'
 #' @param features A data.frame or matrix representing the
 #'     features that are used. Must have two columns.
 #' @param clustering A vector representing the clustering
 #' @param xlab The label for the x-axis
 #' @param ylab The label for the y-axis
 #' @param cols The coloring of the groups. Does not need to be passed.
-#'   If it is passed, it needs to be a character vector of the same 
-#'   length as there are groups, and each element of the vector is 
+#'   If it is passed, it needs to be a character vector of the same
+#'   length as there are groups, and each element of the vector is
 #'   a color.
 #' @param pch The symbol used for data points, see ?par
 #' @param main The title of the plot
 #' @param cex The size of the plotting symbols, see ?par
 #' @param connect_clusters Boolean. Connect the groups through lines?
 #'   Useful to illustrate a graph structure.
-#' 
-draw_assignment <- function(features, clustering, xlab = "feature 1", 
+#'
+#' @export
+#'
+#'
+draw_assignment <- function(features, clustering, xlab = "feature 1",
                             ylab = "feature 2", cols = NULL,
                             pch = 19, main = "", cex = 3,
                             connect_clusters = FALSE) {
@@ -31,7 +34,7 @@ draw_assignment <- function(features, clustering, xlab = "feature 1",
   cols <- cols[clustering]
   def_mar <- c(5, 4, 4, 2) + 0.1
   par(mar = def_mar + c(0, 1, 0, 0))
-  plot(x, y, las = 1, cex.axis = 2, cex.lab = 2, 
+  plot(x, y, las = 1, cex.axis = 2, cex.lab = 2,
        col = cols, xlab = xlab, ylab = ylab, cex = cex,
        xaxt = "n", yaxt = "n", pch = pch, main = main)
   if (connect_clusters)
@@ -42,8 +45,8 @@ draw_assignment <- function(features, clustering, xlab = "feature 1",
 draw_all_cliques <- function(x, y, assignment, lwd = 1.5, lty = 1, cols) {
   n_cliques <- length(unique(assignment))
   for (i in 1:n_cliques) {
-    draw_clique(x[assignment == i], y[assignment == i], 
-                col = cols[assignment == i], lwd = lwd, 
+    draw_clique(x[assignment == i], y[assignment == i],
+                col = cols[assignment == i], lwd = lwd,
                 lty = lty)
   }
 }
