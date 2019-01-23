@@ -53,7 +53,7 @@ draw_all_cliques <- function(x, y, assignment, lwd = 1.5, lty = 1, cols) {
 
 # draw edges connecting all elements of a clique
 draw_clique <- function(x, y, col, lwd = 1.5, lty = 1) {
-  connections <- all_connections(x, y)
+  connections <- connections_within_clique(x, y)
   cords <- data.frame(x = x, y = y)
   cords <- cords[c(t(connections)), ]
   startpoints <- seq(1, nrow(cords) - 1, 2)
@@ -66,7 +66,7 @@ draw_clique <- function(x, y, col, lwd = 1.5, lty = 1) {
   }
 }
 
-all_connections <- function(x, y) {
+connections_within_clique <- function(x, y) {
   nitems <- length(x)
   connections <- expand.grid(1:nitems, 1:nitems)
   connections <- connections[connections[, 1] < connections[, 2], ]
