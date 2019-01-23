@@ -4,7 +4,7 @@
 #' Create groups of elements (anticlusters) that are as similar as possible.
 #'
 #' @param features A vector, matrix or data.frame of data points.  Rows
-#'     correspond to items and columns correspond to features.
+#'     correspond to elements and columns correspond to features.
 #' @param n_anticlusters How many anticlusters should be created.
 #' @param standardize Boolean - should the features be
 #'     standardized before anticlusters are created? Defaults to TRUE

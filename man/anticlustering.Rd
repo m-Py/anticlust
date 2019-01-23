@@ -9,7 +9,7 @@ anticlustering(features, n_anticlusters, standardize = TRUE,
 }
 \arguments{
 \item{features}{A vector, matrix or data.frame of data points.  Rows
-correspond to items and columns correspond to features.}
+correspond to elements and columns correspond to features.}
 
 \item{n_anticlusters}{How many anticlusters should be created.}
 
