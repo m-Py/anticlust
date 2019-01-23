@@ -11,7 +11,7 @@ test_that("all levels of heuristicism work and that exact approach has best obje
     n_elements <- p_anticlusters * 5 # n must be multiplier of p
     features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
     distances <- dist(features)
-    solver <- "glpk"
+    solver <- "Rglpk"
     ## Traverse through levels of heuristicism
     obj_values <- rep(NA, 4)
     anti_list <- list()
