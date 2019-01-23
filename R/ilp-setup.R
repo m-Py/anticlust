@@ -4,8 +4,8 @@
 #' @param distances An distance object or matrix representing the
 #'   distances between items
 #' @param p The number of groups to be created
-#' @param solver A string identifing the solver to be used ("glpk",
-#'   "gurobi", or "cplex")
+#' @param solver A string identifing the solver to be used ("Rglpk",
+#'   "gurobi", or "Rcplex")
 #'
 #' @return A list representing the ILP formulation of the instance
 #'
@@ -25,7 +25,7 @@
 #' clustering problem,” Mathematical Programming, vol. 45, nos. 1-3, pp.
 #' 59–96, 1989.
 
-anticlustering_ilp <- function(distances, p, solver = "glpk") {
+anticlustering_ilp <- function(distances, p, solver = "Rglpk") {
 
   ## Initialize some constant variables:
   equality_signs <- equality_identifiers(solver)
@@ -78,7 +78,7 @@ anticlustering_ilp <- function(distances, p, solver = "glpk") {
 equality_identifiers <- function(solver) {
   ## identify solver because they use different identifiers for
   ## equality:
-  if (solver == "glpk") {
+  if (solver == "Rglpk") {
     equal_sign <- "=="
     lower_sign <- "<="
     greater_sign <- ">="
@@ -86,12 +86,12 @@ equality_identifiers <- function(solver) {
     equal_sign <- "="
     lower_sign <- "<="
     greater_sign <- ">="
-  } else if (solver == "cplex") {
+  } else if (solver == "Rcplex") {
     equal_sign <- "E"
     lower_sign <- "L"
     greater_sign <- "G"
   } else {
-    stop("solver must be 'cplex', 'glpk', or 'gurobi'")
+    stop("solver must be 'Rcplex', 'Rglpk', or 'gurobi'")
   }
   return(list(e = equal_sign, l = lower_sign, g = greater_sign))
 }

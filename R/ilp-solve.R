@@ -192,7 +192,7 @@ solve_ilp <- function(ilp, solver, objective = "max") {
 
   ret_list <- list() # return the optimal value and the variable assignment
 
-  if (solver == "glpk") {
+  if (solver == "Rglpk") {
     max <- FALSE
     if (objective == "max")
       max <- TRUE
@@ -217,7 +217,7 @@ solve_ilp <- function(ilp, solver, objective = "max") {
     ilp_solution <- gurobi::gurobi(model)
     ret_list$x <- ilp_solution$x
     ret_list$obj <- ilp_solution$objval
-  } else if (solver == "cplex") {
+  } else if (solver == "Rcplex") {
     ilp_solution <- Rcplex::Rcplex(cvec = ilp$obj_function,
                         Amat = ilp$constraints,
                         bvec = ilp$rhs,

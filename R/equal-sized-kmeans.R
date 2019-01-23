@@ -124,9 +124,10 @@ cluster_centers <- function(features, clusters) {
 #     and contain the distance to the respective cluster for each item.
 #
 # @details
-# This code was published in Leisch (2006). "A Toolbox for
-# K-Centroids Cluster Analysis". Computational Statistics and Data
-# Analysis, 51(2), 526–544.
+# This code was published in Leisch (2006).
+# @references
+# Leisch (2006). A Toolbox for K-Centroids Cluster Analysis. Computational
+# Statistics and Data Analysis, 51(2), 526–544.
 #
 dist_from_centers <- function(features, centers, squared) {
   z <- matrix(0, nrow = nrow(features), ncol = nrow(centers))
