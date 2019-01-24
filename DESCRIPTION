@@ -4,12 +4,14 @@ Title: Algorithms for the anticlustering problem
 Version: 0.1.2
 Author: Martin Papenberg
 Maintainer: Martin Papenberg <martin.papenberg@hhu.de>
-Description: `anticlust` is an R package to solve the anticlustering problem,
+Description: Algorithms to solve the anticlustering problem,
     i.e., assigning elements to groups in such a way that the groups are as
-    similar as possible. The package also offers methods to solve 
-    clustering problems. 
+    similar as possible. Includes exact and heuristics methods. The exact 
+    approach requires that an linear programming solver is installed. 
+    Also offers methods to solve clustering problems under specific size 
+    constraints, i.e., creating clusters of equal size.
 Encoding: UTF-8
-License: Undecided
+License: MIT
 LazyData: true
 RoxygenNote: 6.1.0
 Imports: Matrix
@@ -19,5 +21,6 @@ Suggests:
     Rcplex,
     testthat,
     knitr,
-    rmarkdown
+    rmarkdown,
+    dplyr
 VignetteBuilder: knitr
