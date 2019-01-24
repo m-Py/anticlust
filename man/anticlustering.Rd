@@ -13,11 +13,11 @@ correspond to elements and columns correspond to features.}
 
 \item{n_anticlusters}{How many anticlusters should be created.}
 
-\item{standardize}{Boolean - should the features be
-standardized before anticlusters are created? Defaults to TRUE}
+\item{standardize}{Boolean - should the features be standardized
+before anticlusters are created? Defaults to TRUE}
 
-\item{objective}{The objective to be maximized, either
-"distance" (default) or "variance". See Details}
+\item{objective}{The objective to be maximized, either "distance"
+(default) or "variance". See Details}
 
 \item{method}{One of "heuristic" or "exact". Currently, an exact
 solution can only be obtained when the `objective` is "distance".}
@@ -26,7 +26,8 @@ solution can only be obtained when the `objective` is "distance".}
 A vector representing anticluster affiliation
 }
 \description{
-Create groups of elements (anticlusters) that are as similar as possible.
+Create groups of elements (anticlusters) that are as similar as
+possible.
 }
 \details{
 TODO: Write details

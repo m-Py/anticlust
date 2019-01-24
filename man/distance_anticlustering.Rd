@@ -20,31 +20,34 @@ correspond to items and columns correspond to features.}
 standardized before groups are created? Defaults to TRUE}
 
 \item{heuristic}{Set the level of "heuristicism" by setting a numeric
-value of 0 to 3. Set to 0 to obtain the exact solution for the item
-assignment instance. Levels 1 to 3 will in a first step identify
-very similar items and then ensure that these will be assigned to
-different groups. Level 1 does this preclustering using exact
-cluster editing; Level 2 does this preclustering using a heuristic
-based on k-means clustering. On Level 3, preclustering is also done
-using the heuristic based on k-means clustering, and the final
-assignment is no longer done using exact ILP item assignment, but
-instead using a repeated random assignment.}
+value of 0 to 3. Set to 0 to obtain the exact solution for the
+item assignment instance. Levels 1 to 3 will in a first step
+identify very similar items and then ensure that these will be
+assigned to different groups. Level 1 does this preclustering
+using exact cluster editing; Level 2 does this preclustering
+using a heuristic based on k-means clustering. On Level 3,
+preclustering is also done using the heuristic based on k-means
+clustering, and the final assignment is no longer done using
+exact ILP item assignment, but instead using a repeated random
+assignment.}
 }
 \value{
-A vector representing the anticluster affiliation of elements.
+A vector representing the anticluster affiliation of
+    elements.
 }
 \description{
 Solve anticlustering using the distance criterion
 }
 \details{
 This function includes an exact approach to anticlustering
- using the distance criterion. To use this functionality, a linear
- programming solver must be installed and usable from R. The open source GNU linear
- programming kit (called from the package `Rglpk`) or one of the
- commercial solvers gurobi (called from the package `gurobi`) or
- IBM CPLEX (called from the package `Rcplex`) can be used. A license
- is needed for the commercial solvers. One of the interface packages
- must be installed. To improve run time, some restrictions can be
- enforced (see argument heuristic); the solution is still found through
- an ILP but the solution need not be optimal, though it often still is.
+    using the distance criterion. To use this functionality, a linear
+    programming solver must be installed and usable from R. The open
+    source GNU linear programming kit (called from the package
+    `Rglpk`) or one of the commercial solvers gurobi (called from the
+    package `gurobi`) or IBM CPLEX (called from the package `Rcplex`)
+    can be used. A license is needed for the commercial solvers. One
+    of the interface packages must be installed. To improve run time,
+    some restrictions can be enforced (see argument heuristic); the
+    solution is still found through an ILP but the solution need not
+    be optimal, though it often still is.
 }

@@ -2,19 +2,23 @@
 % Please edit documentation in R/ilp-setup.R
 \name{vectorized_triangular}
 \alias{vectorized_triangular}
-\title{Construct indices for a sparse matrix representation of triangular constraints}
+\title{Construct indices for a sparse matrix representation of triangular
+constraints}
 \usage{
 vectorized_triangular(n_items, pair_names)
 }
 \arguments{
 \item{n_items}{How many items are there}
 
-\item{pair_names}{A character vector of names representing the item pairs.
-Must have the form that is contained in the ILP data.frame costs$pair.}
+\item{pair_names}{A character vector of names representing the item
+pairs.  Must have the form that is contained in the ILP
+data.frame costs$pair.}
 }
 \value{
-A list of indices to be used as input parameters of Matrix::sparseMatrix
+A list of indices to be used as input parameters of
+    Matrix::sparseMatrix
 }
 \description{
-Construct indices for a sparse matrix representation of triangular constraints
+Construct indices for a sparse matrix representation of triangular
+constraints
 }

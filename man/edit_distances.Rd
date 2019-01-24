@@ -10,8 +10,8 @@ edit_distances(distances, clustering, value = -1e+06)
 \item{distances}{A distance object or matrix of
 between-item-distances.}
 
-\item{clustering}{A vector representing a clustering; objects that are
-part of the same cluster are assigned a new distance.}
+\item{clustering}{A vector representing a clustering; objects that
+are part of the same cluster are assigned a new distance.}
 
 \item{value}{The value that is assigned to the fixed distances.
 Defaults to -1,000,000.}
@@ -22,10 +22,10 @@ A distance object containing the fixed distances. For items
 }
 \description{
 Based on a clustering, distances between elements of the same cluster
-are set to a specified value. This is used to enforce or forbid pairs of elements
-to be part of the same anticluster when the distance matrix is passed
-to the ILP solver.  By considering a preclustering of
-items, very similar items will not be assigned to the same group when
-the fixed distance object is used to create the ILP formulation of
-the item assignment instance.
+are set to a specified value. This is used to enforce or forbid pairs
+of elements to be part of the same anticluster when the distance
+matrix is passed to the ILP solver.  By considering a preclustering
+of items, very similar items will not be assigned to the same group
+when the fixed distance object is used to create the ILP formulation
+of the item assignment instance.
 }

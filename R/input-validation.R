@@ -1,5 +1,6 @@
 
-# Test that the number of features is a multiplier of unique anticlusters
+# Test that the number of features is a multiplier of unique
+# anticlusters
 legal_number_of_clusters <- function(features, clusters) {
   ## 1. correct number of clusters assignments?
   if (length(clusters) != nrow(features))

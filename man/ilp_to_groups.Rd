@@ -17,6 +17,6 @@ ilp_to_groups(ilp, solution)
 A vector: the anticlusters resulting from the ILP.
 }
 \description{
-This function is primarily called from within other functions and probably
-should not be called directly.
+This function is primarily called from within other functions and
+probably should not be called directly.
 }

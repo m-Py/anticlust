@@ -2,10 +2,10 @@
 #' Compute objective value for the (anti)clustering problem
 #'
 #' @param features A data.frame, matrix or vector representing the
-#'   features that are used in (anti)clustering.
+#'     features that are used in (anti)clustering.
 #' @param anticlusters A vector representing the anticluster affiliation
-#' @param objective The objective to be maximized, either
-#'     "distance" or "variance".
+#' @param objective The objective to be maximized, either "distance" or
+#'     "variance".
 #'
 #' @return Scalar, the objective value; either the total
 #'   within-cluster variance (if objective == "variance") or
@@ -43,7 +43,7 @@ get_objective <- function(features, anticlusters, objective) {
 #' Compute objective value for variance criterion
 #'
 #' @param features A data.frame, matrix or vector representing the
-#'   features that are used in the assignment.
+#'     features that are used in the assignment.
 #' @param anticlusters A vector representing the anticluster affiliation
 #'
 #' @return Scalar, the total within-cluster variance.
@@ -62,11 +62,10 @@ obj_value_variance <- function(features, anticlusters) {
 #' Objective value for the distance criterion
 #'
 #' @param features A data.frame, matrix or vector representing the
-#'   features that are used in the assignment.
+#'     features that are used in the assignment.
 #' @param anticlusters A vector representing the anticluster affiliation
 #'
-#' @return Scalar, the total sum of within-cluster
-#'   pointwise distances.
+#' @return Scalar, the total sum of within-cluster pointwise distances.
 #'
 #'
 obj_value_distance <- function(features, anticlusters) {

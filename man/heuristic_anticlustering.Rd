@@ -14,11 +14,11 @@ features that are used.}
 \item{clustering}{A vector representing the preclustering of
 elements. See Details.}
 
-\item{objective}{The objective to be maximized, either
-"distance" (default) or "variance".}
+\item{objective}{The objective to be maximized, either "distance"
+(default) or "variance".}
 
-\item{nrep}{The number of repetitions tried when assigning
-elements to anticlusters.}
+\item{nrep}{The number of repetitions tried when assigning elements
+to anticlusters.}
 }
 \value{
 A vector representing the anticlustering.
@@ -29,11 +29,11 @@ Anticlustering based on a heuristic
 \details{
 The heuristic approach to anticlustering forbids elements
     belonging to the same precluster to be assigned to the same
-    anticluster. The preclustering should be accomplished by one of the
-    clustering functions, `equal_sized_cluster_editing` (an exact
+    anticluster. The preclustering should be accomplished by one of
+    the clustering functions, `equal_sized_cluster_editing` (an exact
     method that minimizes distance criterion under the restriction of
-    equal group sizes) or `equal_sized_kmeans` (a heuristic
-    method that tries to minimize the variance criterion under the
+    equal group sizes) or `equal_sized_kmeans` (a heuristic method
+    that tries to minimize the variance criterion under the
     restriction of equal group sizes). Anticlustering can be done via
     maximizinz the distance or the variance criterion.
 }

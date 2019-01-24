@@ -7,13 +7,15 @@
 all_connections(i, n)
 }
 \arguments{
-\item{i}{The point for which the connections are sought (must be in 1...n)}
+\item{i}{The point for which the connections are sought (must be in
+1...n)}
 
 \item{n}{The number of points}
 }
 \value{
-A `data.frame` with two columns representing start and end point.
-  The second column always contains the "larger number" point.
+A `data.frame` with two columns representing start and end
+    point.  The second column always contains the "larger number"
+    point.
 }
 \description{
 Find all connections of an element

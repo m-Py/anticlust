@@ -1,20 +1,20 @@
 
 #' Visualize a clustering of two features
 #'
-#' @param features A data.frame or matrix representing the
-#'     features that are used. Must have two columns.
+#' @param features A data.frame or matrix representing the features that
+#'     are used. Must have two columns.
 #' @param clustering A vector representing the clustering
 #' @param xlab The label for the x-axis
 #' @param ylab The label for the y-axis
 #' @param cols The coloring of the groups. Does not need to be passed.
-#'   If it is passed, it needs to be a character vector of the same
-#'   length as there are groups, and each element of the vector is
-#'   a color.
+#'     If it is passed, it needs to be a character vector of the same
+#'     length as there are groups, and each element of the vector is a
+#'     color.
 #' @param pch The symbol used for data points, see ?par
 #' @param main The title of the plot
 #' @param cex The size of the plotting symbols, see ?par
 #' @param connect_clusters Boolean. Connect the groups through lines?
-#'   Useful to illustrate a graph structure.
+#'     Useful to illustrate a graph structure.
 #'
 #' @export
 #'

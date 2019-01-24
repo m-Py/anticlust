@@ -12,7 +12,7 @@ equality_identifiers(solver)
 }
 \value{
 A list of three elements containing strings representing
-  equality (e), lower (l), and greater (g) relationships
+    equality (e), lower (l), and greater (g) relationships
 }
 \description{
 Based on the solver, return identifiers for equality relationships

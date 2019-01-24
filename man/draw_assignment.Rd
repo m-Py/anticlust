@@ -9,8 +9,8 @@ draw_assignment(features, clustering, xlab = "feature 1",
   connect_clusters = FALSE)
 }
 \arguments{
-\item{features}{A data.frame or matrix representing the
-features that are used. Must have two columns.}
+\item{features}{A data.frame or matrix representing the features that
+are used. Must have two columns.}
 
 \item{clustering}{A vector representing the clustering}
 
@@ -20,8 +20,8 @@ features that are used. Must have two columns.}
 
 \item{cols}{The coloring of the groups. Does not need to be passed.
 If it is passed, it needs to be a character vector of the same
-length as there are groups, and each element of the vector is
-a color.}
+length as there are groups, and each element of the vector is a
+color.}
 
 \item{pch}{The symbol used for data points, see ?par}
 

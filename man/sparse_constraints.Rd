@@ -9,11 +9,13 @@ sparse_constraints(n_items, pair_names)
 \arguments{
 \item{n_items}{How many items are there}
 
-\item{pair_names}{A character vector of names representing the item pairs.
-Must have the form that is contained in the ILP data.frame costs$pair.}
+\item{pair_names}{A character vector of names representing the item
+pairs.  Must have the form that is contained in the ILP
+data.frame costs$pair.}
 }
 \value{
-A sparse matrix representing the left-hand side of the ILP (A in Ax ~ b)
+A sparse matrix representing the left-hand side of the ILP (A
+    in Ax ~ b)
 }
 \description{
 Construct a sparse matrix representing the ILP constraints

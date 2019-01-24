@@ -21,20 +21,21 @@ cluster editing).}
 }
 \value{
 A `list` having two entries: `x` is the vector of optimal
-  coefficients for all decision variables. `obj` is the optimal
-  objective value.
+    coefficients for all decision variables. `obj` is the optimal
+    objective value.
 }
 \description{
 Usually it will be advised to call the higher level function
-`distance_anticlustering`. By setting the `objective` parameter to "min", this
-function solves weighted cluster editing instead of anticlustering.
+`distance_anticlustering`. By setting the `objective` parameter to
+"min", this function solves weighted cluster editing instead of
+anticlustering.
 }
 \details{
-To use this function, a linear programming solver must
- be installed and usable from R. The open source GNU linear
- programming kit (called from the package `Rglpk`) or one of the
- commercial solvers gurobi (called from the package `gurobi`) or
- IBM CPLEX (called from the package `Rcplex`) can be used. A license
- is needed for the commercial solvers. One of the interface packages
- must be installed.
+To use this function, a linear programming solver must be
+    installed and usable from R. The open source GNU linear
+    programming kit (called from the package `Rglpk`) or one of the
+    commercial solvers gurobi (called from the package `gurobi`) or
+    IBM CPLEX (called from the package `Rcplex`) can be used. A
+    license is needed for the commercial solvers. One of the
+    interface packages must be installed.
 }

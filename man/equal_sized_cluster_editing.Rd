@@ -16,8 +16,8 @@ correspond to items and columns correspond to features.}
 \item{solver}{A string identifing the solver to be used ("Rglpk",
 "gurobi", or "Rcplex")}
 
-\item{standardize}{Boolean - should the feature values be
-standardized before groups are created? Defaults to FALSE.}
+\item{standardize}{Boolean, should the feature values be standardized
+before groups are created? Defaults to FALSE.}
 }
 \value{
 A vector representing the clustering.

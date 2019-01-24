@@ -7,14 +7,14 @@
 vectorize_weights(distances)
 }
 \arguments{
-\item{distances}{A distance matrix}
+\item{distances}{A distance matrix of class matrix or dist}
 }
 \value{
-A data.frame having the following columns:
-   `costs` - the actual weights in vectorized form
-   `i` the first index of the item pair that is connected
-   `j` the second index of the item pair that is connected
-   `pair` A string of form x_ij identifying the item pair
+A data.frame having the following columns: `costs` - the
+    distances in vectorized form; `i` the first index of the item
+    pair that is connected; `j` the second index of the item pair
+    that is connected; `pair` A string of form "xi_j" identifying the
+    item pair
 }
 \description{
 Convert matrix of distances into vector of distances

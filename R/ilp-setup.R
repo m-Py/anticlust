@@ -2,20 +2,20 @@
 #' Construct the ILP represenation of a anticlustering problem
 
 #' @param distances An distance object or matrix representing the
-#'   distances between items
+#'     distances between items
 #' @param p The number of groups to be created
 #' @param solver A string identifing the solver to be used ("Rglpk",
-#'   "gurobi", or "Rcplex")
+#'     "gurobi", or "Rcplex")
 #'
 #' @return A list representing the ILP formulation of the instance
 #'
-#' @details To use this function, a linear programming solver must
-#'  be installed and usable in R. You can use the open source GNU linear
-#'  programming kit (called from the package `Rglpk`) or one of the
-#'  commercial solvers gurobi (called from the package `gurobi`) or
-#'  IBM CPLEX (called from the package `Rcplex`). A license
-#'  is needed for the commercial solvers. One of the interface packages
-#'  must be installed.
+#' @details To use this function, a linear programming solver must be
+#'     installed and usable in R. You can use the open source GNU linear
+#'     programming kit (called from the package `Rglpk`) or one of the
+#'     commercial solvers gurobi (called from the package `gurobi`) or
+#'     IBM CPLEX (called from the package `Rcplex`). A license is needed
+#'     for the commercial solvers. One of the interface packages must be
+#'     installed.
 #'
 #' @export
 #'
@@ -70,10 +70,10 @@ anticlustering_ilp <- function(distances, p, solver = "Rglpk") {
 #' Based on the solver, return identifiers for equality relationships
 #'
 #' @param solver A string identifing the solver to be used ("Rglpk",
-#'   "gurobi", or "cplex")
+#'     "gurobi", or "cplex")
 #'
 #' @return A list of three elements containing strings representing
-#'   equality (e), lower (l), and greater (g) relationships
+#'     equality (e), lower (l), and greater (g) relationships
 #'
 equality_identifiers <- function(solver) {
   ## identify solver because they use different identifiers for
@@ -99,12 +99,13 @@ equality_identifiers <- function(solver) {
 
 #' Convert matrix of distances into vector of distances
 #'
-#' @param distances A distance matrix
-#' @return A data.frame having the following columns:
-#'    `costs` - the actual weights in vectorized form
-#'    `i` the first index of the item pair that is connected
-#'    `j` the second index of the item pair that is connected
-#'    `pair` A string of form x_ij identifying the item pair
+#' @param distances A distance matrix of class matrix or dist
+#' 
+#' @return A data.frame having the following columns: `costs` - the
+#'     distances in vectorized form; `i` the first index of the item
+#'     pair that is connected; `j` the second index of the item pair
+#'     that is connected; `pair` A string of form "xi_j" identifying the
+#'     item pair
 vectorize_weights <- function(distances) {
   ## Problem: I have matrix of costs but need vector for ILP
   costs_m <- as.matrix(distances)
@@ -121,9 +122,11 @@ vectorize_weights <- function(distances) {
 
 #' Construct a sparse matrix representing the ILP constraints
 #' @param n_items How many items are there
-#' @param pair_names A character vector of names representing the item pairs.
-#'   Must have the form that is contained in the ILP data.frame costs$pair.
-#' @return A sparse matrix representing the left-hand side of the ILP (A in Ax ~ b)
+#' @param pair_names A character vector of names representing the item
+#'     pairs.  Must have the form that is contained in the ILP
+#'     data.frame costs$pair.
+#' @return A sparse matrix representing the left-hand side of the ILP (A
+#'     in Ax ~ b)
 #'
 #' @importFrom Matrix sparseMatrix
 sparse_constraints <- function(n_items, pair_names) {
@@ -133,11 +136,14 @@ sparse_constraints <- function(n_items, pair_names) {
   return(Matrix::sparseMatrix(c(tri$i, gr$i), c(tri$j, gr$j), x = c(tri$x, gr$x)))
 }
 
-#' Construct indices for a sparse matrix representation of triangular constraints
+#' Construct indices for a sparse matrix representation of triangular
+#' constraints
 #' @param n_items How many items are there
-#' @param pair_names A character vector of names representing the item pairs.
-#'   Must have the form that is contained in the ILP data.frame costs$pair.
-#' @return A list of indices to be used as input parameters of Matrix::sparseMatrix
+#' @param pair_names A character vector of names representing the item
+#'     pairs.  Must have the form that is contained in the ILP
+#'     data.frame costs$pair.
+#' @return A list of indices to be used as input parameters of
+#'     Matrix::sparseMatrix
 #'
 vectorized_triangular <- function(n_items, pair_names) {
   triangular_constraints <- choose(n_items, 3)
@@ -164,11 +170,14 @@ vectorized_triangular <- function(n_items, pair_names) {
   return(list(i = row_indices, j = c(col_indices), x = xes))
 }
 
-#' Construct indices for a sparse matrix representation of group constraints
+#' Construct indices for a sparse matrix representation of group
+#' constraints
 #' @param n_items How many items does the instance have
-#' @param pair_names A character vector of names representing the item pairs.
-#'   Must have the form that is contained in the ILP data.frame costs$pair.
-#' @return A list of indices to be used as input parameters of Matrix::sparseMatrix
+#' @param pair_names A character vector of names representing the item
+#'     pairs.  Must have the form that is contained in the ILP
+#'     data.frame costs$pair.
+#' @return A list of indices to be used as input parameters of
+#'     Matrix::sparseMatrix
 vectorized_group <- function(n_items, pair_names) {
   coef_per_constraint <- (n_items - 1)
   group_coefficients <- coef_per_constraint * n_items
@@ -192,10 +201,12 @@ connections_to_pair <- function(connections) {
 }
 
 #' Find all connections of an element
-#' @param i The point for which the connections are sought (must be in 1...n)
+#' @param i The point for which the connections are sought (must be in
+#'     1...n)
 #' @param n The number of points
-#' @return A `data.frame` with two columns representing start and end point.
-#'   The second column always contains the "larger number" point.
+#' @return A `data.frame` with two columns representing start and end
+#'     point.  The second column always contains the "larger number"
+#'     point.
 all_connections <- function(i, n) {
   if (i > n | i <= 0)
     stop("Error in function `all_connections`: cannot find connections for element that is outside of legal range")

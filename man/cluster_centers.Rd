@@ -9,8 +9,8 @@ cluster_centers(features, clusters)
 \arguments{
 \item{features}{A data matrix of element features}
 
-\item{clusters}{A numeric vector indicating cluster membership
-of each element}
+\item{clusters}{A numeric vector indicating cluster membership of
+each element}
 }
 \value{
 A matrix of cluster centers. Rows represent clusters and

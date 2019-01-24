@@ -93,8 +93,8 @@ clusters_to_long <- function(assignments) {
 #' Compute cluster centers
 #'
 #' @param features A data matrix of element features
-#' @param clusters A numeric vector indicating cluster membership
-#'   of each element
+#' @param clusters A numeric vector indicating cluster membership of
+#'     each element
 #'
 #' @return A matrix of cluster centers. Rows represent clusters and
 #'   columns represent features
@@ -125,6 +125,7 @@ cluster_centers <- function(features, clusters) {
 #
 # @details
 # This code was published in Leisch (2006).
+#
 # @references
 # Leisch (2006). A Toolbox for K-Centroids Cluster Analysis. Computational
 # Statistics and Data Analysis, 51(2), 526–544.

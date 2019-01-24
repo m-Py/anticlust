@@ -12,8 +12,8 @@ features that are used in (anti)clustering.}
 
 \item{anticlusters}{A vector representing the anticluster affiliation}
 
-\item{objective}{The objective to be maximized, either
-"distance" or "variance".}
+\item{objective}{The objective to be maximized, either "distance" or
+"variance".}
 }
 \value{
 Scalar, the objective value; either the total

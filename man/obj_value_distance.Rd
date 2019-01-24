@@ -13,8 +13,7 @@ features that are used in the assignment.}
 \item{anticlusters}{A vector representing the anticluster affiliation}
 }
 \value{
-Scalar, the total sum of within-cluster
-  pointwise distances.
+Scalar, the total sum of within-cluster pointwise distances.
 }
 \description{
 Objective value for the distance criterion

@@ -3,9 +3,9 @@
 #'
 #' @param x A matrix or data frame
 #' @param col An numeric index or character vector of length 1 to select
-#'   the column by which the table is sorted.
+#'     the column by which the table is sorted.
 #'
-#' @return The matrix or data frame sorted by `row`
+#' @return The matrix or data frame sorted by `col`
 #'
 sort_by_col <- function(x, col) {
   if (!class(x) %in% c("data.frame", "matrix"))

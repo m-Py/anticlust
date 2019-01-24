@@ -1,8 +1,8 @@
 
 #' Return group membership based on ILP solution for item assignment
 #'
-#' This function is primarily called from within other functions and probably
-#' should not be called directly.
+#' This function is primarily called from within other functions and
+#' probably should not be called directly.
 #'
 #' @param ilp An ILP representation of the item assignment problem
 #'     (returned by rom `item_assign_ilp`)
@@ -40,7 +40,8 @@ fill_groups_wce <- function(ilp, solution) {
 }
 
 
-## Extract groups from a the information of pairwise connectivity of items
+## Extract groups from a the information of pairwise connectivity of
+## items
 fill_groups_wce_ <- function(ilp, variable_assignment) {
   ## as long as this function is not in the package: I have to load
   ## the functions in file ILP.R manually first
@@ -77,8 +78,8 @@ fill_groups_wce_ <- function(ilp, variable_assignment) {
   return(groups)
 }
 
-## This finds which items are in the same cluster, but
-## it possibly returns duplicates
+## This finds which items are in the same cluster, but it possibly
+## returns duplicates
 fill_groups_ <- function(ilp, variable_assignment, groups) {
   costs <- ilp$costs
   for (i in 1:length(groups)) {
@@ -99,18 +100,18 @@ list_length <- function(x) sapply(x, length)
 #' Edit distances
 #'
 #' Based on a clustering, distances between elements of the same cluster
-#' are set to a specified value. This is used to enforce or forbid pairs of elements
-#' to be part of the same anticluster when the distance matrix is passed
-#' to the ILP solver.  By considering a preclustering of
-#' items, very similar items will not be assigned to the same group when
-#' the fixed distance object is used to create the ILP formulation of
-#' the item assignment instance.
+#' are set to a specified value. This is used to enforce or forbid pairs
+#' of elements to be part of the same anticluster when the distance
+#' matrix is passed to the ILP solver.  By considering a preclustering
+#' of items, very similar items will not be assigned to the same group
+#' when the fixed distance object is used to create the ILP formulation
+#' of the item assignment instance.
 #'
 #' @param distances A distance object or matrix of
 #'     between-item-distances.
 #'
-#' @param clustering A vector representing a clustering; objects that are
-#'     part of the same cluster are assigned a new distance.
+#' @param clustering A vector representing a clustering; objects that
+#'     are part of the same cluster are assigned a new distance.
 #' @param value The value that is assigned to the fixed distances.
 #'     Defaults to -1,000,000.
 #'

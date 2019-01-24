@@ -13,7 +13,7 @@ sort_by_col(x, col)
 the column by which the table is sorted.}
 }
 \value{
-The matrix or data frame sorted by `row`
+The matrix or data frame sorted by `col`
 }
 \description{
 Sort a matrix or data frame by one column
