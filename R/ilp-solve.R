@@ -182,7 +182,7 @@ solve_ilp <- function(ilp, solver, objective = "max") {
                         objsense = objective,
                         sense = ilp$equalities,
                         vtype = "I",
-                        control = list(round = 1)) # important to obtain integers
+                        control = list(round = 1, trace = 0)) # important to obtain integers
     ret_list$x <- ilp_solution$xopt
     ret_list$obj <- ilp_solution$obj
   }
