@@ -27,19 +27,26 @@ Compute objective value for the (anti)clustering problem
 \examples{
 
 features <- matrix(rnorm(1000, 100, 15), ncol = 2)
-n_anticlusters <- 4
-# Precluster cases
-n_preclusters <- nrow(features) / n_anticlusters
-preclusters <- equal_sized_kmeans(features, n_preclusters)
-# Use preclustering as resticting information in anticlustering
-anticlusters <- heuristic_anticlustering(features, preclusters, objective = "distance")
-get_objective(features, anticlusters, "distance")
-get_objective(features, anticlusters, "variance")
-anticlusters <- heuristic_anticlustering(features, preclusters, objective = "variance")
-get_objective(features, anticlusters, "distance")
-get_objective(features, anticlusters, "variance")
+n_elements <- 15
+m_features <- 2
+n_clusters <- 3
+features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
+clusters_exact <- clustering(features, n_clusters, method = "exact", standardize = FALSE)
+clusters_heuristic <- clustering(features, n_clusters, method = "heuristic", standardize = FALSE)
+# Exact clustering minimizes distance criterion
+get_objective(features, clusters_exact, "distance")
+get_objective(features, clusters_heuristic, "distance")
+get_objective(features, clusters_exact, "variance")
+# Heuristic clustering tries to minimize variance criterion
+get_objective(features, clusters_heuristic, "variance")
 
+# Plot the clustering
+par(mfrow = c(1, 2))
+draw_assignment(features, clusters_exact)
+draw_assignment(features, clusters_heuristic)
+
+}
+\references{
 H. Späth, “Anticlustering: Maximizing the variance criterion,”
 Control and Cybernetics, vol. 15, no. 2, pp. 213–218, 1986.
-
 }
