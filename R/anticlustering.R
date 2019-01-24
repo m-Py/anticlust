@@ -45,7 +45,7 @@ anticlustering <- function(features, n_anticlusters, standardize = TRUE,
   }
 
   if (objective == "distance") {
-    heuristic <- ifelse(method == "exact", 1, 3)
+    heuristic <- ifelse(method == "exact", 0, 3)
     solver <- solver_available()
     if (method == "exact" & solver == FALSE)
       stop("One of the packages 'Rglpk', 'gurobi', or 'Rcplex' must be installed for an exact solution")
