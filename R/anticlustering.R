@@ -4,19 +4,21 @@
 #' Create groups of elements (anticlusters) that are as similar as
 #' possible.
 #'
-#' @param features A vector, matrix or data.frame of data points.  Rows
+#' @param features A vector, matrix or data.frame of data points. Rows
 #'     correspond to elements and columns correspond to features.
 #' @param n_anticlusters How many anticlusters should be created.
 #' @param standardize Boolean - should the features be standardized
-#'     before anticlusters are created? Defaults to TRUE
+#'     before anticlusters are assigned? Defaults to TRUE
 #' @param objective The objective to be maximized, either "distance"
-#'     (default) or "variance". See Details
+#'     (default) or "variance". See Details.
 #' @param method One of "heuristic" or "exact". Currently, an exact
 #'     solution can only be obtained when the `objective` is "distance".
+#'     Use method exact only for small problem sizes (< 30 elements)
 #'
 #' @return A vector representing anticluster affiliation
 #'
 #' @importFrom utils installed.packages
+#' @importFrom stats as.dist dist
 #'
 #' @export
 #'
@@ -25,6 +27,15 @@
 #' @examples
 #'
 #' # TODO: Write examples
+#'
+#' @references
+#'
+#' M. Grötschel and Y. Wakabayashi, “A cutting plane algorithm for a
+#' clustering problem,” Mathematical Programming, vol. 45, nos. 1-3, pp.
+#' 59–96, 1989.
+#'
+#' H. Späth, “Anticlustering: Maximizing the variance criterion,”
+#' Control and Cybernetics, vol. 15, no. 2, pp. 213–218, 1986.
 #'
 anticlustering <- function(features, n_anticlusters, standardize = TRUE,
                            objective = "distance", method = "heuristic") {

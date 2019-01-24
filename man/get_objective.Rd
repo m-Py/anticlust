@@ -39,4 +39,7 @@ anticlusters <- heuristic_anticlustering(features, preclusters, objective = "var
 get_objective(features, anticlusters, "distance")
 get_objective(features, anticlusters, "variance")
 
+H. Späth, “Anticlustering: Maximizing the variance criterion,”
+Control and Cybernetics, vol. 15, no. 2, pp. 213–218, 1986.
+
 }

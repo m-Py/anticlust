@@ -1,51 +1,45 @@
 
-#' Anticlustering based on a heuristic
-#'
-#' @param features A data.frame, matrix or vector representing the
-#'     features that are used.
-#' @param clustering A vector representing the preclustering of
-#'     elements. See Details.
-#' @param objective The objective to be maximized, either "distance"
-#'     (default) or "variance".
-#' @param nrep The number of repetitions tried when assigning elements
-#'     to anticlusters.
-#'
-#' @return A vector representing the anticlustering.
-#'
-#' @details The heuristic approach to anticlustering forbids elements
-#'     belonging to the same precluster to be assigned to the same
-#'     anticluster. The preclustering should be accomplished by one of
-#'     the clustering functions, `equal_sized_cluster_editing` (an exact
-#'     method that minimizes distance criterion under the restriction of
-#'     equal group sizes) or `equal_sized_kmeans` (a heuristic method
-#'     that tries to minimize the variance criterion under the
-#'     restriction of equal group sizes). Anticlustering can be done via
-#'     maximizinz the distance or the variance criterion.
-#'
-#' @export
-#'
-#' @examples
-#'
-#' features <- matrix(rnorm(1000, 100, 15), ncol = 2)
-#' n_anticlusters <- 4
-#' # Precluster cases
-#' n_preclusters <- nrow(features) / n_anticlusters
-#' preclusters <- equal_sized_kmeans(features, n_preclusters)
-#' # Use preclustering as resticting information in anticlustering
-#' anticlusters <- heuristic_anticlustering(features, preclusters)
-#' # Check out results
-#' plot(features, col = anticlusters, pch = 19)
-#' tapply(features[, 1], anticlusters, mean)
-#' tapply(features[, 1], anticlusters, sd)
-#' tapply(features[, 2], anticlusters, mean)
-#' tapply(features[, 2], anticlusters, sd)
-#'
-#' anticlusters <- heuristic_anticlustering(features, preclusters, objective = "variance")
-#'
-#' @references
-#' H. Späth, “Anticlustering: Maximizing the variance criterion,”
-#' Control and Cybernetics, vol. 15, no. 2, pp. 213–218, 1986.
-
+# Anticlustering based on a heuristic
+#
+# @param features A data.frame, matrix or vector representing the
+#     features that are used.
+# @param clustering A vector representing the preclustering of
+#     elements. See Details.
+# @param objective The objective to be maximized, either "distance"
+#     (default) or "variance".
+# @param nrep The number of repetitions tried when assigning elements
+#     to anticlusters.
+#
+# @return A vector representing the anticlustering.
+#
+# @details The heuristic approach to anticlustering forbids elements
+#     belonging to the same precluster to be assigned to the same
+#     anticluster. The preclustering should be accomplished by one of
+#     the clustering functions, `equal_sized_cluster_editing` (an exact
+#     method that minimizes distance criterion under the restriction of
+#     equal group sizes) or `equal_sized_kmeans` (a heuristic method
+#     that tries to minimize the variance criterion under the
+#     restriction of equal group sizes). Anticlustering can be done via
+#     maximizinz the distance or the variance criterion.
+#
+# @examples
+#
+# features <- matrix(rnorm(1000, 100, 15), ncol = 2)
+# n_anticlusters <- 4
+# # Precluster cases
+# n_preclusters <- nrow(features) / n_anticlusters
+# preclusters <- equal_sized_kmeans(features, n_preclusters)
+# # Use preclustering as resticting information in anticlustering
+# anticlusters <- heuristic_anticlustering(features, preclusters)
+# # Check out results
+# plot(features, col = anticlusters, pch = 19)
+# tapply(features[, 1], anticlusters, mean)
+# tapply(features[, 1], anticlusters, sd)
+# tapply(features[, 2], anticlusters, mean)
+# tapply(features[, 2], anticlusters, sd)
+#
+# anticlusters <- heuristic_anticlustering(features, preclusters, objective = "variance")
+#
 heuristic_anticlustering <- function(features, clustering, objective = "distance",
                                      nrep = 100) {
 

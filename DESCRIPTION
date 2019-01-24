@@ -12,8 +12,8 @@ Description: Anticlustering establishes groups of elements (i.e.,
     optimization criteria that both maximize group similarity. The exact
     approach requires that a linear programming solver is installed. The
     package also offers methods to solve classical clustering problems
-    under specific cluster size constraints, i.e., creating clusters of equal
-    size.
+    under specific cluster size constraints, i.e., creating clusters of
+    equal size.
 Encoding: UTF-8
 License: MIT + file LICENSE
 LazyData: true

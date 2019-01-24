@@ -1,34 +1,31 @@
 
 
-#' Heuristic algorithm creating equal-sized clusters
-#'
-#' Uses kmeans algorithm to initiate cluster centers, then sequentially
-#' chooses a cluster center and assigns the closest element to it,
-#' ensuring that each cluster is filled with the same number of items.
-#'
-#' @param features A vector, matrix or data.frame of data points.  Rows
-#'     correspond to items and columns correspond to features.
-#' @param nclusters The number of clusters to be created.
-#'
-#' @return A vector representing the clustering
-#'
-#' @export
-#'
-#' @examples
-#'
-#' # Equal-sized k-means
-#' clusters1 <- equal_sized_kmeans(iris[- 5], 3)
-#' table(clusters1)
-#' table(clusters1, iris[, 5])
-#' plot(iris[, 1], iris[, 2], col = clusters1, pch = 19)
-#' # Compare to classical k-means
-#' clusters2 <- kmeans(iris[- 5], 3)$cl
-#' table(clusters2)
-#' table(clusters2, iris[, 5])
-#' plot(iris[, 1], iris[, 2], col = clusters2, pch = 19)
-#'
-#' @importFrom stats kmeans
-#'
+# Heuristic algorithm creating equal-sized clusters
+#
+# Uses kmeans algorithm to initiate cluster centers, then sequentially
+# chooses a cluster center and assigns the closest element to it,
+# ensuring that each cluster is filled with the same number of items.
+#
+# @param features A vector, matrix or data.frame of data points.  Rows
+#     correspond to items and columns correspond to features.
+# @param nclusters The number of clusters to be created.
+#
+# @return A vector representing the clustering
+#
+# @examples
+#
+# # Equal-sized k-means
+# clusters1 <- equal_sized_kmeans(iris[- 5], 3)
+# table(clusters1)
+# table(clusters1, iris[, 5])
+# plot(iris[, 1], iris[, 2], col = clusters1, pch = 19)
+# # Compare to classical k-means
+# clusters2 <- kmeans(iris[- 5], 3)$cl
+# table(clusters2)
+# table(clusters2, iris[, 5])
+# plot(iris[, 1], iris[, 2], col = clusters2, pch = 19)
+#
+#
 equal_sized_kmeans <- function(features, nclusters) {
   ## kmeans does not deal with missing values
   if (any(is.na(features)))
@@ -43,7 +40,6 @@ equal_sized_kmeans <- function(features, nclusters) {
   ## determine distances between all items and all cluster centers:
   clust_dist <- dist_from_centers(features, centers, squared = TRUE)
   assignments <- heuristic_cluster_assignment(clust_dist)
-  ## return in long format that is consistent with return of ILP
   return(clusters_to_long(assignments))
 }
 
@@ -90,15 +86,15 @@ clusters_to_long <- function(assignments) {
 }
 
 
-#' Compute cluster centers
-#'
-#' @param features A data matrix of element features
-#' @param clusters A numeric vector indicating cluster membership of
-#'     each element
-#'
-#' @return A matrix of cluster centers. Rows represent clusters and
-#'   columns represent features
-#'
+# Compute cluster centers
+#
+# @param features A data matrix of element features
+# @param clusters A numeric vector indicating cluster membership of
+#     each element
+#
+# @return A matrix of cluster centers. Rows represent clusters and
+#   columns represent features
+#
 
 cluster_centers <- function(features, clusters) {
   features <- as.matrix(features) #  if features is a vector

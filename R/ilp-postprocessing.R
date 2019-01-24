@@ -1,42 +1,25 @@
 
-#' Return group membership based on ILP solution for item assignment
-#'
-#' This function is primarily called from within other functions and
-#' probably should not be called directly.
-#'
-#' @param ilp An ILP representation of the item assignment problem
-#'     (returned by rom `item_assign_ilp`)
-#' @param solution The solution of the instance returned by the function
-#'     `solve_ilp`.
-#'
-#' @return A vector: the anticlusters resulting from the ILP.
-#' @export
-#'
+# Return group membership based on ILP solution for item assignment
+#
+# This function is primarily called from other functions and
+# probably should not be called directly. Only use this if you have
+# called solve_ilp earlier.
+#
+# @param ilp An ILP representation of the item assignment problem
+#     (returned by anticlustering_ilp)
+# @param solution The solution of the instance returned by
+#     solve_ilp
+#
+# @return A vector representing anticluster affiliation for each
+#     element
+#
 ilp_to_groups <- function(ilp, solution) {
-  assignment <- fill_groups_wce(ilp, solution)
-  return(assignment$group)
-}
-
-#' Return group membership based on ILP solution for a weighted cluster
-#' editing instance
-#'
-#' @param ilp An ILP representation of the item assignment problem
-#'     (returned by rom `item_assign_ilp`)
-#' @param solution The solution of the instance returned by the function
-#'     `solve_ilp`.
-#'
-#' @return A data.frame containing one column of item ids (here, the id
-#'     corresponds to the order of the items); one column contains the
-#'     group assignments of the items.
-#'
-fill_groups_wce <- function(ilp, solution) {
   assignment_list <- fill_groups_wce_(ilp, solution$x)
   ret <- data.frame(item = unlist(assignment_list),
                     group = rep(1:length(assignment_list),
                                 list_length(assignment_list)))
   ret <- sort_by_col(ret, "item")
-  rownames(ret) <- NULL
-  return(ret)
+  return(ret$group)
 }
 
 
@@ -97,29 +80,28 @@ fill_groups_ <- function(ilp, variable_assignment, groups) {
 list_length <- function(x) sapply(x, length)
 
 
-#' Edit distances
-#'
-#' Based on a clustering, distances between elements of the same cluster
-#' are set to a specified value. This is used to enforce or forbid pairs
-#' of elements to be part of the same anticluster when the distance
-#' matrix is passed to the ILP solver.  By considering a preclustering
-#' of items, very similar items will not be assigned to the same group
-#' when the fixed distance object is used to create the ILP formulation
-#' of the item assignment instance.
-#'
-#' @param distances A distance object or matrix of
-#'     between-item-distances.
-#'
-#' @param clustering A vector representing a clustering; objects that
-#'     are part of the same cluster are assigned a new distance.
-#' @param value The value that is assigned to the fixed distances.
-#'     Defaults to -1,000,000.
-#'
-#' @return A distance object containing the fixed distances. For items
-#'     that are part of the same cluster.
-#'
-#' @importFrom stats as.dist dist
-#'
+# Edit distances
+#
+# Based on a clustering, distances between elements of the same cluster
+# are set to a specified value. This is used to enforce or forbid pairs
+# of elements to be part of the same anticluster when the distance
+# matrix is passed to the ILP solver.  By considering a preclustering
+# of items, very similar items will not be assigned to the same group
+# when the fixed distance object is used to create the ILP formulation
+# of the item assignment instance.
+#
+# @param distances A distance object or matrix of
+#     between-item-distances.
+#
+# @param clustering A vector representing a clustering; objects that
+#     are part of the same cluster are assigned a new distance.
+# @param value The value that is assigned to the fixed distances.
+#     Defaults to -1,000,000.
+#
+# @return A distance object containing the fixed distances. For items
+#     that are part of the same cluster.
+#
+#
 edit_distances <- function(distances, clustering, value = -1000000) {
   n_groups <- length(unique(clustering))
   distances <- as.matrix(distances)

@@ -8,19 +8,20 @@ anticlustering(features, n_anticlusters, standardize = TRUE,
   objective = "distance", method = "heuristic")
 }
 \arguments{
-\item{features}{A vector, matrix or data.frame of data points.  Rows
+\item{features}{A vector, matrix or data.frame of data points. Rows
 correspond to elements and columns correspond to features.}
 
 \item{n_anticlusters}{How many anticlusters should be created.}
 
 \item{standardize}{Boolean - should the features be standardized
-before anticlusters are created? Defaults to TRUE}
+before anticlusters are assigned? Defaults to TRUE}
 
 \item{objective}{The objective to be maximized, either "distance"
-(default) or "variance". See Details}
+(default) or "variance". See Details.}
 
 \item{method}{One of "heuristic" or "exact". Currently, an exact
-solution can only be obtained when the `objective` is "distance".}
+solution can only be obtained when the `objective` is "distance".
+Use method exact only for small problem sizes (< 30 elements)}
 }
 \value{
 A vector representing anticluster affiliation
@@ -36,4 +37,12 @@ TODO: Write details
 
 # TODO: Write examples
 
+}
+\references{
+M. Grötschel and Y. Wakabayashi, “A cutting plane algorithm for a
+clustering problem,” Mathematical Programming, vol. 45, nos. 1-3, pp.
+59–96, 1989.
+
+H. Späth, “Anticlustering: Maximizing the variance criterion,”
+Control and Cybernetics, vol. 15, no. 2, pp. 213–218, 1986.
 }

@@ -1,6 +1,6 @@
 
 
-context("Test high level function to solve distance anticlustering")
+context("Test solving function for distance anticlustering")
 library("anticlust")
 
 test_that("all levels of heuristicism work and that exact approach has best objective", {

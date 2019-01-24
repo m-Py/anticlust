@@ -1,29 +1,27 @@
 
-#' Construct the ILP represenation of a anticlustering problem
-
-#' @param distances An distance object or matrix representing the
-#'     distances between items
-#' @param p The number of groups to be created
-#' @param solver A string identifing the solver to be used ("Rglpk",
-#'     "gurobi", or "Rcplex")
-#'
-#' @return A list representing the ILP formulation of the instance
-#'
-#' @details To use this function, a linear programming solver must be
-#'     installed and usable in R. You can use the open source GNU linear
-#'     programming kit (called from the package `Rglpk`) or one of the
-#'     commercial solvers gurobi (called from the package `gurobi`) or
-#'     IBM CPLEX (called from the package `Rcplex`). A license is needed
-#'     for the commercial solvers. One of the interface packages must be
-#'     installed.
-#'
-#' @export
-#'
-#' @references
-#'
-#' M. Grötschel and Y. Wakabayashi, “A cutting plane algorithm for a
-#' clustering problem,” Mathematical Programming, vol. 45, nos. 1-3, pp.
-#' 59–96, 1989.
+# Construct the ILP represenation of a anticlustering problem
+#
+# @param distances An distance object or matrix representing the
+#     distances between items
+# @param p The number of groups to be created
+# @param solver A string identifing the solver to be used ("Rglpk",
+#     "gurobi", or "Rcplex")
+#
+# @return A list representing the ILP formulation of the instance
+#
+# @details To use this function, a linear programming solver must be
+#     installed and usable in R. You can use the open source GNU linear
+#     programming kit (called from the package `Rglpk`) or one of the
+#     commercial solvers gurobi (called from the package `gurobi`) or
+#     IBM CPLEX (called from the package `Rcplex`). A license is needed
+#     for the commercial solvers. One of the interface packages must be
+#     installed.
+#
+# @references
+#
+# M. Grötschel and Y. Wakabayashi, “A cutting plane algorithm for a
+# clustering problem,” Mathematical Programming, vol. 45, nos. 1-3, pp.
+# 59–96, 1989.
 
 anticlustering_ilp <- function(distances, p, solver = "Rglpk") {
 
@@ -100,7 +98,7 @@ equality_identifiers <- function(solver) {
 #' Convert matrix of distances into vector of distances
 #'
 #' @param distances A distance matrix of class matrix or dist
-#' 
+#'
 #' @return A data.frame having the following columns: `costs` - the
 #'     distances in vectorized form; `i` the first index of the item
 #'     pair that is connected; `j` the second index of the item pair

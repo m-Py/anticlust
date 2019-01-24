@@ -29,6 +29,9 @@
 #' get_objective(features, anticlusters, "distance")
 #' get_objective(features, anticlusters, "variance")
 #'
+#' H. Späth, “Anticlustering: Maximizing the variance criterion,”
+#' Control and Cybernetics, vol. 15, no. 2, pp. 213–218, 1986.
+#'
 get_objective <- function(features, anticlusters, objective) {
   features <- as.matrix(features)
   if (!objective %in% c("distance", "variance"))
@@ -40,15 +43,15 @@ get_objective <- function(features, anticlusters, objective) {
 }
 
 
-#' Compute objective value for variance criterion
-#'
-#' @param features A data.frame, matrix or vector representing the
-#'     features that are used in the assignment.
-#' @param anticlusters A vector representing the anticluster affiliation
-#'
-#' @return Scalar, the total within-cluster variance.
-#'
-#'
+# Compute objective value for variance criterion
+#
+# @param features A data.frame, matrix or vector representing the
+#     features that are used in the assignment.
+# @param anticlusters A vector representing the anticluster affiliation
+#
+# @return Scalar, the total within-cluster variance.
+#
+#
 obj_value_variance <- function(features, anticlusters) {
   ## 1. Compute cluster centers
   centers <- cluster_centers(features, anticlusters)
@@ -59,15 +62,15 @@ obj_value_variance <- function(features, anticlusters) {
   return(sum(distances))
 }
 
-#' Objective value for the distance criterion
-#'
-#' @param features A data.frame, matrix or vector representing the
-#'     features that are used in the assignment.
-#' @param anticlusters A vector representing the anticluster affiliation
-#'
-#' @return Scalar, the total sum of within-cluster pointwise distances.
-#'
-#'
+# Objective value for the distance criterion
+#
+# @param features A data.frame, matrix or vector representing the
+#     features that are used in the assignment.
+# @param anticlusters A vector representing the anticluster affiliation
+#
+# @return Scalar, the total sum of within-cluster pointwise distances.
+#
+#
 obj_value_distance <- function(features, anticlusters) {
   ## determine distances within each group
   distances <- by(features, anticlusters, dist)
