@@ -1,21 +1,25 @@
 Package: anticlust
 Type: Package
 Title: Algorithms for the anticlustering problem
-Version: 0.1.2
-Author: Martin Papenberg
-Maintainer: Martin Papenberg <martin.papenberg@hhu.de>
-Description: Algorithms to solve the anticlustering problem,
-    i.e., assigning elements to groups in such a way that the groups are as
-    similar as possible. Includes exact and heuristics methods. The exact 
-    approach requires that an linear programming solver is installed. 
-    Also offers methods to solve clustering problems under specific size 
-    constraints, i.e., creating clusters of equal size.
+Version: 0.2.0
+Authors@R: person("Papenberg", "Martin", email = "martin.papenberg@hhu.de",
+  role = c("aut", "cre"))
+Description: Anticlustering establishes groups of elements (i.e.,
+    anticlusters) that are as similar as possible, reversing the logic
+    of classical cluster analysis that creates groups that can be
+    clearly separated. This package includes exact and heuristics
+    methods to solve anticlustering, making use of two different
+    optimization criteria that maximize group similarity. The exact
+    approach requires that a linear programming solver is installed. The
+    package also offers methods to solve classical clustering problems
+    under specific size constraints, i.e., creating clusters of equal
+    size.
 Encoding: UTF-8
 License: MIT
 LazyData: true
 RoxygenNote: 6.1.0
 Imports: Matrix
-Suggests: 
+Suggests:
     gurobi,
     Rglpk,
     Rcplex,
