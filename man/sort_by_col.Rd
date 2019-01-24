@@ -9,17 +9,12 @@ sort_by_col(x, col)
 \arguments{
 \item{x}{A matrix or data frame}
 
-\item{row}{An numeric index or character vector for selecting
-the column by which the table is sorted. Needs to have length 1.}
+\item{col}{An numeric index or character vector of length 1 to select
+the column by which the table is sorted.}
 }
 \value{
 The matrix or data frame sorted by `row`
 }
 \description{
 Sort a matrix or data frame by one column
-}
-\examples{
-mat <- cbind(10:1, 1:10)
-mat
-sort_by_col(mat, 1)
 }

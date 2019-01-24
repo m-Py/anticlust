@@ -7,15 +7,15 @@ Authors@R: person("Papenberg", "Martin", email = "martin.papenberg@hhu.de",
 Description: Anticlustering establishes groups of elements (i.e.,
     anticlusters) that are as similar as possible, reversing the logic
     of classical cluster analysis that creates groups that can be
-    clearly separated. This package includes exact and heuristics
-    methods to solve anticlustering, making use of two different
-    optimization criteria that maximize group similarity. The exact
+    clearly separated. This package includes exact and heuristic
+    approaches to solve anticlustering, making use of two different
+    optimization criteria that both maximize group similarity. The exact
     approach requires that a linear programming solver is installed. The
     package also offers methods to solve classical clustering problems
-    under specific size constraints, i.e., creating clusters of equal
+    under specific cluster size constraints, i.e., creating clusters of equal
     size.
 Encoding: UTF-8
-License: MIT
+License: MIT + file LICENSE
 LazyData: true
 RoxygenNote: 6.1.0
 Imports: Matrix

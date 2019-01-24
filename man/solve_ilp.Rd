@@ -2,7 +2,7 @@
 % Please edit documentation in R/ilp-solve.R
 \name{solve_ilp}
 \alias{solve_ilp}
-\title{Solve the ILP formulation of the item assignment problem}
+\title{Solve the ILP formulation of distance anticlustering}
 \usage{
 solve_ilp(ilp, solver, objective = "max")
 }
@@ -10,8 +10,8 @@ solve_ilp(ilp, solver, objective = "max")
 \item{ilp}{An object representing the ILP formulation of the
 instance, returned by `item_assign_ilp`}
 
-\item{solver}{A string identifing the solver to be used ("glpk",
-"gurobi", or "cplex")}
+\item{solver}{A string identifing the solver to be used ("Rglpk",
+"gurobi", or "Rcplex")}
 
 \item{objective}{A string identifying whether the objective function
 of the ILP should be maximized ("max") or minimized
@@ -26,8 +26,8 @@ A `list` having two entries: `x` is the vector of optimal
 }
 \description{
 Usually it will be advised to call the higher level function
-`item_assignment` By setting the `objective` parameter to "min", this
-function solves weighted cluster editing instead of item assignment.
+`distance_anticlustering`. By setting the `objective` parameter to "min", this
+function solves weighted cluster editing instead of anticlustering.
 }
 \details{
 To use this function, a linear programming solver must

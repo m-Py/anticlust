@@ -4,12 +4,14 @@
 \alias{distance_anticlustering}
 \title{Solve anticlustering using the distance criterion}
 \usage{
-distance_anticlustering(features, n_groups, solver, standardize = TRUE,
-  heuristic = 1)
+distance_anticlustering(features, n_anticlusters, solver,
+  standardize = TRUE, heuristic = 1)
 }
 \arguments{
 \item{features}{A vector, matrix or data.frame of data points.  Rows
 correspond to items and columns correspond to features.}
+
+\item{n_anticlusters}{How many anticlusters should be created.}
 
 \item{solver}{A string identifying the solver to be used ("glpk",
 "gurobi", or "cplex")}
@@ -27,8 +29,6 @@ based on k-means clustering. On Level 3, preclustering is also done
 using the heuristic based on k-means clustering, and the final
 assignment is no longer done using exact ILP item assignment, but
 instead using a repeated random assignment.}
-
-\item{n_anticlusters}{How many anticlusters should be created.}
 }
 \value{
 A vector representing the anticluster affiliation of elements.
@@ -37,7 +37,7 @@ A vector representing the anticluster affiliation of elements.
 Solve anticlustering using the distance criterion
 }
 \details{
-This function includes an exact approach to solving anticlustering
+This function includes an exact approach to anticlustering
  using the distance criterion. To use this functionality, a linear
  programming solver must be installed and usable from R. The open source GNU linear
  programming kit (called from the package `Rglpk`) or one of the

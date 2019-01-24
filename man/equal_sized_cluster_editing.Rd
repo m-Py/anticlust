@@ -4,16 +4,17 @@
 \alias{equal_sized_cluster_editing}
 \title{Solve exact equal-sized cluster editing}
 \usage{
-equal_sized_cluster_editing(items, n_groups, solver, standardize = FALSE)
+equal_sized_cluster_editing(features, n_clusters, solver,
+  standardize = FALSE)
 }
 \arguments{
-\item{items}{A data.frame of item features. Rows must correspond to
-items and columns to features.}
+\item{features}{A vector, matrix or data.frame of data points.  Rows
+correspond to items and columns correspond to features.}
 
-\item{n_groups}{How many clusters are to be created.}
+\item{n_clusters}{How many clusters are to be created.}
 
 \item{solver}{A string identifing the solver to be used ("Rglpk",
-"gurobi", or "cplex")}
+"gurobi", or "Rcplex")}
 
 \item{standardize}{Boolean - should the feature values be
 standardized before groups are created? Defaults to FALSE.}

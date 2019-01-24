@@ -15,6 +15,8 @@
 #'
 #' @return A vector representing anticluster affiliation
 #'
+#' @importFrom utils installed.packages
+#'
 #' @export
 #'
 #' @details TODO: Write details

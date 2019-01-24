@@ -21,7 +21,7 @@
 #'
 #' @return A vector representing the anticluster affiliation of elements.
 #'
-#' @details This function includes an exact approach to solving anticlustering
+#' @details This function includes an exact approach to anticlustering
 #'  using the distance criterion. To use this functionality, a linear
 #'  programming solver must be installed and usable from R. The open source GNU linear
 #'  programming kit (called from the package `Rglpk`) or one of the
@@ -35,7 +35,7 @@
 #'
 #' @export
 #'
-distance_anticlustering <- function(features, n_groups, solver,
+distance_anticlustering <- function(features, n_anticlusters, solver,
                                     standardize = TRUE, heuristic = 1) {
 
   ## some input handling
@@ -52,7 +52,7 @@ distance_anticlustering <- function(features, n_groups, solver,
 
   if (heuristic == 1) {
     ## Preclustering
-    ilp <- anticlustering_ilp(distances, n_items / n_groups,
+    ilp <- anticlustering_ilp(distances, n_items / n_anticlusters,
                               solver = solver)
     solution <- solve_ilp(ilp, solver, "min")
     assignment <- ilp_to_groups(ilp, solution)
@@ -62,13 +62,13 @@ distance_anticlustering <- function(features, n_groups, solver,
     ## Edit ILP - objective function and group sizes
     ilp$obj_function <- vectorize_weights(distances)$costs
     ilp$rhs <- c(rep(1, choose(n_items, 3) * 3),
-                 rep((n_items / n_groups) - 1, n_items))
+                 rep((n_items / n_anticlusters) - 1, n_items))
     ## Solve edited ILP to solve heuristic item assignment
     solution <- solve_ilp(ilp, solver)
     assignment <- ilp_to_groups(ilp, solution)
     return(assignment)
   } else if (heuristic > 1) {
-    assignment <- equal_sized_kmeans(data.frame(features), n_items / n_groups)
+    assignment <- equal_sized_kmeans(data.frame(features), n_items / n_anticlusters)
     distances  <- edit_distances(distances, assignment)
   }
 
@@ -79,64 +79,20 @@ distance_anticlustering <- function(features, n_groups, solver,
 
   ## The following creates the item assignment ILP formulation and
   ## solves it:
-  ilp <- anticlustering_ilp(distances, n_groups, solver = solver)
+  ilp <- anticlustering_ilp(distances, n_anticlusters, solver = solver)
   solution <- solve_ilp(ilp, solver)
   assignment <- ilp_to_groups(ilp, solution)
   return(assignment)
 }
 
 
-#' Edit distances of neighbours
-#'
-#' Based on a preclustering, distances between items of the same cluster
-#' are set to a large negative value. By considering a preclustering of
-#' items, very similar items will not be assigned to the same group when
-#' the fixed distance object is used to create the ILP formulation of
-#' the item assignment instance.
-#'
-#' @param distances A distance object or matrix of
-#'     between-item-distances.
-#' @return A vector representing the group assignment; objects that are
-#'     part of the same group as indicated by this vector are assigned a
-#'     new distance.
-#' @param value The value that is assigned to the fixed distances.
-#'     Defaults to -1,000,000 currently.
-#'
-#' @return A distance object containing the fixed distances. For items
-#'     that are part of the same cluster (as specified in the
-#'     `data.frame` `assignment`), the between-item-distances are set to
-#'     -1000000. This will have to be replaced by a theoretically-sound
-#'     value; -1000000 is just a hack that will work in the present
-#'     applications.
-#'
-#' @importFrom stats as.dist dist
-#' @export
-
-edit_distances <- function(distances, assignment, value = -1000000) {
-  n_groups <- length(unique(assignment))
-  distances <- as.matrix(distances)
-  for (i in 1:n_groups) {
-    items <- which(assignment == i) ## which items are in the i'th cluster
-    ## two for-loops to tap all pairwise distances that may require
-    ## fixing (a lot of unnecessary iterations, probably)
-    for (j in 1:(length(items) - 1)) {
-      for (t in 2:length(items)) {
-        distances[items[j], items[t]] <- value
-        distances[items[t], items[j]] <- value
-      }
-    }
-  }
-  return(as.dist(distances))
-}
-
-
 #' Solve exact equal-sized cluster editing
 #'
-#' @param items A data.frame of item features. Rows must correspond to
-#'     items and columns to features.
-#' @param n_groups How many clusters are to be created.
+#' @param features A vector, matrix or data.frame of data points.  Rows
+#'     correspond to items and columns correspond to features.
+#' @param n_clusters How many clusters are to be created.
 #' @param solver A string identifing the solver to be used ("Rglpk",
-#'   "gurobi", or "cplex")
+#'   "gurobi", or "Rcplex")
 #' @param standardize Boolean - should the feature values be
 #'     standardized before groups are created? Defaults to FALSE.
 #'
@@ -144,29 +100,30 @@ edit_distances <- function(distances, assignment, value = -1000000) {
 #'
 #' @export
 #'
-equal_sized_cluster_editing <- function(items, n_groups, solver,
+equal_sized_cluster_editing <- function(features, n_clusters, solver,
                                         standardize = FALSE) {
+
   if (standardize) {
-    items <- scale(items)
+    features <- scale(features)
   }
-  distances <- dist(items)
-  ilp <- item_assign_ilp(distances, n_groups, solver = solver)
+  distances <- dist(features)
+  ilp <- distance_anticlustering(distances, n_clusters, solver = solver)
   solution <- solve_ilp(ilp, solver, "min")
   assignment <- ilp_to_groups(ilp, solution)
   return(assignment)
 }
 
 
-#' Solve the ILP formulation of the item assignment problem
+#' Solve the ILP formulation of distance anticlustering
 #'
 #' Usually it will be advised to call the higher level function
-#' `item_assignment` By setting the `objective` parameter to "min", this
-#' function solves weighted cluster editing instead of item assignment.
+#' `distance_anticlustering`. By setting the `objective` parameter to "min", this
+#' function solves weighted cluster editing instead of anticlustering.
 #'
 #' @param ilp An object representing the ILP formulation of the
 #'     instance, returned by `item_assign_ilp`
-#' @param solver A string identifing the solver to be used ("glpk",
-#'   "gurobi", or "cplex")
+#' @param solver A string identifing the solver to be used ("Rglpk",
+#'   "gurobi", or "Rcplex")
 #' @param objective A string identifying whether the objective function
 #'     of the ILP should be maximized ("max") or minimized
 #'     ("min"). Maximizing creates similar groups (i.e., solves item

@@ -18,6 +18,8 @@
 #'
 #' @export
 #'
+#' @importFrom grDevices rainbow
+#' @importFrom graphics lines par plot
 #'
 draw_assignment <- function(features, clustering, xlab = "feature 1",
                             ylab = "feature 2", cols = NULL,

@@ -14,10 +14,7 @@ ilp_to_groups(ilp, solution)
 `solve_ilp`.}
 }
 \value{
-A data.frame containing one column of item ids (here, the id
-    corresponds to the order of the items) and one column contains the
-    group assignments of the items. The original items are also
-    returned as columns of the data.frame.
+A vector: the anticlusters resulting from the ILP.
 }
 \description{
 This function is primarily called from within other functions and probably
