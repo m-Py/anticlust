@@ -4,8 +4,8 @@
 \alias{anticlustering}
 \title{Anticlustering}
 \usage{
-anticlustering(features, n_anticlusters, standardize = TRUE,
-  objective = "distance", method = "heuristic")
+anticlustering(features, n_anticlusters, standardize = FALSE,
+  objective = "distance", method = "annealing")
 }
 \arguments{
 \item{features}{A vector, matrix or data.frame of data points. Rows
@@ -14,14 +14,12 @@ correspond to elements and columns correspond to features.}
 \item{n_anticlusters}{How many anticlusters should be created.}
 
 \item{standardize}{Boolean - should the features be standardized
-before anticlusters are assigned? Defaults to TRUE}
+before anticlusters are assigned? Defaults to FALSE}
 
 \item{objective}{The objective to be maximized, either "distance"
 (default) or "variance". See Details.}
 
-\item{method}{One of "heuristic" or "exact". Currently, an exact
-solution can only be obtained when the `objective` is "distance".
-Use method exact only for small problem sizes (< 30 elements)}
+\item{method}{One of "annealing", "random", or "exact". See details.}
 }
 \value{
 A vector representing anticluster affiliation
@@ -31,11 +29,53 @@ Create groups of elements (anticlusters) that are as similar as
 possible.
 }
 \details{
-TODO: Write details
+TODO: Some explanation of objective.
+
+An exact solution can only be obtained when the `objective` is
+"distance". Use method exact only for small problem sizes (< 30
+elements). To use the exact approach, To use this functionality, a linear
+programming solver must be installed and usable from R. The open
+source GNU linear programming kit (called from the package
+`Rglpk`) or one of the commercial solvers gurobi (called from the
+package `gurobi`) or IBM CPLEX (called from the package `Rcplex`)
+can be used. A license is needed for the commercial solvers and one
+of the interface packages must be installed.
+
+Two heuristic approaches
+are available, one based on repeated random sampling and another
+based on simulated annealing. Both approaches rely on a preclustering
+that prevents grouping very similar elements into the same anticluster.
+Method = "random" will be somewhat faster, but method = "annealing" will
+usually return a slightly better objective.
 }
 \examples{
 
-# TODO: Write examples
+# Compare heuristic approaches
+n_elements <- 200
+features <- matrix(round(rnorm(n_elements * 2, 70, 15)), ncol = 2)
+criterion <- "variance"
+n_anticlusters <- 4
+classes1 <- anticlustering(features, n_anticlusters, objective = criterion,
+                           standardize = FALSE, method = "random")
+classes2 <- anticlustering(features, n_anticlusters, objective = criterion,
+                             standardize = FALSE, method = "annealing")
+get_objective(features, classes1, objective = criterion)
+get_objective(features, classes2, objective = criterion)
+
+# Try out exact approach, only works with distance objective
+criterion <- "distance"
+n_elements <- 20
+features <- matrix(round(rnorm(n_elements * 2, 70, 15)), ncol = 2)
+n_anticlusters <- 2
+classes1 <- anticlustering(features, n_anticlusters, objective = criterion,
+                           standardize = FALSE, method = "random")
+classes2 <- anticlustering(features, n_anticlusters, objective = criterion,
+                           standardize = FALSE, method = "annealing")
+classes3 <- anticlustering(features, n_anticlusters, objective = criterion,
+                           standardize = FALSE, method = "exact")
+get_objective(features, classes1, objective = criterion)
+get_objective(features, classes2, objective = criterion)
+get_objective(features, classes3, objective = criterion)
 
 }
 \references{

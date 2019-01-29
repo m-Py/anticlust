@@ -33,7 +33,8 @@ test_that("high level anticlustering function runs through", {
     n_elements <- n_clusters * 3 # n must be multiplier of p
     features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
     anticlusters_exact <- anticlustering(features, n_clusters, method = "exact", standardize = FALSE)
-    anticlusters_heuristic <- anticlustering(features, n_clusters, method = "heuristic", standardize = FALSE)
+    anticlusters_heuristic <- anticlustering(features, n_clusters,
+                                             method = "random", standardize = FALSE)
     ## Check that output is valid
     expect_equal(legal_number_of_clusters(features, anticlusters_exact), NULL)
     expect_equal(legal_number_of_clusters(features, anticlusters_heuristic), NULL)
