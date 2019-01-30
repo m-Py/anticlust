@@ -76,17 +76,19 @@ heuristic_anticlustering <- function(features, clustering, objective = "distance
 }
 
 ## Simulated annealing approach to finding the best objective considering
-## preclustering restrictions
-
+## preclustering restrictions. Relevant for this method is the
+## next_candidate function below
 simulated_annealing <- function(dat, clustering, objective) {
   ## Initialize variables
   n_elements <- nrow(dat)
   n_preclusters <- length(unique(clustering))
   n_anticlusters <- n_elements / n_preclusters
-  ## Initial parameter values
+  ## Initial parameter values; the preclustering ensures a good initial
+  ## state for the simulated annealing approach
   init <- replicate_sample(n_preclusters, n_anticlusters)
 
-  ## Wrap objective function so it takes only one parameter
+  ## Wrap objective function so it only takes the anticluster
+  ## affiliation as parameter (data is included from outside the function)
   objective_fun <- function(clusters) {
     return(get_objective(dat[, -c(1, 2)], clusters, objective))
   }
@@ -96,6 +98,28 @@ simulated_annealing <- function(dat, clustering, objective) {
                control = list(maxit = 10000, temp = 2000, REPORT = 500,
                               fnscale = -1, tmax = 20))$par)
 }
+
+
+## Generate a candidate move for simulated annealing anticlustering.
+## This function only works as expected when the anticlusters are sorted
+## by precluster, as is the case when it is called from within the
+## `simulated_annealing` function above.
+next_candidate <- function(anticlusters) {
+  n_anticlusters <- length(unique(anticlusters))
+  n_preclusters <- length(anticlusters) / n_anticlusters
+  preclusters <- rep(1:n_preclusters, each = n_anticlusters)
+  ## Select a random precluster
+  rndclus <- sample(n_preclusters, 1)
+  ## Within this precluster, which elements should be swapped into
+  ## the respective other anticluster?
+  changepoints <- sample(n_anticlusters, size = 2, replace = FALSE)
+  ## Some ugly code for swapping anticluster affiliation of the two elements
+  tmp <- anticlusters[preclusters == rndclus][changepoints[1]]
+  anticlusters[preclusters == rndclus][changepoints[1]] <- anticlusters[preclusters == rndclus][changepoints[2]]
+  anticlusters[preclusters == rndclus][changepoints[2]] <- tmp
+  return(anticlusters)
+}
+
 
 ## Random sampling approach to finding the best objective considering
 ## preclustering restrictions
@@ -118,26 +142,8 @@ random_sampling <- function(dat, clustering, objective, nrep) {
 }
 
 ## Random anticluster assignment, replicated per precluster; called
-## from within `heuristic_anticlustering`
+## from within `random_sampling` and `simulated_annealing`
 replicate_sample <- function(times, N) {
   c(replicate(times, sample(N)))
 }
 
-
-## Generate a candidate move for simulated annealing anticlustering.
-## This function only works as expected when the anticlusters are sorted
-## by precluster, as is the case when it is called from within
-next_candidate <- function(anticlusters) {
-  n_anticlusters <- length(unique(anticlusters))
-  n_preclusters <- length(anticlusters) / n_anticlusters
-  preclusters <- rep(1:n_preclusters, each = n_anticlusters)
-  ## select a random precluster
-  rndclus <- sample(n_preclusters, 1)
-  ## within this precluster, which elements should be swapped?
-  changepoints <- sample(n_anticlusters, size = 2, replace = FALSE)
-  ## Some ugly code for swapping the two values
-  tmp <- anticlusters[preclusters == rndclus][changepoints[1]]
-  anticlusters[preclusters == rndclus][changepoints[1]] <- anticlusters[preclusters == rndclus][changepoints[2]]
-  anticlusters[preclusters == rndclus][changepoints[2]] <- tmp
-  return(anticlusters)
-}
