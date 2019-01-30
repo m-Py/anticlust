@@ -64,21 +64,31 @@
 #' get_objective(features, classes1, objective = criterion)
 #' get_objective(features, classes2, objective = criterion)
 #'
-#' # Try out exact approach, only works with distance objective
+#' # Compare exact and heuristic approaches:
+#' conditions <- expand.grid(preclustering = c(TRUE, FALSE),
+#'                           method = c("exact", "annealing", "sampling"))
+#' # Set up matrix to store the objective values obtained by different methods
+#' storage <- matrix(ncol = 3, nrow = 2)
+#' colnames(storage) <- c("exact", "annealing", "sampling")
+#' rownames(storage) <- c("preclustering", "no_preclustering")
+#'
 #' criterion <- "distance"
 #' n_elements <- 20
 #' features <- matrix(round(rnorm(n_elements * 2, 70, 15)), ncol = 2)
 #' n_anticlusters <- 2
-#' classes1 <- anticlustering(features, n_anticlusters, objective = criterion,
-#'                            method = "sampling")
-#' classes2 <- anticlustering(features, n_anticlusters, objective = criterion,
-#'                            method = "annealing")
-#' # exact variant
-#' classes3 <- anticlustering(features, n_anticlusters, objective = criterion,
-#'                            method = "exact", preclustering = FALSE)
-#' get_objective(features, classes1, objective = criterion)
-#' get_objective(features, classes2, objective = criterion)
-#' get_objective(features, classes3, objective = criterion)
+#'
+#' for (i in 1:nrow(conditions)) {
+#'   method <- conditions$method[i]
+#'   preclustering <- conditions$preclustering[i]
+#'   anticlusters <- anticlustering(features, n_anticlusters, criterion,
+#'                                  method, preclustering)
+#'   obj <- get_objective(features, anticlusters, objective = criterion)
+#'   rowname <- ifelse(preclustering, "preclustering", "no_preclustering")
+#'   storage[rowname, method] <- obj
+#' }
+#' storage
+#'
+#'
 #'
 #' @references
 #'
