@@ -1,5 +1,5 @@
 
-#' Anticlustering
+#' Algorithms for anticlustering
 #'
 #' Create groups of elements (anticlusters) that are as similar as
 #' possible.
@@ -47,24 +47,40 @@
 #' sampling and another based on simulated annealing. Both approaches
 #' rely on a preclustering that prevents grouping very similar elements
 #' into the same anticluster. Method = "sampling" will be somewhat
-#' faster, but method = "annealing" will usually return a slightly
-#' better objective.
+#' faster, but method = "annealing" will usually return a better
+#' objective. Simulated annealing is the default setting.
 #'
 #' @examples
 #'
-#' # Compare heuristic approaches
+#' # 1. Default approach to anticlustering (uses simulated annealing)
+#'
+#' # Use Iris data set
+#' data(iris)
+#' anticlusters <- anticlustering(iris[, -5], n_anticlusters = 3)
+#' # Compare feature means by anticluster
+#' by(iris[, -5], anticlusters, colMeans)
+#' # Plot the anticlustering
+#' draw_assignment(iris[, 1:2], anticlusters) # see overlap
+#' draw_assignment(iris[, 3:4], anticlusters)
+#' # Is Iris species distributed evenly among the anticlusters (Species
+#' # is not part of "training")
+#' table(iris$Species, anticlusters)
+#'
+#'
+#' # 2. Compare two heuristic approaches with variance criterion
+#'
 #' n_elements <- 200
-#' features <- matrix(round(rnorm(n_elements * 2, 70, 15)), ncol = 2)
+#' features <- matrix(rnorm(n_elements * 2), ncol = 2)
 #' criterion <- "variance"
 #' n_anticlusters <- 4
-#' classes1 <- anticlustering(features, n_anticlusters, objective = criterion,
-#'                            method = "sampling")
-#' classes2 <- anticlustering(features, n_anticlusters, objective = criterion,
-#'                            method = "annealing")
+#' classes1 <- anticlustering(features, n_anticlusters, criterion, method = "annealing")
+#' classes2 <- anticlustering(features, n_anticlusters, criterion, method = "sampling")
 #' get_objective(features, classes1, objective = criterion)
 #' get_objective(features, classes2, objective = criterion)
 #'
-#' # Compare exact and heuristic approaches:
+#'
+#' # 3. Compare exact and heuristic approaches for distance criterion
+#'
 #' conditions <- expand.grid(preclustering = c(TRUE, FALSE),
 #'                           method = c("exact", "annealing", "sampling"))
 #' # Set up matrix to store the objective values obtained by different methods
@@ -74,7 +90,7 @@
 #'
 #' criterion <- "distance"
 #' n_elements <- 20
-#' features <- matrix(round(rnorm(n_elements * 2, 70, 15)), ncol = 2)
+#' features <- matrix(rnorm(n_elements * 2), ncol = 2)
 #' n_anticlusters <- 2
 #'
 #' for (i in 1:nrow(conditions)) {
@@ -86,8 +102,10 @@
 #'   rowname <- ifelse(preclustering, "preclustering", "no_preclustering")
 #'   storage[rowname, method] <- obj
 #' }
-#' storage
+#' round(storage, 2)
 #'
+#' # Print objectives relative to optimum objective:
+#' round(storage / storage["no_preclustering", "exact"], 3)
 #'
 #'
 #' @references
