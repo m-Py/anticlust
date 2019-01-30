@@ -12,6 +12,12 @@
 #' @param objective The objective to be maximized, either "distance"
 #'     (default) or "variance". See Details.
 #' @param method One of "annealing", "sampling", or "exact". See details.
+#' @param preclustering Boolean, should a preclustering be conducted
+#'     before anticlusters are created. Defaults to TRUE and it is
+#'     strongly suggested to keep it that way for the heuristic methods
+#'     "annealing" and "sampling".
+#'     `preclustering` = FALSE is mainly implemented to test against the
+#'     option `preclustering` = TRUE.
 #'
 #' @return A vector representing anticluster affiliation
 #'
@@ -26,21 +32,23 @@
 #' TODO: Some explanation of objective.
 #'
 #' An exact solution can only be obtained when the `objective` is
-#' "distance". Use method exact only for small problem sizes (< 30
-#' elements). To use the exact approach, a linear programming solver
-#' must be installed and usable from R. The open source GNU linear
-#' programming kit (called from the package `Rglpk`) or one of the
-#' commercial solvers gurobi (called from the package `gurobi`) or IBM
-#' CPLEX (called from the package `Rcplex`) can be used. A license is
-#' needed for the commercial solvers and one of the interface packages
-#' must be installed.
+#' "distance". To obtain the optimal objective for the distance
+#' criterion, use `preclustering` = FALSE, `method` = "exact", and
+#' `objective` = "distance". Use method exact only for small problem
+#' sizes (< 30 elements). To use the exact approach, a linear
+#' programming solver must be installed and usable from R. The open
+#' source GNU linear programming kit (called from the package `Rglpk`)
+#' or one of the commercial solvers gurobi (called from the package
+#' `gurobi`) or IBM CPLEX (called from the package `Rcplex`) can be
+#' used. A license is needed for the commercial solvers and one of the
+#' interface packages must be installed.
 #'
 #' Two heuristic approaches are available, one based on repeated random
 #' sampling and another based on simulated annealing. Both approaches
 #' rely on a preclustering that prevents grouping very similar elements
-#' into the same anticluster. Method = "sampling" will be somewhat faster,
-#' but method = "annealing" will usually return a slightly better
-#' objective.
+#' into the same anticluster. Method = "sampling" will be somewhat
+#' faster, but method = "annealing" will usually return a slightly
+#' better objective.
 #'
 #' @examples
 #'
