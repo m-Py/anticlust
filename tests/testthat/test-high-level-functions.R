@@ -24,9 +24,6 @@ test_that("high level equal sized clustering function runs through", {
 })
 
 
-
-## TODO: include tests for simulated annealing, preclustering (in total:
-## all combinations of possible calls to anticlustering)
 test_that("high level anticlustering function runs through", {
   conditions <- expand.grid(m = 1:4, p = 2:3)
   for (k in 1:nrow(conditions)) {
@@ -36,20 +33,42 @@ test_that("high level anticlustering function runs through", {
     features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
     anticlusters_exact <- anticlustering(features, n_clusters, method = "exact", standardize = FALSE,
                                          preclustering = FALSE)
-    anticlusters_heuristic1 <- anticlustering(features, n_clusters,
+    anticlusters_heuristic <- anticlustering(features, n_clusters,
                                              method = "sampling", standardize = FALSE)
-    anticlusters_heuristic2 <- anticlustering(features, n_clusters,
-                                             method = "annealing", standardize = FALSE)
     ## Check that output is valid
     expect_equal(legal_number_of_clusters(features, anticlusters_exact), NULL)
-    expect_equal(legal_number_of_clusters(features, anticlusters_heuristic1), NULL)
-    expect_equal(legal_number_of_clusters(features, anticlusters_heuristic2), NULL)
+    expect_equal(legal_number_of_clusters(features, anticlusters_heuristic), NULL)
     ## Assert that exact solution has highest objective (for distance
     ## criterion), allowing for numeric imprecision of ILP solver
     obj_exact     <- get_objective(features, anticlusters_exact, "distance")
-    obj_heuristic1 <- get_objective(features, anticlusters_heuristic1, "distance")
-    obj_heuristic2 <- get_objective(features, anticlusters_heuristic2, "distance")
-    expect_equal(round(obj_exact, 10) >= round(obj_heuristic1, 10), TRUE)
-    expect_equal(round(obj_exact, 10) >= round(obj_heuristic2, 10), TRUE)
+    obj_heuristic <- get_objective(features, anticlusters_heuristic, "distance")
+    expect_equal(round(obj_exact, 10) >= round(obj_heuristic, 10), TRUE)
   }
+})
+
+
+test_that("all argument combinations run through", {
+  conditions <- expand.grid(preclustering = c(TRUE, FALSE),
+                            method = c("exact", "annealing", "sampling"))
+  # Set up matrix to store the objective values obtained by different methods
+  storage <- matrix(ncol = 3, nrow = 2)
+  colnames(storage) <- c("exact", "annealing", "sampling")
+  rownames(storage) <- c("preclustering", "no_preclustering")
+
+  criterion <- "distance"
+  n_elements <- 12
+  features <- matrix(round(rnorm(n_elements * 2)), ncol = 2)
+  n_anticlusters <- 2
+
+  for (i in 1:nrow(conditions)) {
+    method <- conditions$method[i]
+    preclustering <- conditions$preclustering[i]
+    anticlusters <- anticlustering(features, n_anticlusters, criterion,
+                                   method, preclustering)
+    obj <- get_objective(features, anticlusters, objective = criterion)
+    rowname <- ifelse(preclustering, "preclustering", "no_preclustering")
+    storage[rowname, method] <- obj
+  }
+  ## Exact solution must be best:
+  expect_equal(all(round(storage["no_preclustering", "exact"], 10) >= round(c(storage), 10)), TRUE)
 })
