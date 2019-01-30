@@ -76,7 +76,7 @@ simulated_annealing <- function(dat, clustering, objective, preclustering = TRUE
   ## state when preclustering is not considered.
   if (preclustering == FALSE) {
     init <- rep(1:n_anticlusters, n_preclusters)
-    init <- sample(anticlusters)
+    init <- sample(init)
   } else if (preclustering == TRUE) {
     init <- replicate_sample(n_preclusters, n_anticlusters)
   }
