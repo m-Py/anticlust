@@ -77,7 +77,7 @@ test_that("heuristic anticlustering produces expected output", {
     expect_equal(as.numeric(table(preclusters)[1]), n_elements / n_preclusters)
 
     ## Now: anticlustering:
-    anticlusters <- heuristic_anticlustering(features, preclusters, nrep = 100)
+    anticlusters <- heuristic_anticlustering(features, preclusters, nrep = 100, method = "sampling")
     ## Legal number of anticlusters?
     expect_equal(legal_number_of_clusters(features, anticlusters), NULL)
     ## Expected number of anticlusters?

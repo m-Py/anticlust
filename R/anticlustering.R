@@ -11,7 +11,7 @@
 #'     before anticlusters are assigned? Defaults to FALSE
 #' @param objective The objective to be maximized, either "distance"
 #'     (default) or "variance". See Details.
-#' @param method One of "annealing", "random", or "exact". See details.
+#' @param method One of "annealing", "sampling", or "exact". See details.
 #'
 #' @return A vector representing anticluster affiliation
 #'
@@ -38,7 +38,7 @@
 #' Two heuristic approaches are available, one based on repeated random
 #' sampling and another based on simulated annealing. Both approaches
 #' rely on a preclustering that prevents grouping very similar elements
-#' into the same anticluster. Method = "random" will be somewhat faster,
+#' into the same anticluster. Method = "sampling" will be somewhat faster,
 #' but method = "annealing" will usually return a slightly better
 #' objective.
 #'
@@ -50,7 +50,7 @@
 #' criterion <- "variance"
 #' n_anticlusters <- 4
 #' classes1 <- anticlustering(features, n_anticlusters, objective = criterion,
-#'                            standardize = FALSE, method = "random")
+#'                            standardize = FALSE, method = "sampling")
 #' classes2 <- anticlustering(features, n_anticlusters, objective = criterion,
 #'                              standardize = FALSE, method = "annealing")
 #' get_objective(features, classes1, objective = criterion)
@@ -62,7 +62,7 @@
 #' features <- matrix(round(rnorm(n_elements * 2, 70, 15)), ncol = 2)
 #' n_anticlusters <- 2
 #' classes1 <- anticlustering(features, n_anticlusters, objective = criterion,
-#'                            standardize = FALSE, method = "random")
+#'                            standardize = FALSE, method = "sampling")
 #' classes2 <- anticlustering(features, n_anticlusters, objective = criterion,
 #'                            standardize = FALSE, method = "annealing")
 #' classes3 <- anticlustering(features, n_anticlusters, objective = criterion,
@@ -85,8 +85,8 @@ anticlustering <- function(features, n_anticlusters, standardize = FALSE,
                            objective = "distance", method = "annealing",
                            preclustering = TRUE) {
 
-  if (!method %in% c("exact", "random",  "annealing"))
-    stop("Method must be one of 'exact', 'random', or 'annealing'")
+  if (!method %in% c("exact", "sampling",  "annealing"))
+    stop("Method must be one of 'exact', 'sampling', or 'annealing'")
   if (!objective %in% c("variance", "distance"))
     stop("Argument objective must be 'distance' or 'variance'.")
 
@@ -108,8 +108,6 @@ anticlustering <- function(features, n_anticlusters, standardize = FALSE,
     stop("There is no exact method for maximizing the variance criterion")
   ## Heuristic approach for variance criterion:
   } else {
-    ## Determine if we use simulated annealing or random sampling
-    method <- ifelse(method == "annealing", "sa", "rnd")
     n_preclusters <- nrow(features) / n_anticlusters
     preclusters <- equal_sized_kmeans(features, n_preclusters)
     anticlusters <- heuristic_anticlustering(features, preclusters,

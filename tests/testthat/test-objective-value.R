@@ -14,7 +14,9 @@ test_that("output of objective value functions has correct structure", {
     n_preclusters <- nrow(features) / p_anticlusters
     preclusters <- equal_sized_kmeans(features, n_preclusters)
     # Use preclustering as resticting information in anticlustering
-    anticlusters <- heuristic_anticlustering(features, preclusters, objective = "distance", nrep = 100)
+    anticlusters <- heuristic_anticlustering(features, preclusters, nrep = 100,
+                                             objective = "distance",
+                                             method = "sampling")
     dist_obj <- get_objective(features, anticlusters, "distance")
     var_obj <- get_objective(features, anticlusters, "variance")
     expect_equal(mode(dist_obj), "numeric")

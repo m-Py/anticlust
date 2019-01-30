@@ -7,10 +7,10 @@
 #     elements. See Details.
 # @param objective The objective to be maximized, either "distance"
 #     (default) or "variance".
-# @param method The method used to find the best objective. Can be "rnd"
-#     for repeated random sampling or "sa" for simulated annealing.
+# @param method The method used to find the best objective. Can be "sampling"
+#     for repeated random sampling or "annealing" for simulated annealing.
 # @param nrep The number of repetitions tried when assigning elements
-#     to anticlusters when the method is "rnd"
+#     to anticlusters when the method is "sampling"
 # @param preclustering Boolean, should a preclustering be conducted
 #     before anticlusters are created. Defaults to TRUE and it is
 #     advised to keep it that way for the heuristic methods.
@@ -34,26 +34,9 @@
 #     exchanges between elements of the same precluster are allowed
 #     in the simulated annealing approach.
 #
-# @examples
-#
-# features <- matrix(rnorm(1000, 100, 15), ncol = 2)
-# n_anticlusters <- 4
-# # Precluster cases
-# n_preclusters <- nrow(features) / n_anticlusters
-# preclusters <- equal_sized_kmeans(features, n_preclusters)
-# # Use preclustering as resticting information in anticlustering
-# anticlusters <- heuristic_anticlustering(features, preclusters)
-# # Check out results
-# plot(features, col = anticlusters, pch = 19)
-# tapply(features[, 1], anticlusters, mean)
-# tapply(features[, 1], anticlusters, sd)
-# tapply(features[, 2], anticlusters, mean)
-# tapply(features[, 2], anticlusters, sd)
-#
-# anticlusters <- heuristic_anticlustering(features, preclusters, objective = "variance")
-#
+
 heuristic_anticlustering <- function(features, clustering, objective = "distance",
-                                     method = "rnd", nrep, preclustering = TRUE) {
+                                     method, nrep, preclustering = TRUE) {
 
   ## Some input handling
   if (!objective %in% c("distance", "variance"))
@@ -67,12 +50,12 @@ heuristic_anticlustering <- function(features, clustering, objective = "distance
   ## precluster is assigned to a different anticluster
   dat <- sort_by_col(dat, 1)
 
-  if (method == "rnd")
+  if (method == "sampling")
     best_assignment <- random_sampling(dat, clustering, objective, nrep, preclustering)
-  else if (method == "sa")
+  else if (method == "annealing")
     best_assignment <- simulated_annealing(dat, clustering, objective, preclustering)
   else
-    stop("Method must be 'rnd' or 'sa'")
+    stop("Method must be 'sampling' or 'annealing'")
 
   ## Return anticluster assignment in original order
   dat[, 1] <- best_assignment
@@ -100,7 +83,9 @@ simulated_annealing <- function(dat, clustering, objective, preclustering = TRUE
 
   ## Wrap objective function so it only takes the anticluster
   ## affiliation as parameter (data is included from outside the function)
-  objective_fun <- function(clusters) {
+  ## (the argument `preclustering` is necessary here because the `next_candidate`
+  ## function has this argument and both functions must have same signature)
+  objective_fun <- function(clusters, preclustering) {
     return(get_objective(dat[, -c(1, 2)], clusters, objective))
   }
 

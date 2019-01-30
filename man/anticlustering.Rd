@@ -19,7 +19,7 @@ before anticlusters are assigned? Defaults to FALSE}
 \item{objective}{The objective to be maximized, either "distance"
 (default) or "variance". See Details.}
 
-\item{method}{One of "annealing", "random", or "exact". See details.}
+\item{method}{One of "annealing", "sampling", or "exact". See details.}
 }
 \value{
 A vector representing anticluster affiliation
@@ -44,7 +44,7 @@ must be installed.
 Two heuristic approaches are available, one based on repeated random
 sampling and another based on simulated annealing. Both approaches
 rely on a preclustering that prevents grouping very similar elements
-into the same anticluster. Method = "random" will be somewhat faster,
+into the same anticluster. Method = "sampling" will be somewhat faster,
 but method = "annealing" will usually return a slightly better
 objective.
 }
@@ -56,7 +56,7 @@ features <- matrix(round(rnorm(n_elements * 2, 70, 15)), ncol = 2)
 criterion <- "variance"
 n_anticlusters <- 4
 classes1 <- anticlustering(features, n_anticlusters, objective = criterion,
-                           standardize = FALSE, method = "random")
+                           standardize = FALSE, method = "sampling")
 classes2 <- anticlustering(features, n_anticlusters, objective = criterion,
                              standardize = FALSE, method = "annealing")
 get_objective(features, classes1, objective = criterion)
@@ -68,7 +68,7 @@ n_elements <- 20
 features <- matrix(round(rnorm(n_elements * 2, 70, 15)), ncol = 2)
 n_anticlusters <- 2
 classes1 <- anticlustering(features, n_anticlusters, objective = criterion,
-                           standardize = FALSE, method = "random")
+                           standardize = FALSE, method = "sampling")
 classes2 <- anticlustering(features, n_anticlusters, objective = criterion,
                            standardize = FALSE, method = "annealing")
 classes3 <- anticlustering(features, n_anticlusters, objective = criterion,
