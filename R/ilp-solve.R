@@ -7,7 +7,7 @@
 # @param solver A string identifying the solver to be used ("glpk",
 #     "gurobi", or "cplex")
 # @param standardize Boolean - should the feature values be
-#     standardized before groups are created? Defaults to TRUE
+#     standardized before groups are created?
 # @param heuristic Set the level of "heuristicism" by setting a numeric
 #     value of 0 to 3. Set to 0 to obtain the exact solution for the
 #     item assignment instance. Levels 1 to 3 will in a first step
@@ -36,17 +36,15 @@
 #     be optimal, though it often still is.
 #
 #
-distance_anticlustering <- function(features, n_anticlusters, solver,
-                                    standardize = TRUE, heuristic = 1) {
+distance_anticlustering <- function(features, n_anticlusters, solver, heuristic) {
 
   ## some input handling
-  if (!(heuristic %in% 0:3)) {
-    stop("argument heuristic must have a value between 0 and 3")
+  if (!(heuristic %in% 0:1)) {
+    stop("argument heuristic must have a value between 0 and 1")
   }
 
-  if (standardize) {
-    features <- scale(features)
-  }
+  ## if only one feature was passed:
+  features <- as.matrix(features)
 
   n_items <- nrow(features)
   distances <- dist(features)
@@ -67,14 +65,6 @@ distance_anticlustering <- function(features, n_anticlusters, solver,
     ## Solve edited ILP to solve heuristic item assignment
     solution <- solve_ilp(ilp, solver)
     assignment <- ilp_to_groups(ilp, solution)
-    return(assignment)
-  } else if (heuristic > 1) {
-    assignment <- equal_sized_kmeans(data.frame(features), n_items / n_anticlusters)
-    distances  <- edit_distances(distances, assignment)
-  }
-
-  if (heuristic == 3) {
-    assignment <- heuristic_anticlustering(features, assignment)
     return(assignment)
   }
 
