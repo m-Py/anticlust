@@ -7,9 +7,9 @@ Authors@R: person("Papenberg", "Martin", email = "martin.papenberg@hhu.de",
 Description: Anticlustering establishes groups of elements (i.e.,
     anticlusters) that are as similar as possible, reversing the logic
     of classical cluster analysis that creates groups that can be
-    clearly separated. This package includes exact and heuristic
+    clearly separated. The package includes exact and heuristic
     approaches to solve anticlustering, making use of two different
-    optimization criteria that both maximize group similarity. The exact
+    optimization criteria to maximize group similarity. The exact
     approach requires that a linear programming solver is installed. The
     package also offers methods to solve classical clustering problems
     under specific cluster size constraints, i.e., creating clusters of

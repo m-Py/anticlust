@@ -125,7 +125,9 @@ replicate_sample <- function(times, N) {
 }
 
 
-## Generate a candidate move for simulated annealing anticlustering
+## Generate a candidate move for simulated annealing anticlustering.
+## This function only works as expected when the anticlusters are sorted
+## by precluster, as is the case when it is called from within
 next_candidate <- function(anticlusters) {
   n_anticlusters <- length(unique(anticlusters))
   n_preclusters <- length(anticlusters) / n_anticlusters

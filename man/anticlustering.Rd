@@ -33,20 +33,20 @@ TODO: Some explanation of objective.
 
 An exact solution can only be obtained when the `objective` is
 "distance". Use method exact only for small problem sizes (< 30
-elements). To use the exact approach, To use this functionality, a linear
-programming solver must be installed and usable from R. The open
-source GNU linear programming kit (called from the package
-`Rglpk`) or one of the commercial solvers gurobi (called from the
-package `gurobi`) or IBM CPLEX (called from the package `Rcplex`)
-can be used. A license is needed for the commercial solvers and one
-of the interface packages must be installed.
+elements). To use the exact approach, a linear programming solver
+must be installed and usable from R. The open source GNU linear
+programming kit (called from the package `Rglpk`) or one of the
+commercial solvers gurobi (called from the package `gurobi`) or IBM
+CPLEX (called from the package `Rcplex`) can be used. A license is
+needed for the commercial solvers and one of the interface packages
+must be installed.
 
-Two heuristic approaches
-are available, one based on repeated random sampling and another
-based on simulated annealing. Both approaches rely on a preclustering
-that prevents grouping very similar elements into the same anticluster.
-Method = "random" will be somewhat faster, but method = "annealing" will
-usually return a slightly better objective.
+Two heuristic approaches are available, one based on repeated random
+sampling and another based on simulated annealing. Both approaches
+rely on a preclustering that prevents grouping very similar elements
+into the same anticluster. Method = "random" will be somewhat faster,
+but method = "annealing" will usually return a slightly better
+objective.
 }
 \examples{
 
@@ -84,5 +84,5 @@ clustering problem,” Mathematical Programming, vol. 45, nos. 1-3, pp.
 59–96, 1989.
 
 H. Späth, “Anticlustering: Maximizing the variance criterion,”
-Control and Cybernetics, vol. 15, no. 2, pp. 213–218, 1986.
+Control and Cybernetics, vol. 15, no. 2, pp. 213-218, 1986.
 }

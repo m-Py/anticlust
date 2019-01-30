@@ -17,6 +17,7 @@
 #'
 #' @importFrom utils installed.packages
 #' @importFrom stats as.dist dist optim
+#' @importFrom Matrix sparseMatrix
 #'
 #' @export
 #'
@@ -26,20 +27,20 @@
 #'
 #' An exact solution can only be obtained when the `objective` is
 #' "distance". Use method exact only for small problem sizes (< 30
-#' elements). To use the exact approach, To use this functionality, a linear
-#' programming solver must be installed and usable from R. The open
-#' source GNU linear programming kit (called from the package
-#' `Rglpk`) or one of the commercial solvers gurobi (called from the
-#' package `gurobi`) or IBM CPLEX (called from the package `Rcplex`)
-#' can be used. A license is needed for the commercial solvers and one
-#' of the interface packages must be installed.
+#' elements). To use the exact approach, a linear programming solver
+#' must be installed and usable from R. The open source GNU linear
+#' programming kit (called from the package `Rglpk`) or one of the
+#' commercial solvers gurobi (called from the package `gurobi`) or IBM
+#' CPLEX (called from the package `Rcplex`) can be used. A license is
+#' needed for the commercial solvers and one of the interface packages
+#' must be installed.
 #'
-#' Two heuristic approaches
-#' are available, one based on repeated random sampling and another
-#' based on simulated annealing. Both approaches rely on a preclustering
-#' that prevents grouping very similar elements into the same anticluster.
-#' Method = "random" will be somewhat faster, but method = "annealing" will
-#' usually return a slightly better objective.
+#' Two heuristic approaches are available, one based on repeated random
+#' sampling and another based on simulated annealing. Both approaches
+#' rely on a preclustering that prevents grouping very similar elements
+#' into the same anticluster. Method = "random" will be somewhat faster,
+#' but method = "annealing" will usually return a slightly better
+#' objective.
 #'
 #' @examples
 #'
@@ -77,8 +78,9 @@
 #' 59–96, 1989.
 #'
 #' H. Späth, “Anticlustering: Maximizing the variance criterion,”
-#' Control and Cybernetics, vol. 15, no. 2, pp. 213–218, 1986.
+#' Control and Cybernetics, vol. 15, no. 2, pp. 213-218, 1986.
 #'
+
 anticlustering <- function(features, n_anticlusters, standardize = FALSE,
                            objective = "distance", method = "annealing") {
 
@@ -103,12 +105,12 @@ anticlustering <- function(features, n_anticlusters, standardize = FALSE,
   } else if (objective == "variance" & method == "exact") {
     stop("There is no exact method for maximizing the variance criterion")
   } else { ## Heuristic approach
-    ## Determine whether we use simulated annealing or random sampling
+    ## Determine if we use simulated annealing or random sampling
     method <- ifelse(method == "annealing", "sa", "rnd")
     n_preclusters <- nrow(features) / n_anticlusters
     preclusters <- equal_sized_kmeans(features, n_preclusters)
     anticlusters <- heuristic_anticlustering(features, preclusters,
-                                             objective, nrep = 1000,
+                                             objective, nrep = 10000,
                                              method = method)
   }
   return(anticlusters)
