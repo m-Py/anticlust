@@ -5,7 +5,7 @@
 \title{Anticlustering}
 \usage{
 anticlustering(features, n_anticlusters, standardize = FALSE,
-  objective = "distance", method = "annealing")
+  objective = "distance", method = "annealing", preclustering = TRUE)
 }
 \arguments{
 \item{features}{A vector, matrix or data.frame of data points. Rows

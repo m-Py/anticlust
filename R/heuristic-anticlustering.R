@@ -11,6 +11,11 @@
 #     for repeated random sampling or "sa" for simulated annealing.
 # @param nrep The number of repetitions tried when assigning elements
 #     to anticlusters when the method is "rnd"
+# @param preclustering Boolean, should a preclustering be conducted
+#     before anticlusters are created. Defaults to TRUE and it is
+#     advised to keep it that way for the heuristic methods.
+#     `preclustering` = FALSE is mainly implemented to test against the
+#     option `preclustering` = TRUE
 #
 # @return A vector representing the anticlustering.
 #
@@ -48,7 +53,7 @@
 # anticlusters <- heuristic_anticlustering(features, preclusters, objective = "variance")
 #
 heuristic_anticlustering <- function(features, clustering, objective = "distance",
-                                     method = "rnd", nrep = 100) {
+                                     method = "rnd", nrep, preclustering = TRUE) {
 
   ## Some input handling
   if (!objective %in% c("distance", "variance"))
@@ -63,9 +68,9 @@ heuristic_anticlustering <- function(features, clustering, objective = "distance
   dat <- sort_by_col(dat, 1)
 
   if (method == "rnd")
-    best_assignment <- random_sampling(dat, clustering, objective, nrep)
+    best_assignment <- random_sampling(dat, clustering, objective, nrep, preclustering)
   else if (method == "sa")
-    best_assignment <- simulated_annealing(dat, clustering, objective)
+    best_assignment <- simulated_annealing(dat, clustering, objective, preclustering)
   else
     stop("Method must be 'rnd' or 'sa'")
 
@@ -78,14 +83,20 @@ heuristic_anticlustering <- function(features, clustering, objective = "distance
 ## Simulated annealing approach to finding the best objective considering
 ## preclustering restrictions. Relevant for this method is the
 ## next_candidate function below
-simulated_annealing <- function(dat, clustering, objective) {
+simulated_annealing <- function(dat, clustering, objective, preclustering = TRUE) {
   ## Initialize variables
   n_elements <- nrow(dat)
   n_preclusters <- length(unique(clustering))
   n_anticlusters <- n_elements / n_preclusters
   ## Initial parameter values; the preclustering ensures a good initial
-  ## state for the simulated annealing approach
-  init <- replicate_sample(n_preclusters, n_anticlusters)
+  ## state for the simulated annealing approach. Uses a random initial
+  ## state when preclustering is not considered.
+  if (preclustering == FALSE) {
+    init <- rep(1:n_anticlusters, n_preclusters)
+    init <- sample(anticlusters)
+  } else if (preclustering == TRUE) {
+    init <- replicate_sample(n_preclusters, n_anticlusters)
+  }
 
   ## Wrap objective function so it only takes the anticluster
   ## affiliation as parameter (data is included from outside the function)
@@ -95,6 +106,7 @@ simulated_annealing <- function(dat, clustering, objective) {
 
   ## Use `optim` for simulated annealing
   return(optim(init, objective_fun, next_candidate, method = "SANN",
+               preclustering = preclustering,
                control = list(maxit = 10000, temp = 2000, REPORT = 500,
                               fnscale = -1, tmax = 20))$par)
 }
@@ -104,10 +116,23 @@ simulated_annealing <- function(dat, clustering, objective) {
 ## This function only works as expected when the anticlusters are sorted
 ## by precluster, as is the case when it is called from within the
 ## `simulated_annealing` function above.
-next_candidate <- function(anticlusters) {
+next_candidate <- function(anticlusters, preclustering = TRUE) {
   n_anticlusters <- length(unique(anticlusters))
   n_preclusters <- length(anticlusters) / n_anticlusters
   preclusters <- rep(1:n_preclusters, each = n_anticlusters)
+
+  ## 1. Candidate generation without preclustering. Change the
+  ## anticlusters of two entirely random elements
+  if (preclustering == FALSE) {
+    changepoints <- sample(anticlusters, size = 2, replace = FALSE)
+    tmp <- anticlusters[changepoints[1]]
+    anticlusters[changepoints[1]] <- anticlusters[changepoints[2]]
+    anticlusters[changepoints[2]] <- tmp
+    return(anticlusters)
+  }
+
+  ## 2. Next candidate generation while respecting preclustering
+
   ## Select a random precluster
   rndclus <- sample(n_preclusters, 1)
   ## Within this precluster, which elements should be swapped into
@@ -123,7 +148,7 @@ next_candidate <- function(anticlusters) {
 
 ## Random sampling approach to finding the best objective considering
 ## preclustering restrictions
-random_sampling <- function(dat, clustering, objective, nrep) {
+random_sampling <- function(dat, clustering, objective, nrep, preclustering = TRUE) {
   ## Initialize variables
   n_elements <- nrow(dat)
   n_preclusters <- length(unique(clustering))
@@ -131,7 +156,14 @@ random_sampling <- function(dat, clustering, objective, nrep) {
   ## Start optimizing
   best_obj <- -Inf
   for (i in seq_along(nrep)) {
-    anticlusters <- replicate_sample(n_preclusters, n_anticlusters)
+    ## 1. Random sampling without preclustering restrictions
+    if (preclustering == FALSE) {
+      anticlusters <- rep(1:n_anticlusters, n_preclusters)
+      anticlusters <- sample(anticlusters)
+    ## 2. Include preclustering restrictions
+    } else if (preclustering == TRUE) {
+      anticlusters <- replicate_sample(n_preclusters, n_anticlusters)
+    }
     cur_obj <- get_objective(dat[, -(1:2)], anticlusters, objective)
     if (cur_obj > best_obj) {
       best_assignment <- anticlusters

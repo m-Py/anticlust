@@ -82,14 +82,15 @@
 #'
 
 anticlustering <- function(features, n_anticlusters, standardize = FALSE,
-                           objective = "distance", method = "annealing") {
+                           objective = "distance", method = "annealing",
+                           preclustering = TRUE) {
 
   if (!method %in% c("exact", "random",  "annealing"))
     stop("Method must be one of 'exact', 'random', or 'annealing'")
   if (!objective %in% c("variance", "distance"))
     stop("Argument objective must be 'distance' or 'variance'.")
 
-  features <- as.matrix(features)
+  ## standardize feature values (for each feature, mean = 0, sd = 1)?
   if (standardize) {
     features <- scale(features)
   }
@@ -99,19 +100,22 @@ anticlustering <- function(features, n_anticlusters, standardize = FALSE,
     solver <- solver_available()
     if (method == "exact" & solver == FALSE)
       stop("One of the packages 'Rglpk', 'gurobi', or 'Rcplex' must be installed for an exact solution")
+    heuristic  <- ifelse(preclustering == TRUE, 1, 0)
     anticlusters <- distance_anticlustering(features, n_anticlusters,
-                                            solver, FALSE, heuristic = 0)
+                                            solver, heuristic = heuristic)
   ## 2. Variance objective is maximized
   } else if (objective == "variance" & method == "exact") {
     stop("There is no exact method for maximizing the variance criterion")
-  } else { ## Heuristic approach
+  ## Heuristic approach for variance criterion:
+  } else {
     ## Determine if we use simulated annealing or random sampling
     method <- ifelse(method == "annealing", "sa", "rnd")
     n_preclusters <- nrow(features) / n_anticlusters
     preclusters <- equal_sized_kmeans(features, n_preclusters)
     anticlusters <- heuristic_anticlustering(features, preclusters,
                                              objective, nrep = 10000,
-                                             method = method)
+                                             method = method,
+                                             preclustering = preclustering)
   }
   return(anticlusters)
 }
