@@ -51,7 +51,6 @@ heuristic_anticlustering <- function(features, clustering, objective = "distance
                                      method = "rnd", nrep = 100) {
 
   ## Some input handling
-  features <- as.matrix(features) # if only one feature is passed
   if (!objective %in% c("distance", "variance"))
     stop("Argument objective must be 'distance' or 'variance'.")
   legal_number_of_clusters(features, clustering)
