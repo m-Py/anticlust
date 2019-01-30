@@ -65,9 +65,9 @@ features <- matrix(round(rnorm(n_elements * 2, 70, 15)), ncol = 2)
 criterion <- "variance"
 n_anticlusters <- 4
 classes1 <- anticlustering(features, n_anticlusters, objective = criterion,
-                           standardize = FALSE, method = "sampling")
+                           method = "sampling")
 classes2 <- anticlustering(features, n_anticlusters, objective = criterion,
-                             standardize = FALSE, method = "annealing")
+                           method = "annealing")
 get_objective(features, classes1, objective = criterion)
 get_objective(features, classes2, objective = criterion)
 
@@ -77,11 +77,12 @@ n_elements <- 20
 features <- matrix(round(rnorm(n_elements * 2, 70, 15)), ncol = 2)
 n_anticlusters <- 2
 classes1 <- anticlustering(features, n_anticlusters, objective = criterion,
-                           standardize = FALSE, method = "sampling")
+                           method = "sampling")
 classes2 <- anticlustering(features, n_anticlusters, objective = criterion,
-                           standardize = FALSE, method = "annealing")
+                           method = "annealing")
+# exact variant
 classes3 <- anticlustering(features, n_anticlusters, objective = criterion,
-                           standardize = FALSE, method = "exact")
+                           method = "exact", preclustering = FALSE)
 get_objective(features, classes1, objective = criterion)
 get_objective(features, classes2, objective = criterion)
 get_objective(features, classes3, objective = criterion)
