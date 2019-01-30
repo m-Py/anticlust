@@ -7,8 +7,6 @@
 #' @param features A vector, matrix or data.frame of data points. Rows
 #'     correspond to elements and columns correspond to features.
 #' @param n_anticlusters How many anticlusters should be created.
-#' @param standardize Boolean - should the features be standardized
-#'     before anticlusters are assigned? Defaults to FALSE
 #' @param objective The objective to be maximized, either "distance"
 #'     (default) or "variance". See Details.
 #' @param method One of "annealing", "sampling", or "exact". See details.
@@ -18,6 +16,8 @@
 #'     "annealing" and "sampling".
 #'     `preclustering` = FALSE is mainly implemented to test against the
 #'     option `preclustering` = TRUE.
+#' @param standardize Boolean - should the features be standardized
+#'     before anticlusters are assigned? Defaults to FALSE
 #'
 #' @return A vector representing anticluster affiliation
 #'
@@ -90,9 +90,9 @@
 #' Control and Cybernetics, vol. 15, no. 2, pp. 213-218, 1986.
 #'
 
-anticlustering <- function(features, n_anticlusters, standardize = FALSE,
-                           objective = "distance", method = "annealing",
-                           preclustering = TRUE) {
+anticlustering <- function(features, n_anticlusters, objective = "distance",
+                           method = "annealing", preclustering = TRUE,
+                           standardize = FALSE) {
 
   if (!method %in% c("exact", "sampling",  "annealing"))
     stop("Method must be one of 'exact', 'sampling', or 'annealing'")
