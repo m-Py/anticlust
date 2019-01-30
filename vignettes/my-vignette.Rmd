@@ -18,19 +18,19 @@ knitr::opts_chunk$set(
 )
 ```
 
-Clustering algorithm establish groups of elements ensuring that elements
-within each cluster are homogenoues, but elements from different
-clusters are dissimilar to each other. Anticlustering reverses this
-logic: It tries to establish groups of elements (anticlusters) that are
-as similar as possible (Spaeth, 1987). This is useful in several
-contexts, for example to
+Clustering algorithms establish groups of elements ensuring that
+elements within each cluster are homogenoues, but clearly separated from
+element in  different clusters. Anticlustering reverses this logic:
+anticlustering establishes groups of elements (anticlusters) that are as
+similar as possible (Spaeth, 1987). This is useful in several contexts,
+for example to
 
 - assign students to groups of equal prior achievement
 - create examinations of equal difficulty for different cohorts of students
 - ...
 
-The `R` package `anticlust` package tackles this problem algorithmically
-by building on the theory of cluster analysis.
+Building on the theory on cluster analysis, the `R` package `anticlust`
+package tackles such applications algorithmically.
 
 ## A quick start
 
@@ -38,52 +38,49 @@ First, we get to see the main function `anticlustering` in action. As
 for many clustering algorithms (for example see `?kmeans` from
 base-`R`), the `anticlustering` function takes a data matrix of features
 describing our elements. Each row is an element, for example a student,
-and each column is a variable. First we generate some random data,
-representing hypothetical test scores of students in two tests.
+and each column is a variable. We use the classical iris data set:
 
 ```{r}
 library("knitr")
 
-## Generate some random data
-n_students <- 60
-n_clusters <- 3
-data <- matrix(round(rnorm(n_students * 2, 70, 15)), ncol = 2)
-colnames(data) <- c("test1", "test2")
+## Select data for
+data <- iris[, -5]
 kable(head(data))
 nrow(data)
 ```
 
-Imagine we wish to assign `r n_students` students to `r n_clusters`
-classes ensuring equal achievment in the prior tests. To this end, we
-use the `anticlustering` function:
+We now use the `anticlustering` function to establish 3 similar groups
+of iris plants:
 
 ```{r}
 library("anticlust")
-classes <- anticlustering(data, n_clusters)
-classes
-table(classes)
+n_clusters <- 3
+anticlusters <- anticlustering(data, n_clusters, standardize = TRUE)
+anticlusters
+table(anticlusters)
 ```
 
-The vector `classes` now contains the anticluster affiliation, i.e., the
-class membership of each student. The `anticlustering` function created
-an equal number of students per anticluster.
+The vector `anticlusters` now contains the anticluster affiliation, of
+each plant. The `anticlustering` function created an equal number of
+plants per anticluster.
 
 Now, we wish to know how well the assignment worked. First, we plot
-test scores by anticluster:
+plant characteristics by anticluster:
 
 ```{r}
-plot(data, col = classes, pch = 19)
+draw_assignment(data[, 1:2], anticlusters, cex = 1)
+draw_assignment(data[, 3:4], anticlusters, cex = 1)
 ```
 
 This looks rather chaotic, but it is probably what we want: We expect a
-strong overlap in achievment among the students in each group. In
-constrast, a clustering of students by achievement would have looked
-like this:
+strong overlap in all characteristics of the plants. In
+constrast, a clustering of plants have looked like this:
 
 ```{r}
 clusters <- kmeans(data, n_clusters)$cl
 clusters
-plot(data, col = clusters, pch = 19)
+draw_assignment(data[, 1:2], clusters, cex = 1)
+draw_assignment(data[, 3:4], clusters, cex = 1)
 ```
 
 As the name suggests, anticlustering is the reversal of clustering.
@@ -92,14 +89,13 @@ overlap of anticlusters; groups should at best be indistinguishable.
 
 In addition to just inspecting the plot above, we probably want to know
 how well the anticlustering worked by investigating the descriptive
-statistics of test scores by anticluster. Ideally, average test scores
-as well as the distribution of test scores should be the same for each
-anticluster.
+statistics of features by anticluster. Ideally, the distribution of
+plant characteristics should be the same for each anticluster.
 
 ```{r}
 library("dplyr")
 
-data <- data.frame(class = classes, data)
+data <- data.frame(class = anticlusters, data)
 data %>%
   group_by(class) %>%
   summarize_all(funs(mean, sd)) %>%
@@ -113,19 +109,8 @@ grouping:
 
 ```{r}
 
-data$class <- c(replicate(n_students / n_clusters, sample(1:n_clusters)))
-
-data %>%
-  group_by(class) %>%
-  summarize_all(funs(mean, sd)) %>%
-  round(2) %>%
-  knitr::kable()
-
-```
-
-```{r}
-
-data$class <- anticlustering(data, n_clusters, objective = "variance")
+data$class <- rep(1:n_clusters, nrow(data) / n_clusters)
+data$class <- sample(data$class)
 
 data %>%
   group_by(class) %>%
@@ -139,70 +124,15 @@ data %>%
 
 - Explain the anticlustering principle - vs. k-means and cluster editing
 - Objective functions
-- Computational complexity
 
 ## Algorithms
 
+Computational complexity
+
 ### Exact
+
+Integer linear programming
 
 ### Heuristics
 
-Vignettes are long form documentation commonly included in packages.
-Because they are part of the distribution of the package, they need to
-be as compact as possible. The `html_vignette` output type provides a
-custom style sheet (and tweaks some options) to ensure that the
-resulting html is as small as possible. The `html_vignette` format:
-
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
-
-## Vignette Info
-
-Note the various macros within the `vignette` section of the metadata
-block above. These are required in order to instruct R how to build the
-vignette. Note that you should change the `title` field and the
-`\VignetteIndexEntry` to match the title of your vignette.
-
-## Styles
-
-The `html_vignette` template includes a basic CSS theme. To override
-this theme you can specify your own CSS in the document metadata as
-follows:
-
-    output:
-      rmarkdown::html_vignette:
-        css: mystyles.css
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two
-images side-by-side.
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
-```
-
-You can enable figure captions by `fig_caption: yes` in YAML:
-
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
-
-Then you can use the chunk option `fig.cap = "Your figure caption."` in
-**knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$,
-footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
-```
-
-Also a quote using `>`:
-
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+Simulated annealing
