@@ -134,22 +134,23 @@ completely random assignment of anticlusters.
 
 However, the anticlustering method does not actually try to minimize
 differences in groups means -- it is just a side effect that group means
-turn out to be similar. Instead, anticlustering uses of optimization
-objectives that have been developed for clustering methods and reverses
-their logic. The package `anticlust`, adapts two clustering methods:
-k-means [@spath1986; @valev1998] and cluster editing [@bocker2013].
-K-means is the most classical of all clustering algorithms [@jain2010].
-Across a pre-specified number of clusters (*k*), the k-means algorithm
-tries to minimize the variance within all clusters. @spath1986 as well
-as @valev1998 proposed to maximize the variance criterion to establish
-groups that are similar to each other. In cluster editing, we first
-compute pairwise distances between all elements, for example by
-computing a classical euclidean distance. The cluster editing objective
-is to find a grouping that minimizes the sum of dissimilarities across
-all groups [@grotschel1989]. When using this objective in
-anticlustering, we try to maximize the sum of all pairwise distances
-within all groups. These objectives are discussed in more detail in the
-vignette "Technical notes" that is included with the package.
+turn out to be similar. Instead, anticlustering uses optimization
+objectives that have been developed for clustering methods, and reverses
+their logic. In particular, the package `anticlust`, adapts two
+clustering methods: k-means [@spath1986; @valev1998] and cluster editing
+[@bocker2013]. K-means is the most classical of all clustering
+algorithms [@jain2010]. Across a pre-specified number of clusters (*k*),
+the k-means algorithm tries to minimize the variance within all
+clusters. @spath1986 as well as @valev1998 proposed to maximize the
+variance criterion to establish groups that are similar to each other.
+Cluster editing is based on the pairwise mathematical distances between
+all elements, for example the classical euclidean distance. The cluster
+editing objective is to find a grouping that minimizes the sum of
+dissimilarities across all groups [@grotschel1989]. When using the
+cluster editing objective in an anticlustering application, we try to
+maximize the sum of all pairwise distances within all groups. These
+objectives are discussed in more detail in the vignette "Technical
+notes" that is included with the package.
 
 To vary the objective function, we can use the parameter `objective` of
 the function `anticlustering`. In most cases, the results for the
@@ -167,5 +168,16 @@ data %>%
   summarize_all(funs(mean)) %>%
   round(2) %>% knitr::kable()
 ```
+
+## How to procede
+
+If you are already happy with the results provided by the
+`anticlustering` function, you may stop here. If you wish to learn more
+about the theory of anticlustering, you may procede to the vignette
+"Technical notes" that is included with the package. It provides a more
+detailed explanation of the variance and distance objectives and the
+algorithms the package uses to optimize the objectives. The help
+page (`?anticlustering`) explains all of the parameters that can be
+adjusted for the `anticlusting` function.
 
 ## References
