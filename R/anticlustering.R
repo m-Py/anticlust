@@ -120,12 +120,22 @@ anticlustering <- function(features, n_anticlusters, objective = "distance",
                            method = "annealing", preclustering = TRUE,
                            standardize = TRUE) {
 
+  ## Some input handling
   if (!method %in% c("exact", "sampling",  "annealing"))
     stop("Method must be one of 'exact', 'sampling', or 'annealing'")
   if (!objective %in% c("variance", "distance"))
     stop("Argument objective must be 'distance' or 'variance'.")
+  if (n_anticlusters <= 1 | nrow(features) %% n_anticlusters != 0)
+    stop("The number of features must be a multiplier of n_anticlusters")
+  features <- as.matrix(features) #  if features is a vector
+  if (mode(features) != "numeric")
+    stop("Features must be of type numeric")
+  if (!is.logical(preclustering) | is.na(preclustering))
+    stop("Argument `preclustering` must be logical (TRUE or FALSE)")
+  if (!is.logical(standardize) | is.na(standardize))
+    stop("Argument `preclustering` must be logical (TRUE or FALSE)")
 
-  ## standardize feature values (for each feature, mean = 0, sd = 1)?
+  ## Standardize feature values (for each feature, mean = 0, sd = 1)?
   if (standardize) {
     features <- scale(features)
   }

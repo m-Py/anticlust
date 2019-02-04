@@ -30,11 +30,6 @@ equal_sized_kmeans <- function(features, nclusters) {
   ## kmeans does not deal with missing values
   if (any(is.na(features)))
     stop("The features include missing values.")
-  if (nclusters <= 1 | nrow(features) %% nclusters != 0)
-    stop("The number of features must be a multiplier of nclusters")
-  features <- as.matrix(features) #  if features is a vector
-  if (mode(features) != "numeric")
-    stop("Features must be of type numeric")
   ## initialize cluster centers using kmeans
   centers <- stats::kmeans(features, nclusters)$centers
   ## determine distances between all items and all cluster centers:
