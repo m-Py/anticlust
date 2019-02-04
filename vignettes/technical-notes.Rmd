@@ -1,0 +1,37 @@
+---
+title: "Anticlust - technical notes"
+author: "Martin Papenberg"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.align = "center",
+  fig.cap = ""
+)
+```
+
+# Objective
+
+- Explain the anticlustering principle - vs. k-means and cluster editing
+- Objective functions
+
+# Algorithms
+
+- Computational complexity
+
+## Exact
+
+- Integer linear programming
+
+## Heuristics
+
+- Simulated annealing
+- Neighborhood of elements, preclustering

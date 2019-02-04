@@ -1,5 +1,5 @@
 ---
-title: "Algorithms for the anticlustering problem"
+title: "Getting started with the anticlust package"
 author: "Martin Papenberg"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -72,12 +72,13 @@ draw_assignment(data[, 1:2], anticlusters, cex = 1)
 draw_assignment(data[, 3:4], anticlusters, cex = 1)
 ```
 
-This looks rather chaotic, but it is probably what we want: We expect a
-strong overlap in all characteristics of the plants. In
-constrast, a clustering of plants have looked like this:
+This looks rather chaotic, but it is probably what we want: Among the
+anticlusters, we expect a strong overlap in all of the plants'
+characteristics. In constrast, a clustering of plants have looked like
+this:
 
 ```{r}
-clusters <- kmeans(data, n_clusters)$cl
+clusters <- clustering(data, n_clusters)
 clusters
 draw_assignment(data[, 1:2], clusters, cex = 1)
 draw_assignment(data[, 3:4], clusters, cex = 1)
@@ -127,12 +128,13 @@ data %>%
 
 ## Algorithms
 
-Computational complexity
+- Computational complexity
 
 ### Exact
 
-Integer linear programming
+- Integer linear programming
 
 ### Heuristics
 
-Simulated annealing
+- Simulated annealing
+- Neighborhood of elements, preclustering
