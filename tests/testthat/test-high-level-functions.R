@@ -34,7 +34,8 @@ test_that("high level anticlustering function runs through", {
     anticlusters_exact <- anticlustering(features, n_clusters, method = "exact", standardize = FALSE,
                                          preclustering = FALSE)
     anticlusters_heuristic <- anticlustering(features, n_clusters,
-                                             method = "sampling", standardize = FALSE)
+                                             method = "sampling",
+                                             standardize = FALSE)
     ## Check that output is valid
     expect_equal(legal_number_of_clusters(features, anticlusters_exact), NULL)
     expect_equal(legal_number_of_clusters(features, anticlusters_heuristic), NULL)
@@ -64,7 +65,7 @@ test_that("all argument combinations run through", {
     method <- conditions$method[i]
     preclustering <- conditions$preclustering[i]
     anticlusters <- anticlustering(features, n_anticlusters, criterion,
-                                   method, preclustering)
+                                   method, preclustering, standardize = FALSE)
     obj <- get_objective(features, anticlusters, objective = criterion)
     rowname <- ifelse(preclustering, "preclustering", "no_preclustering")
     storage[rowname, method] <- obj

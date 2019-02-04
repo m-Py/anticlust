@@ -17,7 +17,7 @@
 #'     `preclustering` = FALSE is mainly implemented to test against the
 #'     option `preclustering` = TRUE.
 #' @param standardize Boolean - should the features be standardized
-#'     before anticlusters are assigned? Defaults to FALSE
+#'     before anticlusters are assigned? Defaults to TRUE
 #'
 #' @return A vector representing anticluster affiliation
 #'
@@ -118,7 +118,7 @@
 
 anticlustering <- function(features, n_anticlusters, objective = "distance",
                            method = "annealing", preclustering = TRUE,
-                           standardize = FALSE) {
+                           standardize = TRUE) {
 
   if (!method %in% c("exact", "sampling",  "annealing"))
     stop("Method must be one of 'exact', 'sampling', or 'annealing'")

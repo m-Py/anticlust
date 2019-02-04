@@ -5,7 +5,7 @@
 \title{Algorithms for anticlustering}
 \usage{
 anticlustering(features, n_anticlusters, objective = "distance",
-  method = "annealing", preclustering = TRUE, standardize = FALSE)
+  method = "annealing", preclustering = TRUE, standardize = TRUE)
 }
 \arguments{
 \item{features}{A vector, matrix or data.frame of data points. Rows
@@ -26,7 +26,7 @@ strongly suggested to keep it that way for the heuristic methods
 option `preclustering` = TRUE.}
 
 \item{standardize}{Boolean - should the features be standardized
-before anticlusters are assigned? Defaults to FALSE}
+before anticlusters are assigned? Defaults to TRUE}
 }
 \value{
 A vector representing anticluster affiliation
