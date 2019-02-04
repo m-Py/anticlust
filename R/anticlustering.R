@@ -95,7 +95,7 @@
 #'   method <- conditions$method[i]
 #'   preclustering <- conditions$preclustering[i]
 #'   anticlusters <- anticlustering(features, n_anticlusters, criterion,
-#'                                  method, preclustering)
+#'                                  method, preclustering, standardize = FALSE)
 #'   obj <- get_objective(features, anticlusters, objective = criterion)
 #'   rowname <- ifelse(preclustering, "preclustering", "no_preclustering")
 #'   storage[rowname, method] <- obj
