@@ -1,5 +1,5 @@
 ---
-title: "Anticlust - technical notes"
+title: "Technical notes"
 author: "Martin Papenberg"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -7,6 +7,8 @@ vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+
+bibliography: lit.bib
 ---
 
 ```{r setup, include = FALSE}
@@ -14,24 +16,85 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.align = "center",
-  fig.cap = ""
+  fig.cap = "",
+  message = FALSE,
+  warning = FALSE
 )
 ```
 
-# Objective
+This vignette documents the technical aspects of the `R` package
+`anticlust`. This includes a description of the objective functions used
+to measure cluster similarity, and a documentation of the algorithms
+used to optimize these criteria.
 
-- Explain the anticlustering principle - vs. k-means and cluster editing
-- Objective functions
+## The anticlustering objective
 
-# Algorithms
+@spath1986 and @valev1998 independently introduced the anticlustering
+method to maximize similarity of different groups. They proposed to
+maximize  the variance criterion that -- in k-means clustering -- is
+used to create well-separated clusters. Assume that $X = x_i$ ($i = 1,
+..., n$) is the set of $n$ d-dimensional data points that has to be
+partitioned into $K$ clusters $C = \{c_k, k = 1, ..., K\}$. K-means
+tries to find the partitioning of data points into clusters in such a
+way that the squared error between cluster centers ($\mu_k$) and
+individual data points is minimized [@jain2010]:
+
+$$\sum\limits_{k=1}^{K} \sum\limits_{x_i \in c_k} \vert \vert x_i -
+\mu_k \vert \vert$$
+
+Optimizing this objective is a computationally difficult problem that is
+usually tackled using heuristic methods; `anticlust` makes use of a
+simulated annealing approach that is described below.
+
+## The distance criterion
+
+The package `anticlust` also employs an objective that is used in the
+problem domain of cluster editing to tackle the anticlustering problem
+[@rahmann2007; @bocker2013].[^1] The objective is based on the pairwise
+dissimilarities between all data points. In cluster editing, the optimal
+objective is found when the sum of all pairwise dissimilarities within
+clusters is minimized; maximizing a measure of similarity can also be
+done instead. Assume that the we use variables $x_{ij}$ to encode
+whether two data points $x_i$ and $x_j$ belong to the same anticluster
+$c_k$:
+
+[^1]: Cluster editing has also been studied under different names such
+as correlation clustering [@bansal2004], clique partition problem
+[@grotschel1989], and transitivity clustering [@wittkop2010].
+
+$$
+   x_{ij} =
+   \begin{cases}
+     1 & \textrm{if} \:  \: x_i \in c_k \wedge x_j \in c_k \\
+     0 & \textrm{otherwise}
+   \end{cases}
+$$
+
+Moreover, assume that $d_{ij}$ measures the dissimilarity between two
+d-dimensional data points $x_i$ and $x_j$, for example as the euclidean
+distance. The cluster editing objective is then given as follows
+[@miyauchi2015; @grotschel1989]:[^2]
+
+[^2]: Note that in classical cluster editing, measures of
+(dis)similarity require positive and negative values to ensure a
+reasonable cluster partitioning. We do not have this requirement because
+we introduce restriction on the group sizes, ensuring good solutions
+even if all distance measures are positive.
+
+$$\sum\limits_{1 \leq i < j \leq n} d_{ij} \: x_{ij}$$
+
+## Algorithmic approaches
 
 - Computational complexity
+- exact vs. heuristic approaches
 
-## Exact
+### The exact approach
 
-- Integer linear programming
+- Integer linear programming [@grotschel1989; @bocker2011]
 
-## Heuristics
+## The heuristic approach
 
 - Simulated annealing
 - Neighborhood of elements, preclustering
+
+## References
