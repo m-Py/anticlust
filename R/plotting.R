@@ -4,6 +4,8 @@
 #' @param features A data.frame or matrix representing the features that
 #'     are used. Must have two columns.
 #' @param clustering A vector representing the clustering
+#' @param connect_clusters Boolean. Connect the groups through lines?
+#'     Useful to illustrate a graph structure.
 #' @param xlab The label for the x-axis
 #' @param ylab The label for the y-axis
 #' @param cols The coloring of the groups. Does not need to be passed.
@@ -13,18 +15,28 @@
 #' @param pch The symbol used for data points, see ?par
 #' @param main The title of the plot
 #' @param cex The size of the plotting symbols, see ?par
-#' @param connect_clusters Boolean. Connect the groups through lines?
-#'     Useful to illustrate a graph structure.
+#' @param cex.axis The size of the values on the axes
+#' @param cex.axis The size of the labels of the axes
 #'
 #' @export
 #'
 #' @importFrom grDevices rainbow
 #' @importFrom graphics lines par plot
 #'
-draw_assignment <- function(features, clustering, xlab = "feature 1",
-                            ylab = "feature 2", cols = NULL,
-                            pch = 19, main = "", cex = 3,
-                            connect_clusters = FALSE) {
+plot_clusters <- function(features, clustering, connect_clusters = FALSE,
+                          xlab = NULL, ylab = NULL, cols = NULL,
+                          pch = 19, main = "", cex = 1.2,
+                          cex.axis = 1.2, cex.lab = 1.2) {
+
+  if (ncol(features) != 2)
+    stop("Can only plot two features")
+
+  ## Specify axis labels if they cannot be assumed from data matrix or argument
+  if (is.null(xlab))
+    xlab <- ifelse(is.null(colnames(features)[1]), "Feature 1", colnames(features)[1])
+  if (is.null(ylab))
+    ylab <- ifelse(is.null(colnames(features)[2]), "Feature 2", colnames(features)[2])
+
   x <- features[, 1]
   y <- features[, 2]
   n_cliques <- length(unique(clustering))
@@ -32,11 +44,11 @@ draw_assignment <- function(features, clustering, xlab = "feature 1",
     cols <- rainbow(n_cliques)
   ## Set colors for cliques
   if (length(cols) != n_cliques)
-    stop("If you pass colors, you have to pass as many colors as there are groups.")
+    stop("If you specify colors, you have to specify as many colors as there are clusters")
   cols <- cols[clustering]
   def_mar <- c(5, 4, 4, 2) + 0.1
   par(mar = def_mar + c(0, 1, 0, 0))
-  plot(x, y, las = 1, cex.axis = 2, cex.lab = 2,
+  plot(x, y, las = 1, cex.axis = cex.axis, cex.lab = cex.lab,
        col = cols, xlab = xlab, ylab = ylab, cex = cex,
        xaxt = "n", yaxt = "n", pch = pch, main = main)
   if (connect_clusters)

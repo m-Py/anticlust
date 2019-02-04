@@ -67,11 +67,9 @@ anticlusters <- anticlustering(iris[, -5], n_anticlusters = 3)
 # Compare feature means by anticluster
 by(iris[, -5], anticlusters, colMeans)
 # Plot the anticlustering
-draw_assignment(iris[, 1:2], anticlusters) # see overlap
-draw_assignment(iris[, 3:4], anticlusters)
-# Is Iris species distributed evenly among the anticlusters (Species
-# is not part of "training")
-table(iris$Species, anticlusters)
+par(mfrow = c(1, 2))
+plot_clusters(iris[, 1:2], anticlusters) # see overlap
+plot_clusters(iris[, 3:4], anticlusters)
 
 
 # 2. Compare two heuristic approaches with variance criterion

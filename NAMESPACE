@@ -2,8 +2,8 @@
 
 export(anticlustering)
 export(clustering)
-export(draw_assignment)
 export(get_objective)
+export(plot_clusters)
 importFrom(Matrix,sparseMatrix)
 importFrom(grDevices,rainbow)
 importFrom(graphics,lines)
