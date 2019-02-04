@@ -174,10 +174,10 @@ data %>%
 If you are already happy with the results provided by the
 `anticlustering` function, you may stop here. If you wish to learn more
 about the theory of anticlustering, you may procede to the vignette
-"Technical notes" that is included with the package. It provides a more
-detailed explanation of the variance and distance objectives and the
-algorithms the package uses to optimize the objectives. The help
-page (`?anticlustering`) explains all of the parameters that can be
-adjusted for the `anticlusting` function.
+"Technical notes" that is included with the package. It provides a
+detailed explanation of the variance and distance objectives as well as
+an explanation of the algorithms the package uses to optimize the
+objectives. The help page (`?anticlustering`) explains all of the
+parameters that can be adjusted for the `anticlusting` function.
 
 ## References
