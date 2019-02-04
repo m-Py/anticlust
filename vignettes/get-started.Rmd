@@ -7,6 +7,8 @@ vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+
+bibliography: lit.bib
 ---
 
 ```{r setup, include = FALSE}
@@ -14,31 +16,32 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.align = "center",
-  fig.cap = ""
+  fig.cap = "",
+  message = FALSE,
+  warning = FALSE
 )
+
+set.seed(123)
 ```
 
 Clustering algorithms establish groups of elements ensuring that
 elements within each cluster are homogenoues, but clearly separated from
-element in  different clusters. Anticlustering reverses this logic:
-anticlustering establishes groups of elements (anticlusters) that are as
-similar as possible (Spaeth, 1987). This is useful in several contexts,
-for example to
-
-- assign students to groups of equal prior achievement
-- create examinations of equal difficulty for different cohorts of students
-- ...
-
-Building on the theory on cluster analysis, the `R` package `anticlust`
-package tackles such applications algorithmically.
+elements in  other clusters. Anticlustering reverses this logic and
+creates groups of elements (anticlusters) that are as similar as
+possible [@spath1986; @valev1998]. The `R` package `anticlust` tackles
+this problem algorithmically.
 
 ## A quick start
 
-First, we get to see the main function `anticlustering` in action. As
-for many clustering algorithms (for example see `?kmeans` from
-base-`R`), the `anticlustering` function takes a data matrix of features
-describing our elements. Each row is an element, for example a student,
-and each column is a variable. We use the classical iris data set:
+As a start we see the main function `anticlustering` in action (for most
+users of the package `anticlust`, it should be sufficient to know this
+function). As is the common case for clustering functions (for example
+see `?kmeans`), the `anticlustering` function takes a data matrix of
+features describing the elements that we wish to assign to different
+groups. Each row is any kind of element element, for example a person, a
+picture, a word or a photo. Each column is a variable describing one of
+the  elements' features. To illustrate the usage of the package, we use
+the classical iris data set describing the properties of 150 iris plants:
 
 ```{r}
 library("knitr")
@@ -55,86 +58,114 @@ of iris plants:
 ```{r}
 library("anticlust")
 n_clusters <- 3
-anticlusters <- anticlustering(data, n_clusters, standardize = TRUE)
+anticlusters <- anticlustering(data, n_clusters)
 anticlusters
 table(anticlusters)
 ```
 
-The vector `anticlusters` now contains the anticluster affiliation, of
-each plant. The `anticlustering` function created an equal number of
-plants per anticluster.
+The vector `anticlusters` contains the anticluster affiliation of each
+plant. The `anticlustering` function created an equal number of plants
+per anticluster. Currently, it is not possible to create anticlusters
+of different sizes, but it may well be in the future.
 
-Now, we wish to know how well the assignment worked. First, we plot
-plant characteristics by anticluster:
+We wish to know how well the anticluster assignment worked. First, we
+plot plant characteristics by anticluster:
 
-```{r}
-draw_assignment(data[, 1:2], anticlusters, cex = 1)
-draw_assignment(data[, 3:4], anticlusters, cex = 1)
+```{r, fig.width = 6.5}
+par(mfrow = c(1, 2))
+plot_clusters(data[, 1:2], anticlusters)
+plot_clusters(data[, 3:4], anticlusters)
 ```
 
 This looks rather chaotic, but it is probably what we want: Among the
 anticlusters, we expect a strong overlap in all of the plants'
-characteristics. In constrast, a clustering of plants have looked like
-this:
+characteristics. In constrast, a clustering of plants have created a
+strong separation between groups, as can be seen in this example:
 
-```{r}
+```{r, fig.width = 6.5}
 clusters <- clustering(data, n_clusters)
-clusters
-draw_assignment(data[, 1:2], clusters, cex = 1)
-draw_assignment(data[, 3:4], clusters, cex = 1)
+
+par(mfrow = c(1, 2))
+plot_clusters(data[, 1:2], clusters)
+plot_clusters(data[, 3:4], clusters)
 ```
 
 As the name suggests, anticlustering is the reversal of clustering.
-Instead of separating groups as well as possible, we create a strong
-overlap of anticlusters; groups should at best be indistinguishable.
+Instead of separating groups as effectvely as possible, we create a
+strong overlap between groups; groups should at best be
+indistinguishable.
 
-In addition to just inspecting the plot above, we probably want to know
-how well the anticlustering worked by investigating the descriptive
-statistics of features by anticluster. Ideally, the distribution of
-plant characteristics should be the same for each anticluster.
+In addition to visually inspecting the plots above, we probably want to
+know how well the anticlustering worked by investigating the descriptive
+statistics of the plants' characteristics by anticluster. Ideally, the
+distribution of plant characteristics should be the same for each
+anticluster. This code example inspects the mean values of each feature
+by anticluster.
 
 ```{r}
 library("dplyr")
 
-data <- data.frame(class = anticlusters, data)
+data <- data.frame(Anticluster = anticlusters, data)
 data %>%
-  group_by(class) %>%
-  summarize_all(funs(mean, sd)) %>%
-  round(2) %>%
-  knitr::kable()
-
+  group_by(Anticluster) %>%
+  summarize_all(funs(mean)) %>%
+  round(2) %>%  knitr::kable()
 ```
 
-A completely random assignment would very likely produce a much worse
+A completely random assignment very likely produces a much worse
 grouping:
 
 ```{r}
-
-data$class <- rep(1:n_clusters, nrow(data) / n_clusters)
-data$class <- sample(data$class)
+data$Anticluster <- rep(1:n_clusters, nrow(data) / n_clusters)
+data$Anticluster <- sample(data$Anticluster)
 
 data %>%
-  group_by(class) %>%
-  summarize_all(funs(mean, sd)) %>%
-  round(2) %>%
-  knitr::kable()
-
+  group_by(Anticluster) %>%
+  summarize_all(funs(mean)) %>%
+  round(2) %>% knitr::kable()
 ```
 
-## How does it work
+## The objective function
 
-- Explain the anticlustering principle - vs. k-means and cluster editing
-- Objective functions
+In the example above, we noted that the `anticlustering` function
+established anticlusters that were very similar with regard to the mean
+of each plant feature. In particular, the approach vastly outperformed a
+completely random assignment of anticlusters.
 
-## Algorithms
+However, the anticlustering method does not actually try to minimize
+differences in groups means -- it is just a side effect that group means
+turn out to be similar. Instead, anticlustering uses of optimization
+objectives that have been developed for clustering methods and reverses
+their logic. The package `anticlust`, adapts two clustering methods:
+k-means [@spath1986; @valev1998] and cluster editing [@bocker2013].
+K-means is the most classical of all clustering algorithms [@jain2010].
+Across a pre-specified number of clusters (*k*), the k-means algorithm
+tries to minimize the variance within all clusters. @spath1986 as well
+as @valev1998 proposed to maximize the variance criterion to establish
+groups that are similar to each other. In cluster editing, we first
+compute pairwise distances between all elements, for example by
+computing a classical euclidean distance. The cluster editing objective
+is to find a grouping that minimizes the sum of dissimilarities across
+all groups [@grotschel1989]. When using this objective in
+anticlustering, we try to maximize the sum of all pairwise distances
+within all groups. These objectives are discussed in more detail in the
+vignette "Technical notes" that is included with the package.
 
-- Computational complexity
+To vary the objective function, we can use the parameter `objective` of
+the function `anticlustering`. In most cases, the results for the
+variance criterion (á la k-means) and the results for the distance
+criterion (á la cluster editing) will be quite similar. The default
+objective is `"distance"`. We can change the objective to `"variance"`
+as follows:
 
-### Exact
+```{r, fig.width = 6.5}
+data <- iris[, -5]
+data$Anticluster <- anticlustering(data, n_clusters, objective = "variance")
 
-- Integer linear programming
+data %>%
+  group_by(Anticluster) %>%
+  summarize_all(funs(mean)) %>%
+  round(2) %>% knitr::kable()
+```
 
-### Heuristics
-
-- Simulated annealing
-- Neighborhood of elements, preclustering
+## References
