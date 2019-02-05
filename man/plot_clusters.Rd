@@ -5,7 +5,7 @@
 \title{Visualize a clustering of two features}
 \usage{
 plot_clusters(features, clustering, connect_clusters = FALSE,
-  xlab = NULL, ylab = NULL, cols = NULL, pch = 19, main = "",
+  xlab = NULL, ylab = NULL, col = NULL, pch = 19, main = "",
   cex = 1.2, cex.axis = 1.2, cex.lab = 1.2)
 }
 \arguments{
@@ -21,21 +21,44 @@ Useful to illustrate a graph structure.}
 
 \item{ylab}{The label for the y-axis}
 
-\item{cols}{The coloring of the groups. Does not need to be passed.
-If it is passed, it needs to be a character vector of the same
-length as there are groups, and each element of the vector is a
-color.}
-
-\item{pch}{The symbol used for data points, see ?par}
+\item{pch}{A numeric vector representing the symbol used to plot
+data points (see \code{\link{par}}). Should either be of length 1,
+then the same symbol is used for all plots, or should have the
+same length as there are different clusters. In the latter case,
+each cluster has a different plotting symbol.}
 
 \item{main}{The title of the plot}
 
-\item{cex}{The size of the plotting symbols, see ?par}
+\item{cex}{The size of the plotting symbols, see \code{\link{par}}}
 
 \item{cex.axis}{The size of the values on the axes}
+
+\item{cols}{The coloring of the groups. Does not need to be passed.
+If it is passed, it needs to be a character vector of the same
+length as there are clusters, and each element of the vector is a
+color.}
 
 \item{cex.axis}{The size of the labels of the axes}
 }
 \description{
 Visualize a clustering of two features
+}
+\details{
+In most cases, the argument `clustering` is a vector
+  returned by one of the functions \code{\link{anticlustering}} or
+  \code{\link{clustering}}. However, the plotting function can also
+  be used to plot the results of other cluster functions such as
+  \code{\link{kmeans}}.
+}
+\examples{
+
+n_elements <- 90
+features <- matrix(runif(n_elements * 2), ncol = 2)
+n_groups <- 3
+clusters <- clustering(features, n_groups)
+anticlusters <- anticlustering(features, n_groups, method = "sampling")
+par(mfrow = c(1, 2))
+plot_clusters(features, clusters, pch = c(15, 16, 17))
+plot_clusters(features, anticlusters, pch = c(15, 16, 17))
+
 }
