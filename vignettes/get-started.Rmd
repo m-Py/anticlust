@@ -77,8 +77,9 @@ find out, we first plot the plants' characteristics by anticluster:
 
 ```{r, fig.width = 6.5}
 par(mfrow = c(1, 2))
-plot_clusters(data[, 1:2], anticlusters) # a function of the anticlust package
-plot_clusters(data[, 3:4], anticlusters)
+pch <- c(15, 16, 17)
+plot_clusters(data[, 1:2], anticlusters, pch = pch) # a function of the anticlust package
+plot_clusters(data[, 3:4], anticlusters, pch = pch)
 ```
 
 This looks rather chaotic, but it is probably what we want: We would
@@ -91,8 +92,8 @@ following example:
 clusters <- clustering(data, n_clusters) # a function of the anticlust package
 
 par(mfrow = c(1, 2))
-plot_clusters(data[, 1:2], clusters)
-plot_clusters(data[, 3:4], clusters)
+plot_clusters(data[, 1:2], clusters, pch = pch)
+plot_clusters(data[, 3:4], clusters, pch = pch)
 ```
 
 As the name suggests, anticlustering is the reversal of clustering.
@@ -119,8 +120,7 @@ data %>%
 ```
 
 A completely random assignment very likely produces a much worse
-grouping. The following code illustrates the results of a random group
-assignment:
+grouping, as is illustrated by the following code:
 
 ```{r}
 ## Randomly assign plants to anticlusters
@@ -151,23 +151,26 @@ K-means is probably the best-known cluster algorithm. K-Means tries to
 minimize the within-cluster variance of feature values across a
 pre-specified number of clusters (*k*) [@jain2010]. @spath1986 and
 @valev1998 proposed to maximize the variance criterion for the
-anticlustering application. The cluster editing objective employs a
-measure of the pairwise dissimilarities between all elements. The
-optimal objective is found when the sum of all pairwise dissimilarities
-within clusters is minimized [@miyauchi2015; @grotschel1989].[^2]
-Adapting the cluster editing objective to anticlustering, the package
-`anticlust` maximizes the sum of all pairwise euclidean distances within
-anticlusters. This approach maximizes group similarity as measured by
-the average linkage method employed in hierarchical clustering methods
-[@guha1998].
+anticlustering application. The basic unit underlying the cluster
+editing objective is a measure $d_{ij}$ quantifying the dissimilarity
+between two elements $i$ and $j$, for example as the common Euclidean
+distance.[^2] The optimal cluster editing objective is found when the
+sum of pairwise within-cluster dissimilarities is minimized
+[@miyauchi2015; @grotschel1989]. Adapting the cluster editing objective
+to anticlustering, the package `anticlust` maximizes the sum of all
+pairwise euclidean distances within anticlusters. This approach
+maximizes group similarity as measured by the average linkage method
+employed in hierarchical clustering methods.
 
-[^2]: Maximizing a measure of similarity can be also done instead.
+[^2]: Similarity measures can be used as well, in which case larger
+values indicate higher similarity [@demaine2006].
 
-To vary the objective function, it is possible change the parameter
-`objective` in the function `anticlustering`. In most cases, the results
-for the `"variance"` objective (k-means) and the `"distance"` objective
-(cluster editing) will be quite similar. The default objective is
-`"distance"`; you can change it to `"variance"` as follows:
+To vary the objective function in `anticlust`, it is possible change the
+parameter `objective` in the function `anticlustering`. In most cases,
+the results for the `"variance"` objective (k-means) and the
+`"distance"` objective (cluster editing) will be quite similar. The
+default objective is `"distance"`; you can change it to `"variance"` as
+follows:
 
 ```{r, fig.width = 6.5}
 data <- iris[, -5]

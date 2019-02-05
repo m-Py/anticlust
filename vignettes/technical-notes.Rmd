@@ -20,43 +20,85 @@ knitr::opts_chunk$set(
   message = FALSE,
   warning = FALSE
 )
+
+set.seed(123)
 ```
 
 This vignette documents the technical aspects of the `R` package
-`anticlust`. This includes a description of the objective functions used
-to measure cluster similarity, and a documentation of the algorithms
-used to optimize these criteria.
+`anticlust`. This includes a formalization of the problem, a description
+of the objective functions used to measure anticluster similarity, and a
+documentation of the algorithms used to optimize these criteria.
 
-## The anticlustering objective
+We formalize anticlustering as follows. A set of $n$ d-dimensional data
+points $X = \{x_i\}$ ($i = 1, ..., n$) has to be partitioned into $K$
+clusters $C = \{c_k, k = 1, ..., K\}$, satisfying the following
+restrictions:
 
-@spath1986 and @valev1998 independently introduced the anticlustering
-method to maximize similarity of different groups. They proposed to
-maximize  the variance criterion that -- in k-means clustering -- is
-used to create well-separated clusters. Assume that $X = x_i$ ($i = 1,
-..., n$) is the set of $n$ d-dimensional data points that has to be
-partitioned into $K$ clusters $C = \{c_k, k = 1, ..., K\}$. K-means
-tries to find the partitioning of data points into clusters in such a
-way that the squared error between cluster centers ($\mu_k$) and
-individual data points is minimized [@jain2010]:
+(1) $\bigcup\limits_{k = 1}^{K} c_k = X$
+(2) $S_k \cap S_j = \emptyset$ $\forall k, j \in \{1, ..., p\}$, $k \ne j$
+(3) $\vert c_i \vert = \vert c_j \vert$ $\forall i, j \in \{1, ..., K\}$
+
+Restriction (1) ensures that each element from the underlying set $X$ is
+assigned to an anticluster; restriction (2) ensures that each element is
+assigned to only one anticluster; restriction (3) ensures that each
+anticluster contains the same number of elements. It follows that $\vert
+c_k \vert = \frac{n}{K}$ $\forall k \in \{1, ..., K\}$. The objective is
+to select a partitioning that maximizes the similarity of the $K$
+anticlusters.
+
+Note that restriction (3) is currently implemented for all methods in
+the `anticlust` package, but in general it is not an obligatory
+restriction and could be relaxed.
+
+## The variance objective
+
+@spath1986 and @valev1998 independently proposed to maximize the
+variance criterion used in k-means clustering to create maximally
+similar anticlusters. In k-means, the variance criterion is minimized by
+finding a partitioning of data points that minimizes the squared error
+between cluster centers ($\mu_k$) and individual data points
+[@jain2010]:
 
 $$\sum\limits_{k=1}^{K} \sum\limits_{x_i \in c_k} \vert \vert x_i -
 \mu_k \vert \vert$$
 
-Optimizing this objective is a computationally difficult problem that is
-usually tackled using heuristic methods; `anticlust` makes use of a
+The following plot graphically illustrates the maximization and
+minimization of the variance criterion in a 2-dimensional feature space;
+these groupings employ the restrictions (1) - (3) described above,
+including the restriction of equal cluster sizes:
+
+```{r, fig.width = 6.5, echo = FALSE}
+library("anticlust")
+n_elements <- 90
+features <- matrix(runif(n_elements * 2), ncol = 2)
+n_groups <- 3
+pch <- c(15, 16, 17)
+
+clusters <- clustering(features, n_groups)
+anticlusters <- anticlustering(features, n_groups, method = "sampling", objective = "variance")
+par(mfrow = c(1, 2))
+plot_clusters(features, clusters, pch = pch, main = "Minimize variance")
+plot_clusters(features, anticlusters, pch = pch, main = "Maximize variance")
+```
+
+Optimizing the variance objective is a computationally difficult problem
+that is usually tackled with heuristic methods. In the left-hand plot,
+the categorization of some elements may not have been ideal, but
+finding the optimal clustering is NP hard. To maximize the variance
+criterion for the anticlustering problem, `anticlust` makes use of a
 simulated annealing approach that is described below.
 
-## The distance criterion
+## The distance objective
 
-The package `anticlust` also employs an objective that is used in the
-problem domain of cluster editing to tackle the anticlustering problem
-[@rahmann2007; @bocker2013].[^1] The objective is based on the pairwise
-dissimilarities between all data points. In cluster editing, the optimal
-objective is found when the sum of all pairwise dissimilarities within
-clusters is minimized; maximizing a measure of similarity can also be
-done instead. Assume that the we use variables $x_{ij}$ to encode
-whether two data points $x_i$ and $x_j$ belong to the same anticluster
-$c_k$:
+To tackle the anticlustering problem, `anticlust` also employs another
+objective that is used in the problem domain of cluster editing
+[@rahmann2007; @bocker2013].[^1] This objective is based on the pairwise
+dissimilarities between all data points; the optimal objective is found
+when the sum of pairwise dissimilarities within clusters is minimized.
+Note that maximizing a measure of "connectedness" or similarity could
+also be done instead. To formalize the objective, we use variables
+$x_{ij}$ to encode whether two data points $x_i$ and $x_j$ belong to the
+same anticluster $c_k$:
 
 [^1]: Cluster editing has also been studied under different names such
 as correlation clustering [@bansal2004], clique partition problem
@@ -71,17 +113,18 @@ $$
 $$
 
 Moreover, assume that $d_{ij}$ measures the dissimilarity between two
-d-dimensional data points $x_i$ and $x_j$, for example as the euclidean
-distance. The cluster editing objective is then given as follows
-[@miyauchi2015; @grotschel1989]:[^2]
-
-[^2]: Note that in classical cluster editing, measures of
-(dis)similarity require positive and negative values to ensure a
-reasonable cluster partitioning. We do not have this requirement because
-we introduce restriction on the group sizes, ensuring good solutions
-even if all distance measures are positive.
+data points $x_i$ and $x_j$, for example given as the euclidean
+distance. The cluster editing distance objective is then given as
+follows [@miyauchi2015; @grotschel1989]:
 
 $$\sum\limits_{1 \leq i < j \leq n} d_{ij} \: x_{ij}$$
+
+Note that in classical cluster editing, measures of (dis)similarity
+require positive and negative values to ensure a reasonable cluster
+partitioning. We do not have this requirement because we introduced a
+restriction on the sizes of all anticlusters, ensuring reasonable
+solutions even if all distance measures are positive (as is the case
+when using a euclidean distance).
 
 ## Algorithmic approaches
 
