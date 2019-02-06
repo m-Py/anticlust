@@ -133,11 +133,20 @@ positive (as is the case when employing a euclidean distance).
 
 ## Algorithmic approaches
 
-Finding partitions that optimize an objective such as the variance
-and distance criterion usually corresponds to NP-complete problems
+Finding partitions that optimize an objective such as the variance and
+distance criterion usually corresponds to NP-complete problems
 [@arabie1996; @jain2010; @bansal2004]. This means that it is probably
-not possible to find an efficient algorithm that solves large problem
-instances.
+not possible to find an efficient algorithm that finds the best possible
+partitioning. In practice, this usually means that optimal clusterings
+are not feasible when many elements have to be partitioned. Indeed, the
+k-means algorithm employs a heuristic that finds good solutions with
+high probability, but it is not guaranteed that the best solution is
+found.
+
+In the case of cluster editing, it has been found that exact solutions
+can indeed be found even for moderately large problem instances of
+several hundred elements [@bocker2011; @lorena2018]. Such approaches
+rely on integer linear programming.
 
 - Computational complexity
 - exact vs. heuristic approaches

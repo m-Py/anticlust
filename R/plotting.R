@@ -6,6 +6,8 @@
 #' @param clustering A vector representing the clustering
 #' @param connect_clusters Boolean. Connect the groups through lines?
 #'     Useful to illustrate a graph structure.
+#' @param show_axes Boolean, display values on the x and y-axis? Defaults
+#'     to `FALSE`.
 #' @param xlab The label for the x-axis
 #' @param ylab The label for the y-axis
 #' @param cols The coloring of the groups. Does not need to be passed.
@@ -45,8 +47,8 @@
 #' plot_clusters(features, anticlusters, pch = c(15, 16, 17))
 #'
 plot_clusters <- function(features, clustering, connect_clusters = FALSE,
-                          xlab = NULL, ylab = NULL, col = NULL,
-                          pch = 19, main = "", cex = 1.2,
+                          show_axes = FALSE, xlab = NULL, ylab = NULL,
+                          col = NULL, pch = 19, main = "", cex = 1.2,
                           cex.axis = 1.2, cex.lab = 1.2) {
   if (ncol(features) != 2)
     stop("Can only plot two features")
@@ -83,9 +85,12 @@ plot_clusters <- function(features, clustering, connect_clusters = FALSE,
   col <- col[clustering]
   def_mar <- c(5, 4, 4, 2) + 0.1
   par(mar = def_mar + c(0, 1, 0, 0))
+  axt <- "n"
+  if (show_axes == TRUE)
+    axt <- "s"
   plot(x, y, las = 1, cex.axis = cex.axis, cex.lab = cex.lab,
        col = col, xlab = xlab, ylab = ylab, cex = cex,
-       xaxt = "n", yaxt = "n", pch = pch, main = main)
+       xaxt = axt, yaxt = axt, pch = pch, main = main)
   if (connect_clusters)
     draw_all_cliques(x, y, clustering, cols = col)
   par(mar = def_mar)

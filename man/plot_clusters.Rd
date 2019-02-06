@@ -5,8 +5,8 @@
 \title{Visualize a clustering of two features}
 \usage{
 plot_clusters(features, clustering, connect_clusters = FALSE,
-  xlab = NULL, ylab = NULL, col = NULL, pch = 19, main = "",
-  cex = 1.2, cex.axis = 1.2, cex.lab = 1.2)
+  show_axes = FALSE, xlab = NULL, ylab = NULL, col = NULL,
+  pch = 19, main = "", cex = 1.2, cex.axis = 1.2, cex.lab = 1.2)
 }
 \arguments{
 \item{features}{A data.frame or matrix representing the features that
@@ -16,6 +16,9 @@ are used. Must have two columns.}
 
 \item{connect_clusters}{Boolean. Connect the groups through lines?
 Useful to illustrate a graph structure.}
+
+\item{show_axes}{Boolean, display values on the x and y-axis? Defaults
+to `FALSE`.}
 
 \item{xlab}{The label for the x-axis}
 
