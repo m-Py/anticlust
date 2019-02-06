@@ -11,13 +11,12 @@
 #'     (default) or "variance". See Details.
 #' @param method One of "annealing", "sampling", or "exact". See details.
 #' @param preclustering Boolean, should a preclustering be conducted
-#'     before anticlusters are created. Defaults to TRUE and it is
-#'     strongly suggested to keep it that way for the heuristic methods
-#'     "annealing" and "sampling".
-#'     `preclustering` = FALSE is mainly implemented to test against the
-#'     option `preclustering` = TRUE.
+#'     before anticlusters are created. Defaults to `TRUE`.
 #' @param standardize Boolean - should the features be standardized
-#'     before anticlusters are assigned? Defaults to TRUE
+#'     before anticlusters are assigned? Defaults to `TRUE`.
+#'     Standardization is done using the function \code{\link{scale}}.
+#' @param nrep The number of repetitions used in the heuristic methods
+#'     "sampling" or "annealing".
 #'
 #' @return A vector representing anticluster affiliation
 #'
@@ -48,7 +47,9 @@
 #' rely on a preclustering that prevents grouping very similar elements
 #' into the same anticluster. Method = "sampling" will be somewhat
 #' faster, but method = "annealing" will usually return a better
-#' objective. Simulated annealing is the default setting.
+#' objective. Simulated annealing is the default setting. . It is
+#' strongly suggested to keep the default value of `preclustering` when
+#' using one of the heuristic methods.
 #'
 #' @examples
 #'
@@ -118,7 +119,7 @@
 
 anticlustering <- function(features, n_anticlusters, objective = "distance",
                            method = "annealing", preclustering = TRUE,
-                           standardize = TRUE) {
+                           standardize = TRUE, nrep = 200) {
 
   ## Some input handling
   if (!method %in% c("exact", "sampling",  "annealing"))
@@ -126,21 +127,21 @@ anticlustering <- function(features, n_anticlusters, objective = "distance",
   if (!objective %in% c("variance", "distance"))
     stop("Argument objective must be 'distance' or 'variance'.")
   if (n_anticlusters <= 1 | nrow(features) %% n_anticlusters != 0)
-    stop("The number of features must be a multiplier of n_anticlusters")
+    stop("The number of cases must be a multiplier of `n_anticlusters`")
   features <- as.matrix(features) #  if features is a vector
   if (mode(features) != "numeric")
     stop("Features must be of type numeric")
   if (!is.logical(preclustering) | is.na(preclustering))
     stop("Argument `preclustering` must be logical (TRUE or FALSE)")
   if (!is.logical(standardize) | is.na(standardize))
-    stop("Argument `preclustering` must be logical (TRUE or FALSE)")
+    stop("Argument `standardize` must be logical (TRUE or FALSE)")
 
   ## Standardize feature values (for each feature, mean = 0, sd = 1)?
   if (standardize) {
     features <- scale(features)
   }
 
-  ## 1. Distance objective is maximized
+  ## First possibility: use exact ILP to solve anticlustering
   if (objective == "distance" & method == "exact") {
     solver <- solver_available()
     if (method == "exact" & solver == FALSE)
@@ -148,18 +149,18 @@ anticlustering <- function(features, n_anticlusters, objective = "distance",
     heuristic  <- ifelse(preclustering == TRUE, 1, 0)
     anticlusters <- distance_anticlustering(features, n_anticlusters,
                                             solver, heuristic = heuristic)
-  ## 2. Variance objective is maximized
+  ## Exact solution not available for variance criterion
   } else if (objective == "variance" & method == "exact") {
     stop("There is no exact method for maximizing the variance criterion")
-  ## Heuristic approach for variance criterion:
-  } else {
+  } else { ## Heuristic approach
     n_preclusters <- nrow(features) / n_anticlusters
     preclusters <- equal_sized_kmeans(features, n_preclusters)
     anticlusters <- heuristic_anticlustering(features, preclusters,
-                                             objective, nrep = 10000,
+                                             objective, nrep = nrep,
                                              method = method,
                                              preclustering = preclustering)
   }
+  names(anticlusters) <- NULL
   return(anticlusters)
 }
 

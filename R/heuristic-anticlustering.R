@@ -10,7 +10,7 @@
 # @param method The method used to find the best objective. Can be "sampling"
 #     for repeated random sampling or "annealing" for simulated annealing.
 # @param nrep The number of repetitions tried when assigning elements
-#     to anticlusters when the method is "sampling"
+#     to anticlusters when the method is "sampling" or "annealing".
 # @param preclustering Boolean, should a preclustering be conducted
 #     before anticlusters are created. Defaults to TRUE and it is
 #     advised to keep it that way for the heuristic methods.
@@ -51,9 +51,9 @@ heuristic_anticlustering <- function(features, clustering, objective = "distance
   dat <- sort_by_col(dat, 1)
 
   if (method == "sampling")
-    best_assignment <- random_sampling(dat, clustering, objective, nrep, preclustering)
+    best_assignment <- random_sampling(dat, clustering, objective, preclustering, nrep)
   else if (method == "annealing")
-    best_assignment <- simulated_annealing(dat, clustering, objective, preclustering)
+    best_assignment <- simulated_annealing(dat, clustering, objective, preclustering, nrep)
   else
     stop("Method must be 'sampling' or 'annealing'")
 
@@ -66,7 +66,7 @@ heuristic_anticlustering <- function(features, clustering, objective = "distance
 ## Simulated annealing approach to finding the best objective considering
 ## preclustering restrictions. Relevant for this method is the
 ## next_candidate function below
-simulated_annealing <- function(dat, clustering, objective, preclustering = TRUE) {
+simulated_annealing <- function(dat, clustering, objective, preclustering = TRUE, nrep) {
   ## Initialize variables
   n_elements <- nrow(dat)
   n_preclusters <- length(unique(clustering))
@@ -92,7 +92,7 @@ simulated_annealing <- function(dat, clustering, objective, preclustering = TRUE
   ## Use `optim` for simulated annealing
   return(optim(init, objective_fun, next_candidate, method = "SANN",
                preclustering = preclustering,
-               control = list(maxit = 10000, temp = 2000, REPORT = 500,
+               control = list(maxit = nrep, temp = 2000, REPORT = 500,
                               fnscale = -1, tmax = 20))$par)
 }
 
@@ -133,14 +133,14 @@ next_candidate <- function(anticlusters, preclustering = TRUE) {
 
 ## Random sampling approach to finding the best objective considering
 ## preclustering restrictions
-random_sampling <- function(dat, clustering, objective, nrep, preclustering = TRUE) {
+random_sampling <- function(dat, clustering, objective, preclustering = TRUE, nrep) {
   ## Initialize variables
   n_elements <- nrow(dat)
   n_preclusters <- length(unique(clustering))
   n_anticlusters <- n_elements / n_preclusters
   ## Start optimizing
   best_obj <- -Inf
-  for (i in seq_along(nrep)) {
+  for (i in 1:nrep) {
     ## 1. Random sampling without preclustering restrictions
     if (preclustering == FALSE) {
       anticlusters <- rep(1:n_anticlusters, n_preclusters)

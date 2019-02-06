@@ -5,7 +5,8 @@
 \title{Algorithms for anticlustering}
 \usage{
 anticlustering(features, n_anticlusters, objective = "distance",
-  method = "annealing", preclustering = TRUE, standardize = TRUE)
+  method = "annealing", preclustering = TRUE, standardize = TRUE,
+  nrep = 200)
 }
 \arguments{
 \item{features}{A vector, matrix or data.frame of data points. Rows
@@ -19,14 +20,14 @@ correspond to elements and columns correspond to features.}
 \item{method}{One of "annealing", "sampling", or "exact". See details.}
 
 \item{preclustering}{Boolean, should a preclustering be conducted
-before anticlusters are created. Defaults to TRUE and it is
-strongly suggested to keep it that way for the heuristic methods
-"annealing" and "sampling".
-`preclustering` = FALSE is mainly implemented to test against the
-option `preclustering` = TRUE.}
+before anticlusters are created. Defaults to `TRUE`.}
 
 \item{standardize}{Boolean - should the features be standardized
-before anticlusters are assigned? Defaults to TRUE}
+before anticlusters are assigned? Defaults to `TRUE`.
+Standardization is done using the function \code{\link{scale}}.}
+
+\item{nrep}{The number of repetitions used in the heuristic methods
+"sampling" or "annealing".}
 }
 \value{
 A vector representing anticluster affiliation
@@ -55,7 +56,9 @@ sampling and another based on simulated annealing. Both approaches
 rely on a preclustering that prevents grouping very similar elements
 into the same anticluster. Method = "sampling" will be somewhat
 faster, but method = "annealing" will usually return a better
-objective. Simulated annealing is the default setting.
+objective. Simulated annealing is the default setting. . It is
+strongly suggested to keep the default value of `preclustering` when
+using one of the heuristic methods.
 }
 \examples{
 
