@@ -160,7 +160,9 @@ To find the optimal solution, we have to set the arguments `method = "exact"` an
 
 ``` r
 # Create random data to illustrate exact solution
-features <- matrix(runif(32), ncol = 2)
+n_elements <- 16
+n_anticlusters <- 2
+features <- matrix(runif(n_elements * n_anticlusters), ncol = 2)
 anticlusters <- anticlustering(features, n_anticlusters = 2,
                                method = "exact", preclustering = FALSE,
                                objective = "distance")
@@ -182,7 +184,9 @@ Note that this approach will only work for small problem sizes (&lt; 30 elements
 
 ``` r
 # Create random data to illustrate exact solution
-features <- matrix(runif(64), ncol = 2)
+n_elements <- 32
+n_anticlusters <- 2
+features <- matrix(runif(n_elements * n_anticlusters), ncol = 2)
 anticlusters <- anticlustering(features, n_anticlusters = 2,
                                method = "exact", preclustering = TRUE,
                                objective = "distance")

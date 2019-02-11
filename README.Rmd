@@ -226,7 +226,9 @@ latter is the default argument, however)
 
 ```{r}
 # Create random data to illustrate exact solution
-features <- matrix(runif(32), ncol = 2)
+n_elements <- 16
+n_anticlusters <- 2
+features <- matrix(runif(n_elements * n_anticlusters), ncol = 2)
 anticlusters <- anticlustering(features, n_anticlusters = 2,
                                method = "exact", preclustering = FALSE,
                                objective = "distance")
@@ -249,7 +251,9 @@ solution will still be very good:
 
 ```{r}
 # Create random data to illustrate exact solution
-features <- matrix(runif(64), ncol = 2)
+n_elements <- 32
+n_anticlusters <- 2
+features <- matrix(runif(n_elements * n_anticlusters), ncol = 2)
 anticlusters <- anticlustering(features, n_anticlusters = 2,
                                method = "exact", preclustering = TRUE,
                                objective = "distance")
