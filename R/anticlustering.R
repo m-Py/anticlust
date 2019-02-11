@@ -1,0 +1,175 @@
+
+#' Algorithms for anticlustering
+#'
+#' Create groups of elements (anticlusters) that are as similar as
+#' possible.
+#'
+#' @param features A vector, matrix or data.frame of data points. Rows
+#'     correspond to elements and columns correspond to features.
+#' @param n_anticlusters How many anticlusters should be created.
+#' @param objective The objective to be maximized, either "distance"
+#'     (default) or "variance". See Details.
+#' @param method One of "annealing", "sampling", or "exact". See details.
+#' @param preclustering Boolean, should a preclustering be conducted
+#'     before anticlusters are created. Defaults to `TRUE`.
+#' @param standardize Boolean - should the features be standardized
+#'     before anticlusters are assigned? Defaults to `TRUE`.
+#'     Standardization is done using the function \code{\link{scale}}.
+#' @param nrep The number of repetitions used in the heuristic methods
+#'     "sampling" or "annealing".
+#'
+#' @return A vector representing anticluster affiliation
+#'
+#' @importFrom utils installed.packages
+#' @importFrom stats as.dist dist optim
+#' @importFrom Matrix sparseMatrix
+#'
+#' @export
+#'
+#' @details
+#'
+#' TODO: Some explanation of objective.
+#'
+#' An exact solution can only be obtained when the `objective` is
+#' "distance". To obtain the optimal objective for the distance
+#' criterion, use `preclustering` = FALSE, `method` = "exact", and
+#' `objective` = "distance". Use method exact only for small problem
+#' sizes (< 30 elements). To use the exact approach, a linear
+#' programming solver must be installed and usable from R. The open
+#' source GNU linear programming kit (called from the package `Rglpk`)
+#' or one of the commercial solvers gurobi (called from the package
+#' `gurobi`) or IBM CPLEX (called from the package `Rcplex`) can be
+#' used. A license is needed for the commercial solvers and one of the
+#' interface packages must be installed.
+#'
+#' Two heuristic approaches are available, one based on repeated random
+#' sampling and another based on simulated annealing. Both approaches
+#' rely on a preclustering that prevents grouping very similar elements
+#' into the same anticluster. Method = "sampling" will be somewhat
+#' faster, but method = "annealing" will usually return a better
+#' objective. Simulated annealing is the default setting. . It is
+#' strongly suggested to keep the default value of `preclustering` when
+#' using one of the heuristic methods.
+#'
+#' @examples
+#'
+#' # 1. Default approach to anticlustering (uses simulated annealing)
+#'
+#' # Use Iris data set
+#' data(iris)
+#' anticlusters <- anticlustering(iris[, -5], n_anticlusters = 3)
+#' # Compare feature means by anticluster
+#' by(iris[, -5], anticlusters, colMeans)
+#' # Plot the anticlustering
+#' par(mfrow = c(1, 2))
+#' plot_clusters(iris[, 1:2], anticlusters) # see overlap
+#' plot_clusters(iris[, 3:4], anticlusters)
+#'
+#'
+#' # 2. Compare two heuristic approaches with variance criterion
+#'
+#' n_elements <- 200
+#' features <- matrix(rnorm(n_elements * 2), ncol = 2)
+#' criterion <- "variance"
+#' n_anticlusters <- 4
+#' classes1 <- anticlustering(features, n_anticlusters, criterion, method = "annealing")
+#' classes2 <- anticlustering(features, n_anticlusters, criterion, method = "sampling")
+#' get_objective(features, classes1, objective = criterion)
+#' get_objective(features, classes2, objective = criterion)
+#'
+#'
+#' # 3. Compare exact and heuristic approaches for distance criterion
+#'
+#' conditions <- expand.grid(preclustering = c(TRUE, FALSE),
+#'                           method = c("exact", "annealing", "sampling"))
+#' # Set up matrix to store the objective values obtained by different methods
+#' storage <- matrix(ncol = 3, nrow = 2)
+#' colnames(storage) <- c("exact", "annealing", "sampling")
+#' rownames(storage) <- c("preclustering", "no_preclustering")
+#'
+#' criterion <- "distance"
+#' n_elements <- 20
+#' features <- matrix(rnorm(n_elements * 2), ncol = 2)
+#' n_anticlusters <- 2
+#'
+#' for (i in 1:nrow(conditions)) {
+#'   method <- conditions$method[i]
+#'   preclustering <- conditions$preclustering[i]
+#'   anticlusters <- anticlustering(features, n_anticlusters, criterion,
+#'                                  method, preclustering, standardize = FALSE)
+#'   obj <- get_objective(features, anticlusters, objective = criterion)
+#'   rowname <- ifelse(preclustering, "preclustering", "no_preclustering")
+#'   storage[rowname, method] <- obj
+#' }
+#' round(storage, 2)
+#'
+#' # Print objectives relative to optimum objective:
+#' round(storage / storage["no_preclustering", "exact"], 3)
+#'
+#'
+#' @references
+#'
+#' M. Grötschel and Y. Wakabayashi, “A cutting plane algorithm for a
+#' clustering problem,” Mathematical Programming, vol. 45, nos. 1-3, pp.
+#' 59–96, 1989.
+#'
+#' H. Späth, “Anticlustering: Maximizing the variance criterion,”
+#' Control and Cybernetics, vol. 15, no. 2, pp. 213-218, 1986.
+#'
+
+anticlustering <- function(features, n_anticlusters, objective = "distance",
+                           method = "annealing", preclustering = TRUE,
+                           standardize = TRUE, nrep = 200) {
+
+  ## Some input handling
+  if (!method %in% c("exact", "sampling",  "annealing"))
+    stop("Method must be one of 'exact', 'sampling', or 'annealing'")
+  if (!objective %in% c("variance", "distance"))
+    stop("Argument objective must be 'distance' or 'variance'.")
+  if (n_anticlusters <= 1 | nrow(features) %% n_anticlusters != 0)
+    stop("The number of cases must be a multiplier of `n_anticlusters`")
+  features <- as.matrix(features) #  if features is a vector
+  if (mode(features) != "numeric")
+    stop("Features must be of type numeric")
+  if (!is.logical(preclustering) | is.na(preclustering))
+    stop("Argument `preclustering` must be logical (TRUE or FALSE)")
+  if (!is.logical(standardize) | is.na(standardize))
+    stop("Argument `standardize` must be logical (TRUE or FALSE)")
+
+  ## Standardize feature values (for each feature, mean = 0, sd = 1)?
+  if (standardize) {
+    features <- scale(features)
+  }
+
+  ## First possibility: use exact ILP to solve anticlustering
+  if (objective == "distance" & method == "exact") {
+    solver <- solver_available()
+    if (method == "exact" & solver == FALSE)
+      stop("One of the packages 'Rglpk', 'gurobi', or 'Rcplex' must be installed for an exact solution")
+    heuristic  <- ifelse(preclustering == TRUE, 1, 0)
+    anticlusters <- distance_anticlustering(features, n_anticlusters,
+                                            solver, heuristic = heuristic)
+  ## Exact solution not available for variance criterion
+  } else if (objective == "variance" & method == "exact") {
+    stop("There is no exact method for maximizing the variance criterion")
+  } else { ## Heuristic approach
+    n_preclusters <- nrow(features) / n_anticlusters
+    preclusters <- equal_sized_kmeans(features, n_preclusters)
+    anticlusters <- heuristic_anticlustering(features, preclusters,
+                                             objective, nrep = nrep,
+                                             method = method,
+                                             preclustering = preclustering)
+  }
+  names(anticlusters) <- NULL
+  return(anticlusters)
+}
+
+## Check if a solver package can be used
+solver_available <- function() {
+  solvers <- c("Rcplex", "gurobi", "Rglpk")
+  pcks <- rownames(installed.packages())
+  solvers_available <- solvers %in% pcks
+  if (sum(solvers_available) == 0) # no solver available
+    return(FALSE)
+  return(solvers[solvers_available][1]) # pick only one solver
+}
