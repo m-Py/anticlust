@@ -50,11 +50,11 @@ library("anticlust")
 n_clusters <- 3
 anticlusters <- anticlustering(data, n_clusters)
 anticlusters
-#>   [1] 1 1 3 2 3 1 2 2 2 2 3 3 2 1 2 1 2 2 3 3 1 1 3 1 2 3 2 1 1 2 3 2 3 2 1
-#>  [36] 3 3 1 3 3 3 1 1 1 1 3 2 1 2 2 1 2 3 2 2 1 3 3 2 1 3 1 3 1 1 1 3 1 1 2
-#>  [71] 3 1 3 2 3 1 3 3 3 1 1 3 3 3 2 1 2 3 3 3 2 2 2 2 3 1 2 2 1 2 2 3 2 1 3
-#> [106] 3 3 3 1 3 2 2 1 2 3 2 1 1 2 2 1 1 1 1 2 1 2 1 3 3 1 2 1 2 1 2 3 3 3 3
-#> [141] 1 2 3 3 1 2 2 2 1 2
+#>   [1] 1 2 3 1 2 1 2 3 1 2 1 2 3 1 2 1 3 3 2 3 1 1 3 2 1 1 3 2 2 1 2 3 2 3 3
+#>  [36] 1 2 1 3 1 1 2 2 3 3 1 2 3 3 2 1 3 2 1 3 2 2 3 2 3 3 3 1 2 1 3 2 2 2 3
+#>  [71] 2 2 3 3 2 1 2 3 1 3 1 2 3 2 1 1 1 1 3 3 2 1 1 1 3 3 2 1 2 1 1 1 2 3 2
+#> [106] 2 2 1 2 2 3 1 3 2 2 2 3 1 1 3 3 3 3 3 1 3 2 3 3 1 2 3 1 1 3 3 2 1 2 1
+#> [141] 1 2 1 2 1 3 1 2 3 1
 table(anticlusters)
 #> anticlusters
 #>  1  2  3 
@@ -102,9 +102,9 @@ data %>%
 
 |  Anticluster|  Sepal.Length|  Sepal.Width|  Petal.Length|  Petal.Width|
 |------------:|-------------:|------------:|-------------:|------------:|
-|            1|          5.86|         3.08|          3.75|          1.2|
-|            2|          5.87|         3.07|          3.75|          1.2|
-|            3|          5.80|         3.03|          3.77|          1.2|
+|            1|          5.85|         3.06|          3.77|         1.19|
+|            2|          5.84|         3.06|          3.74|         1.21|
+|            3|          5.84|         3.06|          3.76|         1.20|
 
 A completely random assignment very likely produces a much worse grouping, as is illustrated by the following code:
 
@@ -121,9 +121,9 @@ data %>%
 
 |  Anticluster|  Sepal.Length|  Sepal.Width|  Petal.Length|  Petal.Width|
 |------------:|-------------:|------------:|-------------:|------------:|
-|            1|          5.97|         3.04|          4.05|         1.27|
-|            2|          5.89|         2.93|          4.02|         1.33|
-|            3|          5.68|         3.20|          3.21|         1.00|
+|            1|          5.76|         2.92|          3.81|         1.22|
+|            2|          5.91|         3.13|          3.80|         1.22|
+|            3|          5.86|         3.13|          3.66|         1.16|
 
 The anticlustering objective
 ----------------------------
@@ -147,9 +147,9 @@ data %>%
 
 |  Anticluster|  Sepal.Length|  Sepal.Width|  Petal.Length|  Petal.Width|
 |------------:|-------------:|------------:|-------------:|------------:|
-|            1|          5.84|         3.07|          3.73|         1.18|
-|            2|          5.84|         3.05|          3.79|         1.21|
-|            3|          5.85|         3.05|          3.75|         1.20|
+|            1|          5.86|         3.07|          3.74|         1.20|
+|            2|          5.83|         3.05|          3.76|         1.19|
+|            3|          5.84|         3.05|          3.78|         1.22|
 
 An exact approach
 -----------------
@@ -177,8 +177,8 @@ data %>%
 
 |  Anticluster|  X1\_mean|  X2\_mean|  X1\_sd|  X2\_sd|
 |------------:|---------:|---------:|-------:|-------:|
-|            1|      0.41|      0.41|    0.30|    0.28|
-|            2|      0.41|      0.41|    0.28|    0.36|
+|            1|      0.48|      0.48|    0.26|    0.34|
+|            2|      0.47|      0.46|    0.32|    0.31|
 
 Note that this approach will only work for small problem sizes (&lt; 30 elements). We can increase the problem size that the exact approach can handle by setting the argument `preclustering = TRUE`. In this case, we insert a minor restriction that precludes very similar elements to be assigned to the same set. In some occasions, this prohibits the integer linear programming solver to find the very best partitioning, but the solution will still be very good:
 
@@ -201,8 +201,8 @@ data %>%
 
 |  Anticluster|  X1\_mean|  X2\_mean|  X1\_sd|  X2\_sd|
 |------------:|---------:|---------:|-------:|-------:|
-|            1|      0.59|      0.42|    0.32|     0.3|
-|            2|      0.58|      0.43|    0.31|     0.3|
+|            1|      0.44|      0.50|    0.29|    0.34|
+|            2|      0.44|      0.51|    0.29|    0.34|
 
 How to procede
 --------------
