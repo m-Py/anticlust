@@ -119,7 +119,7 @@
 
 anticlustering <- function(features, n_anticlusters, objective = "distance",
                            method = "annealing", preclustering = TRUE,
-                           standardize = TRUE, nrep = 200) {
+                           standardize = TRUE, nrep = 10000) {
 
   ## Some input handling
   if (!method %in% c("exact", "sampling",  "annealing"))

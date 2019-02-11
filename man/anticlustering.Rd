@@ -6,7 +6,7 @@
 \usage{
 anticlustering(features, n_anticlusters, objective = "distance",
   method = "annealing", preclustering = TRUE, standardize = TRUE,
-  nrep = 200)
+  nrep = 10000)
 }
 \arguments{
 \item{features}{A vector, matrix or data.frame of data points. Rows
