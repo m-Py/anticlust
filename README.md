@@ -19,7 +19,7 @@ library("anticlust")
 A quick start
 -------------
 
-The main function of the package is `anticlustering`. For most users, it should be sufficient to know this function. It takes as input a data matrix of features describing the elements that we want to assign to groups.[1] In the data matrix, each row is an element, for example a person, picture, word, or a photo. Each column is a numeric variable describing one of the elements' features.
+The main function of the package is `anticlustering`. For most users, it should be sufficient to know this function. It takes as input a data matrix of features describing the elements that we want to assign to groups.\[^1\] In the data matrix, each row is an element, for example a person, picture, word, or a photo. Each column is a numeric variable describing one of the elements' features.
 
 To illustrate the usage of the function, we use the classical iris data set describing the characteristics of 150 iris plants:
 
@@ -130,7 +130,7 @@ The anticlustering objective
 
 In the example above, the `anticlustering` function established anticlusters that were very similar with regard to the mean of each plant feature, outperforming a simple random allocation. However, it was just a side effect that group means turned out to be similar -- the anticlustering method does not directly minimize differences in groups means. Instead, anticlustering operates on measures of group similarity that have been developed in the context of cluster analysis; `anticlust` adapts two clustering methods: k-means (Späth 1986; Valev 1998) and cluster editing (Böcker and Baumbach 2013). The vignette "Technical notes" that is included with the package discusses the objectives of these clustering methods in more detail, but a short primer is given here:
 
-K-means is probably the best-known cluster algorithm. K-Means tries to minimize the within-cluster variance of feature values across a pre-specified number of clusters (*k*) (Jain 2010). Späth (1986) and Valev (1998) proposed to maximize the variance criterion for the anticlustering application. The basic unit underlying the cluster editing objective is a measure *d*<sub>*i**j*</sub> quantifying the dissimilarity between two elements *i* and *j*, for example as the common Euclidean distance.[2] The optimal cluster editing objective is found when the sum of pairwise within-cluster dissimilarities is minimized (Miyauchi and Sukegawa 2015; Grötschel and Wakabayashi 1989). Adapting the cluster editing objective to anticlustering, the package `anticlust` maximizes the sum of all pairwise euclidean distances within anticlusters. This approach maximizes group similarity as measured by the average linkage method employed in hierarchical clustering methods.
+K-means is probably the best-known cluster algorithm. K-Means tries to minimize the within-cluster variance of feature values across a pre-specified number of clusters (*k*) (Jain 2010). Späth (1986) and Valev (1998) proposed to maximize the variance criterion for the anticlustering application. The basic unit underlying the cluster editing objective is a measure *d*<sub>*i**j*</sub> quantifying the dissimilarity between two elements *i* and *j*, for example as the common Euclidean distance.[1] The optimal cluster editing objective is found when the sum of pairwise within-cluster dissimilarities is minimized (Miyauchi and Sukegawa 2015; Grötschel and Wakabayashi 1989). Adapting the cluster editing objective to anticlustering, the package `anticlust` maximizes the sum of all pairwise euclidean distances within anticlusters. This approach maximizes group similarity as measured by the average linkage method employed in hierarchical clustering methods.
 
 To vary the objective function in `anticlust`, it is possible change the parameter `objective` in the function `anticlustering`. In most cases, the results for the `"variance"` objective (k-means) and the `"distance"` objective (cluster editing) will be quite similar. The default objective is `"distance"`; you can change it to `"variance"` as follows:
 
@@ -154,6 +154,32 @@ data %>%
 An exact approach
 -----------------
 
+Finding an optimal partioning that maximizes the distance or variance criterion is computationally hard. For the distance criterion, the package `anticlust` offers the possibility to find the best possible partition, relying on [integer linear programming](https://en.wikipedia.org/wiki/Integer_programming). The exact approach relies on an algorithm developed by Grötschel and Wakabayashi (1989) that can be used to rather efficiently solve the cluster editing problem exactly (Böcker, Briesemeister, and Klau 2011). To use obtain an optimal solution, a linear programming solver must be installed on your system; `anticlust` supports the commercial solvers [gurobi](https://www.gurobi.com/) and [CPLEX](https://www.ibm.com/analytics/cplex-optimizer) as well as the open source [GNU linear programming kit](https://www.gnu.org/software/glpk/glpk.html). The commercial solvers are generally faster. Researchers can install a commercial solver for free using an academic licence. To use any of the solvers from within `R`, one of the interface packages `gurobi` (is shipped with the software gurobi), [Rcplex](https://CRAN.R-project.org/package=Rcplex) or [Rglpk](https://CRAN.R-project.org/package=Rglpk) must also be installed.
+
+To find the optimal solution, we have to set the arguments `method = "exact"` and `preclustering = FALSE` and `objective = "distance"` (the latter is the default argument, however)
+
+``` r
+# Create random data to illustrate exact solution
+features <- matrix(runif(32), ncol = 2)
+anticlusters <- anticlustering(features, n_anticlusters = 2,
+                               method = "exact", preclustering = FALSE,
+                               objective = "distance")
+plot_clusters(features, anticlusters, pch = 15:16)
+```
+
+<img src="README_files/figure-markdown_github/unnamed-chunk-9-1.png" style="display: block; margin: auto;" />
+
+``` r
+# see ?anticlustering
+```
+
+Note that this approach will only work for small problem sizes (maybe &lt; 30 elements). Finding an optimal partitioning of elements into sets is computationally difficult. For example, there are `r minDiff:::all_combinations(c(10, 10))` possibilities to partition 20 elements into 2 groups. The number of possible partitions grows exponentially with the number of elements. There are `r minDiff:::all_combinations(c(20, 20))` possibilities to assign 40 elements to 2 groups and there are 5.778312110^{26} possibilities to assign 60 elements to 3 groups.
+
+Optimal clustering
+------------------
+
+We can also use the exact approach to obtain an optimal clustering that minimizes the distance criterion while ensuring an equal cluster size:
+
 How to procede
 --------------
 
@@ -163,6 +189,8 @@ References
 ----------
 
 Böcker, Sebastian, and Jan Baumbach. 2013. “Cluster Editing.” In *Conference on Computability in Europe*, 33–44. Springer.
+
+Böcker, Sebastian, Sebastian Briesemeister, and Gunnar W Klau. 2011. “Exact Algorithms for Cluster Editing: Evaluation and Experiments.” *Algorithmica* 60 (2). Springer: 316–34.
 
 Demaine, Erik D, Dotan Emanuel, Amos Fiat, and Nicole Immorlica. 2006. “Correlation Clustering in General Weighted Graphs.” *Theoretical Computer Science* 361 (2-3). Elsevier: 172–87.
 
@@ -176,6 +204,4 @@ Späth, H. 1986. “Anticlustering: Maximizing the Variance Criterion.” *Contr
 
 Valev, Ventzeslav. 1998. “Set Partition Principles Revisited.” In *Joint IAPR International Workshops on Statistical Techniques in Pattern Recognition (SPR) and Structural and Syntactic Pattern Recognition (SSPR)*, 875–81. Springer.
 
-[1] The input may be an R `matrix` or `data.frame`. A single feature can be passed as a `vector`.
-
-[2] Similarity measures can be used as well, in which case larger values indicate higher similarity (Demaine et al. 2006).
+[1] Similarity measures can be used as well, in which case larger values indicate higher similarity (Demaine et al. 2006).

@@ -60,9 +60,6 @@ describing one of the elements' features.
 To illustrate the usage of the function, we use the classical iris data
 set describing the characteristics of 150 iris plants:
 
-[^1]:  The input may be an R `matrix` or `data.frame`. A single
-feature can be passed as a `vector`.
-
 ```{r}
 ## Select only the numeric attributes
 data <- iris[, -5]
@@ -92,7 +89,7 @@ of different sizes.
 Next, we wish to know how well the anticluster assignment worked. To
 find out, we first plot the plants' characteristics by anticluster:
 
-```{r, fig.width = 6.5}
+```{r, fig.width = 7.5}
 par(mfrow = c(1, 2))
 pch <- c(15, 16, 17)
 plot_clusters(data[, 1:2], anticlusters, pch = pch) # a function of the anticlust package
@@ -105,7 +102,7 @@ the three anticlusters. In constrast, a clustering of plants would have
 created a strong separation between groups, as can be seen in the
 following example:
 
-```{r, fig.width = 6.5}
+```{r, fig.width = 7.5}
 clusters <- clustering(data, n_clusters) # a function of the anticlust package
 
 par(mfrow = c(1, 2))
@@ -189,7 +186,7 @@ the results for the `"variance"` objective (k-means) and the
 default objective is `"distance"`; you can change it to `"variance"` as
 follows:
 
-```{r, fig.width = 6.5}
+```{r}
 data <- iris[, -5]
 data$Anticluster <- anticlustering(data, n_clusters, objective = "variance")
 
@@ -202,7 +199,56 @@ data %>%
 
 ## An exact approach
 
+Finding an optimal partioning that maximizes the distance or variance
+criterion is computationally hard. For the distance criterion, the
+package `anticlust` offers the possibility to find the best possible
+partition, relying on [integer linear
+programming](https://en.wikipedia.org/wiki/Integer_programming).  The
+exact approach relies on an algorithm developed by @grotschel1989  that
+can be used to rather efficiently solve the cluster editing  problem
+exactly []@bocker2011]. To use obtain an optimal solution, a linear
+programming solver must be installed on your system; `anticlust`
+supports the commercial solvers [gurobi](https://www.gurobi.com/) and
+[CPLEX](https://www.ibm.com/analytics/cplex-optimizer) as well as the
+open source [GNU linear programming
+kit](https://www.gnu.org/software/glpk/glpk.html). The commercial
+solvers are generally faster. Researchers can install a commercial
+solver for free using an academic licence. To use any of the solvers
+from within `R`, one of the interface packages `gurobi` (is shipped with
+the software gurobi),
+[Rcplex](https://CRAN.R-project.org/package=Rcplex) or
+[Rglpk](https://CRAN.R-project.org/package=Rglpk) must also be
+installed.
 
+To find the optimal solution, we have to set the arguments `method =
+"exact"` and `preclustering = FALSE` and `objective = "distance"` (the
+latter is the default argument, however)
+
+```{r}
+# Create random data to illustrate exact solution
+features <- matrix(runif(32), ncol = 2)
+anticlusters <- anticlustering(features, n_anticlusters = 2,
+                               method = "exact", preclustering = FALSE,
+                               objective = "distance")
+plot_clusters(features, anticlusters, pch = 15:16)
+# see ?anticlustering
+```
+
+Note that this approach will only work for small problem sizes (maybe <
+30 elements). Finding an optimal partitioning of elements into sets is
+computationally difficult. For example, there are `r
+minDiff:::all_combinations(c(10, 10))` possibilities to partition 20
+elements into 2 groups. The number of possible partitions grows
+exponentially with the number of elements. There are `r
+minDiff:::all_combinations(c(20, 20))` possibilities to assign 40
+elements to 2 groups and there are `r  minDiff:::all_combinations(c(20,
+20, 20))` possibilities to assign 60 elements to 3 groups. 
+
+
+## Optimal clustering
+
+We can also use the exact approach to obtain an optimal clustering that 
+minimizes the distance criterion while ensuring an equal cluster size:
 
 ## How to procede
 

@@ -25,7 +25,8 @@ set.seed(123)
 ```
 
 This vignette documents the technical aspects of the `R` package
-`anticlust`. This includes a formalization of the problem, a description
+`anticlust`. **It is a work in progress, there are still pieces
+missing.** This includes a formalization of the problem, a description
 of the objective functions used to measure anticluster similarity, and a
 documentation of the algorithms used to optimize these criteria.
 
