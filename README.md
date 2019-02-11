@@ -164,26 +164,46 @@ features <- matrix(runif(32), ncol = 2)
 anticlusters <- anticlustering(features, n_anticlusters = 2,
                                method = "exact", preclustering = FALSE,
                                objective = "distance")
-plot_clusters(features, anticlusters, pch = 15:16)
+
+# Display partitioning
+data <- data.frame(features, Anticluster = anticlusters)
+data %>%
+  group_by(Anticluster) %>%
+  summarize_all(funs(mean, sd)) %>%
+  round(2) %>% knitr::kable()
 ```
 
-<img src="README_files/figure-markdown_github/unnamed-chunk-9-1.png" style="display: block; margin: auto;" />
+|  Anticluster|  X1\_mean|  X2\_mean|  X1\_sd|  X2\_sd|
+|------------:|---------:|---------:|-------:|-------:|
+|            1|      0.41|      0.41|    0.30|    0.28|
+|            2|      0.41|      0.41|    0.28|    0.36|
+
+Note that this approach will only work for small problem sizes (&lt; 30 elements). We can increase the problem size that the exact approach can handle by setting the argument `preclustering = TRUE`. In this case, we insert a minor restriction that precludes very similar elements to be assigned to the same set. In some occasions, this prohibits the integer linear programming solver to find the very best partitioning, but the solution will still be very good:
 
 ``` r
-# see ?anticlustering
+# Create random data to illustrate exact solution
+features <- matrix(runif(64), ncol = 2)
+anticlusters <- anticlustering(features, n_anticlusters = 2,
+                               method = "exact", preclustering = TRUE,
+                               objective = "distance")
+
+# Display partitioning
+data <- data.frame(features, Anticluster = anticlusters)
+data %>%
+  group_by(Anticluster) %>%
+  summarize_all(funs(mean, sd)) %>%
+  round(2) %>% knitr::kable()
 ```
 
-Note that this approach will only work for small problem sizes (maybe &lt; 30 elements). Finding an optimal partitioning of elements into sets is computationally difficult. For example, there are `r minDiff:::all_combinations(c(10, 10))` possibilities to partition 20 elements into 2 groups. The number of possible partitions grows exponentially with the number of elements. There are `r minDiff:::all_combinations(c(20, 20))` possibilities to assign 40 elements to 2 groups and there are 5.778312110^{26} possibilities to assign 60 elements to 3 groups.
-
-Optimal clustering
-------------------
-
-We can also use the exact approach to obtain an optimal clustering that minimizes the distance criterion while ensuring an equal cluster size:
+|  Anticluster|  X1\_mean|  X2\_mean|  X1\_sd|  X2\_sd|
+|------------:|---------:|---------:|-------:|-------:|
+|            1|      0.59|      0.42|    0.32|     0.3|
+|            2|      0.58|      0.43|    0.31|     0.3|
 
 How to procede
 --------------
 
-If you are already happy with the results provided by the `anticlustering` function, you may stop here. The help page (`?anticlustering`) explains all of the parameters that can be adjusted for the `anticlusting` function. Currently, there is also a paper in preparation that will explain the theoretical background of the `anticlust` package in detail
+If you are already happy with the results provided by the `anticlustering` function, you may stop here. The help page (`?anticlustering`) explains all of the parameters that can be adjusted for the `anticlusting` function. Currently, there is also a paper in preparation that will explain the theoretical background of the `anticlust` package in detail.
 
 References
 ----------
