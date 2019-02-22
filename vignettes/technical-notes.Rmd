@@ -1,14 +1,22 @@
 ---
-title: "Technical notes"
+title: "Technical notes on the `anticlust` package"
 author: "Martin Papenberg"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output:
+  bookdown::pdf_book:
+    toc: false
+    number_sections: true
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 
 bibliography: lit.bib
+csl: "apa.csl"
+
+header-includes:
+  - \usepackage{hyperref}
+  - \hypersetup{colorlinks = true}
 ---
 
 ```{r setup, include = FALSE}
@@ -24,20 +32,27 @@ knitr::opts_chunk$set(
 set.seed(123)
 ```
 
-This vignette documents the technical aspects of the `R` package
-`anticlust`. **It is a work in progress, there are still pieces
-missing.** This includes a formalization of the problem, a description
-of the objective functions used to measure anticluster similarity, and a
-documentation of the algorithms used to optimize these criteria.
+This document explains the technical and algorithmical background of the
+`R` package `anticlust`. **It is still a work in progress.** The
+following topics are covered:
 
-We formalize anticlustering as follows. A set of $n$ d-dimensional data
-points $X = \{x_i\}$ ($i \in \{1, ..., n\}$) has to be partitioned into
-$K$ clusters $C = \{c_k, k = 1, ..., K\}$, satisfying the following
-restrictions:
+1. A formalization of the anticlustering problem
+2. A description of the objective functions used to measure anticluster
+   similarity
+3. A documentation of the algorithms used to optimize the objective
+   funtions
 
-(1) $\bigcup\limits_{k = 1}^{K} c_k = X$
-(2) $S_k \cap S_j = \emptyset$ $\forall k, j \in \{1, ..., p\}$, $k \ne j$
-(3) $\vert c_i \vert = \vert c_j \vert$ $\forall i, j \in \{1, ..., K\}$
+# Problem formalization
+
+A set of $n$ d-dimensional data points $X = \{x_i\}$ ($i \in \{1, ...,
+n\}$) has to be partitioned into $K$ clusters $C = \{c_k, k = 1, ...,
+K\}$, satisfying the following restrictions:
+
+\begin{align}
+\bigcup\limits_{k = 1}^{K} c_k = X \label{formalization:1} \\
+S_k \cap S_j = \emptyset, \; \forall k, j \in \{1, ..., K\}, \; k \ne j\label{formalization:2} \\
+\vert c_k \vert = \vert c_j \vert, \; \forall k, j \in \{1, ..., K\} \label{formalization:3}
+\end{align}
 
 Restriction (1) ensures that each element from the underlying set $X$ is
 assigned to an anticluster; restriction (2) ensures that each element is
@@ -48,59 +63,64 @@ to select a partitioning that maximizes the similarity of the $K$
 anticlusters.
 
 Note that restriction (3) is currently implemented for all methods in
-the `anticlust` package, but in general it is not an obligatory
-restriction and could be relaxed.
+the `anticlust` package, but it is not an obligatory restriction for
+anticlustering in general.
+
+# Objective functions
+
+This section presents definitions of optimal set similarity as assumed
+in the `anticlust` package.
 
 ## The variance objective
 
 @spath1986 and @valev1998 independently proposed to maximize the
-variance criterion used in k-means clustering to create maximally
-similar anticlusters. In k-means, the variance criterion is minimized by
-finding a partitioning of data points that minimizes the squared error
-between cluster centers ($\mu_k$) and individual data points
+variance criterion used in k-means clustering to create similar
+anticlusters. The variance criterion is given by sum of the squared
+errors between cluster centers ($\mu_k$) and individual data points
 [@jain2010]:
 
-$$\sum\limits_{k=1}^{K} \sum\limits_{x_i \in c_k} \vert \vert x_i -
-\mu_k \vert \vert$$
+\begin{align} \label{varianceobj}
+\sum\limits_{k=1}^{K} \sum\limits_{x_i \in c_k} \vert \vert x_i -
+\mu_k \vert \vert^2
+\end{align}
 
 The following plot graphically illustrates efforts to maximize and to
 minimize the variance criterion in a 2-dimensional feature space for
-three (anti)clusters, respectively. The partitioning shown employs the
-restrictions (1) - (3) described above, including the restriction of
-equal (anti)cluster sizes.
+three (anti)clusters, respectively. The partitions employ restrictions
+\eqref{formalization:1} - \eqref{formalization:3}, including the
+restriction of equal (anti)cluster sizes. Optimizing the variance
+objective is a computationally difficult problem that is usually tackled
+using heuristic methods [@jain2010; @spath1986; @valev1998].
 
-```{r, fig.width = 6.5, echo = FALSE}
+```{r, fig.width = 6.5, , fig.height = 3.7, echo = FALSE}
 library("anticlust")
 n_elements <- 90
 features <- matrix(runif(n_elements * 2), ncol = 2)
 n_groups <- 3
-pch <- c(15, 16, 17)
+pch <- c(15, 17, 19)
+col <- c("gray8", "gray30", "gray78")
 
 clusters <- clustering(features, n_groups)
 anticlusters <- anticlustering(features, n_groups, method = "sampling", objective = "variance")
 par(mfrow = c(1, 2))
-plot_clusters(features, clusters, pch = pch, main = "Minimize variance")
-plot_clusters(features, anticlusters, pch = pch, main = "Maximize variance")
+plot_clusters(features, clusters, pch = pch, main = "Minimize variance", col = col)
+plot_clusters(features, anticlusters, pch = pch, main = "Maximize variance", col = col)
 ```
-
-Optimizing the variance objective is a computationally difficult problem
-that is usually tackled with heuristic methods. In the left-hand plot,
-the categorization of some elements may not have been ideal, but
-finding the optimal clustering is NP hard. To maximize the variance
-criterion for the anticlustering problem, `anticlust` makes use of a
-simulated annealing approach that is described below.
 
 ## The distance objective
 
-To tackle the anticlustering problem, `anticlust` also employs another
-objective that is used in the problem domain of cluster editing
-[@rahmann2007; @bocker2013].[^1] This objective is based on the pairwise
-dissimilarities between all data points. The optimal objective is found
-when the sum of pairwise dissimilarities within clusters is minimized.
-Note that maximizing a measure of similarity or "connectedness" could
-also be done instead. To formalize the cluster editing objective
-function, we use variables $x_{ij}$ to encode whether two data points
-$x_i$ and $x_j$ belong to the same anticluster $c_k$:
+In addition to the variance criterion, the `anticlust` package
+introduces another clustering objective to the anticlustering
+application. This objective has been used in the problem domain of
+cluster editing and is based on a measure of the pairwise
+dissimilarities of data point [@rahmann2007; @bocker2013].[^1] In
+weighted cluster editing, the optimal objective is found when the sum of
+within-cluster dissimilarities is minimized; for the anticlustering
+application, the objective is maximized instead.
+
+To formalize the cluster editing objective, we use variables $x_{ij}$ to
+encode whether two data points $x_i$ and $x_j$ belong to the same
+anticluster $c_k$:
 
 [^1]: Cluster editing has also been studied under different names such
 as correlation clustering [@bansal2004], clique partition problem
@@ -114,51 +134,199 @@ $$
    \end{cases}
 $$
 
-Moreover, assume that $d_{ij}$ measures the dissimilarity between two
-data points $x_i$ and $x_j$, for example given as the euclidean
+Assume that $d_{ij}$ represents a measure of the dissimilarity between
+two data points $x_i$ and $x_j$, for example given as the euclidean
 distance. The cluster editing distance objective is then given as
 follows [@miyauchi2015; @grotschel1989]:
 
-$$\sum\limits_{1 \leq i < j \leq n} d_{ij} \: x_{ij}$$
+\begin{align} \label{objectivedist}
+\sum\limits_{1 \leq i < j \leq n} d_{ij} \: x_{ij}
+\end{align}
 
-Note that in classical cluster editing, $d_{ij}$ has to take positive as
-well as negative values to ensure a reasonable cluster partitioning. If
-all $d_{ij} \ge 0$, the objective would be minimized by $x_{ij} = 0$,
-$\forall i, j \in \{1, ..., n\}$, i.e., by using a separate cluster for
-each element. Similarly, the distance objective  would be maximized by
-$x_{ij} = 1$, $\forall i, j \in \{1, ..., n\}$, i.e., by using one big
-anticluster that entails all elements. We use a restriction on the
-number and the size of the clusters to ensure that a reasonable
-anticlustering is accomplished even if all distance measures are
-positive (as is the case when employing a euclidean distance).
+Hence, the cluster editing objective is given as the sum of distances of
+elements within the same cluster. I refer to this objective function as
+the "distance objective" as opposed to the "variance objective" in
+\eqref{varianceobj}.
 
-## Algorithmic approaches
+Maximizing the distance objective corresponds to minimizing the average
+linkage distance between partitions. In hierarchical cluster algorithms,
+the average linkage distance is a quantification of the similarity of
+two clusters [@guha1998; @bacon2001]. To appreciate the correspondence
+of the distance objective and the average linkage method, consider the
+total sum of paired distances of all elements. The total sum of all
+distances can be partitioned into within-cluster and between-cluster
+distances:
 
-Finding partitions that optimize an objective such as the variance and
-distance criterion usually corresponds to NP-complete problems
-[@arabie1996; @jain2010; @bansal2004]. This means that it is probably
-not possible to find an efficient algorithm that finds the best possible
-partitioning. In practice, this usually means that optimal clusterings
-are not feasible when many elements have to be partitioned. Indeed, the
-k-means algorithm employs a heuristic that finds good solutions with
-high probability, but it is not guaranteed that the best solution is
-found.
+\begin{align}
+\sum\limits_{1 \leq i < j \leq n} d_{ij} =
+\sum\limits_{1 \leq i < j \leq n} d_{ij} \: x_{ij} +
+\sum\limits_{1 \leq i < j \leq n} d_{ij} \: (1- x_{ij})
+\end{align}
 
-In the case of cluster editing, it has been found that exact solutions
-can indeed be found even for moderately large problem instances of
-several hundred elements [@bocker2011; @lorena2018]. Such approaches
-rely on integer linear programming.
+The total sum of distances is not influenced by the concrete
+partitioning $x_{ij}$. Hence, the following optimizations lead to the
+same partitioning $x_{ij}$:
 
-- Computational complexity
-- exact vs. heuristic approaches
+$$\mathrm{Maximize} \sum\limits_{1 \leq i < j \leq n} d_{ij} \: x_{ij}$$
 
-### The exact approach
+$$\mathrm{Minimize} \sum\limits_{1 \leq i < j \leq n} d_{ij} \: (1- x_{ij})$$
 
-- Integer linear programming [@grotschel1989; @bocker2011]
+In the special case of two partitions $A$ and $B$ ($K = 2$), the sum of
+the between-cluster distances can be written as follows:
+
+\begin{align} \label{sumlinkage}
+\sum\limits_{i \in A} \: \sum\limits_{j \in B} d_{ij}
+\end{align}
+
+This formulation is very close to the average linkage objective that
+however also incorporates the cardinalities of the sets $A$ and $B$
+[@guha1998]:
+
+\begin{align} \label{avglinkage}
+\frac{1}{\vert A \vert \: \vert B \vert }
+\sum\limits_{i \in A} \: \sum\limits_{j \in B} d_{ij}
+\end{align}
+
+Given restriction \eqref{formalization:3} for the anticlustering
+problem, the partitions $A$ and $B$ are of equal size; therefore,
+\eqref{sumlinkage} gives the same information with regard to the
+similarity of clusters as \eqref{avglinkage}. The cluster editing
+objective is hence a generalization of the average linkage measure on
+more than two clusters.
+
+# Algorithmic approaches
+
+Finding optimal data partitions usually corresponds to NP-complete
+problems [@arabie1996; @jain2010; @bansal2004]. For NP-complete
+problems, it is often infeasible to find the optimal objective,
+especially when *n* is large. To find the optimal solution for
+moderately large instances, `anticlust` employs integer linear
+programming. To process larger problem instances, `anticlust` uses
+heuristic methods based on repeated random sampling.
+
+## NP-completeness
+
+In the following, I show that anticlustering using the distance
+criterion is NP-complete. First, the distance objective can be computed
+in polynomial time for a given partitioning $C$ because the summation of
+all distance values $d_{ij}$ is in $O(n^2)$.
+
+Second, I show that if an efficient algorithm exists to solve distance
+anticlusting in polynomial time, it is also possible solve the
+NP-complete balanced number partitioning problem in polynomial time
+[@mertens2001]. In the number partitioning problem, we have a list of
+positive integers $a_1, a_2, ..., a_n$ and try to find a subset $A
+\subset \{1, ..., n\}$ that minimizes the partition difference
+
+\begin{align}
+E(A) = \bigg\vert \sum\limits_{i \in A} a_i - \sum\limits_{j \notin A} a_j \bigg\vert
+\end{align}
+
+In the balanced version of number partitioning, we can impose the
+restriction of $\vert A \vert = \frac{n}{2}$ -- assuming that $n$ is
+even -- corresponding to restriction \eqref{formalization:3} of equal
+cluster sizes in anticlusting [@mertens2001].
+
+To convert the number partitioning formulation into a formulation of
+distance anticlustering, we define $d_{ij}$ as the absolute difference
+representing the "dissimilarity" of two numbers:
+
+\begin{align} \label{absdiff}
+d_{ij} := \vert a_i - a_j \vert
+\end{align}
+
+We thus obtain
+
+\begin{align}
+E(A) = \sum\limits_{i \in A} \sum\limits_{j \notin A} d_{ij}
+\end{align}
+
+Using variables $x_{ij} \in \{0, 1\}$ to represent whether two numbers
+belong to the same subset, i.e.,
+
+$$
+   x_{ij} =
+   \begin{cases}
+     1 & \textrm{if} \:  \: (x_i \in A \wedge x_j \in A) \vee
+       (x_i \notin A \wedge x_j \notin A) \\
+     0 & \textrm{otherwise}
+   \end{cases}
+$$
+
+we obtain $E(A)$ as the distance anticlustering objective:
+
+\begin{align}
+E(A) = \sum\limits_{1 \leq i < j \leq n} d_{ij} \: x_{ij}
+\end{align}
+
+Hence, anticlustering using the distance objective is equivalent to the
+balanced number partitioning problem in the special case where
+
+a) $K = 2$
+b) each element is described by an integer
+c) $d_{ij}$ is the absolute difference
+
+Therefore, if a polynomial-time algorithm exists that solves distance
+anticlustering, we can solve the NP-complete balanced number
+partitioning in polynomial time. Hence, distance anticlustering is
+NP-complete.
+
+## Integer linear programming
+
+The `anticlust` package uses integer linear programming to solve
+distance anticlustering exactly [@grotschel1989; @bocker2011]. Despite
+the NP-complete nature of cluster editing, integer linear programming
+(ILP) has successfully been used to find optimal solutions even for
+relatively large cluster editing problem instances  [@bocker2011;
+@lorena2018].
+
+The `anticlust` package uses an ILP based on formulations proposed by
+Grötschel and Wakabayashi [-@grotschel1989]. The complete problem
+formulation used in the package `anticlust` is given as follows:
+
+\begin{align}
+\mathrm{Maximize} \sum\limits_{1 \leq i < j \leq n} d_{ij} \: x_{ij}
+\end{align}
+
+\begin{align}
+- x_{ij} + x_{ik} + x_{jk} + y_k \le 1, \qquad
+  \forall \; 1 \le i < j < k \le n, \label{tri1} \\
+x_{ij} - x_{ik} + x_{jk} \le 1, \qquad
+  \forall \;  1 \le i < j < k \le n, \\
+x_{ij} + x_{ik} - x_{jk} \le 1, \qquad
+  \forall \; 1 \le i < j < k \le n, \label{tri3} \\
+\sum\limits_{1 \leq i < j \leq n} x_{ij} + \sum\limits_{1 \leq k < i \leq n} x_{ki} = \frac{n}{K} - 1, \qquad \forall i \in \{1, ..., n\} \label{clustersize} \\
+x_{ij} \in \{0, 1\}, \; \forall \; 1 \leq i < j \leq n \label{binary}
+\end{align}
+
+The inequalities \eqref{tri1} - \eqref{tri3} are called triangular
+constraints and were developed by Grötschel and Wakabayashi
+[-@grotschel1989]; they ensure that all within-cluster distances are
+used to compute the objective function and between-cluster distances are
+ignored. They also enforce the anticlustering restrictions
+\eqref{formalization:1} and \eqref{formalization:2}, i.e., they ensure
+that each element is assigned to exactly one anticluster. The equality
+\eqref{clustersize} enforces that each anticluster consists of the same
+number of elements $\frac{n}{K}$. This condition is ensured by enforcing
+that each element $x_i$ is connected with $\frac{n}{K} - 1$ elements
+within the same anticluster. Constraint \eqref{binary} ensures that the
+partitioning variables $x_{ij}$ are binary.
+
+### Additional restrictions
+
+**TODO**: Explain preclustering
 
 ## The heuristic approach
 
 - Simulated annealing
 - Neighborhood of elements, preclustering
 
-## References
+\clearpage
+
+# References
+
+\setlength{\parindent}{-0.5in}
+\setlength{\leftskip}{0.5in}
+\setlength{\parskip}{8pt}
+
+\noindent
