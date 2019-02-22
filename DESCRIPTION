@@ -17,7 +17,7 @@ Description: Anticlustering establishes groups of elements (i.e.,
 Encoding: UTF-8
 License: MIT + file LICENSE
 LazyData: true
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 Imports: Matrix
 Suggests:
     gurobi,
