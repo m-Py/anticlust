@@ -2,7 +2,7 @@
 title: "Getting started with the anticlust package"
 author: "Martin Papenberg"
 date: "`r Sys.Date()`"
-output: 
+output:
   md_document:
     variant: markdown_github
 
@@ -43,7 +43,7 @@ install_github("m-Py/anticlust")
 ```
 
 ```{r}
-# load the package via 
+# load the package via
 library("anticlust")
 ```
 
@@ -204,7 +204,7 @@ criterion is computationally hard. For the distance criterion, the
 package `anticlust` offers the possibility to find the best possible
 partition, relying on [integer linear
 programming](https://en.wikipedia.org/wiki/Integer_programming).  The
-exact approach relies on an algorithm developed by @grotschel1989  that
+exact approach relies on an algorithm developed by @grotschel1989 that
 can be used to rather efficiently solve the cluster editing  problem
 exactly []@bocker2011]. To use obtain an optimal solution, a linear
 programming solver must be installed on your system; `anticlust`
