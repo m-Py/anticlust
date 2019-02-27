@@ -121,20 +121,9 @@ anticlustering <- function(features, n_anticlusters, objective = "distance",
                            method = "annealing", preclustering = TRUE,
                            standardize = TRUE, nrep = 10000) {
 
-  ## Some input handling
-  if (!method %in% c("exact", "sampling",  "annealing"))
-    stop("Method must be one of 'exact', 'sampling', or 'annealing'")
-  if (!objective %in% c("variance", "distance"))
-    stop("Argument objective must be 'distance' or 'variance'.")
-  if (n_anticlusters <= 1 | nrow(features) %% n_anticlusters != 0)
-    stop("The number of cases must be a multiplier of `n_anticlusters`")
-  features <- as.matrix(features) #  if features is a vector
-  if (mode(features) != "numeric")
-    stop("Features must be of type numeric")
-  if (!is.logical(preclustering) | is.na(preclustering))
-    stop("Argument `preclustering` must be logical (TRUE or FALSE)")
-  if (!is.logical(standardize) | is.na(standardize))
-    stop("Argument `standardize` must be logical (TRUE or FALSE)")
+  input_handling_anticlustering(features, n_anticlusters, objective,
+                                method, preclustering,
+                                standardize, nrep)
 
   ## Standardize feature values (for each feature, mean = 0, sd = 1)?
   if (standardize) {
@@ -143,13 +132,10 @@ anticlustering <- function(features, n_anticlusters, objective = "distance",
 
   ## First possibility: use exact ILP to solve anticlustering
   if (objective == "distance" & method == "exact") {
-    solver <- solver_available()
-    if (method == "exact" & solver == FALSE)
-      stop("One of the packages 'Rglpk', 'gurobi', or 'Rcplex' must be installed for an exact solution")
     heuristic  <- ifelse(preclustering == TRUE, 1, 0)
     anticlusters <- distance_anticlustering(features, n_anticlusters,
                                             solver, heuristic = heuristic)
-  ## Exact solution not available for variance criterion
+    ## Exact solution not available for variance criterion
   } else if (objective == "variance" & method == "exact") {
     stop("There is no exact method for maximizing the variance criterion")
   } else { ## Heuristic approach
@@ -172,4 +158,26 @@ solver_available <- function() {
   if (sum(solvers_available) == 0) # no solver available
     return(FALSE)
   return(solvers[solvers_available][1]) # pick only one solver
+}
+
+
+val_input_anticlust <- function(features, n_anticlusters, objective,
+                                method, preclustering, standardize, nrep) {
+  solver <- solver_available()
+  if (method == "exact" & solver == FALSE) {
+    stop("One of the packages 'Rglpk', 'gurobi', or 'Rcplex' ",
+         "must be installed for an exact solution")
+  }
+
+  validate_input(method, "method", "character", len = 1,
+                 input_set = c("exact", "sampling",  "annealing"))
+  validate_input(objective, "method", "character", len = 1,
+                 input_set = c("variance", "distance"))
+  validate_input(features, "features", c("data.frame", "matrix", "numeric"),
+                 objmode = "numeric")
+
+  validate_input(preclustering, "preclustering", "logical", len = 1,
+                 input_set = c(TRUE, FALSE))
+  validate_input(standardize, "standardize", "logical", len = 1,
+                 input_set = c(TRUE, FALSE))
 }
