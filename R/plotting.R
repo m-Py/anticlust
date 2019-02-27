@@ -96,6 +96,7 @@ plot_clusters <- function(features, clustering, connect_clusters = FALSE,
   par(mar = def_mar)
 }
 
+# Note: length(cols) must be == length(x)
 draw_all_cliques <- function(x, y, assignment, lwd = 1.5, lty = 1, cols) {
   n_cliques <- length(unique(assignment))
   for (i in 1:n_cliques) {
