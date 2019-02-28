@@ -155,8 +155,8 @@ simulated_annealing <- function(dat, n_anticlusters, objective,
 #' the preclustering information is ignored, this function switches the
 #' anticlusters of two random elements. When preclustering is not
 #' ignored, two elements that are not part of the same anticluster are
-#' switched. Both methods could be improved by preventing "switching"
-#' elements within the same anticluster.
+#' switched. Both methods prevent that elements within the same anticluster
+#' are switched.
 #'
 #' @noRd
 #'
@@ -179,6 +179,10 @@ next_candidate <- function(anticlusters, ignore_preclusters) {
 #'
 random_move <- function(anticlusters) {
   changepoints <- sample(anticlusters, size = 2, replace = FALSE)
+  # Ensure that different anticlusters are switched:
+  while (anticlusters[changepoints[1]] == anticlusters[changepoints[2]]) {
+    changepoints <- sample(anticlusters, size = 2, replace = FALSE)
+  }
   tmp <- anticlusters[changepoints[1]]
   anticlusters[changepoints[1]] <- anticlusters[changepoints[2]]
   anticlusters[changepoints[2]] <- tmp
@@ -214,6 +218,10 @@ preclustering_move <- function(anticlusters) {
   ## swapped into the respective other anticluster
   changepoints <- sample(n_anticlusters, size = 2, replace = FALSE)
   ## Some ugly code for swapping anticluster affiliation of the two elements
+  while (anticlusters[preclusters == rndclus][changepoints[1]] ==
+         anticlusters[preclusters == rndclus][changepoints[2]]) {
+    changepoints <- sample(n_anticlusters, size = 2, replace = FALSE)
+  }
   tmp <- anticlusters[preclusters == rndclus][changepoints[1]]
   anticlusters[preclusters == rndclus][changepoints[1]] <-
     anticlusters[preclusters == rndclus][changepoints[2]]
@@ -253,7 +261,7 @@ random_sampling <- function(dat, n_anticlusters, objective,
     if (ignore_preclusters == TRUE) {
       anticlusters <- rep(1:n_anticlusters, n_preclusters)
       anticlusters <- sample(anticlusters)
-    ## 2. Include preclustering restrictions
+      ## 2. Include preclustering restrictions
     } else if (ignore_preclusters == FALSE) {
       anticlusters <- replicate_sample(n_preclusters, n_anticlusters)
     }
