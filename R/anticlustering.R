@@ -80,37 +80,46 @@ anticlustering <- function(features, n_anticlusters, objective = "distance",
                                 standardize, nrep)
 
   ## Standardize feature values (for each feature, mean = 0, sd = 1)?
-  features <- as.matrix(features) # if only one feature was passed
+  features <- as.matrix(features)
   if (standardize) {
     features <- scale(features)
   }
 
-  ## Use exact method to solve distance anticlustering (using ILP)
+  ## Exact method using ILP
   if (method == "exact") {
     anticlusters <- exact_anticlustering(features, n_anticlusters,
                                          solver_available(),
                                          preclustering)
-  } else {
-    ## Use heuristic approach.
-    ## TODO: Preclustering not necessary if preclustering = FALSE
+    return(anticlusters)
+  }
+
+  ## Heuristic method
+  preclusters <- NULL
+  if (preclustering == TRUE) {
     n_preclusters <- nrow(features) / n_anticlusters
     preclusters   <- equal_sized_kmeans(features, n_preclusters)
-    anticlusters  <- heuristic_anticlustering(features, preclusters,
-                                              objective, nrep = nrep,
-                                              method = method,
-                                              preclustering = preclustering)
   }
-  names(anticlusters) <- NULL
+  anticlusters  <- heuristic_anticlustering(features, preclusters,
+                                            objective, nrep = nrep,
+                                            method = method,
+                                            preclustering = preclustering)
   return(anticlusters)
 }
 
 
-## A function for validating the arguments passed to `anticlustering`. This
-## ensures that:
-## (a) All arguments have correct type
-## (b) Method "exact" can only be used with objective = "distance"
-## (c) A solver package is install if method = "exact"
-## (d) A legal number of anticlusters was requested
+#' Validating the arguments passed to `anticlustering`
+#'
+#' This function ensures that:
+#' (a) All arguments have correct type
+#' (b) Method "exact" can only be used with objective = "distance"
+#' (c) A solver package is install if method = "exact"
+#' (d) A legal number of anticlusters was requested
+#'
+#' Takes the same parameters as \code{anticlustering}
+#'
+#' @return NULL
+#'
+#' @noRd
 input_handling_anticlustering <- function(features, n_anticlusters, objective,
                                           method, preclustering, standardize, nrep) {
 
@@ -147,10 +156,17 @@ input_handling_anticlustering <- function(features, n_anticlusters, objective,
   if (objective == "variance" && method == "exact") {
     stop("There is no exact method for maximizing the variance criterion")
   }
+  return(invisible(NULL))
 }
 
 
-## Check if a solver package can be used
+#' Check if a solver package can be used
+#'
+#' Has no parameters, checks in the installed packages from the user
+#'
+#' @return \code{FALSE} If no solver is available; A string identifying
+#'   the solver if at least one is available ("Rcplex", "gurobi", "Rglpk")
+#' @noRd
 solver_available <- function() {
   solvers <- c("Rcplex", "gurobi", "Rglpk")
   pcks <- rownames(installed.packages())

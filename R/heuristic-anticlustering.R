@@ -1,41 +1,24 @@
 
-# Anticlustering based on a heuristic
-#
-# @param features A data.frame, matrix or vector representing the
-#     features that are used.
-# @param clustering An optional vector representing the preclustering of
-#     elements. See Details.
-# @param objective The objective to be maximized, either "distance"
-#     (default) or "variance".
-# @param method The method used to find the best objective. Can be "sampling"
-#     for repeated random sampling or "annealing" for simulated annealing.
-# @param nrep The number of repetitions tried when assigning elements
-#     to anticlusters when the method is "sampling" or "annealing".
-# @param preclustering Boolean, should a preclustering be conducted
-#     before anticlusters are created. Defaults to TRUE and it is
-#     advised to keep it that way for the heuristic methods.
-#     `preclustering` = FALSE is mainly implemented to test against the
-#     option `preclustering` = TRUE
-#
-# @return A vector representing the anticlustering.
-#
-# @details
-#     The heuristic approaches to anticlustering forbids elements
-#     belonging to the same precluster to be assigned to the same
-#     anticluster. The preclustering should be accomplished by one of
-#     the clustering functions, `equal_sized_cluster_editing` (an exact
-#     method that minimizes distance criterion under the restriction of
-#     equal group sizes) or `equal_sized_kmeans` (a heuristic method
-#     that tries to minimize the variance criterion under the
-#     restriction of equal group sizes). Anticlustering can be done via
-#     maximizinz the distance or the variance criterion.
-#     The simulated annealing approach also considers the preclusters
-#     as the neighborhood in the exchange candidate generation. Only
-#     exchanges between elements of the same precluster are allowed
-#     in the simulated annealing approach.
-#
-
-heuristic_anticlustering <- function(features, clustering, objective,
+#' Heuristic anticlustering using random search methods
+#'
+#' @param features A data.frame, matrix or vector representing the
+#'     features that are used.
+#' @param clustering An optional vector representing the preclustering of
+#'     elements. See Details.
+#' @param objective The objective to be maximized, either "distance"
+#'     or "variance".
+#' @param method The method used to find the best objective. Can be "sampling"
+#'     for repeated random sampling or "annealing" for simulated annealing.
+#' @param nrep The number of repetitions tried when assigning elements
+#'     to anticlusters when the method is "sampling" or "annealing".
+#' @param preclustering Boolean, should a preclustering be conducted
+#'     before anticlusters are created.
+#'
+#' @return A vector representing the anticlustering.
+#'
+#' @noRd
+#'
+heuristic_anticlustering <- function(features, preclusters, objective,
                                      method, nrep, preclustering) {
 
   ## Store all data as a matrix for sorting. First column:
