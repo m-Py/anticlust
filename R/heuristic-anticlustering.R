@@ -179,10 +179,11 @@ next_candidate <- function(anticlusters, ignore_preclusters) {
 #' @noRd
 #'
 random_move <- function(anticlusters) {
-  changepoints <- sample(anticlusters, size = 2, replace = FALSE)
+  N <- length(anticlusters)
+  changepoints <- sample(N, size = 2, replace = FALSE)
   # Ensure that different anticlusters are switched:
   while (anticlusters[changepoints[1]] == anticlusters[changepoints[2]]) {
-    changepoints <- sample(anticlusters, size = 2, replace = FALSE)
+    changepoints <- sample(N, size = 2, replace = FALSE)
   }
   tmp <- anticlusters[changepoints[1]]
   anticlusters[changepoints[1]] <- anticlusters[changepoints[2]]
