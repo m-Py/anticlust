@@ -81,6 +81,7 @@ preclustering_data_format <- function(features, preclusters, n_anticlusters) {
   }
   dat <- cbind(preclusters, 1:nrow(features), features)
   dat <- sort_by_col(dat, 1) # sort by precluster
+  return(dat)
 }
 
 
