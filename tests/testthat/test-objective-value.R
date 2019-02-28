@@ -13,12 +13,15 @@ test_that("output of objective value functions has correct structure", {
     n_elements <- p_anticlusters * 5 # n must be multiplier of p
     features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
     # Precluster cases
-    n_preclusters <- nrow(features) / p_anticlusters
-    preclusters <- equal_sized_kmeans(features, n_preclusters)
+    preclusters <- NULL
+    if (conditions$preclustering[i] == TRUE) {
+      n_preclusters <- n_elements / p_anticlusters
+      preclusters <- equal_sized_kmeans(features, n_preclusters)
+    }
     # Use preclustering as resticting information in anticlustering
-    anticlusters <- heuristic_anticlustering(features, preclusters, nrep = 100,
+    anticlusters <- heuristic_anticlustering(features, p_anticlusters,
+                                             preclusters, nrep = 100,
                                              method = conditions$method[i],
-                                             preclustering = conditions$preclustering[i],
                                              objective = conditions$objective[i])
     dist_obj <- get_objective(features, anticlusters, "distance")
     var_obj <- get_objective(features, anticlusters, "variance")

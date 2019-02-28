@@ -61,17 +61,20 @@ test_that("heuristic anticlustering produces expected output", {
     features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
 
     ## First: heuristic preclustering
-    n_preclusters <- n_elements / p_anticlusters
-    preclusters <- equal_sized_kmeans(features, n_preclusters)
-    ## Legal number of preclusters?
-    expect_equal(legal_number_of_clusters(features, preclusters), NULL)
-    ## Expected number of preclusters?
-    expect_equal(as.numeric(table(preclusters)[1]), n_elements / n_preclusters)
+    preclusters <- NULL
+    if (conditions$preclustering[i] == TRUE) {
+      n_preclusters <- n_elements / p_anticlusters
+      preclusters <- equal_sized_kmeans(features, n_preclusters)
+      ## Legal number of preclusters?
+      expect_equal(legal_number_of_clusters(features, preclusters), NULL)
+      ## Expected number of preclusters?
+      expect_equal(as.numeric(table(preclusters)[1]), n_elements / n_preclusters)
+    }
 
     ## Now: anticlustering:
-    anticlusters <- heuristic_anticlustering(features, preclusters, nrep = 100,
+    anticlusters <- heuristic_anticlustering(features, p_anticlusters,
+                                             preclusters, nrep = 100,
                                              method = conditions$method[i],
-                                             preclustering = conditions$preclustering[i],
                                              objective = conditions$objective[i])
     ## Legal number of anticlusters?
     expect_equal(legal_number_of_clusters(features, anticlusters), NULL)

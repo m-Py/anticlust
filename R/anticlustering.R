@@ -99,10 +99,10 @@ anticlustering <- function(features, n_anticlusters, objective = "distance",
     n_preclusters <- nrow(features) / n_anticlusters
     preclusters   <- equal_sized_kmeans(features, n_preclusters)
   }
-  anticlusters  <- heuristic_anticlustering(features, preclusters,
+  anticlusters  <- heuristic_anticlustering(features, n_anticlusters,
+                                            preclusters,
                                             objective, nrep = nrep,
-                                            method = method,
-                                            preclustering = preclustering)
+                                            method = method)
   return(anticlusters)
 }
 
