@@ -4,8 +4,7 @@
 \alias{clustering}
 \title{Create clusters of equal size}
 \usage{
-clustering(features, n_clusters, standardize = TRUE,
-  method = "heuristic")
+clustering(features, n_clusters, standardize = TRUE, method = "heuristic")
 }
 \arguments{
 \item{features}{A vector, matrix or data.frame of data points. Rows

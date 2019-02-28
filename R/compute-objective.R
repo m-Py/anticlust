@@ -32,8 +32,8 @@
 #'
 #' # Plot the clustering
 #' par(mfrow = c(1, 2))
-#' draw_assignment(features, clusters_exact)
-#' draw_assignment(features, clusters_heuristic)
+#' plot_clusters(features, clusters_exact)
+#' plot_clusters(features, clusters_heuristic)
 #'
 #' @references
 #' H. Späth, “Anticlustering: Maximizing the variance criterion,”

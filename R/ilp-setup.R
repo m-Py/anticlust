@@ -9,13 +9,6 @@
 #
 # @return A list representing the ILP formulation of the instance
 #
-# @details To use this function, a linear programming solver must be
-#     installed and usable in R. You can use the open source GNU linear
-#     programming kit (called from the package `Rglpk`) or one of the
-#     commercial solvers gurobi (called from the package `gurobi`) or
-#     IBM CPLEX (called from the package `Rcplex`). A license is needed
-#     for the commercial solvers. One of the interface packages must be
-#     installed.
 #
 # @references
 #

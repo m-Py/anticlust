@@ -10,7 +10,8 @@ anticlustering(features, n_anticlusters, objective = "distance",
 }
 \arguments{
 \item{features}{A vector, matrix or data.frame of data points. Rows
-correspond to elements and columns correspond to features.}
+correspond to elements and columns correspond to features.
+A vector represents a single feature.}
 
 \item{n_anticlusters}{How many anticlusters should be created.}
 
@@ -23,7 +24,7 @@ correspond to elements and columns correspond to features.}
 before anticlusters are created. Defaults to `TRUE`.}
 
 \item{standardize}{Boolean - should the features be standardized
-before anticlusters are assigned? Defaults to `TRUE`.
+before anticlusters are created? Defaults to `TRUE`.
 Standardization is done using the function \code{\link{scale}}.}
 
 \item{nrep}{The number of repetitions used in the heuristic methods
@@ -41,30 +42,24 @@ TODO: Some explanation of objective.
 
 An exact solution can only be obtained when the `objective` is
 "distance". To obtain the optimal objective for the distance
-criterion, use `preclustering` = FALSE, `method` = "exact", and
-`objective` = "distance". Use method exact only for small problem
+criterion, use \code{preclustering = FALSE}, \code{method = "exact"}, and
+\code{objective = "distance"}. Use method exact only for small problem
 sizes (< 30 elements). To use the exact approach, a linear
 programming solver must be installed and usable from R. The open
-source GNU linear programming kit (called from the package `Rglpk`)
+source GNU linear programming kit (called from the package \code{Rglpk})
 or one of the commercial solvers gurobi (called from the package
-`gurobi`) or IBM CPLEX (called from the package `Rcplex`) can be
+\code{gurobi}) or IBM CPLEX (called from the package \code{Rcplex}) can be
 used. A license is needed for the commercial solvers and one of the
 interface packages must be installed.
 
 Two heuristic approaches are available, one based on repeated random
 sampling and another based on simulated annealing. Both approaches
-rely on a preclustering that prevents grouping very similar elements
-into the same anticluster. Method = "sampling" will be somewhat
-faster, but method = "annealing" will usually return a better
-objective. Simulated annealing is the default setting. . It is
-strongly suggested to keep the default value of `preclustering` when
-using one of the heuristic methods.
+may rely on a preclustering that prevents grouping very similar elements
+into the same anticluster if we set \code{preclustering = TRUE}.
 }
 \examples{
 
-# 1. Default approach to anticlustering (uses simulated annealing)
-
-# Use Iris data set
+# Use Iris data set with the default settings
 data(iris)
 anticlusters <- anticlustering(iris[, -5], n_anticlusters = 3)
 # Compare feature means by anticluster
@@ -73,47 +68,6 @@ by(iris[, -5], anticlusters, colMeans)
 par(mfrow = c(1, 2))
 plot_clusters(iris[, 1:2], anticlusters) # see overlap
 plot_clusters(iris[, 3:4], anticlusters)
-
-
-# 2. Compare two heuristic approaches with variance criterion
-
-n_elements <- 200
-features <- matrix(rnorm(n_elements * 2), ncol = 2)
-criterion <- "variance"
-n_anticlusters <- 4
-classes1 <- anticlustering(features, n_anticlusters, criterion, method = "annealing")
-classes2 <- anticlustering(features, n_anticlusters, criterion, method = "sampling")
-get_objective(features, classes1, objective = criterion)
-get_objective(features, classes2, objective = criterion)
-
-
-# 3. Compare exact and heuristic approaches for distance criterion
-
-conditions <- expand.grid(preclustering = c(TRUE, FALSE),
-                          method = c("exact", "annealing", "sampling"))
-# Set up matrix to store the objective values obtained by different methods
-storage <- matrix(ncol = 3, nrow = 2)
-colnames(storage) <- c("exact", "annealing", "sampling")
-rownames(storage) <- c("preclustering", "no_preclustering")
-
-criterion <- "distance"
-n_elements <- 20
-features <- matrix(rnorm(n_elements * 2), ncol = 2)
-n_anticlusters <- 2
-
-for (i in 1:nrow(conditions)) {
-  method <- conditions$method[i]
-  preclustering <- conditions$preclustering[i]
-  anticlusters <- anticlustering(features, n_anticlusters, criterion,
-                                 method, preclustering, standardize = FALSE)
-  obj <- get_objective(features, anticlusters, objective = criterion)
-  rowname <- ifelse(preclustering, "preclustering", "no_preclustering")
-  storage[rowname, method] <- obj
-}
-round(storage, 2)
-
-# Print objectives relative to optimum objective:
-round(storage / storage["no_preclustering", "exact"], 3)
 
 
 }

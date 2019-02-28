@@ -5,8 +5,8 @@
 \title{Visualize a clustering of two features}
 \usage{
 plot_clusters(features, clustering, connect_clusters = FALSE,
-  show_axes = FALSE, xlab = NULL, ylab = NULL, col = NULL,
-  pch = 19, main = "", cex = 1.2, cex.axis = 1.2, cex.lab = 1.2)
+  show_axes = FALSE, xlab = NULL, ylab = NULL, col = NULL, pch = 19,
+  main = "", cex = 1.2, cex.axis = 1.2, cex.lab = 1.2)
 }
 \arguments{
 \item{features}{A data.frame or matrix representing the features that
