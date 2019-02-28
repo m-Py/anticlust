@@ -102,7 +102,8 @@ col <- c("gray8", "gray30", "gray78")
 clusters <- clustering(features, n_groups)
 anticlusters <- anticlustering(features, n_groups,
                                method = "sampling",
-                               objective = "variance")
+                               objective = "variance", 
+                               nrep = 1000)
 
 # Plot clusters and anticlusters
 par(mfrow = c(1, 2))
@@ -371,8 +372,9 @@ redefinition of the cost function $w$:
 
 In the cluster editing ILP framework, setting $w(ij) = -\infty$ prevents
 two elements $x_i$ and $x_j$ from joining the same anticluster
-[@bocker2011]. If edge weights for similar elements are redefined like
-this, we induce a strong enevenness in edge weights.
+[@bocker2011]. Redefining edge weights of similar elements induces a
+strong enevenness in edge weights, increasing the problem sizes the ILP
+can be applied to. 
 
 Therefore, the `anticlust` package realizes a preprocessing step in
 which very similar elements are grouped into *preclusters*; elements of
@@ -392,26 +394,32 @@ x_{ij} + x_{ik} - x_{jk} \le 1, \qquad
 x_{ij} \in \{0, 1\}, \; \forall \; 1 \leq i < j \leq n \label{clusterediting:end}
 \end{align}
 
-By minimizing the distance objective, the preclustering step solves
-weighted cluster editing under the restriction of a cluster size $K$.
-That is, each precluster contains as many elements as there are
-anticlusters. For $K = 2$, the preclustering corresponds to the minimum
-weight perfect matching problem [@gerards1995]. The left-hand plot in
-Figure 2 illustrates the preprocessing step for $K = 3$ and $n = 18$.
-
-```{r, fig.width = 6.5, fig.height = 3.7, echo = FALSE, fig.cap = "The left-hand plot shows six preclusters with a respective size of three elements. The right-hand plot shows the optimal anticlustering under the preclustering restrictions. Elements that are part of the same precluster cannot be part of the same anticluster"}
-
-n_elements <- 18
+```{r preparecomputation, echo = FALSE}
+n_elements <- 15
 features <- matrix(runif(n_elements * 2), ncol = 2)
-n_preclusters <- 6
+n_preclusters <- n_elements / 3
 n_anticlusters <- n_elements / n_preclusters
-pch <- 15:(15+n_preclusters-1)
+
 clusters <- clustering(features, n_preclusters, method = "exact")
 anticlusters <- anticlustering(features, n_anticlusters,
                                method = "exact", preclustering = TRUE)
 
+```
+
+By minimizing the distance objective \eqref{clusterediting} , the
+preclustering step solves weighted cluster editing under the restriction
+of a cluster size $K$. That is, each precluster contains as many
+elements as there are anticlusters. For $K = 2$, the preclustering
+corresponds to the minimum weight perfect matching problem
+[@gerards1995]. The left-hand plot in Figure 2 illustrates the
+preprocessing step for $K = `r n_anticlusters`$ and $n = `r 
+n_elements`$.
+
+```{r plotanticlusters, fig.width = 6.5, fig.height = 3.7, echo = FALSE, fig.cap = "The left-hand plot shows the preclusters each consisting of three elements. The right-hand plot shows the optimal anticlustering under the preclustering restrictions. Elements that are part of the same precluster cannot be part of the same anticluster"}
+
 # Plot clusters and anticlusters
 par(mfrow = c(1, 2))
+pch <- 15:(15+n_preclusters-1)
 plot_clusters(features, clusters, pch = pch, connect_clusters = TRUE,
               main = "Preclustering", xlab = "", ylab = "")
 plot_clusters(features, anticlusters, pch = 15:(15+n_anticlusters-1),
@@ -421,7 +429,8 @@ anticlust:::draw_all_cliques(features[, 1], features[, 2],
                              cols = rep("darkgrey", n_elements))
 ```
 
-In a second step, the cost function is redefined as follows:
+In a second step, the cost function is redefined to prevent elements
+from the same preclustering from joining the same anticluster:
 
 $$
    w(ij) =
@@ -431,13 +440,12 @@ $$
    \end{cases}
 $$
 
-Using the redefined edge weights, we solve the distance anticlustering
-in \eqref{maxobjective} - \eqref{binary}. We prevent elements from the
-same precluster from joining the same anticluster; the results of an
-anticlustering employing the preclustering restrictions is shown in the
-right-hand plot of Figure 2. Note that the optimal solution sometimes
-requires to join elements that are part of the same precluster within
-the same precluster. Therefore, the preprocessing sometimes precludes an
+Using the redefined edge weights, we solve distance anticlustering using
+the ILP defined in \eqref{maxobjective} - \eqref{binary}. The results of
+an anticlustering employing the preclustering restrictions is shown in
+the right-hand plot of Figure 2. Note that the optimal solution
+sometimes would sometimes require to join elements that are part of the
+same precluster. Therefore, the preprocessing sometimes precludes an
 optimal solution.
 
 ## The heuristic approach
