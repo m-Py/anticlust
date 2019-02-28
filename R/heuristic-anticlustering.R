@@ -3,7 +3,7 @@
 #
 # @param features A data.frame, matrix or vector representing the
 #     features that are used.
-# @param clustering A vector representing the preclustering of
+# @param clustering An optional vector representing the preclustering of
 #     elements. See Details.
 # @param objective The objective to be maximized, either "distance"
 #     (default) or "variance".
@@ -35,13 +35,8 @@
 #     in the simulated annealing approach.
 #
 
-heuristic_anticlustering <- function(features, clustering, objective = "distance",
-                                     method, nrep, preclustering = TRUE) {
-
-  ## Some input handling
-  if (!objective %in% c("distance", "variance"))
-    stop("Argument objective must be 'distance' or 'variance'.")
-  legal_number_of_clusters(features, clustering)
+heuristic_anticlustering <- function(features, clustering, objective,
+                                     method, nrep, preclustering) {
 
   ## Store all data as a matrix for sorting. First column:
   ## Cluster affiliation; Second column: Original order of elements
@@ -50,12 +45,12 @@ heuristic_anticlustering <- function(features, clustering, objective = "distance
   ## precluster is assigned to a different anticluster
   dat <- sort_by_col(dat, 1)
 
-  if (method == "sampling")
+  if (method == "sampling") {
     best_assignment <- random_sampling(dat, clustering, objective, preclustering, nrep)
-  else if (method == "annealing")
+  }
+  else if (method == "annealing") {
     best_assignment <- simulated_annealing(dat, clustering, objective, preclustering, nrep)
-  else
-    stop("Method must be 'sampling' or 'annealing'")
+  }
 
   ## Return anticluster assignment in original order
   dat[, 1] <- best_assignment

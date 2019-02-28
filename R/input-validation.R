@@ -10,13 +10,11 @@
 #'   c("numeric", "integer", "double"). The class is tested via the
 #'   function \code{class}. This means that if \code{obj} is a matrix,
 #'   it is necessary to pass \code{class_string = "matrix"}; you cannot
-#'   refer to the "mode" of the matrix. A special case is the
-#'   \code{class_string} "groupvar" that is expanded to
-#'   c("factor", "character", "numeric", "integer", "double").
+#'   refer to the "mode" of the matrix.
 #' @param len Optional numeric vector for objects having a length
 #'   (mostly for vectors).
-#' @param gt0 Optional logical vector indicating if numeric input has
-#'   to be greater than 0.
+#' @param greater_than Optional scalar indicating if numeric input has
+#'   to be greater than a specified number.
 #' @param must_be_integer Optional logical vector indicating if numeric
 #'   input has to be integer.
 #' @param groupsize Optional argument how many groups a grouping variable
@@ -32,23 +30,19 @@
 #' @noRd
 
 validate_input <- function(obj, argument_name, class_string = NULL,
-                           len = NULL, gt0 = FALSE, must_be_integer = FALSE, groupsize = NULL,
-                           input_set = NULL, objmode = NULL, not_na = FALSE) {
+                           len = NULL, greater_than = NULL, must_be_integer = FALSE,
+                           groupsize = NULL, input_set = NULL, objmode = NULL,
+                           not_na = FALSE) {
 
-  self_validation(argument_name, class_string, len, gt0,
-                  must_be_integer, groupsize, input_set, objmode)
+  self_validation(argument_name, class_string, len, greater_than,
+                  must_be_integer, groupsize, input_set,
+                  objmode, not_na)
 
   ## - Check class of object
   if (argument_exists(class_string))  {
     # Allow for all numeric types:
     if ("numeric" %in% class_string) {
       class_string <- c(class_string, "integer", "double")
-    }
-    # Case - grouping variable: Allow for numeric, character or factor
-    if ("groupvariable" %in% class_string) {
-      class_string <- setdiff(c(class_string, "factor", "character",
-                                "numeric", "integer", "double"),
-                              "groupvariable")
     }
     correct_class <- class(obj) %in% class_string
     if (!correct_class) {
@@ -64,9 +58,11 @@ validate_input <- function(obj, argument_name, class_string = NULL,
     }
   }
 
-  ## - Check if input has to be greater than 0
-  if (gt0 == TRUE && any(obj <= 0)) {
-    stop(argument_name, " must be greater than 0")
+  ## - Check if input has to be greater than some value
+  if (argument_exists(greater_than)) {
+    if (any(obj <= greater_than)) {
+      stop(argument_name, " must be greater than ", greater_than)
+    }
   }
 
   ## - Check if input has to be integer
@@ -92,8 +88,8 @@ validate_input <- function(obj, argument_name, class_string = NULL,
   ## - Check mode of input
   if (argument_exists(objmode)) {
     if (mode(obj) != objmode) {
-      stop(argument_name, " must be integer of mode ", objmode,
-           ", but is of mode ", mode(obj))
+      stop(argument_name, " must be ", objmode,
+           ", but is ", mode(obj))
     }
   }
 
@@ -108,7 +104,7 @@ validate_input <- function(obj, argument_name, class_string = NULL,
 
 ## Validate input for the `validate_input` function (these errors are
 ## not for users, but only for developers)
-self_validation <- function(argument_name, class_string, len, gt0,
+self_validation <- function(argument_name, class_string, len, greater_than,
                             must_be_integer, groupsize,
                             input_set, objmode, not_na) {
   if (argument_exists(class_string)) {
@@ -121,20 +117,31 @@ self_validation <- function(argument_name, class_string, len, gt0,
     stopifnot(len >= 0)
     stopifnot(len %% 1 == 0)
   }
-  stopifnot(gt0 %in% c(TRUE, FALSE))
-  stopifnot(length(gt0) == 1)
-  stopifnot(must_be_integer %in% c(TRUE, FALSE))
+
+  if (argument_exists(greater_than)) {
+    stopifnot(length(greater_than) == 1)
+    stopifnot(class(greater_than) %in% c("numeric", "integer"))
+  }
+
   stopifnot(length(must_be_integer) == 1)
-  stopifnot(not_na %in% c(TRUE, FALSE))
+  stopifnot(must_be_integer %in% c(TRUE, FALSE))
   stopifnot(length(not_na) == 1)
+  stopifnot(not_na %in% c(TRUE, FALSE))
 
   if (argument_exists(groupsize)) {
     stopifnot(mode(groupsize) == "numeric")
     stopifnot(length(groupsize) == 1)
   }
 
-  if (argument_exists(input_set) && len != 1) {
+  if ((argument_exists(input_set) && !argument_exists(len)) ||
+      (argument_exists(input_set) && len != 1))  {
     stop("If an input set is passed, argument len must be 1 ",
+         "(this message should not be seen by users of the package).")
+  }
+
+  if ((not_na == TRUE && !argument_exists(len)) ||
+      (not_na == TRUE && len != 1)) {
+    stop("If not_na is passed, argument len must be 1 ",
          "(this message should not be seen by users of the package).")
   }
 
@@ -152,8 +159,7 @@ argument_exists <- function(arg) {
 
 
 # Test that the number of features is a multiplier of unique
-# anticlusters. I think this function is only used in tests.
-# maybe replace / delete it later.
+# anticlusters. I think this function is only used in test cases.
 legal_number_of_clusters <- function(features, clusters) {
   ## 1. correct number of clusters assignments?
   if (length(clusters) != nrow(features))

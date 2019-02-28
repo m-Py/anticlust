@@ -80,29 +80,75 @@ anticlustering <- function(features, n_anticlusters, objective = "distance",
                                 standardize, nrep)
 
   ## Standardize feature values (for each feature, mean = 0, sd = 1)?
+  features <- as.matrix(features) # if only one feature was passed
   if (standardize) {
     features <- scale(features)
   }
 
-  ## First possibility: use exact ILP to solve anticlustering
-  if (objective == "distance" & method == "exact") {
-    heuristic  <- ifelse(preclustering == TRUE, 1, 0)
-    anticlusters <- distance_anticlustering(features, n_anticlusters,
-                                            solver, heuristic = heuristic)
-    ## Exact solution not available for variance criterion
-  } else if (objective == "variance" & method == "exact") {
-    stop("There is no exact method for maximizing the variance criterion")
-  } else { ## Heuristic approach
+  ## Use exact method to solve distance anticlustering (using ILP)
+  if (method == "exact") {
+    anticlusters <- exact_anticlustering(features, n_anticlusters,
+                                         solver_available(),
+                                         preclustering)
+  } else {
+    ## Use heuristic approach.
+    ## TODO: Preclustering not necessary if preclustering = FALSE
     n_preclusters <- nrow(features) / n_anticlusters
-    preclusters <- equal_sized_kmeans(features, n_preclusters)
-    anticlusters <- heuristic_anticlustering(features, preclusters,
-                                             objective, nrep = nrep,
-                                             method = method,
-                                             preclustering = preclustering)
+    preclusters   <- equal_sized_kmeans(features, n_preclusters)
+    anticlusters  <- heuristic_anticlustering(features, preclusters,
+                                              objective, nrep = nrep,
+                                              method = method,
+                                              preclustering = preclustering)
   }
   names(anticlusters) <- NULL
   return(anticlusters)
 }
+
+
+## A function for validating the arguments passed to `anticlustering`. This
+## ensures that:
+## (a) All arguments have correct type
+## (b) Method "exact" can only be used with objective = "distance"
+## (c) A solver package is install if method = "exact"
+## (d) A legal number of anticlusters was requested
+input_handling_anticlustering <- function(features, n_anticlusters, objective,
+                                          method, preclustering, standardize, nrep) {
+
+  ## Validate features as input
+  validate_input(features, "features", c("data.frame", "matrix", "numeric"))
+  features <- as.matrix(features)
+  validate_input(features, "features", objmode = "numeric")
+
+  validate_input(n_anticlusters, "n_anticlusters", "numeric", len = 1, greater_than = 1)
+  if (nrow(features) %% n_anticlusters != 0) {
+    stop("The number of anticlusters must be a divider of the number of elements.")
+  }
+
+  validate_input(nrep, "nrep", "numeric", len = 1, greater_than = 0,
+                 must_be_integer = TRUE)
+  validate_input(method, "method", c("character", "factor"), len = 1,
+                 input_set = c("exact", "sampling",  "annealing"))
+  validate_input(objective, "objective", c("character", "factor"), len = 1,
+                 input_set = c("variance", "distance"))
+
+  validate_input(preclustering, "preclustering", "logical", len = 1,
+                 input_set = c(TRUE, FALSE))
+  validate_input(standardize, "standardize", "logical", len = 1,
+                 input_set = c(TRUE, FALSE))
+
+  if (method == "exact") {
+    solver <- solver_available()
+    if (solver == FALSE) {
+      stop("One of the packages 'Rglpk', 'gurobi', or 'Rcplex' ",
+           "must be installed for an exact solution")
+    }
+  }
+
+  if (objective == "variance" && method == "exact") {
+    stop("There is no exact method for maximizing the variance criterion")
+  }
+}
+
 
 ## Check if a solver package can be used
 solver_available <- function() {
@@ -112,26 +158,4 @@ solver_available <- function() {
   if (sum(solvers_available) == 0) # no solver available
     return(FALSE)
   return(solvers[solvers_available][1]) # pick only one solver
-}
-
-
-val_input_anticlust <- function(features, n_anticlusters, objective,
-                                method, preclustering, standardize, nrep) {
-  solver <- solver_available()
-  if (method == "exact" & solver == FALSE) {
-    stop("One of the packages 'Rglpk', 'gurobi', or 'Rcplex' ",
-         "must be installed for an exact solution")
-  }
-
-  validate_input(method, "method", "character", len = 1,
-                 input_set = c("exact", "sampling",  "annealing"))
-  validate_input(objective, "method", "character", len = 1,
-                 input_set = c("variance", "distance"))
-  validate_input(features, "features", c("data.frame", "matrix", "numeric"),
-                 objmode = "numeric")
-
-  validate_input(preclustering, "preclustering", "logical", len = 1,
-                 input_set = c(TRUE, FALSE))
-  validate_input(standardize, "standardize", "logical", len = 1,
-                 input_set = c(TRUE, FALSE))
 }
