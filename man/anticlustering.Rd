@@ -101,7 +101,7 @@ data(iris)
 iris <- iris[, -5]
 anticlusters <- anticlustering(iris, n_anticlusters = 3)
 # Compare feature means by anticluster
-by(iris, anticlusters, colMeans)
+by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
 # Plot the anticlustering
 par(mfrow = c(1, 2))
 plot_clusters(iris[, 1:2], anticlusters)
@@ -116,7 +116,7 @@ n_elements <- 20
 features <- matrix(rnorm(n_elements * n_features), ncol = n_features)
 ac <- anticlustering(features, n_anticlusters, method = "exact",
                      preclustering = FALSE, standardize = FALSE)
-# Determine objective value
+# Determine objective value (larger is better)
 get_objective(features, ac, "distance")
 
 # Enable preclustering
