@@ -5,70 +5,124 @@
 \title{Algorithms for anticlustering}
 \usage{
 anticlustering(features, n_anticlusters, objective = "distance",
-  method = "annealing", preclustering = TRUE, standardize = TRUE,
+  method = "sampling", preclustering = TRUE, standardize = TRUE,
   nrep = 10000)
 }
 \arguments{
 \item{features}{A vector, matrix or data.frame of data points. Rows
-correspond to elements and columns correspond to features.
-A vector represents a single feature.}
+correspond to elements and columns correspond to features. A
+vector represents a single feature.}
 
 \item{n_anticlusters}{How many anticlusters should be created.}
 
 \item{objective}{The objective to be maximized, either "distance"
-(default) or "variance". See Details.}
+(default) or "variance". See details.}
 
-\item{method}{One of "annealing", "sampling", or "exact". See details.}
+\item{method}{One of "annealing", "sampling", or "exact". See
+details.}
 
 \item{preclustering}{Boolean, should a preclustering be conducted
-before anticlusters are created. Defaults to `TRUE`.}
+before anticlusters are created. Defaults to \code{TRUE}. See
+details.}
 
 \item{standardize}{Boolean - should the features be standardized
-before anticlusters are created? Defaults to `TRUE`.
-Standardization is done using the function \code{\link{scale}}.}
+before anticlusters are created? Defaults to \code{TRUE}.
+Standardization is done using the function \code{\link{scale}}
+using the default settings.}
 
 \item{nrep}{The number of repetitions used in the heuristic methods
-"sampling" or "annealing".}
+"sampling" or "annealing". This argument does not have an effect
+if the argument \code{method} is \code{"exact"}.}
 }
 \value{
-A vector representing anticluster affiliation
+A vector representing the anticluster affiliation.
 }
 \description{
 Create groups of elements (anticlusters) that are as similar as
 possible.
 }
 \details{
-TODO: Some explanation of objective.
+Späth (1986) and Valev (1998) proposed to maximize the variance
+criterion used in k-means clustering to establish similar groups in
+the anticlustering application. In the \code{anticlust} package,
+optimizing the variance criterion is accomplished by setting
+\code{objective = "variance"}. The \code{anticlust} package also
+introduces another objective function to the anticlustering
+application that has been developed in the problem domain of cluster
+editing and is based on a measure of the pairwise distances of data
+points (Grötschel & Wakabayashi, 1989). In weighted cluster editing,
+the optimal objective is found when the sum of within-cluster
+distances is minimized; for the anticlustering application, the
+distance objective is maximized instead.
 
-An exact solution can only be obtained when the `objective` is
-"distance". To obtain the optimal objective for the distance
-criterion, use \code{preclustering = FALSE}, \code{method = "exact"}, and
-\code{objective = "distance"}. Use method exact only for small problem
-sizes (< 30 elements). To use the exact approach, a linear
-programming solver must be installed and usable from R. The open
-source GNU linear programming kit (called from the package \code{Rglpk})
-or one of the commercial solvers gurobi (called from the package
-\code{gurobi}) or IBM CPLEX (called from the package \code{Rcplex}) can be
-used. A license is needed for the commercial solvers and one of the
-interface packages must be installed.
+The \code{anticlust} uses integer linear programming to find optimal
+objective for the distance criterion (Grötschel & Wakabayashi,
+1989). To obtain an optimal solution, a linear programming solver
+must be installed on the system and be usable from R. The
+\code{anticlust} package supports the open source GNU linear
+programming kit (called from the package \code{Rglpk}) and the
+commercial solvers gurobi (called from the package \code{gurobi}) and
+IBM CPLEX (called from the package \code{Rcplex}). A license is
+needed to use one of the commercial solvers.
 
-Two heuristic approaches are available, one based on repeated random
-sampling and another based on simulated annealing. Both approaches
-may rely on a preclustering that prevents grouping very similar elements
-into the same anticluster if we set \code{preclustering = TRUE}.
+An optimal solution can only be obtained for distance anticlustering,
+i.e., when setting \code{objective = "distance"}. To obtain the
+optimal objective for the distance criterion, use the following
+arguments: \code{preclustering = FALSE}, \code{method = "exact"}, and
+\code{objective = "distance"}. Use this combination of arguments only
+for small problem sizes (< 30 elements). To relax the optimality
+condition, it is possible to set \code{preclustering = TRUE}. In this
+case, the distance objective is still optimized using integer linear
+programming, but a preprocessing forbids very similar elements to be
+assigned to the same anticluster. This approach can be used to work
+on larger problem instances and the solution is usually optimal or
+very close to optimal.
+
+If no exact solution is required or the problem size is too large for
+the exact approach, two heuristic methods are available. One approach
+is based on repeated random sampling and another based on simulated
+annealing. Both approaches may rely on a preclustering that prevents
+grouping very similar elements into the same anticluster if
+\code{preclustering = TRUE}. It is strongly suggested that the
+preclustering condition is activated when using one of the heuristics
+because the solution is usually better with preclustering.
 }
 \examples{
 
-# Use Iris data set with the default settings
+## Use anticlustering on the iris data set with the default settings:
+# (a) Optimizes the distance objective
+# (b) Heuristic method: random sampling
+# (c) 10,000 sampling repetitions
+# (d) Preclustering is activated
+# (e) Anticlustering uses standardized features (Mean = 0, SD = 1)
+
 data(iris)
-anticlusters <- anticlustering(iris[, -5], n_anticlusters = 3)
+# Only use numeric attributes:
+iris <- iris[, -5]
+anticlusters <- anticlustering(iris, n_anticlusters = 3)
 # Compare feature means by anticluster
-by(iris[, -5], anticlusters, colMeans)
+by(iris, anticlusters, colMeans)
 # Plot the anticlustering
 par(mfrow = c(1, 2))
-plot_clusters(iris[, 1:2], anticlusters) # see overlap
+plot_clusters(iris[, 1:2], anticlusters)
 plot_clusters(iris[, 3:4], anticlusters)
 
+## The exact approach
+library("Rglpk") # package that calls the GNU linear programming kit
+# Create artifical data
+n_features <- 2
+n_anticlusters <- 2
+n_elements <- 20
+features <- matrix(rnorm(n_elements * n_features), ncol = n_features)
+ac <- anticlustering(features, n_anticlusters, method = "exact",
+                     preclustering = FALSE, standardize = FALSE)
+# Determine objective value
+get_objective(features, ac, "distance")
+
+# Enable preclustering
+ac_preclust <- anticlustering(features, n_anticlusters, method = "exact",
+                              preclustering = TRUE, standardize = FALSE)
+get_objective(features, ac_preclust, "distance")
 
 }
 \references{
@@ -78,4 +132,9 @@ clustering problem,” Mathematical Programming, vol. 45, nos. 1-3, pp.
 
 H. Späth, “Anticlustering: Maximizing the variance criterion,”
 Control and Cybernetics, vol. 15, no. 2, pp. 213-218, 1986.
+
+Valev, V. (1998). Set partition principles revisited. In Joint IAPR
+international workshops on statistical techniques in pattern
+recognition (SPR) and structural and syntactic pattern recognition
+(SSPR) (pp.  875–881).
 }
