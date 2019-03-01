@@ -1,0 +1,14 @@
+
+
+Anticlustering arguments:
+
+- list for adjusting the simulated annealing parameters
+- list for adjusting ILP solver setting (esp. verbose)
+
+Tests
+
+- how do all methods deal with missing data?
+
+Documentation
+
+- All exported function fully documented?
