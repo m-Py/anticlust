@@ -80,7 +80,7 @@ very close to optimal.
 
 If no exact solution is required or the problem size is too large for
 the exact approach, two heuristic methods are available. One approach
-is based on repeated random sampling and another based on simulated
+is based on repeated random sampling and another is based on simulated
 annealing. Both approaches may rely on a preclustering that prevents
 grouping very similar elements into the same anticluster if
 \code{preclustering = TRUE}. It is strongly suggested that the
