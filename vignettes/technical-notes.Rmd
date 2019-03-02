@@ -91,7 +91,7 @@ restriction of equal (anti)cluster sizes. Optimizing the variance
 objective is a computationally difficult problem that is usually tackled
 using heuristic methods [@jain2010; @spath1986; @valev1998].
 
-```{r, fig.width = 6.5, fig.height = 3.7, echo = FALSE, fig.cap = "Attempts to minimize and maximize the variance objective, leading to clustering and anticlustering partitions, respectively."}
+```{r, fig.width = 6.5, fig.height = 3.7, echo = FALSE, fig.cap = "Attempts to minimize and maximize the variance objective, leading to clustering and anticlustering partitions, respectively. **TODO**: add cluster centers to illustrate the k-means variance objective; in anticlustering, the cluster centers are close to each other."}
 library("anticlust")
 n_elements <- 90
 features <- matrix(runif(n_elements * 2), ncol = 2)
@@ -408,12 +408,12 @@ anticlusters <- anticlustering(features, n_anticlusters,
 
 By minimizing the distance objective \eqref{clusterediting} , the
 preclustering step solves weighted cluster editing under the restriction
-of a cluster size $K$. That is, each precluster contains as many
-elements as there are anticlusters. For $K = 2$, the preclustering
-corresponds to the minimum weight perfect matching problem
-[@gerards1995]. The left-hand plot in Figure 2 illustrates the
-preprocessing step for $K = `r n_anticlusters`$ and $n = `r 
-n_elements`$.
+of a cluster size $K$, resulting in $\frac{n}{K}$ clusters. The number
+of elements per precluster corresponds to the number of anticlusters.
+For $K = 2$, the preclustering corresponds to the minimum weight perfect
+matching problem [@gerards1995]. The left-hand plot in Figure 2
+illustrates the preprocessing step for $K = `r n_anticlusters`$ and $n =
+`r n_elements`$.
 
 ```{r plotanticlusters, fig.width = 6.5, fig.height = 3.7, echo = FALSE, fig.cap = "The left-hand plot shows the preclusters each consisting of three elements. The right-hand plot shows the optimal anticlustering under the preclustering restrictions. Elements that are part of the same precluster cannot be part of the same anticluster"}
 
@@ -443,15 +443,47 @@ $$
 Using the redefined edge weights, we solve distance anticlustering using
 the ILP defined in \eqref{maxobjective} - \eqref{binary}. The results of
 an anticlustering employing the preclustering restrictions is shown in
-the right-hand plot of Figure 2. Note that the optimal solution
-sometimes would sometimes require to join elements that are part of the
-same precluster. Therefore, the preprocessing sometimes precludes an
-optimal solution.
+the right-hand plot of Figure 2. Because the optimal solution sometimes
+sometimes requires to join elements that are part of the same
+precluster, the preprocessing sometimes precludes an optimal solution.
 
-## The heuristic approach
+## Heuristic approaches
+
+To solve larger problem instances that cannot be processed using integer
+linear programming, two heuristic methods based on random search are
+employed in the `anticlust` package. These methods can be use to
+optimize both the distance and the variance objective. Both approaches
+may employ a preclustering step as the ILP does; for the heuristics, the
+preclustering usually improves the quality of the solution.
+
+
+
+### Random sampling
+
+A random sampling approach is used to optimize the variance or distance 
+objective. That is, across a user-specified number of repetitions all 
+elements are 
 
 - Simulated annealing
 - Neighborhood of elements, preclustering
+
+### Heuristic preclustering
+
+For the ILP approach, an exact preclustering solves weighted cluster
+editing using a restriction $K$ on the cluster sizes. For the heuristic
+procedures, a heuristic cluster algorithm is used. This method extends
+k-means on equal cluster sizes.
+
+```
+for (i in 1:elements_per_cluster) {
+  ## iterate over clusters in random order
+  for (j in sample(nclusters)) {
+    ## 1. Choose element that is closest to center of cluster j:
+    ## 2. Add this element to cluster j:
+    ## 3. Remove this element from the list of elements
+  }
+}
+```
 
 \clearpage
 
