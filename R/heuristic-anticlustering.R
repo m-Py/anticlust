@@ -161,6 +161,7 @@ simulated_annealing <- function(dat, n_anticlusters, objective,
 #'
 #' @noRd
 #'
+
 next_candidate <- function(anticlusters, ignore_preclusters) {
   if (ignore_preclusters == TRUE) {
     return(random_move(anticlusters))
@@ -178,6 +179,7 @@ next_candidate <- function(anticlusters, ignore_preclusters) {
 #'
 #' @noRd
 #'
+
 random_move <- function(anticlusters) {
   N <- length(anticlusters)
   changepoints <- sample(N, size = 2, replace = FALSE)
@@ -208,6 +210,7 @@ random_move <- function(anticlusters) {
 #'
 #' @noRd
 #'
+
 preclustering_move <- function(anticlusters) {
   n_anticlusters <- length(unique(anticlusters))
   n_preclusters <- length(anticlusters) / n_anticlusters
@@ -221,11 +224,6 @@ preclustering_move <- function(anticlusters) {
   changepoints <- sample(n_anticlusters, size = 2, replace = FALSE)
   ## Some ugly code for swapping anticluster affiliation of the two elements
   ## First, ensure that different anticlusters are switched:
-  while (anticlusters[preclusters == rndclus][changepoints[1]] ==
-         anticlusters[preclusters == rndclus][changepoints[2]]) {
-    changepoints <- sample(n_anticlusters, size = 2, replace = FALSE)
-  }
-  ## Now switch anticlusters
   tmp <- anticlusters[preclusters == rndclus][changepoints[1]]
   anticlusters[preclusters == rndclus][changepoints[1]] <-
     anticlusters[preclusters == rndclus][changepoints[2]]
@@ -253,6 +251,7 @@ preclustering_move <- function(anticlusters) {
 #'
 #' @noRd
 #'
+
 random_sampling <- function(dat, n_anticlusters, objective,
                             nrep, ignore_preclusters) {
   ## Initialize variables
