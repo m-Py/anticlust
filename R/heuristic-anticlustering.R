@@ -18,6 +18,7 @@
 #'
 #' @noRd
 #'
+
 heuristic_anticlustering <- function(features, n_anticlusters,
                                      preclusters = NULL, objective,
                                      method, nrep) {
@@ -31,10 +32,12 @@ heuristic_anticlustering <- function(features, n_anticlusters,
   dat <- preclustering_data_format(features, preclusters, n_anticlusters)
 
   if (method == "sampling") {
-    best_assignment <- random_sampling(dat, n_anticlusters, objective, nrep, ignore_preclusters)
+    best_assignment <- random_sampling(dat, n_anticlusters, objective, 
+                                       nrep, ignore_preclusters)
   }
   else if (method == "annealing") {
-    best_assignment <- simulated_annealing(dat, n_anticlusters, objective, nrep, ignore_preclusters)
+    best_assignment <- simulated_annealing(dat, n_anticlusters, objective, 
+                                           nrep, ignore_preclusters)
   }
 
   ## Return anticluster assignment in original order
@@ -74,6 +77,7 @@ heuristic_anticlustering <- function(features, n_anticlusters,
 #'
 #' @noRd
 #'
+
 preclustering_data_format <- function(features, preclusters, n_anticlusters) {
   if (!argument_exists(preclusters)) {
     ## This is actually irrelevant numbers and is ignored later on
@@ -106,6 +110,7 @@ preclustering_data_format <- function(features, preclusters, n_anticlusters) {
 #'
 #' @noRd
 #'
+
 simulated_annealing <- function(dat, n_anticlusters, objective,
                                 nrep, ignore_preclusters) {
   ## Initialize variables
