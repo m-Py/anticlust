@@ -33,8 +33,8 @@ set.seed(123)
 ```
 
 This document explains the technical and algorithmical background of the
-`R` package `anticlust`. **It is still a work in progress.** The
-following topics are covered:
+`R` package `anticlust`. **It is a work in progress.** The following
+topics are covered:
 
 1. A formalization of the anticlustering problem
 2. A description of the objective functions used to measure anticluster
@@ -60,9 +60,9 @@ assigned to only one anticluster; restriction (3) ensures that each
 anticluster contains the same number of elements. It follows that $\vert
 c_k \vert = \frac{n}{K}$ $\forall k \in \{1, ..., K\}$. Restriction (3)
 is currently implemented for all methods in the `anticlust` package, but
-it is not an obligatory restriction for anticlustering in general.The
-objective is to select a partitioning that maximizes the similarity of
-the $K$ anticlusters.
+it is not an obligatory restriction for anticlustering in general. The
+objective is to select a partitioning $C$ that maximizes the similarity
+of the $K$ anticlusters.
 
 
 # Objective functions
@@ -91,7 +91,7 @@ restriction of equal (anti)cluster sizes. Optimizing the variance
 objective is a computationally difficult problem that is usually tackled
 using heuristic methods [@jain2010; @spath1986; @valev1998].
 
-```{r, fig.width = 6.5, fig.height = 3.7, echo = FALSE, fig.cap = "Attempts to minimize and maximize the variance objective, leading to clustering and anticlustering partitions, respectively. **TODO**: add cluster centers to illustrate the k-means variance objective; in anticlustering, the cluster centers are close to each other."}
+```{r, fig.width = 6.5, fig.height = 3.7, echo = FALSE, fig.cap = "Attempts to minimize and maximize the variance objective, leading to clustering and anticlustering partitions, respectively."}
 library("anticlust")
 n_elements <- 90
 features <- matrix(runif(n_elements * 2), ncol = 2)
@@ -118,18 +118,18 @@ plot_clusters(features, anticlusters, pch = pch,
 In addition to the variance criterion, the `anticlust` package
 introduces another clustering objective to the anticlustering
 application. The objective has been developed in the problem domain of
-cluster editing and is based on a measure of the pairwise dissimilarity
-between data points [@rahmann2007; @bocker2013].[^1] In weighted cluster
-editing, the optimal objective is found when the sum of all pairwise
-dissimilarities within-clusters is minimized; for the anticlustering
-application, the sum of pairwise dissimilarities is maximized instead.
+cluster editing[^names] and is based on a measure of the pairwise
+dissimilarity between data points [@rahmann2007; @bocker2013]. In
+weighted cluster editing, the optimal objective is found when the sum of
+all pairwise dissimilarities within-clusters is minimized; for the
+anticlustering application, the objective is maximized instead.
 
 To formalize the cluster editing objective, we use variables $x_{ij}$ to
 encode whether two data points $x_i$ and $x_j$ belong to the same
 anticluster $c_k$:
 
-[^1]: Cluster editing has also been studied under different names such
-as correlation clustering [@bansal2004], clique partition problem
+[^names]: Cluster editing has also been studied under different names
+such as correlation clustering [@bansal2004], clique partition problem
 [@grotschel1989], and transitivity clustering [@wittkop2010].
 
 \begin{align} \label{decisionvars}
@@ -149,55 +149,46 @@ follows [@miyauchi2015; @grotschel1989]:
 \sum\limits_{1 \leq i < j \leq n} d_{ij} \: x_{ij}
 \end{align}
 
-I refer to this objective function as the "distance objective" as
-opposed to the "variance objective" in \eqref{varianceobj}.
-
 Maximizing the distance objective corresponds to minimizing the average
 linkage distance between anticlusters. In hierarchical cluster
 algorithms, the average linkage distance is a quantification of the
 similarity of two clusters [@bacon2001]. To appreciate the
-correspondence of the distance objective and the average linkage method,
-consider the total sum of all pairwise dissimilarities. The total sum
-can be partitioned into the sum of distances within-clusters and the sum
-of distances between-clusters:
+correspondence of the distance objective and the average linkage
+distance, consider the total sum of all pairwise dissimilarities. The
+total sum can be partitioned into the sum of distances within-clusters
+and the sum of distances between-clusters:
 
 \begin{align}
-\sum\limits_{1 \leq i < j \leq n} d_{ij} =
-\sum\limits_{1 \leq i < j \leq n} d_{ij} \: x_{ij} +
-\sum\limits_{1 \leq i < j \leq n} d_{ij} \: (1- x_{ij})
+d_{\mathrm{within}} = \sum\limits_{1 \leq i < j \leq n} d_{ij} \: x_{ij} \\
+d_{\mathrm{between}} = \sum\limits_{1 \leq i < j \leq n} d_{ij} \: (1- x_{ij}) \\
+d_{\mathrm{total}} = d_{\mathrm{within}} + d_{\mathrm{between}}
 \end{align}
 
-The total sum of distances is not influenced by the concrete
-partitioning $x_{ij}$; hence, the following optimizations lead to the
-same partitions, i.e., assignments of elements to anticlusters:
-
-$$\mathrm{Maximize} \sum\limits_{1 \leq i < j \leq n} d_{ij} \: x_{ij}$$
-
-$$\mathrm{Minimize} \sum\limits_{1 \leq i < j \leq n} d_{ij} \: (1- x_{ij})$$
-
-In the special case of $K = 2$ where we have two partitions $A$ and $B$,
-the sum of the between-cluster distances can be formulated as follows:
+Because $d_{\mathrm{total}}$ is not influenced by the values of
+$x_{ij}$, maximizing $d_{\mathrm{within}}$ leads to the same values of
+$x_{ij}$ as minimizing $d_{\mathrm{between}}$. In the special case of $K
+= 2$ where we have two partitions $A$ and $B$, $d_{\mathrm{between}}$
+can be formulated as follows:
 
 \begin{align} \label{sumlinkage}
-\sum\limits_{i \in A} \: \sum\limits_{j \in B} d_{ij}
+d_{\mathrm{between}} = \sum\limits_{i \in A} \: \sum\limits_{j \in B} d_{ij}
 \end{align}
 
-This formulation is very close to the average linkage objective that
+This formulation is very close to the average linkage distance that
 additioanlly incorporates the cardinalities of the sets $A$ and $B$
 [@guha1998]:
 
 \begin{align} \label{avglinkage}
-\frac{1}{\vert A \vert \: \vert B \vert }
-\sum\limits_{i \in A} \: \sum\limits_{j \in B} d_{ij}
+d_{\mathrm{avg}} = \frac{1}{\vert A \vert \: \vert B \vert }
+  \sum\limits_{i \in A} \: \sum\limits_{j \in B} d_{ij}
 \end{align}
 
 Given restriction \eqref{formalization:3} for the anticlustering
 problem, the partitions $A$ and $B$ are of equal size; therefore,
-\eqref{sumlinkage} is minimized whenever \eqref{avglinkage} is
-minimized. Hence, the cluster editing objective is a generalization of
-the average linkage measure on more than two clusters: maximizing the
-distance criterion maximizes cluster similarity as measured by the
-average linkage method.
+$d_{\mathrm{between}}$ is minimized whenever $d_{\mathrm{avg}}$ is
+minimized, simultaneously maximizing $d_{\mathrm{within}}$. Thus, the
+cluster editing objective is a generalization of the average linkage
+method on more than two clusters.
 
 # Algorithmic approaches
 
@@ -282,26 +273,26 @@ Despite the NP-complete nature of cluster editing, integer linear
 programming has been successfully used to find optimal solutions even
 for relatively large problem instances [@bocker2011; @lorena2018].
 Integer linear programming identifies the values of *decision variables*
-that optimize a linear objective function while employing constraints on
-the decision variables that are implemented as mathematical
+that optimize a linear objective function, while employing constraints
+on the decision variables that are implemented as mathematical
 inequalities. In the case of anticlustering, integer linear programming
 can be used to maximize the distance objective in \eqref{objectivedist}
-while inequalities ensure that the anticlustering conditions in
+while constraints ensure that the anticlustering conditions in
 \eqref{formalization:1} - \eqref{formalization:3} are met.
 
 For the integer linear programming formulation of distance
 anticlustering, a problem instance is represented as an undirected
-complete graph $G = (V, E)$ [cf. @schaeffer2007]. Each vertex $v \in V
+complete graph $G = (V, E)$ [cf. @schaeffer2007]. Each vertex $v \in V =
 (1, ..., n)$ represents an element from the input data that has to be
 assigned to an anticluster. Edges are unordered pairs $\{i, j\} \in E$;
 the short form $ij$ will be used to refer to edges. A cost function $w:
-E \to \mathbb{R}$ assigns a weight to each edge. In distance
-anticlustering, an edge weight is given by the distance between the two
-elements that are connected by the edge, i.e., $w(ij) = d_{ij}$.
+E \to \mathbb{R}$ assigns a weight to the edges where each weight is
+given by the distance between the two elements that are connected by the
+edge, i.e., $w(ij) = d_{ij}$.
 
-The integer linear program returns a subgraph $G' = (V, E')$. The
-decision variables $x_{ij}$ encode wether two vertices $i$ and $j$ are
-connected by an edge in the output graph $G'$:
+The integer linear program returns a subgraph $G' = (V, E')$. For $G'$,
+we use decision variables $x_{ij}$ to encode wether two vertices $i$ and
+$j$ are connected by an edge:
 
 $$
    x_{ij} =
@@ -314,15 +305,14 @@ $$
 If two vertices are connected by an edge in $G'$, the integer linear
 program ensures that they are also part of a *clique*, that is, a
 subgraph whose vertices are all connected. Cliques in $G'$ represent
-anticlusters -- hence, the following two conditions are equivalent in
-the integer linear programming formulation of distance anticlustering:
+anticlusters. Hence, the following two conditions are equivalent:
 
-1. $ij \in E'$
+1. $x_{ij} = 1$
 2. Vertices $i$ and $j$ belong to the same anticluster.
 
 The `anticlust` package employs an integer linear program on the basis
-of formulations proposed by Grötschel and Wakabayashi [-@grotschel1989]
-to solve cluster editing:
+of formulations that Grötschel and Wakabayashi [-@grotschel1989]
+introduced to solve cluster editing:
 
 \begin{align}
 \mathrm{Maximize} \sum\limits_{1 \leq i < j \leq n} w(ij) \: x_{ij} \label{maxobjective} \\
@@ -342,20 +332,21 @@ cliques [@grotschel1989]. Constraint \eqref{clustersize} ensures that
 $K$ cliques are returned, each of cardinality $\frac{n}{K}$. Constraint
 \eqref{binary} ensures that the decision variables $x_{ij}$ are binary.
 Cliques are created under the objective to maximize the sum of the edge
-weights within cliques.
+weights within cliques, i.e., the distance objective is maximized.
 
-In the `anticlust` package, one of the commercial solvers `gurobi` or
-`CPLEX`, or the open source GNU linear programming kit can be used to
-solve the ILP in \eqref{maxobjective} - \eqref{binary} optimally.
+The `anticlust` package can use one of the commercial solvers `gurobi`
+or `CPLEX` or the open source GNU linear programming kit to solve the
+integer linear program defined in \eqref{maxobjective} - \eqref{binary}
+optimally.
 
 ### Preprocessing
 
 To expand its applicability to larger problem sizes, additional
-constraints were added to the integer linear program through a
-redefinition of the cost function $w$. The redefinition resulted from
-two considerations:
+constraints can be added to the integer linear program through a
+redefinition of the cost function $w$. This approach results from two
+considerations:
 
-1. The run time of the weighted cluster editing ILP is improved if
+1. The run time of exact weighted cluster editing is improved if
    there is an uneven distribution of edge weights [@bocker2013;
    @bocker2011]
 2. It is possible to prevent very similar elements from joining the same
@@ -363,19 +354,19 @@ two considerations:
 
 In the cluster editing integer linear programming framework, setting
 $w(ij) = -\infty$ prevents two vertices $i$ and $j$ from joining the
-same clique in the output graph [@bocker2011].  This recalculation of
-some edge weights induces a strong enevenness  among edge weights,
-increasing the problem sizes the integer linear program can be applied
-to. If only very similar elements are prevented from joining the same
-anticluster, the quality of the solution is not impaired by much because
-the anticlustering objective is based on the idea that similar elements
-should be in different anticlusters.
+same clique in the output graph [@bocker2011]. This recalculation
+induces a strong enevenness among edge weights, increasing the problem
+sizes the integer linear program can be applied to. If only very similar
+elements are prevented from joining the same anticluster, the quality of
+the solution is not impaired by much because the anticlustering
+objective is based on the idea that similar elements should be in
+different anticlusters.
 
-Therefore, the `anticlust` package realizes a preprocessing step in
-which very similar elements are grouped into *preclusters*; elements of
-a precluster are prevented from joining the same anticluster thereafter.
-The preclustering step is formalized by the ILP defined in
-\eqref{clusterediting} - \eqref{clusterediting:end}.
+Therefore, the `anticlust` package may realize a preprocessing step
+grouping very similar elements into *preclusters*; elements of the same
+precluster are prevented from joining the same anticluster thereafter.
+The preclustering step is formalized by the following integer linear
+program:
 
 \begin{align}
 \mathrm{Minimize} \sum\limits_{1 \leq i < j \leq n} w(ij) \: x_{ij} \label{clusterediting} \\
@@ -401,19 +392,19 @@ anticlusters <- anticlustering(features, n_anticlusters,
 
 ```
 
-By minimizing the distance objective, the preclustering step solves
-weighted cluster editing under the restriction of a cluster size $K$,
-resulting in $\frac{n}{K}$ clusters.[^bettermin] The number of elements
-per precluster corresponds to the number of anticlusters. For $K = 2$,
-the preclustering corresponds to the minimum weight perfect matching
-problem [@gerards1995]. The left-hand plot in Figure 2 illustrates the
-preprocessing step for $K = `r n_anticlusters`$ and $n = `r 
-n_elements`$.
+By minimizing the distance objective \eqref{clusterediting}, the
+preclustering step solves weighted cluster editing under the restriction
+of a cluster size $K$, resulting in $\frac{n}{K}$ clusters.[^bettermin]
+The number of elements per precluster corresponds to the number of
+anticlusters. For $K = 2$, the preclustering corresponds to the minimum
+weight perfect matching problem [@gerards1995]. The left-hand plot in
+Figure 2 illustrates the preprocessing step for $K = `r n_anticlusters`$
+and $n = `r  n_elements`$.
 
 [^bettermin]: This is a feasible preprocessing step because minimizing
-the distance objective works faster than maximization for the same
-problem size. That is, cluster editing is solved more efficiently using
-ILP than anticlustering.
+the distance objective works faster than maximizing the distance
+objective when group sizes are equal. That is, cluster editing is solved
+more efficiently using integer linear programming than anticlustering.
 
 ```{r plotanticlusters, fig.width = 6.5, fig.height = 3.7, echo = FALSE, fig.cap = "The left-hand plot shows the preclusters each consisting of three elements. The right-hand plot shows the optimal anticlustering under the preclustering restrictions. Elements that are part of the same precluster cannot be part of the same anticluster"}
 
@@ -430,7 +421,7 @@ anticlust:::draw_all_cliques(features[, 1], features[, 2],
 ```
 
 In a second step, the cost function is redefined to prevent elements
-from the same preclustering from joining the same anticluster:
+from the same precluster from joining the same anticluster:
 
 $$
    w(ij) =
@@ -440,12 +431,13 @@ $$
    \end{cases}
 $$
 
-Using the redefined edge weights, we solve distance anticlustering using
-the ILP defined in \eqref{maxobjective} - \eqref{binary}. The results of
-an anticlustering employing the preclustering restrictions is shown in
-the right-hand plot of Figure 2. Because the optimal solution sometimes
-sometimes requires to join elements that are part of the same
-precluster, the preprocessing sometimes precludes an optimal solution.
+Using the redefined edge weights, `anticlust` solves distance
+anticlustering using the integer linear program defined in
+\eqref{maxobjective} - \eqref{binary}. An example of anticlustering
+employing preclustering restrictions is shown in the right-hand plot of
+Figure 2. Because the optimal solution sometimes requires to join
+elements that are part of the same precluster, the preprocessing
+sometimes precludes an optimal solution.
 
 ## Heuristic anticlustering
 
@@ -458,54 +450,59 @@ improves the quality of the output.
 ### Random sampling
 
 A simple random sampling approach may be used to optimize the variance
-or distance objective. That is, across a user-specified number of runs,
-each element is randomly first assigned to an anticluster, then the
-objective value is computed and in the end, the best assignment is
-returned as the output. When a preclustering is employed, the random
-assignment is conducted under the restriction that preclustered elements
-cannot be part of the same anticluster.
+or distance objective. Across a user-specified number of runs, each
+element is randomly first assigned to an anticluster, then the objective
+value is computed. In the end, the best assignment is returned as the
+output. When a preclustering is employed, the random assignment is
+conducted under the restriction that preclustered elements cannot be
+part of the same anticluster.
 
 ### Simulated annealing
 
 The `anticlust` package also employs a simulated annealing approach to
-optimize the variance or distance objective. If no preclustering  is
-employed, anticlusters are initialized randomly. The exchange step is
-realized by changing the anticluster affiliations of two random elements
--- this step is repeated if two elements  of the same anticluster are
-swapped.  
+optimize the variance or distance objective. If no preclustering is
+employed, the simulated annealing approach uses the following steps:
 
-If preclustering is employed, the initialization of cluster assignments
-incorporates the condition that elements from the same precluster are
-not part of the same anticluster. The exchange step is realized as
-follows: a precluster is selected at random. From this precluster,  two
-elements exchange their anticluster affiliation.
+- Anticlusters are initialized randomly
+- The exchange step is realized by changing the anticluster 
+  affiliations of two random elements
+- The exchange step is repeated as long as two elements from the same 
+  anticluster have been swapped
 
-The simulated annealing uses the function `optim` from base `R`; the
-following parameters are used:
+If preclustering is activated, the simulated annealing approach uses the
+following steps:
+
+- Anticlusters are initialized randomly while incorporating the
+  condition that elements from the same precluster are not part of the
+  same anticluster
+- The exchange step first selects one precluster at random; from the
+  selected precluster, two random elements exchange their anticluster
+  affiliations
+
+The simulated annealing approach uses the function `optim` from base
+`R`; the following parameters are used:
 
 - Temperature: 2000
 - tmax: 20
 
 ### Heuristic preclustering
 
-A preclustering step may be used to improve the quality of the random
-search procedures. To this end, a heuristic clustering algorithm is
-employed. The algorithm is based on k-means clustering and enforces
-equal cluster sizes. First, $\frac{n}{K}$ cluster centers are initialed
-using k-means; then, elements are sequentially assigned to the nearest
-cluster centers while ensuring that each of the clusters is filled with
-$K$ elements. The following pseudo code formalizes the heuristic:
+A heuristic cluster algorithm is employed as a preclustering step for
+the random search procedures. The algorithm is based on k-means
+clustering but enforces equal cluster sizes. First, $\frac{n}{K}$
+cluster centers are initialed using k-means. Then, elements are
+sequentially assigned to the nearest cluster centers while ensuring that
+each of the clusters is filled with $K$ elements. The following pseudo
+code formalizes the heuristic:
 
 ```
 E = list of n elements
 C = list of K/n cluster centers, initialized using k-means
-// Iterate over the number of elements per cluster
 Repeat K times {
-  // Iterate over clusters in random order
   S <- random sequence of C
   for (j in S) {
     1. e = element that is closest to cluster center j
-    2. Add e to cluster of j
+    2. Add e to cluster corresponding to cluster center j
     3. Remove e from E
   }
 }
