@@ -27,31 +27,16 @@ bnb_anticlustering <- function(features, K) {
   # - anticlusters - the current best partitioning
 
   features <- as.matrix(features)
-  anticlusters <- anticlustering(features, K, method = "sampling", nrep = 2)
+  anticlusters <- anticlustering(features, K, method = "sampling", nrep = 50)
   minmax <- get_objective(features, anticlusters, "distance")
   distances <- as.matrix(dist(features))
-  n_problems <- 0 # A counter of problems
-  tree <- list()
+  tree <- new.queue()
   N <- nrow(features)
-
-  # An element of the tree is a problem
-  #
-  # @param new_clusters The anticluster affiliations of all elements in
-  #     the candidate solution
-  # @param objective The objective based on the old elements
-  #
-  # A problem (-> a list) is appended to `tree`. There is no return value.
-  #
-  append_subproblem <- function(new_clusters, objective) {
-    problem <- list(clusters = new_clusters, prev_value = objective)
-    tree[[n_problems + 1]] <<- problem
-    n_problems <<- n_problems + 1
-  }
 
   # Compute objective for the current problem
   #
   #
-  # @param problem, will always be `tree[[1]]`
+  # @param problem, will always be `dequeue(tree)`
   #
   # @return The objective value given all elements in the candidate solution
   #
@@ -75,15 +60,17 @@ bnb_anticlustering <- function(features, K) {
   # Process a subproblem:
   #
   # - compute objective
-  # - decide if objective still good enough (TODO)
+  # - decide if objective still good enough
   # - add split into new subproblems if appropriate
+
   process_problem <- function() {
-    objective <- compute_objective(tree[[1]])
-    length_of_candidate <- length(tree[[1]]$clusters)
+    problem <- dequeue(tree) # takes uppermost candidate
+    objective <- compute_objective(problem)
+    length_of_candidate <- length(problem$clusters)
     ## replace current minmax by objective if it is better
     if (objective >= minmax) {
       minmax <<- objective
-      anticlusters <<- tree[[1]]$clusters
+      anticlusters <<- problem$clusters
     }
 
     ## Compute the maximum that can still be achieved if there is
@@ -92,11 +79,11 @@ bnb_anticlustering <- function(features, K) {
     ## candidate solution, select the maximum N / K-1 distances to elements.
     if (length_of_candidate < N) {
       remaining_elements <- (length_of_candidate + 1):N
-      maxima <- c()
-      for (i in remaining_elements) {
+      maxima <- rep(NA, length(remaining_elements))
+      for (i in seq_along(remaining_elements)) {
         ## all distances for element i
-        tmp_dists <- sort(distances[i, ], decreasing = TRUE)
-        maxima <- c(maxima, sum(tmp_dists[1:(N / K - 1)]))
+        tmp_dists <- sort(distances[remaining_elements[i], ], decreasing = TRUE)
+        maxima[i] <- sum(tmp_dists[1:(N / K - 1)])
       }
       best_possible <- sum(maxima) + objective
       ## is best possible value worse than the minimum maximum to be expected?
@@ -106,31 +93,60 @@ bnb_anticlustering <- function(features, K) {
           ## 2) Check that the new candidate is not a redundant partition
           ## (this means that k cannot be larger than the length of the new
           ## candidate!)
-          new_clusters <- c(tree[[1]]$clusters, k)
+          ## Only append new subproblem if both conditions are satisfied
+          new_clusters <- c(problem$clusters, k)
           if (sum(new_clusters == k) <= N / K &&
               k <= length_of_candidate + 1) {
             ## new problem gets as "previous objective" the current objective
-            append_subproblem(new_clusters, objective)
+            enqueue(tree, list(clusters = new_clusters, prev_value = objective))
           }
         }
       }
     }
-
-    ## remove the problem that was processed
-    tree[[1]] <<- NULL
-    n_problems <<- n_problems - 1
   }
 
   ## Add first subproblem; first element must be in anticluster 1
   ## (Why? -> See my work on partition enumeration;
   ## if the first anticluster were > 1, I would obtain redundant partitions)
-
-  append_subproblem(1, 0)
+  enqueue(tree, list(clusters = 1, prev_value = 0))
   ## Get all together
-  while (length(tree) != 0) {
+  while (!is.empty(tree)) {
     process_problem()
   }
 
   return(list(objective = minmax, anticlusters = anticlusters))
 }
 
+
+## Define a queue in R using environments
+## (source: https://www.researchgate.net/post/What_is_the_queue_data_structure_in_R)
+
+new.queue <- function() {
+  ret <- new.env()
+  ret$front <- new.env()
+  ret$front$q <- NULL
+  ret$front$prev <- NULL
+  ret$last <- ret$front
+  return(ret)
+}
+## add to end of queue
+enqueue <- function(queue, add){
+  queue$last$q <- new.env()
+  queue$last$q$prev <- queue$last
+  queue$last <- queue$last$q
+  queue$last$val <- add
+  queue$last$q <- NULL
+}
+## return front of queue and remove it
+dequeue <- function(queue){
+  if (is.empty(queue)) {
+    stop("Attempting to take element from empty queue")
+  }
+  value <- queue$front$q$val
+  queue$front <- queue$front$q
+  queue$front$q$prev <- NULL
+  return(value)
+}
+is.empty <- function(queue){
+  return(is.null(queue$front$q))
+}
