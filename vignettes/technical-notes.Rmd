@@ -442,47 +442,14 @@ sometimes precludes an optimal solution.
 ## Heuristic anticlustering
 
 To solve larger problem instances that cannot be processed using integer
-linear programming, two heuristic methods based on random search are
-employed in the `anticlust` package: random sampling and simulated
-annealing. Both methods may incorporate a preclustering step that
-usually improves the quality of the output.
-
-### Random sampling
-
-A simple random sampling approach may be used to optimize the variance
-or distance objective. Across a user-specified number of runs, each
-element is first randomly assigned to an anticluster, then the objective
-value is computed. In the end, the best assignment is returned as the
-output. When preclustering is employed, the random assignment is
-conducted under the restriction that preclustered elements cannot be
-part of the same anticluster.
-
-### Simulated annealing
-
-The `anticlust` package also employs a simulated annealing approach to
-optimize the variance or distance objective. If no preclustering is
-employed, the simulated annealing approach uses the following steps:
-
-- Anticlusters are initialized randomly
-- The exchange step is realized by changing the anticluster 
-  affiliations of two random elements (as long as two elements from the 
-  same anticluster have been swapped, this step is repeated)
-
-If preclustering is activated, the simulated annealing approach uses the
-following steps:
-
-- Anticlusters are initialized randomly while incorporating the
-  condition that elements from the same precluster are not part of the
-  same anticluster
-- The exchange step first selects one precluster at random; from the
-  selected precluster, two random elements exchange their anticluster
-  affiliations
-
-The simulated annealing approach uses the function `optim` from base
-`R`; the following parameters are used:
-
-- Temperature: 2000
-- tmax: 20
+linear programming, a heuristic method based on random sampling is
+employed in the `anticlust` package. The heuristic may incorporate a
+preclustering step that often improves the quality of the output. Across
+a user-specified number of runs, each element is first randomly assigned
+to an anticluster, then the objective value is computed. In the end, the
+best assignment is returned as the output. When preclustering is
+employed, the random assignment is conducted under the restriction that
+preclustered elements cannot be part of the same anticluster.
 
 ### Heuristic preclustering
 

@@ -18,8 +18,7 @@ vector represents a single feature.}
 \item{objective}{The objective to be maximized, either "distance"
 (default) or "variance". See details.}
 
-\item{method}{One of "annealing", "sampling", or "exact". See
-details.}
+\item{method}{One of "sampling", or "exact". See details.}
 
 \item{preclustering}{Boolean, should a preclustering be conducted
 before anticlusters are created. Defaults to \code{TRUE}. See
@@ -79,12 +78,11 @@ on larger problem instances and the solution is usually optimal or
 very close to optimal.
 
 If no exact solution is required or the problem size is too large for
-the exact approach, two heuristic methods are available. One approach
-is based on repeated random sampling and another is based on simulated
-annealing. Both approaches may rely on a preclustering that prevents
-grouping very similar elements into the same anticluster if
-\code{preclustering = TRUE}. It is strongly suggested that the
-preclustering condition is activated when using one of the heuristics
+the exact approach, a heuristic method is available, based on
+repeated random sampling. The approach may rely on a preclustering
+that prevents grouping very similar elements into the same
+anticluster if \code{preclustering = TRUE}. It is strongly suggested
+that the preclustering condition is activated when using the heuristic
 because the solution is usually better with preclustering.
 }
 \examples{
