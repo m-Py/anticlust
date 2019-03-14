@@ -87,7 +87,7 @@ obj_value_distance <- function(features, anticlusters) {
   return(objective)
 }
 
-## Compute distance objective based on pre-computed distances
+## Distance objective based on pre-computed distances
 ## (is better for complete enumeration and random sampling than `obj_value_distance`)
 distance_objective <- function(distances, anticlusters, K) {
   sums_within <- rep(NA, K)
@@ -96,10 +96,17 @@ distance_objective <- function(distances, anticlusters, K) {
     ## connections than expand.grid? (I only want those where one column
     ## has smaller value than the other)
     elements <- which(anticlusters == k)
-    selection <- as.matrix(expand.grid(elements, elements))
-    selection <- selection[selection[,1] < selection[,2], ]
+    selection <- unique_combinations(elements)
     sums_within[k] <- sum(distances[selection])
   }
   return(sum(sums_within))
 }
 
+## This variant to create unique combinations is *much* faster
+## (especially for larger N) than using utils::combn even though it
+## seems that a lot of unnecessary combinations are generated using
+## expand.grid
+unique_combinations <- function(elements) {
+  selection <- as.matrix(expand.grid(elements, elements))
+  selection[selection[, 1] < selection[, 2], ]
+}
