@@ -86,7 +86,7 @@
 #' # (c) 10,000 sampling repetitions
 #' # (d) Preclustering is activated
 #' # (e) Anticlustering uses standardized features (Mean = 0, SD = 1)
-#' 
+#'
 #' data(iris)
 #' # Only use numeric attributes:
 #' iris <- iris[, -5]
@@ -109,7 +109,7 @@
 #'                      preclustering = FALSE, standardize = FALSE)
 #' # Determine objective value (larger is better)
 #' get_objective(features, ac, "distance")
-#' 
+#'
 #' # Enable preclustering
 #' ac_preclust <- anticlustering(features, n_anticlusters, method = "exact",
 #'                               preclustering = TRUE, standardize = FALSE)
@@ -127,7 +127,7 @@
 #' Valev, V. (1998). Set partition principles revisited. In Joint IAPR
 #' international workshops on statistical techniques in pattern
 #' recognition (SPR) and structural and syntactic pattern recognition
-#' (SSPR) (pp.  875–881). 
+#' (SSPR) (pp.  875–881).
 #'
 
 anticlustering <- function(features, n_anticlusters, objective = "distance",
@@ -150,15 +150,15 @@ anticlustering <- function(features, n_anticlusters, objective = "distance",
                                 solver_available(), preclustering))
   }
 
-  ## Heuristic method
+  ## Heuristic method - possibly using preclustering
   preclusters <- NULL
   if (preclustering == TRUE) {
     n_preclusters <- nrow(features) / n_anticlusters
     preclusters   <- equal_sized_kmeans(features, n_preclusters)
   }
   heuristic_anticlustering(features, n_anticlusters, preclusters,
-                           objective, nrep = nrep, method = method)
-  
+                           objective, nrep = nrep)
+
 }
 
 
