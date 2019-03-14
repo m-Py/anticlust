@@ -39,6 +39,7 @@
 #' H. Späth, “Anticlustering: Maximizing the variance criterion,”
 #' Control and Cybernetics, vol. 15, no. 2, pp. 213–218, 1986.
 #'
+
 get_objective <- function(features, anticlusters, objective) {
   features <- as.matrix(features)
   if (!objective %in% c("distance", "variance"))

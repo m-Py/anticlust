@@ -33,7 +33,8 @@ clustering <- function(features, n_clusters, standardize = TRUE, method = "heuri
   if (method == "exact") {
     solver <- solver_available()
     if (solver == FALSE)
-      stop("One of the packages 'Rglpk', 'gurobi', or 'Rcplex' must be installed for an exact clustering")
+      stop("One of the packages 'Rglpk', 'gurobi', or 'Rcplex' ",
+           "must be installed for an exact clustering")
     clusters <- equal_sized_cluster_editing(features, n_clusters, solver)
   } else if (method == "heuristic") {
     clusters <- equal_sized_kmeans(features, n_clusters)
