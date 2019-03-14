@@ -12,3 +12,7 @@ Tests
 Documentation
 
 - All exported function fully documented?
+
+---
+
+- get_objective should not compute all distances each time
