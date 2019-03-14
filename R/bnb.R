@@ -9,8 +9,8 @@
 #' @return A list containing the objective and the anticluster
 #'     affiliations.
 #'
-#' @export # remove
-#' # @noRd
+#' @export
+#'
 
 
 bnb_anticlustering <- function(features, K) {
@@ -34,28 +34,28 @@ bnb_anticlustering <- function(features, K) {
   tree <- list()
   N <- nrow(features)
 
-  #' An element of the tree is a problem
-  #'
-  #' @param new_clusters The anticluster affiliations of all elements in
-  #'     the candidate solution
-  #' @param objective The objective based on the old elements
-  #'
-  #' A problem (-> a list) is appended to `tree`. There is no return value.
-  #'
+  # An element of the tree is a problem
+  #
+  # @param new_clusters The anticluster affiliations of all elements in
+  #     the candidate solution
+  # @param objective The objective based on the old elements
+  #
+  # A problem (-> a list) is appended to `tree`. There is no return value.
+  #
   append_subproblem <- function(new_clusters, objective) {
     problem <- list(clusters = new_clusters, prev_value = objective)
     tree[[n_problems + 1]] <<- problem
     n_problems <<- n_problems + 1
   }
 
-  #' Compute objective for the current problem
-  #'
-  #'
-  #' @param problem, will always be `tree[[1]]`
-  #'
-  #' @return The objective value given all elements in the candidate solution
-  #'
-  #'
+  # Compute objective for the current problem
+  #
+  #
+  # @param problem, will always be `tree[[1]]`
+  #
+  # @return The objective value given all elements in the candidate solution
+  #
+  #
   compute_objective <- function(problem) {
     ## Select all elements within the same cluster as the newly added element
     ## (most recent element, i.e., element at last position in `problem$clusters`
@@ -72,11 +72,11 @@ bnb_anticlustering <- function(features, K) {
     return(objective)
   }
 
-  #' Process a subproblem:
-  #'
-  #' - compute objective
-  #' - decide if objective still good enough (TODO)
-  #' - add split into new subproblems if appropriate
+  # Process a subproblem:
+  #
+  # - compute objective
+  # - decide if objective still good enough (TODO)
+  # - add split into new subproblems if appropriate
   process_problem <- function() {
     objective <- compute_objective(tree[[1]])
     length_of_candidate <- length(tree[[1]]$clusters)
@@ -86,7 +86,8 @@ bnb_anticlustering <- function(features, K) {
       anticlusters <<- tree[[1]]$clusters
     }
 
-    ## Compute the maximum that can still be achieved:
+    ## Compute the maximum that can still be achieved if there is
+    ## not all elements in the candidate solution.
     ## Idea: for each element that is still to be inserted into a
     ## candidate solution, select the maximum N / K-1 distances to elements.
     if (length_of_candidate < N) {
@@ -98,25 +99,23 @@ bnb_anticlustering <- function(features, K) {
         maxima <- c(maxima, sum(tmp_dists[1:(N / K - 1)]))
       }
       best_possible <- sum(maxima) + objective
-    } else {
-      best_possible <- objective ## the candidate is "full"
-    }
-
-    ## is best possible value worse than the minimum maximum to be expected?
-    if (best_possible >= minmax) {
-      for (k in 1:K) {
-        ## 1) Check that each cluster occurs legally often in new candidate
-        ## 2) Check that the new candidate is not a redundant partition
-        ## (this means that k cannot be larger than the length of the new
-        ## candidate!)
-        new_clusters <- c(tree[[1]]$clusters, k)
-        if (sum(new_clusters == k) <= N / K &&
-            k <= length_of_candidate + 1) {
-          ## new problem gets as "previous objective" the current objective
-          append_subproblem(new_clusters, objective)
+      ## is best possible value worse than the minimum maximum to be expected?
+      if (best_possible >= minmax) {
+        for (k in 1:K) {
+          ## 1) Check that each cluster occurs legally often in new candidate
+          ## 2) Check that the new candidate is not a redundant partition
+          ## (this means that k cannot be larger than the length of the new
+          ## candidate!)
+          new_clusters <- c(tree[[1]]$clusters, k)
+          if (sum(new_clusters == k) <= N / K &&
+              k <= length_of_candidate + 1) {
+            ## new problem gets as "previous objective" the current objective
+            append_subproblem(new_clusters, objective)
+          }
         }
       }
     }
+
     ## remove the problem that was processed
     tree[[1]] <<- NULL
     n_problems <<- n_problems - 1
@@ -134,3 +133,4 @@ bnb_anticlustering <- function(features, K) {
 
   return(list(objective = minmax, anticlusters = anticlusters))
 }
+
