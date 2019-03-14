@@ -16,3 +16,4 @@ Documentation
 ---
 
 - get_objective should not compute all distances each time
+- remove simulated annealing approach from code base and vignette
