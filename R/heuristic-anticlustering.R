@@ -110,6 +110,9 @@ random_sampling <- function(dat, n_anticlusters, objective,
   best_obj <- -Inf
   # only select features so it is not done each iteration
   features <- dat[, -(1:2)]
+  if (objective == "distance") {
+    distances <- as.matrix(dist(features)) # for distance objective
+  }
   for (i in 1:nrep) {
     ## 1. Random sampling without preclustering restrictions
     if (ignore_preclusters == TRUE) {
@@ -119,7 +122,11 @@ random_sampling <- function(dat, n_anticlusters, objective,
     } else if (ignore_preclusters == FALSE) {
       anticlusters <- replicate_sample(n_preclusters, n_anticlusters)
     }
-    cur_obj <- get_objective(features, anticlusters, objective)
+    if (objective == "distance") {
+      cur_obj <- distance_objective(distances, anticlusters, n_anticlusters)
+    } else {
+      cur_obj <- get_objective(features, anticlusters, objective)
+    }
     if (cur_obj > best_obj) {
       best_assignment <- anticlusters
       best_obj <- cur_obj
