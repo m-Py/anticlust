@@ -80,3 +80,28 @@ first_occurrences <- function(anticlusters, K) {
   }
   first_occurrences
 }
+
+
+## Distance objective based on pre-computed distances
+## (is better for complete enumeration than `obj_value_distance`)
+distance_objective <- function(distances, anticlusters, K) {
+  sums_within <- rep(NA, K)
+  for (k in 1:K) {
+    ## is there a better / faster / less wasteful way to create all
+    ## connections than expand.grid? (I only want those where one column
+    ## has smaller value than the other)
+    elements <- which(anticlusters == k)
+    selection <- unique_combinations(elements)
+    sums_within[k] <- sum(distances[selection])
+  }
+  return(sum(sums_within))
+}
+
+## This variant to create unique combinations is *much* faster
+## (especially for larger N) than using utils::combn even though it
+## seems that a lot of unnecessary combinations are generated using
+## expand.grid
+unique_combinations <- function(elements) {
+  selection <- as.matrix(expand.grid(elements, elements))
+  selection[selection[, 1] < selection[, 2], ]
+}
