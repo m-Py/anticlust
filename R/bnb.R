@@ -25,11 +25,16 @@ bnb_anticlustering <- function(features, K) {
   # - N the total number of elements
   # - temporily: candidates - a list containing all generated candidates
   # - anticlusters - the current best partitioning
+  # - dist_sorted - distances matrix where each column is an item,
+  #   and rows encode the distance by proximity to other elements
+  #   (first row has the closest element etc)
 
   features <- as.matrix(features)
+  ## initialize minimum maximum via heuristic
   anticlusters <- anticlustering(features, K, method = "sampling", nrep = 50)
   minmax <- get_objective(features, anticlusters, "distance")
   distances <- as.matrix(dist(features))
+  dist_sorted <- distance_structure(distances)
   tree <- new.queue()
   N <- nrow(features)
 
@@ -82,17 +87,13 @@ bnb_anticlustering <- function(features, K) {
     ## the maximum N / K-1 distances to elements.
 
     remaining_elements <- (length_of_candidate + 1):N
-    maxima <- rep(NA, length(remaining_elements))
-    for (i in seq_along(remaining_elements)) {
-      ## all distances for element i
-      tmp_dists <- sort(distances[remaining_elements[i], ], decreasing = TRUE)
-      maxima[i] <- sum(tmp_dists[1:(N / K - 1)])
-    }
-    best_possible <- sum(maxima) + objective
+    best_possible <- sum(dist_sorted[1:(N / K - 1), remaining_elements]) + objective
+
     ## is best possible value worse than the minimum maximum to be expected?
     if (!(best_possible > minmax)) {
       return(NULL)
     }
+
     for (k in 1:K) {
       ## 1) Check that each cluster occurs legally often in new candidate
       ## 2) Check that the new candidate is not a redundant partition
@@ -117,7 +118,7 @@ bnb_anticlustering <- function(features, K) {
     process_problem()
   }
 
-  return(list(objective = minmax, anticlusters = anticlusters))
+  return(list(anticlusters = anticlusters, objective = minmax))
 }
 
 
@@ -152,4 +153,24 @@ dequeue <- function(queue){
 }
 is.empty <- function(queue){
   return(is.null(queue$front$q))
+}
+
+
+#' Encode the closest neighbours for each element in a matrix
+#'
+#' @param distances A distance matrix (computed via `as.matrix(dist(...))`)
+#'
+#' @return A matrix where each column is an element. The first row is the
+#'     distance to the closest element, the second row the distance to the
+#'     second closest element etc.
+#'
+#' @noRd
+
+distance_structure <- function(distances) {
+  results <- matrix(ncol = nrow(distances), nrow = nrow(distances))
+  for (i in 1:ncol(results)) {
+    ## make a data.frame from current distances and elements
+    results[, i]  <- sort(distances[i, ], decreasing = TRUE)
+  }
+  results[-1, ]
 }
