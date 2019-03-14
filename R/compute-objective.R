@@ -86,3 +86,20 @@ obj_value_distance <- function(features, anticlusters) {
   objective <- sum(sapply(distances, sum))
   return(objective)
 }
+
+## Compute distance objective based on pre-computed distances
+## (is better for complete enumeration and random sampling than `obj_value_distance`)
+distance_objective <- function(distances, anticlusters, K) {
+  sums_within <- rep(NA, K)
+  for (k in 1:K) {
+    ## is there a better / faster / less wasteful way to create all
+    ## connections than expand.grid? (I only want those where one column
+    ## has smaller value than the other)
+    elements <- which(anticlusters == k)
+    selection <- as.matrix(expand.grid(elements, elements))
+    selection <- selection[selection[,1] < selection[,2], ]
+    sums_within[k] <- sum(distances[selection])
+  }
+  return(sum(sums_within))
+}
+

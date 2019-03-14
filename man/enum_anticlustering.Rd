@@ -4,7 +4,7 @@
 \alias{enum_anticlustering}
 \title{Complete enumeration approach to anticlustering}
 \usage{
-enum_anticlustering(features, K, objective = "distance")
+enum_anticlustering(features, K)
 }
 \arguments{
 \item{features}{A vector, matrix or data.frame of data points. Rows
@@ -13,10 +13,10 @@ vector represents a single feature.}
 
 \item{K}{How many anticlusters should be created.}
 
+\item{talk}{Boolean. If `TRUE`, the function will print its progress.}
+
 \item{objective}{The objective to be maximized, either "distance" or
 "variance".}
-
-\item{talk}{Boolean. If `TRUE`, the function will print its progress.}
 }
 \value{
 A \code{list}. The first element is the best assignment.

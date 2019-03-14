@@ -24,15 +24,17 @@
 #' features <- matrix(runif(n_features * N), ncol = n_features)
 #' results <- enum_anticlustering(features, K, objective = "distance")
 
-enum_anticlustering <- function(features, K, objective = "distance") {
+enum_anticlustering <- function(features, K) {
 
   ## How many items are to be reassigned:
   N <- nrow(features)
   ## Initialize a vector that encodes the assignment to groups
   anticlusters  <- sort(rep_len(1:K, N))
   ## Initialize objective
-  best_objective <- get_objective(features, anticlusters, objective)
-  best_assign <- anticlusters
+  best_objective <- -Inf
+  best_assign <- NULL
+
+  distances <- as.matrix(dist(features))
 
   i <- 1
   repeat {
@@ -48,7 +50,7 @@ enum_anticlustering <- function(features, K, objective = "distance") {
     }
 
     ## Check the objective value
-    cur_obj <- get_objective(features, anticlusters, objective)
+    cur_obj <- distance_objective(distances, anticlusters, K)
     ## Better fit was found, save the assignment
     if (cur_obj > best_objective) {
       best_assign <- anticlusters
