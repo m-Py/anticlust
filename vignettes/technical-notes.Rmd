@@ -186,9 +186,9 @@ d_{\mathrm{avg}} = \frac{1}{\vert A \vert \: \vert B \vert }
 Given restriction \eqref{formalization:3} for the anticlustering
 problem, the partitions $A$ and $B$ are of equal size; therefore,
 $d_{\mathrm{between}}$ is minimized whenever $d_{\mathrm{avg}}$ is
-minimized, simultaneously maximizing $d_{\mathrm{within}}$. Thus, the
-cluster editing objective is a generalization of the average linkage
-method on more than two clusters.
+minimized, which also happens when $d_{\mathrm{within}}$ is maximized.
+Thus, the cluster editing objective is a generalization of the average
+linkage method on more than two clusters.
 
 # Algorithmic approaches
 
@@ -350,7 +350,7 @@ considerations:
    there is an uneven distribution of edge weights [@bocker2013;
    @bocker2011]
 2. It is possible to prevent very similar elements from joining the same
-   anticluster without impairing the quality of the solution strongly
+   anticluster without strongly impairing the quality of the solution
 
 In the cluster editing integer linear programming framework, setting
 $w(ij) = -\infty$ prevents two vertices $i$ and $j$ from joining the
@@ -358,12 +358,12 @@ same clique in the output graph [@bocker2011]. This recalculation
 induces a strong enevenness among edge weights, increasing the problem
 sizes the integer linear program can be applied to. If only very similar
 elements are prevented from joining the same anticluster, the quality of
-the solution is not impaired by much because the anticlustering
+the solution is not strongly impaired because the anticlustering
 objective is based on the idea that similar elements should be in
 different anticlusters.
 
-Therefore, the `anticlust` package may realize a preprocessing step
-grouping very similar elements into *preclusters*; elements of the same
+The `anticlust` package may realize a preprocessing step that groups
+very similar elements into *preclusters*; elements of the same
 precluster are prevented from joining the same anticluster thereafter.
 The preclustering step is formalized by the following integer linear
 program:
@@ -444,16 +444,16 @@ sometimes precludes an optimal solution.
 To solve larger problem instances that cannot be processed using integer
 linear programming, two heuristic methods based on random search are
 employed in the `anticlust` package: random sampling and simulated
-annealing. Both methods may employ a preclustering step that usually
-improves the quality of the output.
+annealing. Both methods may incorporate a preclustering step that
+usually improves the quality of the output.
 
 ### Random sampling
 
 A simple random sampling approach may be used to optimize the variance
 or distance objective. Across a user-specified number of runs, each
-element is randomly first assigned to an anticluster, then the objective
+element is first randomly assigned to an anticluster, then the objective
 value is computed. In the end, the best assignment is returned as the
-output. When a preclustering is employed, the random assignment is
+output. When preclustering is employed, the random assignment is
 conducted under the restriction that preclustered elements cannot be
 part of the same anticluster.
 
@@ -465,9 +465,8 @@ employed, the simulated annealing approach uses the following steps:
 
 - Anticlusters are initialized randomly
 - The exchange step is realized by changing the anticluster 
-  affiliations of two random elements
-- The exchange step is repeated as long as two elements from the same 
-  anticluster have been swapped
+  affiliations of two random elements (as long as two elements from the 
+  same anticluster have been swapped, this step is repeated)
 
 If preclustering is activated, the simulated annealing approach uses the
 following steps:
