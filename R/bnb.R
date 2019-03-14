@@ -33,15 +33,14 @@ bnb_anticlustering <- function(features, K) {
   tree <- new.queue()
   N <- nrow(features)
 
-  # Compute objective for the current problem
-  #
+  # Compute objective for the current BnB subproblem
   #
   # @param problem, will always be `dequeue(tree)`
   #
   # @return The objective value given all elements in the candidate solution
   #
   #
-  compute_objective <- function(problem) {
+  compute_bnb_objective <- function(problem) {
     ## Select all elements within the same cluster as the newly added element
     ## (most recent element, i.e., element at last position in `problem$clusters`
     anticlusters <- problem$clusters
@@ -65,7 +64,7 @@ bnb_anticlustering <- function(features, K) {
 
   process_problem <- function() {
     problem <- dequeue(tree) # takes uppermost candidate
-    objective <- compute_objective(problem)
+    objective <- compute_bnb_objective(problem)
     length_of_candidate <- length(problem$clusters)
     ## replace current minmax by objective if it is better
     if (objective >= minmax) {
@@ -73,34 +72,38 @@ bnb_anticlustering <- function(features, K) {
       anticlusters <<- problem$clusters
     }
 
-    ## Compute the maximum that can still be achieved if there is
-    ## not all elements in the candidate solution.
-    ## Idea: for each element that is still to be inserted into a
-    ## candidate solution, select the maximum N / K-1 distances to elements.
-    if (length_of_candidate < N) {
-      remaining_elements <- (length_of_candidate + 1):N
-      maxima <- rep(NA, length(remaining_elements))
-      for (i in seq_along(remaining_elements)) {
-        ## all distances for element i
-        tmp_dists <- sort(distances[remaining_elements[i], ], decreasing = TRUE)
-        maxima[i] <- sum(tmp_dists[1:(N / K - 1)])
-      }
-      best_possible <- sum(maxima) + objective
-      ## is best possible value worse than the minimum maximum to be expected?
-      if (best_possible >= minmax) {
-        for (k in 1:K) {
-          ## 1) Check that each cluster occurs legally often in new candidate
-          ## 2) Check that the new candidate is not a redundant partition
-          ## (this means that k cannot be larger than the length of the new
-          ## candidate!)
-          ## Only append new subproblem if both conditions are satisfied
-          new_clusters <- c(problem$clusters, k)
-          if (sum(new_clusters == k) <= N / K &&
-              k <= length_of_candidate + 1) {
-            ## new problem gets as "previous objective" the current objective
-            enqueue(tree, list(clusters = new_clusters, prev_value = objective))
-          }
-        }
+    ## If all elements are part of the problem, nothing else needs to be done:
+    if (!(length_of_candidate < N)) {
+      return(NULL)
+    }
+
+    ## Compute the maximum that can still be achieved. For each element
+    ## that is still to be inserted into a candidate solution, select
+    ## the maximum N / K-1 distances to elements.
+
+    remaining_elements <- (length_of_candidate + 1):N
+    maxima <- rep(NA, length(remaining_elements))
+    for (i in seq_along(remaining_elements)) {
+      ## all distances for element i
+      tmp_dists <- sort(distances[remaining_elements[i], ], decreasing = TRUE)
+      maxima[i] <- sum(tmp_dists[1:(N / K - 1)])
+    }
+    best_possible <- sum(maxima) + objective
+    ## is best possible value worse than the minimum maximum to be expected?
+    if (!(best_possible > minmax)) {
+      return(NULL)
+    }
+    for (k in 1:K) {
+      ## 1) Check that each cluster occurs legally often in new candidate
+      ## 2) Check that the new candidate is not a redundant partition
+      ## (this means that k cannot be larger than the length of the new
+      ## candidate!)
+      ## Only append new subproblem if both conditions are satisfied
+      new_clusters <- c(problem$clusters, k)
+      if (sum(new_clusters == k) <= N / K &&
+          k <= length_of_candidate + 1) {
+        ## new problem gets as "previous objective" the current objective
+        enqueue(tree, list(clusters = new_clusters, prev_value = objective))
       }
     }
   }
