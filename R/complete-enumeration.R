@@ -68,15 +68,19 @@ enum_anticlustering <- function(features, K) {
 #' Get the first occurrence of each value in a vector, sorted by values
 #'
 #' @param anticlusters a vector representing anticluster affiliations
+#' @param K The number of anticlusters
+#' @param first defaults to 1, and therefore returns the first occurence
+#'     of each anticluster. Can be changed to return the second, third
+#'     etc. occurence.
 #'
 #' @return The first occurrence of each value 1:K
 #'
 #' @noRd
 #'
-first_occurrences <- function(anticlusters, K) {
+first_occurrences <- function(anticlusters, K, first = 1) {
   first_occurrences <- rep(NA, K)
   for (i in 1:K) {
-    first_occurrences[i] <- which(anticlusters == i)[1]
+    first_occurrences[i] <- which(anticlusters == i)[first]
   }
   first_occurrences
 }
