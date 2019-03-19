@@ -6,8 +6,9 @@
 \usage{
 plot_clusters(features, clustering, within_connection = FALSE,
   between_connection = FALSE, show_axes = FALSE, xlab = NULL,
-  ylab = NULL, col = NULL, pch = 19, main = "", cex = 1.2,
-  cex.axis = 1.2, cex.lab = 1.2, lwd = 1.5)
+  ylab = NULL, xlim = NULL, ylim = NULL, col = NULL, pch = 19,
+  main = "", cex = 1.2, cex.axis = 1.2, cex.lab = 1.2, lwd = 1.5,
+  frame.plot = FALSE, lty = 2)
 }
 \arguments{
 \item{features}{A data.frame or matrix representing the features that
@@ -29,6 +30,10 @@ to `FALSE`.}
 
 \item{ylab}{The label for the y-axis}
 
+\item{xlim}{The limits for the x-axis}
+
+\item{ylim}{The limits for the y-axis}
+
 \item{col}{The coloring of the groups, optional argument. If this
 argument is passed, it needs to be a #' character vector of the
 same length as there are clusters, and each element of the vector
@@ -47,8 +52,15 @@ each cluster has a different plotting symbol.}
 \item{cex.axis}{The size of the values on the axes}
 
 \item{lwd}{The width of the lines connecting elements; has an effect
-if at least one of \code{within_connection} or
-\code{betwee_connection} is TRUE.}
+  if at least one of \code{within_connection} or
+  \code{betwee_connection} is TRUE.
+@param lty The The line type of the lines connecting elements
+  (see \code{\link{par}}); only has an effect
+  if at least one of \code{within_connection} or
+  \code{betwee_connection} is TRUE.}
+
+\item{frame.plot}{a logical indicating whether a box should be drawn
+around the plot.}
 
 \item{cex.axis}{The size of the labels of the axes}
 }

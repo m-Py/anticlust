@@ -13,6 +13,8 @@
 #'     to `FALSE`.
 #' @param xlab The label for the x-axis
 #' @param ylab The label for the y-axis
+#' @param xlim The limits for the x-axis
+#' @param ylim The limits for the y-axis
 #' @param col The coloring of the groups, optional argument. If this
 #'     argument is passed, it needs to be a #' character vector of the
 #'     same length as there are clusters, and each element of the vector
@@ -29,6 +31,12 @@
 #' @param lwd The width of the lines connecting elements; has an effect
 #'    if at least one of \code{within_connection} or
 #'    \code{betwee_connection} is TRUE.
+#'  @param lty The The line type of the lines connecting elements
+#'    (see \code{\link{par}}); only has an effect
+#'    if at least one of \code{within_connection} or
+#'    \code{betwee_connection} is TRUE.
+#' @param frame.plot a logical indicating whether a box should be drawn
+#'    around the plot.
 #'
 #' @export
 #'
@@ -55,8 +63,16 @@
 plot_clusters <- function(features, clustering, within_connection = FALSE,
                           between_connection = FALSE,
                           show_axes = FALSE, xlab = NULL, ylab = NULL,
+                          xlim = NULL, ylim = NULL,
                           col = NULL, pch = 19, main = "", cex = 1.2,
-                          cex.axis = 1.2, cex.lab = 1.2, lwd = 1.5) {
+                          cex.axis = 1.2, cex.lab = 1.2, lwd = 1.5,
+                          frame.plot = FALSE, lty = 2) {
+  if (!argument_exists(xlim)) {
+    xlim <- c(min(features[, 1]), max(features[, 1]))
+  }
+  if (!argument_exists(ylim)) {
+    ylim <- c(min(features[, 2]), max(features[, 2]))
+  }
   if (ncol(features) != 2)
     stop("Can only plot two features")
   if (nrow(features) != length(clustering))
@@ -95,14 +111,15 @@ plot_clusters <- function(features, clustering, within_connection = FALSE,
     axt <- "s"
   plot(x, y, las = 1, cex.axis = cex.axis, cex.lab = cex.lab,
        col = col, xlab = xlab, ylab = ylab, cex = cex,
-       xaxt = axt, yaxt = axt, pch = pch, main = main)
+       xaxt = axt, yaxt = axt, pch = pch, main = main,
+       frame.plot = frame.plot, xlim = xlim, ylim = ylim)
   ## Draw graph structure
   if (within_connection == TRUE) {
-    draw_all_cliques(x, y, clustering, cols = col, lwd = lwd)
+    draw_all_cliques(x, y, clustering, cols = col, lwd = lwd, lty = lty)
   }
   if (between_connection == TRUE) {
     if (K == 2) {
-      draw_between_cliques(x, y, clustering, lwd = lwd)
+      draw_between_cliques(x, y, clustering, lwd = lwd, lty = lty)
       ## redraw points so that the lines do notlay the points
       points(x, y, cex = cex, pch = pch, col = col)
     } else {
