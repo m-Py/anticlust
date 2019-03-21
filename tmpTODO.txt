@@ -1,19 +1,28 @@
 
+---
 
-Anticlustering arguments:
-
-- list for adjusting the simulated annealing parameters
-- list for adjusting ILP solver setting (esp. verbose)
-
-Tests
+Tests:
 
 - how do all methods deal with missing data?
 
-Documentation
+---
+
+Documentation:
 
 - All exported function fully documented?
 
 ---
 
-- get_objective should not compute all distances each time
-- remove simulated annealing approach from code base and vignette
+
+Implementation:
+
+- function `anticlustering` should also take distance object as input
+- complete enumeration as alternative to ILP for method = "exact" if 
+  no solver is installed 
+
+---
+
+`anticlustering` arguments:
+
+  - maybe include an argument list for adjusting ILP solver setting 
+    (esp. verbose; alternative: a verbose option for all methods)
