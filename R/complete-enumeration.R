@@ -1,16 +1,12 @@
 
-#' Complete enumeration approach to anticlustering
+#' Complete enumeration approach to anticluster editing
 #'
 #' @param features A vector, matrix or data.frame of data points. Rows
 #'     correspond to elements and columns correspond to features. A
 #'     vector represents a single feature.
 #' @param K How many anticlusters should be created.
-#' @param talk Boolean. If `TRUE`, the function will print its progress.
-#' @param objective The objective to be maximized, either "distance" or
-#'     "variance".
 #'
-#' @return A \code{list}. The first element is the best assignment.
-#'   The second element is the best objective.
+#' @return The anticluster affiliation
 #'
 #' @export
 #'
@@ -22,7 +18,7 @@
 #' N <- 10
 #' K <- 2
 #' features <- matrix(runif(n_features * N), ncol = n_features)
-#' results <- enum_anticlustering(features, K, objective = "distance")
+#' results <- enum_anticlustering(features, K)
 
 enum_anticlustering <- function(features, K) {
 
@@ -61,7 +57,7 @@ enum_anticlustering <- function(features, K) {
     anticlusters <- next_permutation(anticlusters)
   }
 
-  return(list(anticlusters = best_assign, objective = best_objective))
+  return(best_assign)
 }
 
 

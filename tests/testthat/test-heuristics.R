@@ -51,8 +51,7 @@ test_that("heuristic clustering produces expected output", {
 })
 
 test_that("heuristic anticlustering produces expected output", {
-  conditions <- expand.grid(m = 1:4, p = 2:4, method = c("sampling", "annealing"),
-                            objective = c("distance", "variance"),
+  conditions <- expand.grid(m = 1:4, p = 2:4, objective = c("distance", "variance"),
                             preclustering = c(TRUE, FALSE))
   for (i in 1:nrow(conditions)) {
     m_features <- conditions[i, "m"]
@@ -74,7 +73,6 @@ test_that("heuristic anticlustering produces expected output", {
     ## Now: anticlustering:
     anticlusters <- heuristic_anticlustering(features, p_anticlusters,
                                              preclusters, nrep = 100,
-                                             method = conditions$method[i],
                                              objective = conditions$objective[i])
     ## Legal number of anticlusters?
     expect_equal(legal_number_of_clusters(features, anticlusters), NULL)

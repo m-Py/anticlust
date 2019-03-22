@@ -16,7 +16,14 @@
 #'
 #' @noRd
 
-exact_anticlustering <- function(features, n_anticlusters, solver, preclustering) {
+exact_anticlustering <- function(features, n_anticlusters, solver,
+                                 preclustering) {
+
+  ## If no solver is installed, use complete enumeration
+  if (solver == FALSE) {
+    print("Complete enumeration")
+    return(enum_anticlustering(features, n_anticlusters))
+  }
 
   n_items <- nrow(features)
   distances <- dist(features)
