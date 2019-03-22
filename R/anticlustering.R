@@ -90,14 +90,13 @@
 #' iris <- iris[, -5]
 #' anticlusters <- anticlustering(iris, n_anticlusters = 3)
 #' # Compare feature means by anticluster
-#' by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
+#' by(iris, anticlusters, function(x) round(colMeans(x), 2))
 #' # Plot the anticlustering
 #' par(mfrow = c(1, 2))
 #' plot_clusters(iris[, 1:2], anticlusters)
 #' plot_clusters(iris[, 3:4], anticlusters)
 #'
 #' ## The exact approach
-#' library("Rglpk") # package that calls the GNU linear programming kit
 #' # Create artifical data
 #' n_features <- 2
 #' n_anticlusters <- 2
