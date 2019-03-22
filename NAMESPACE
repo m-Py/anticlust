@@ -2,7 +2,9 @@
 
 export(anticlustering)
 export(clustering)
+export(enum_anticlustering)
 export(get_objective)
+export(next_permutation)
 export(plot_clusters)
 importFrom(Matrix,sparseMatrix)
 importFrom(grDevices,rainbow)

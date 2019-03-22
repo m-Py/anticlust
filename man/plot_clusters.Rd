@@ -4,9 +4,11 @@
 \alias{plot_clusters}
 \title{Visualize a clustering of two features}
 \usage{
-plot_clusters(features, clustering, connect_clusters = FALSE,
-  show_axes = FALSE, xlab = NULL, ylab = NULL, col = NULL,
-  pch = 19, main = "", cex = 1.2, cex.axis = 1.2, cex.lab = 1.2)
+plot_clusters(features, clustering, within_connection = FALSE,
+  between_connection = FALSE, show_axes = FALSE, xlab = NULL,
+  ylab = NULL, xlim = NULL, ylim = NULL, col = NULL, pch = 19,
+  main = "", cex = 1.2, cex.axis = 1.2, cex.lab = 1.2, lwd = 1.5,
+  frame.plot = FALSE, lty = 2)
 }
 \arguments{
 \item{features}{A data.frame or matrix representing the features that
@@ -14,8 +16,12 @@ are used. Must have two columns.}
 
 \item{clustering}{A vector representing the clustering}
 
-\item{connect_clusters}{Boolean. Connect the groups through lines?
-Useful to illustrate a graph structure.}
+\item{within_connection}{Boolean. Connect the elements within each
+clusters through lines? Useful to illustrate a graph structure.}
+
+\item{between_connection}{Boolean. Connect the elements between each
+clusters through lines? Useful to illustrate a graph structure.
+Only works for two anticlusters in \code{clustering}.}
 
 \item{show_axes}{Boolean, display values on the x and y-axis? Defaults
 to `FALSE`.}
@@ -23,6 +29,15 @@ to `FALSE`.}
 \item{xlab}{The label for the x-axis}
 
 \item{ylab}{The label for the y-axis}
+
+\item{xlim}{The limits for the x-axis}
+
+\item{ylim}{The limits for the y-axis}
+
+\item{col}{The coloring of the groups, optional argument. If this
+argument is passed, it needs to be a #' character vector of the
+same length as there are clusters, and each element of the vector
+is a color.}
 
 \item{pch}{A numeric vector representing the symbol used to plot
 data points (see \code{\link{par}}). Should either be of length 1,
@@ -36,10 +51,16 @@ each cluster has a different plotting symbol.}
 
 \item{cex.axis}{The size of the values on the axes}
 
-\item{cols}{The coloring of the groups. Does not need to be passed.
-If it is passed, it needs to be a character vector of the same
-length as there are clusters, and each element of the vector is a
-color.}
+\item{lwd}{The width of the lines connecting elements; has an effect
+  if at least one of \code{within_connection} or
+  \code{betwee_connection} is TRUE.
+@param lty The The line type of the lines connecting elements
+  (see \code{\link{par}}); only has an effect
+  if at least one of \code{within_connection} or
+  \code{betwee_connection} is TRUE.}
+
+\item{frame.plot}{a logical indicating whether a box should be drawn
+around the plot.}
 
 \item{cex.axis}{The size of the labels of the axes}
 }
@@ -55,7 +76,7 @@ In most cases, the argument `clustering` is a vector
 }
 \examples{
 
-n_elements <- 90
+n_elements <- 9
 features <- matrix(runif(n_elements * 2), ncol = 2)
 n_groups <- 3
 clusters <- clustering(features, n_groups)

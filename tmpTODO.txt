@@ -1,0 +1,28 @@
+
+---
+
+Tests:
+
+- how do all methods deal with missing data?
+
+---
+
+Documentation:
+
+- All exported function fully documented?
+
+---
+
+
+Implementation:
+
+- function `anticlustering` should also take distance object as input
+- complete enumeration as alternative to ILP for method = "exact" if 
+  no solver is installed 
+
+---
+
+`anticlustering` arguments:
+
+  - maybe include an argument list for adjusting ILP solver setting 
+    (esp. verbose; alternative: a verbose option for all methods)

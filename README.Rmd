@@ -53,7 +53,7 @@ library("anticlust")
 The main function of the package is `anticlustering`. For most users, it
 should be sufficient to know this function. It takes as input a data
 matrix of features describing the elements that we want to assign to
-groups.[^1] In the data matrix, each row is an element, for example a
+groups. In the data matrix, each row is an element, for example a
 person, picture, word, or a photo. Each column is a numeric variable
 describing one of the elements' features.
 

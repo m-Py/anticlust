@@ -15,9 +15,9 @@ test_that("all levels of heuristicism work and that exact approach has best obje
     ## Traverse through levels of heuristicism
     obj_values <- rep(NA, 4)
     anti_list <- list()
-    for (i in 0:1) {
-      anticlusters <- distance_anticlustering(features, p_anticlusters,
-                                              solver, heuristic = i)
+    for (i in c(TRUE, FALSE)) {
+      anticlusters <- exact_anticlustering(features, p_anticlusters,
+                                           solver, preclustering = i)
       anti_list[[i + 1]] <- anticlusters
       # Allow for some numeric imprecision of ILP solver:
       obj_values[i + 1]  <- round(get_objective(features, anticlusters, "distance"), 10)

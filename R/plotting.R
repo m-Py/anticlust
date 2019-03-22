@@ -4,16 +4,21 @@
 #' @param features A data.frame or matrix representing the features that
 #'     are used. Must have two columns.
 #' @param clustering A vector representing the clustering
-#' @param connect_clusters Boolean. Connect the groups through lines?
-#'     Useful to illustrate a graph structure.
+#' @param within_connection Boolean. Connect the elements within each
+#'     clusters through lines? Useful to illustrate a graph structure.
+#' @param between_connection Boolean. Connect the elements between each
+#'     clusters through lines? Useful to illustrate a graph structure.
+#'     Only works for two anticlusters in \code{clustering}.
 #' @param show_axes Boolean, display values on the x and y-axis? Defaults
 #'     to `FALSE`.
 #' @param xlab The label for the x-axis
 #' @param ylab The label for the y-axis
-#' @param cols The coloring of the groups. Does not need to be passed.
-#'     If it is passed, it needs to be a character vector of the same
-#'     length as there are clusters, and each element of the vector is a
-#'     color.
+#' @param xlim The limits for the x-axis
+#' @param ylim The limits for the y-axis
+#' @param col The coloring of the groups, optional argument. If this
+#'     argument is passed, it needs to be a #' character vector of the
+#'     same length as there are clusters, and each element of the vector
+#'     is a color.
 #' @param pch A numeric vector representing the symbol used to plot
 #'     data points (see \code{\link{par}}). Should either be of length 1,
 #'     then the same symbol is used for all plots, or should have the
@@ -23,6 +28,15 @@
 #' @param cex The size of the plotting symbols, see \code{\link{par}}
 #' @param cex.axis The size of the values on the axes
 #' @param cex.axis The size of the labels of the axes
+#' @param lwd The width of the lines connecting elements; has an effect
+#'    if at least one of \code{within_connection} or
+#'    \code{betwee_connection} is TRUE.
+#'  @param lty The The line type of the lines connecting elements
+#'    (see \code{\link{par}}); only has an effect
+#'    if at least one of \code{within_connection} or
+#'    \code{betwee_connection} is TRUE.
+#' @param frame.plot a logical indicating whether a box should be drawn
+#'    around the plot.
 #'
 #' @export
 #'
@@ -37,7 +51,7 @@
 #'
 #' @examples
 #'
-#' n_elements <- 90
+#' n_elements <- 9
 #' features <- matrix(runif(n_elements * 2), ncol = 2)
 #' n_groups <- 3
 #' clusters <- clustering(features, n_groups)
@@ -46,10 +60,19 @@
 #' plot_clusters(features, clusters, pch = c(15, 16, 17))
 #' plot_clusters(features, anticlusters, pch = c(15, 16, 17))
 #'
-plot_clusters <- function(features, clustering, connect_clusters = FALSE,
+plot_clusters <- function(features, clustering, within_connection = FALSE,
+                          between_connection = FALSE,
                           show_axes = FALSE, xlab = NULL, ylab = NULL,
+                          xlim = NULL, ylim = NULL,
                           col = NULL, pch = 19, main = "", cex = 1.2,
-                          cex.axis = 1.2, cex.lab = 1.2) {
+                          cex.axis = 1.2, cex.lab = 1.2, lwd = 1.5,
+                          frame.plot = FALSE, lty = 2) {
+  if (!argument_exists(xlim)) {
+    xlim <- c(min(features[, 1]), max(features[, 1]))
+  }
+  if (!argument_exists(ylim)) {
+    ylim <- c(min(features[, 2]), max(features[, 2]))
+  }
   if (ncol(features) != 2)
     stop("Can only plot two features")
   if (nrow(features) != length(clustering))
@@ -60,8 +83,8 @@ plot_clusters <- function(features, clustering, connect_clusters = FALSE,
   clustering <- as.numeric(factor(clustering))
 
   ## More input handling:
-  n_cliques <- length(unique(clustering))
-  if (length(pch) == n_cliques)
+  K <- length(unique(clustering))
+  if (length(pch) == K)
     pch <- pch[clustering]
   else if (length(pch) == 1)
     pch <- pch # :-)
@@ -78,22 +101,32 @@ plot_clusters <- function(features, clustering, connect_clusters = FALSE,
   x <- features[, 1]
   y <- features[, 2]
   if (is.null(col) == TRUE)
-    col <- rainbow(n_cliques)
+    col <- rainbow(K)
   ## Set colors for cliques
-  if (length(col) != n_cliques)
+  if (length(col) != K)
     stop("If you specify colors, you have to specify as many colors as there are clusters")
   col <- col[clustering]
-  def_mar <- c(5, 4, 4, 2) + 0.1
-  par(mar = def_mar + c(0, 1, 0, 0))
   axt <- "n"
   if (show_axes == TRUE)
     axt <- "s"
   plot(x, y, las = 1, cex.axis = cex.axis, cex.lab = cex.lab,
        col = col, xlab = xlab, ylab = ylab, cex = cex,
-       xaxt = axt, yaxt = axt, pch = pch, main = main)
-  if (connect_clusters)
-    draw_all_cliques(x, y, clustering, cols = col)
-  par(mar = def_mar)
+       xaxt = axt, yaxt = axt, pch = pch, main = main,
+       frame.plot = frame.plot, xlim = xlim, ylim = ylim)
+  ## Draw graph structure
+  if (within_connection == TRUE) {
+    draw_all_cliques(x, y, clustering, cols = col, lwd = lwd, lty = lty)
+  }
+  if (between_connection == TRUE) {
+    if (K == 2) {
+      draw_between_cliques(x, y, clustering, lwd = lwd, lty = lty)
+      ## redraw points so that the lines do notlay the points
+      points(x, y, cex = cex, pch = pch, col = col)
+    } else {
+      warning("Connections between elements of different clusters were ",
+              "not drawn because there were more than two anticlusters")
+    }
+  }
 }
 
 # Note: length(cols) must be == length(x)
@@ -105,6 +138,7 @@ draw_all_cliques <- function(x, y, assignment, lwd = 1.5, lty = 1, cols) {
                 lty = lty)
   }
 }
+
 
 # draw edges connecting all elements of a clique
 draw_clique <- function(x, y, col, lwd = 1.5, lty = 1) {
@@ -126,4 +160,20 @@ connections_within_clique <- function(x, y) {
   connections <- expand.grid(1:nitems, 1:nitems)
   connections <- connections[connections[, 1] < connections[, 2], ]
   return(connections)
+}
+
+## Function to illustrate distances between elements of different cliques
+## (does not work in general, but only for K = 2)
+draw_between_cliques <- function(x, y, assignment, lwd = 1.5,
+                                 lty = 2) {
+  selfx <- x[assignment == 1] ## first cluster
+  selfy <- y[assignment == 1]
+  otherx <- x[assignment != 1] ## second cluster
+  othery <- y[assignment != 1]
+  for (j in seq_along(selfx)) {
+    for (k in seq_along(otherx)) {
+      lines(c(selfx[j], otherx[k]), c(selfy[j], othery[k]),
+            col = "darkgrey", lwd = lwd, lty = lty)
+    }
+  }
 }

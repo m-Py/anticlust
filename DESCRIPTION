@@ -1,7 +1,7 @@
 Package: anticlust
 Type: Package
 Title: Algorithms for the anticlustering problem
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: person("Papenberg", "Martin", email = "martin.papenberg@hhu.de",
   role = c("aut", "cre"))
 Description: Anticlustering establishes groups of elements (i.e.,

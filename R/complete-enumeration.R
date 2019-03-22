@@ -1,0 +1,111 @@
+
+#' Complete enumeration approach to anticlustering
+#'
+#' @param features A vector, matrix or data.frame of data points. Rows
+#'     correspond to elements and columns correspond to features. A
+#'     vector represents a single feature.
+#' @param K How many anticlusters should be created.
+#' @param talk Boolean. If `TRUE`, the function will print its progress.
+#' @param objective The objective to be maximized, either "distance" or
+#'     "variance".
+#'
+#' @return A \code{list}. The first element is the best assignment.
+#'   The second element is the best objective.
+#'
+#' @export
+#'
+#' @author Martin Papenberg \email{martin.papenberg@@hhu.de}
+#'
+#' @examples
+#'
+#' n_features <- 2
+#' N <- 10
+#' K <- 2
+#' features <- matrix(runif(n_features * N), ncol = n_features)
+#' results <- enum_anticlustering(features, K, objective = "distance")
+
+enum_anticlustering <- function(features, K) {
+
+  ## How many items are to be reassigned:
+  N <- nrow(features)
+  ## Initialize a vector that encodes the assignment to groups
+  anticlusters  <- sort(rep_len(1:K, N))
+  ## Initialize objective
+  best_objective <- -Inf
+  best_assign <- NULL
+
+  distances <- as.matrix(dist(features))
+
+  i <- 1
+  repeat {
+    ## ending condition: next permutation is starting point
+    if (anticlusters[1] != 1) { # only redundant partitions from this point
+      break
+    }
+
+    ## Only compute objective for unique partitions:
+    if (is.unsorted(first_occurrences(anticlusters, K))) {
+      anticlusters <- next_permutation(anticlusters)
+      next
+    }
+
+    ## Check the objective value
+    cur_obj <- distance_objective(distances, anticlusters, K)
+    ## Better fit was found, save the assignment
+    if (cur_obj > best_objective) {
+      best_assign <- anticlusters
+      best_objective <- cur_obj
+    }
+
+    i <- i + 1
+    anticlusters <- next_permutation(anticlusters)
+  }
+
+  return(list(anticlusters = best_assign, objective = best_objective))
+}
+
+
+#' Get the first occurrence of each value in a vector, sorted by values
+#'
+#' @param anticlusters a vector representing anticluster affiliations
+#' @param K The number of anticlusters
+#' @param first defaults to 1, and therefore returns the first occurence
+#'     of each anticluster. Can be changed to return the second, third
+#'     etc. occurence.
+#'
+#' @return The first occurrence of each value 1:K
+#'
+#' @noRd
+#'
+first_occurrences <- function(anticlusters, K, first = 1) {
+  first_occurrences <- rep(NA, K)
+  for (i in 1:K) {
+    first_occurrences[i] <- which(anticlusters == i)[first]
+  }
+  first_occurrences
+}
+
+
+## Distance objective based on pre-computed distances
+## (is better for complete enumeration than `obj_value_distance`)
+distance_objective <- function(distances, anticlusters, K) {
+  sums_within <- rep(NA, K)
+  for (k in 1:K) {
+    ## is there a better / faster / less wasteful way to create all
+    ## connections than expand.grid? (I only want those where one column
+    ## has smaller value than the other)
+    elements <- which(anticlusters == k)
+    selection <- unique_combinations(elements)
+    sums_within[k] <- sum(distances[selection])
+  }
+  return(sum(sums_within))
+}
+
+## This variant to create unique combinations is *much* faster
+## (especially for larger N) than using utils::combn even though it
+## seems that a lot of unnecessary combinations are generated using
+## expand.grid
+unique_combinations <- function(elements) {
+  selection <- as.matrix(expand.grid(elements, elements))
+  selection[selection[, 1] < selection[, 2], ]
+}
