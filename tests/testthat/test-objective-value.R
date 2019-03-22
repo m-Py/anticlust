@@ -4,8 +4,7 @@ context("Test computation of objective values")
 library("anticlust")
 
 test_that("output of objective value functions has correct structure", {
-  conditions <- expand.grid(m = 1:4, p = 2:4, method = c("sampling", "annealing"),
-                            objective = c("distance", "variance"),
+  conditions <- expand.grid(m = 1:4, p = 2:4, objective = c("distance", "variance"),
                             preclustering = c(TRUE, FALSE))
   for (i in nrow(conditions)) {
     m_features <- conditions[i, "m"]
@@ -21,7 +20,6 @@ test_that("output of objective value functions has correct structure", {
     # Use preclustering as resticting information in anticlustering
     anticlusters <- heuristic_anticlustering(features, p_anticlusters,
                                              preclusters, nrep = 100,
-                                             method = conditions$method[i],
                                              objective = conditions$objective[i])
     dist_obj <- get_objective(features, anticlusters, "distance")
     var_obj <- get_objective(features, anticlusters, "variance")

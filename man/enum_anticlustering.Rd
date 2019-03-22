@@ -2,7 +2,7 @@
 % Please edit documentation in R/complete-enumeration.R
 \name{enum_anticlustering}
 \alias{enum_anticlustering}
-\title{Complete enumeration approach to anticlustering}
+\title{Complete enumeration approach to anticluster editing}
 \usage{
 enum_anticlustering(features, K)
 }
@@ -12,18 +12,12 @@ correspond to elements and columns correspond to features. A
 vector represents a single feature.}
 
 \item{K}{How many anticlusters should be created.}
-
-\item{talk}{Boolean. If `TRUE`, the function will print its progress.}
-
-\item{objective}{The objective to be maximized, either "distance" or
-"variance".}
 }
 \value{
-A \code{list}. The first element is the best assignment.
-  The second element is the best objective.
+The anticluster affiliation
 }
 \description{
-Complete enumeration approach to anticlustering
+Complete enumeration approach to anticluster editing
 }
 \examples{
 
