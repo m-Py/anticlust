@@ -25,7 +25,7 @@ n_features <- 2
 N <- 10
 K <- 2
 features <- matrix(runif(n_features * N), ncol = n_features)
-results <- enum_anticlustering(features, K, objective = "distance")
+results <- enum_anticlustering(features, K)
 }
 \author{
 Martin Papenberg \email{martin.papenberg@hhu.de}
