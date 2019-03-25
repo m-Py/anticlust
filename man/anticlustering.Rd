@@ -4,9 +4,9 @@
 \alias{anticlustering}
 \title{Algorithms for anticlustering}
 \usage{
-anticlustering(features, n_anticlusters, objective = "distance",
+anticlustering(features = NULL, n_anticlusters, objective = "distance",
   method = "sampling", preclustering = TRUE, standardize = TRUE,
-  nrep = 10000)
+  nrep = 10000, distances = NULL)
 }
 \arguments{
 \item{features}{A vector, matrix or data.frame of data points. Rows
@@ -32,6 +32,11 @@ using the default settings.}
 \item{nrep}{The number of repetitions used in the heuristic methods
 "sampling" or "annealing". This argument does not have an effect
 if the argument \code{method} is \code{"exact"}.}
+
+\item{distances}{Alternative data argument if \code{features} is not
+passed. A n x n matrix representing the pairwise dissimilarities
+between all n elements. Larger values indicate larger
+dissimilarity.}
 }
 \value{
 A vector representing the anticluster affiliation.

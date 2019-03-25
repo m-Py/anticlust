@@ -21,6 +21,10 @@
 #' @param nrep The number of repetitions used in the heuristic methods
 #'     "sampling" or "annealing". This argument does not have an effect
 #'     if the argument \code{method} is \code{"exact"}.
+#' @param distances Alternative data argument if \code{features} is not
+#'     passed. A n x n matrix representing the pairwise dissimilarities
+#'     between all n elements. Larger values indicate larger
+#'     dissimilarity.
 #'
 #' @return A vector representing the anticluster affiliation.
 #'
@@ -127,24 +131,29 @@
 #' (SSPR) (pp.  875–881).
 #'
 
-anticlustering <- function(features, n_anticlusters, objective = "distance",
+anticlustering <- function(features = NULL, n_anticlusters,
+                           objective = "distance",
                            method = "sampling", preclustering = TRUE,
-                           standardize = TRUE, nrep = 10000) {
+                           standardize = TRUE, nrep = 10000,
+                           distances = NULL) {
 
   input_handling_anticlustering(features, n_anticlusters, objective,
                                 method, preclustering,
-                                standardize, nrep)
+                                standardize, nrep, distances)
 
   ## Standardize feature values (for each feature, mean = 0, sd = 1)?
-  features <- as.matrix(features)
-  if (standardize) {
-    features <- scale(features)
+  if (argument_exists(features)) {
+    features <- as.matrix(features)
+    if (standardize) {
+      features <- scale(features)
+    }
   }
 
   ## Exact method using ILP
   if (method == "exact") {
     return(exact_anticlustering(features, n_anticlusters,
-                                solver_available(), preclustering))
+                                solver_available(), preclustering,
+                                distances))
   }
 
   ## Heuristic method - possibly using preclustering
@@ -173,17 +182,20 @@ anticlustering <- function(features, n_anticlusters, objective = "distance",
 #'
 #' @noRd
 input_handling_anticlustering <- function(features, n_anticlusters, objective,
-                                          method, preclustering, standardize, nrep) {
+                                          method, preclustering, standardize,
+                                          nrep, distances) {
 
   ## Validate feature input
-  validate_input(features, "features", c("data.frame", "matrix", "numeric"))
-  features <- as.matrix(features)
-  validate_input(features, "features", objmode = "numeric")
+  if (argument_exists(features)) {
+    validate_input(features, "features", c("data.frame", "matrix", "numeric"))
+    features <- as.matrix(features)
+    validate_input(features, "features", objmode = "numeric")
 
-  validate_input(n_anticlusters, "n_anticlusters", "numeric", len = 1,
-                 greater_than = 1, must_be_integer = TRUE)
-  if (nrow(features) %% n_anticlusters != 0) {
-    stop("The number of anticlusters must be a divider of the number of elements.")
+    validate_input(n_anticlusters, "n_anticlusters", "numeric", len = 1,
+                   greater_than = 1, must_be_integer = TRUE)
+    if (nrow(features) %% n_anticlusters != 0) {
+      stop("The number of anticlusters must be a divider of the number of elements.")
+    }
   }
 
   validate_input(nrep, "nrep", "numeric", len = 1, greater_than = 0,
@@ -209,6 +221,23 @@ input_handling_anticlustering <- function(features, n_anticlusters, objective,
     stop("There is no exact method to maximize the variance criterion. ",
          "Use method = 'distance' instead")
   }
+
+  if (!argument_exists(features) && !argument_exists(distances)) {
+    stop("One of the arguments 'features' or 'distances' must be given.")
+  }
+
+  if (argument_exists(features) && argument_exists(distances)) {
+    stop("Only pass one of the arguments 'features' or 'distances'.")
+  }
+
+  if (method == "sampling" && argument_exists(distances)) {
+    stop("Currently, it is not possible to combine the arguments 'sampling' and 'distances'.")
+  }
+
+  if (argument_exists(distances) && objective == "variance") {
+    stop("'distances' cannot be used if 'objective' is 'variance'.")
+  }
+
   return(invisible(NULL))
 }
 
