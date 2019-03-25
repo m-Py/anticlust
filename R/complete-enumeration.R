@@ -32,7 +32,6 @@ enum_anticlustering <- function(features, K) {
 
   distances <- as.matrix(dist(features))
 
-  i <- 1
   repeat {
     ## ending condition: next permutation is starting point
     if (anticlusters[1] != 1) { # only redundant partitions from this point
@@ -53,7 +52,6 @@ enum_anticlustering <- function(features, K) {
       best_objective <- cur_obj
     }
 
-    i <- i + 1
     anticlusters <- next_permutation(anticlusters)
   }
 
