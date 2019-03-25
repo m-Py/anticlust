@@ -56,7 +56,7 @@ test_that("objective value for distance criterion is computed correctly", {
     p_anticlusters <- conditions[k, "p"]
     n_elements <- p_anticlusters * 3 # n must be multiplier of p
     features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
-    distances <- dist(features)
+    distances <- as.matrix(dist(features))
     solver <- "Rglpk"
     ilp <- anticlustering_ilp(distances, p_anticlusters, solver)
     solution <- solve_ilp(ilp, solver, "min")

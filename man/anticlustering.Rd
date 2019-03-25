@@ -36,7 +36,7 @@ if the argument \code{method} is \code{"exact"}.}
 \item{distances}{Alternative data argument if \code{features} is not
 passed. A n x n matrix representing the pairwise dissimilarities
 between all n elements. Larger values indicate larger
-dissimilarity.}
+dissimilarity. Can be an object of class \code{dist}.}
 }
 \value{
 A vector representing the anticluster affiliation.

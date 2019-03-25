@@ -51,15 +51,15 @@ test_that("high level anticlustering function runs through", {
 
 test_that("all argument combinations run through", {
   conditions <- expand.grid(preclustering = c(TRUE, FALSE),
-                            method = c("exact", "annealing", "sampling"))
+                            method = c("exact", "sampling"))
   # Set up matrix to store the objective values obtained by different methods
-  storage <- matrix(ncol = 3, nrow = 2)
-  colnames(storage) <- c("exact", "annealing", "sampling")
+  storage <- matrix(ncol = 2, nrow = 2)
+  colnames(storage) <- c("exact", "sampling")
   rownames(storage) <- c("preclustering", "no_preclustering")
 
   criterion <- "distance"
   n_elements <- 12
-  features <- matrix(round(rnorm(n_elements * 2)), ncol = 2)
+  features <- matrix(rnorm(n_elements * 2), ncol = 2)
   n_anticlusters <- 2
 
   for (i in 1:nrow(conditions)) {

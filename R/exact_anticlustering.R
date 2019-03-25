@@ -28,10 +28,10 @@ exact_anticlustering <- function(features, n_anticlusters, solver,
     return(enum_anticlustering(features, n_anticlusters))
   }
 
-
   if (!argument_exists(distances)) {
     distances <- dist(features)
   }
+  distances <- as.matrix(distances)
   n_items <- nrow(distances)
 
   if (preclustering == TRUE) {
@@ -76,11 +76,10 @@ exact_anticlustering <- function(features, n_anticlusters, solver,
 #'
 equal_sized_cluster_editing <- function(features, n_clusters, solver,
                                         standardize = FALSE) {
-
   if (standardize) {
     features <- scale(features)
   }
-  distances <- dist(features)
+  distances <- as.matrix(dist(features))
   ilp <- anticlustering_ilp(distances, n_clusters, solver = solver)
   solution <- solve_ilp(ilp, solver, "min")
   assignment <- ilp_to_groups(ilp, solution)
