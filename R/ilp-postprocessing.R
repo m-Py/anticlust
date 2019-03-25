@@ -114,5 +114,5 @@ edit_distances <- function(distances, clustering, value = -1000000) {
       }
     }
   }
-  return(as.dist(distances))
+  return(distances)
 }

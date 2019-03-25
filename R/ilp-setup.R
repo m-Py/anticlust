@@ -98,12 +98,11 @@ equality_identifiers <- function(solver) {
 #     that is connected; `pair` A string of form "xi_j" identifying the
 #     item pair
 vectorize_weights <- function(distances) {
-  ## Problem: I have matrix of costs but need vector for ILP
-  costs_m <- as.matrix(distances)
+  ## Problem: I have matrix of costs but need vector for ILP.
   ## Make vector of costs in data.frame (makes each cost identifiable)
-  costs <- expand.grid(1:ncol(costs_m), 1:nrow(costs_m))
+  costs <- expand.grid(1:ncol(distances), 1:nrow(distances))
   colnames(costs) <- c("i", "j")
-  costs$costs <- c(costs_m)
+  costs$costs <- c(distances)
   ## remove redundant or self distances:
   costs <- costs[costs$i < costs$j, ]
   costs$pair <- paste0("x", paste0(costs$i, "_", costs$j))
