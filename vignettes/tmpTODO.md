@@ -46,4 +46,11 @@ Implementation:
 
 ---
 
-- test if the branch and bound method is useful for clustering 
+- test if my branch and bound method is useful for clustering 
+  (it is not for anticlustering)
+
+--- 
+
+- implement 'distances' argument for complete enumeration
+  and sampling methods. May be tricky for sampling. (but I had an 
+  implementation for this; use it!)
