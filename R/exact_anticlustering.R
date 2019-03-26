@@ -23,11 +23,6 @@
 exact_anticlustering <- function(features, n_anticlusters, solver,
                                  preclustering, distances) {
 
-  ## If no solver is installed, use complete enumeration
-  if (solver == FALSE) {
-    return(enum_anticlustering(features, n_anticlusters))
-  }
-
   if (!argument_exists(distances)) {
     distances <- dist(features)
   }

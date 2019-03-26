@@ -116,15 +116,12 @@ plot_clusters(iris[, 3:4], anticlusters)
 n_features <- 2
 n_elements <- 20
 features <- matrix(rnorm(n_elements * n_features), ncol = n_features)
-ac <- anticlustering(features, n_anticlusters, method = "exact",
+ac <- anticlustering(features, K = 2, method = "exact",
                      preclustering = FALSE, standardize = FALSE)
-# Determine objective value (larger is better)
-get_objective(features, ac, "distance")
 
 # Enable preclustering
 ac_preclust <- anticlustering(features, K = 2, method = "exact",
                               preclustering = TRUE, standardize = FALSE)
-get_objective(features, ac_preclust, "distance")
 
 }
 \references{

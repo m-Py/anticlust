@@ -207,7 +207,12 @@ input_handling_anticlustering <- function(features, distances,
   if (method == "exact") {
     solver <- solver_available()
     if (solver == FALSE) {
-      print("An exact solution was requested, but none of the linear programming packages 'Rglpk', 'gurobi', or 'Rcplex' is installed. Therefore, the optimal solution is searched via brute force enumeration of all possible solutions, which may take a longer time than via integer linear programming. The 'preclustering' argument was ignored.")
+      stop("An exact solution was requested, but none of the linear ",
+           "programming packages 'Rglpk', 'gurobi', or 'Rcplex' is ",
+           "installed. If you really want to use an exact approach ",
+           "without installing a linear programming solver, check out ",
+           "the `enum_anticlustering` function. This is not advised ",
+           "however, because the linear programming variant is faster.")
     }
   }
 
