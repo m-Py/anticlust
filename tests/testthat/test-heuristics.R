@@ -70,8 +70,8 @@ test_that("heuristic anticlustering produces expected output", {
       expect_equal(as.numeric(table(preclusters)[1]), n_elements / n_preclusters)
     }
 
-    ## Now: anticlustering:
-    anticlusters <- heuristic_anticlustering(features, p_anticlusters,
+    ## Now anticlustering:
+    anticlusters <- heuristic_anticlustering(as.matrix(features), p_anticlusters,
                                              preclusters, nrep = 100,
                                              objective = conditions$objective[i])
     ## Legal number of anticlusters?

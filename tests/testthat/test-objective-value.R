@@ -21,8 +21,8 @@ test_that("output of objective value functions has correct structure", {
     anticlusters <- heuristic_anticlustering(features, p_anticlusters,
                                              preclusters, nrep = 100,
                                              objective = conditions$objective[i])
-    dist_obj <- get_objective(features, anticlusters, "distance")
-    var_obj <- get_objective(features, anticlusters, "variance")
+    dist_obj <- obj_value_distance(features, anticlusters)
+    var_obj <- obj_value_variance(features, anticlusters)
     expect_equal(mode(dist_obj), "numeric")
     expect_equal(length(dist_obj), 1)
     expect_equal(dist_obj > 0, TRUE)
@@ -61,6 +61,6 @@ test_that("objective value for distance criterion is computed correctly", {
     ilp <- anticlustering_ilp(distances, p_anticlusters, solver)
     solution <- solve_ilp(ilp, solver, "min")
     anticlusters <- ilp_to_groups(ilp, solution)
-    expect_equal(solution$obj, get_objective(features, anticlusters, "distance"))
+    expect_equal(solution$obj, obj_value_distance(features, anticlusters))
   }
 })

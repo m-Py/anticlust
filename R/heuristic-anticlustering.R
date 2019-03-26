@@ -27,7 +27,7 @@ heuristic_anticlustering <- function(features, n_anticlusters,
 
   ## Bring data into adequate format
   dat <- preclustering_data_format(features, preclusters, n_anticlusters)
-
+  ## Call random sampling subroutine
   best_assignment <- random_sampling(dat, n_anticlusters, objective,
                                      nrep, ignore_preclusters)
 
@@ -103,6 +103,13 @@ preclustering_data_format <- function(features, preclusters, n_anticlusters) {
 
 random_sampling <- function(dat, n_anticlusters, objective,
                             nrep, ignore_preclusters) {
+
+  if (objective == "distance") {
+    obj_value <- obj_value_distance
+  } else {
+    obj_value <- obj_value_variance
+  }
+
   ## Initialize variables
   n_elements <- nrow(dat)
   n_preclusters <- n_elements / n_anticlusters
@@ -119,7 +126,7 @@ random_sampling <- function(dat, n_anticlusters, objective,
     } else if (ignore_preclusters == FALSE) {
       anticlusters <- replicate_sample(n_preclusters, n_anticlusters)
     }
-    cur_obj <- get_objective(features, anticlusters, objective)
+    cur_obj <- obj_value(features, anticlusters)
     if (cur_obj > best_obj) {
       best_assignment <- anticlusters
       best_obj <- cur_obj
