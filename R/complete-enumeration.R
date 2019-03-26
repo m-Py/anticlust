@@ -1,6 +1,10 @@
 
 #' Complete enumeration approach to anticluster editing
 #'
+#' Computes the optimum anticluster editing objective but is probably
+#' very slow because all possible partitions of anticlusters are
+#' enumerated.
+#'
 #' @param features A vector, matrix or data.frame of data points. Rows
 #'     correspond to elements and columns correspond to features. A
 #'     vector represents a single feature.
@@ -18,19 +22,31 @@
 #' N <- 10
 #' K <- 2
 #' features <- matrix(runif(n_features * N), ncol = n_features)
-#' results <- enum_anticlustering(features, K)
+#' results <- enum_anticlustering(features, K = K)
 
-enum_anticlustering <- function(features, K) {
+enum_anticlustering <- function(features = NULL, distances = NULL, K) {
+
+
+  if (!argument_exists(features) && !argument_exists(distances)) {
+    stop("One of the arguments 'features' or 'distances' must be given.")
+  }
+
+  if (argument_exists(features) && argument_exists(distances)) {
+    stop("Only pass one of the arguments 'features' or 'distances'.")
+  }
+
+  if (argument_exists(features)) {
+    distances <- dist(features)
+  }
+  distances <- as.matrix(distances)
 
   ## How many items are to be reassigned:
-  N <- nrow(features)
+  N <- nrow(distances)
   ## Initialize a vector that encodes the assignment to groups
   anticlusters  <- sort(rep_len(1:K, N))
   ## Initialize objective
   best_objective <- -Inf
   best_assign <- NULL
-
-  distances <- as.matrix(dist(features))
 
   repeat {
     ## ending condition: next permutation is starting point
@@ -45,7 +61,7 @@ enum_anticlustering <- function(features, K) {
     }
 
     ## Check the objective value
-    cur_obj <- distance_objective(distances, anticlusters, K)
+    cur_obj <- distance_objective(distances, anticlusters)
     ## Better fit was found, save the assignment
     if (cur_obj > best_objective) {
       best_assign <- anticlusters

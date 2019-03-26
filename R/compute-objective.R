@@ -41,9 +41,23 @@ obj_value_distance <- function(features, anticlusters) {
 }
 
 
-## Distance objective based on pre-computed distances
-## (is better for complete enumeration than `obj_value_distance`)
-distance_objective <- function(distances, anticlusters, K) {
+#' Distance objective based on pre-computed distances
+#'
+#' This function is is better for enumeration_anticlustering than
+#' \code{obj_value_distance}
+#'
+#' @param distances A n x n matrix of between-element distances. Can
+#'     be an object of class \code{dist}
+#' @param anticlusters An vector representing anticlusters
+#' @param K The number of anticlusters
+#'
+#' @return The distance objective
+#'
+#' @noRd
+##
+distance_objective <- function(distances, anticlusters) {
+  K <- length(unique(anticlusters))
+  distances <- as.matrix(distances)
   sums_within <- rep(NA, K)
   for (k in 1:K) {
     elements <- which(anticlusters == k)

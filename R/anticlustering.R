@@ -141,23 +141,25 @@ anticlustering <- function(features = NULL, distances = NULL,
     if (standardize) {
       features <- scale(features)
     }
+    distances <- as.matrix(dist(features))
+  } else {
+    distances <- as.matrix(distances)
   }
 
   ## Exact method using ILP
   if (method == "exact") {
-    return(exact_anticlustering(features, K, solver_available(),
-                                preclustering, distances))
+    return(exact_anticlustering(distances, K, solver_available(),
+                                preclustering))
   }
 
   ## Heuristic method - possibly using preclustering
   preclusters <- NULL
   if (preclustering == TRUE) {
     n_preclusters <- nrow(features) / K
-    preclusters   <- equal_sized_kmeans(features, n_preclusters)
+      preclusters <- equal_sized_kmeans(features, n_preclusters)
   }
   heuristic_anticlustering(features, K, preclusters,
-                           objective, nrep = nrep)
-
+                           objective, nrep = nrep, distances)
 }
 
 
@@ -229,8 +231,10 @@ input_handling_anticlustering <- function(features, distances,
     stop("Only pass one of the arguments 'features' or 'distances'.")
   }
 
-  if (method == "sampling" && argument_exists(distances)) {
-    stop("Currently, it is not possible to combine the arguments 'sampling' and 'distances'.")
+  if (argument_exists(distances) && preclustering == TRUE && method == "sampling") {
+    stop("Unfortunately, it is currently not possible to conduct a ",
+         "preclustering for the sampling method when a distance matrix ",
+         "is passed as input.")
   }
 
   if (argument_exists(distances) && objective == "variance") {

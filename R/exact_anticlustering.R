@@ -20,13 +20,9 @@
 #'
 #' @noRd
 
-exact_anticlustering <- function(features, n_anticlusters, solver,
-                                 preclustering, distances) {
+exact_anticlustering <- function(distances, n_anticlusters, solver,
+                                 preclustering) {
 
-  if (!argument_exists(distances)) {
-    distances <- dist(features)
-  }
-  distances <- as.matrix(distances)
   n_items <- nrow(distances)
 
   if (preclustering == TRUE) {
