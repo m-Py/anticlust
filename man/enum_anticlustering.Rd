@@ -4,12 +4,19 @@
 \alias{enum_anticlustering}
 \title{Complete enumeration approach to anticluster editing}
 \usage{
-enum_anticlustering(features, K)
+enum_anticlustering(features = NULL, distances = NULL, K)
 }
 \arguments{
 \item{features}{A vector, matrix or data.frame of data points. Rows
 correspond to elements and columns correspond to features. A
 vector represents a single feature.}
+
+\item{distances}{Alternative data argument that can be used if
+\code{features} is not used. A N x N matrix representing the
+pairwise dissimilarities between all N elements. Larger values
+indicate higher dissimilarity. Can be an object of class
+\code{dist} (e.g., returned by \code{\link{dist}} or
+\code{\link{as.dist}}.}
 
 \item{K}{How many anticlusters should be created.}
 }
@@ -17,7 +24,9 @@ vector represents a single feature.}
 The anticluster affiliation
 }
 \description{
-Complete enumeration approach to anticluster editing
+Computes the optimum anticluster editing objective but is probably
+very slow because all possible partitions of anticlusters are
+enumerated.
 }
 \examples{
 
@@ -25,7 +34,7 @@ n_features <- 2
 N <- 10
 K <- 2
 features <- matrix(runif(n_features * N), ncol = n_features)
-results <- enum_anticlustering(features, K)
+results <- enum_anticlustering(features, K = K)
 }
 \author{
 Martin Papenberg \email{martin.papenberg@hhu.de}

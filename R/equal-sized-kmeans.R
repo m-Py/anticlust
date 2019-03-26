@@ -1,31 +1,23 @@
 
 
-# Heuristic algorithm creating equal-sized clusters
-#
-# Uses kmeans algorithm to initiate cluster centers, then sequentially
-# chooses a cluster center and assigns the closest element to it,
-# ensuring that each cluster is filled with the same number of items.
-#
-# @param features A vector, matrix or data.frame of data points.  Rows
-#     correspond to items and columns correspond to features.
-# @param nclusters The number of clusters to be created.
-#
-# @return A vector representing the clustering
-#
-# @examples
-#
-# # Equal-sized k-means
-# clusters1 <- equal_sized_kmeans(iris[- 5], 3)
-# table(clusters1)
-# table(clusters1, iris[, 5])
-# plot(iris[, 1], iris[, 2], col = clusters1, pch = 19)
-# # Compare to classical k-means
-# clusters2 <- kmeans(iris[- 5], 3)$cl
-# table(clusters2)
-# table(clusters2, iris[, 5])
-# plot(iris[, 1], iris[, 2], col = clusters2, pch = 19)
-#
-#
+#' Heuristic algorithm creating equal-sized clusters
+#'
+#' Uses kmeans algorithm to initiate cluster centers, then sequentially
+#' chooses a cluster center and assigns the closest element to it,
+#' ensuring that each cluster is filled with the same number of items.
+#'
+#' @param features A vector, matrix or data.frame of data points.  Rows
+#'     correspond to items and columns correspond to features.
+#' @param nclusters The number of clusters to be created.
+#'
+#' @return A vector representing the clustering
+#'
+#' @examples
+#'
+#' @importFrom stats kmeans
+#'
+#' @noRd
+
 equal_sized_kmeans <- function(features, nclusters) {
   ## kmeans does not deal with missing values
   if (any(is.na(features)))

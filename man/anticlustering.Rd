@@ -4,16 +4,23 @@
 \alias{anticlustering}
 \title{Algorithms for anticlustering}
 \usage{
-anticlustering(features, n_anticlusters, objective = "distance",
-  method = "sampling", preclustering = TRUE, standardize = TRUE,
-  nrep = 10000)
+anticlustering(features = NULL, distances = NULL, K,
+  objective = "distance", method = "sampling", preclustering = TRUE,
+  standardize = TRUE, nrep = 10000)
 }
 \arguments{
 \item{features}{A vector, matrix or data.frame of data points. Rows
 correspond to elements and columns correspond to features. A
 vector represents a single feature.}
 
-\item{n_anticlusters}{How many anticlusters should be created.}
+\item{distances}{Alternative data argument that can be used if
+\code{features} is not used. A N x N matrix representing the
+pairwise dissimilarities between all N elements. Larger values
+indicate higher dissimilarity. Can be an object of class
+\code{dist} (e.g., returned by \code{\link{dist}} or
+\code{\link{as.dist}}.}
+
+\item{K}{How many anticlusters should be created.}
 
 \item{objective}{The objective to be maximized, either "distance"
 (default) or "variance". See details.}
@@ -27,7 +34,7 @@ details.}
 \item{standardize}{Boolean - should the features be standardized
 before anticlusters are created? Defaults to \code{TRUE}.
 Standardization is done using the function \code{\link{scale}}
-using the default settings.}
+using the default settings (mean = 0, SD = 1).}
 
 \item{nrep}{The number of repetitions used in the heuristic methods
 "sampling" or "annealing". This argument does not have an effect
@@ -51,11 +58,11 @@ application that has been developed in the problem domain of cluster
 editing and is based on a measure of the pairwise distances of data
 points (Grötschel & Wakabayashi, 1989). In weighted cluster editing,
 the optimal objective is found when the sum of within-cluster
-distances is minimized; for the anticlustering application, the
-distance objective is maximized instead.
+distances is minimized; for anticluster editing, the distance objective
+is maximized instead.
 
-The \code{anticlust} uses integer linear programming to find optimal
-objective for the distance criterion (Grötschel & Wakabayashi,
+The \code{anticlust} package uses integer linear programming to find optimal
+objective for the anticluster editing criterion (Grötschel & Wakabayashi,
 1989). To obtain an optimal solution, a linear programming solver
 must be installed on the system and be usable from R. The
 \code{anticlust} package supports the open source GNU linear
@@ -95,9 +102,8 @@ because the solution is usually better with preclustering.
 # (e) Anticlustering uses standardized features (Mean = 0, SD = 1)
 
 data(iris)
-# Only use numeric attributes:
-iris <- iris[, -5]
-anticlusters <- anticlustering(iris, n_anticlusters = 3)
+# Only use numeric attributes
+anticlusters <- anticlustering(iris[, -5], K = 3)
 # Compare feature means by anticluster
 by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
 # Plot the anticlustering
@@ -106,21 +112,16 @@ plot_clusters(iris[, 1:2], anticlusters)
 plot_clusters(iris[, 3:4], anticlusters)
 
 ## The exact approach
-library("Rglpk") # package that calls the GNU linear programming kit
 # Create artifical data
 n_features <- 2
-n_anticlusters <- 2
 n_elements <- 20
 features <- matrix(rnorm(n_elements * n_features), ncol = n_features)
-ac <- anticlustering(features, n_anticlusters, method = "exact",
+ac <- anticlustering(features, K = 2, method = "exact",
                      preclustering = FALSE, standardize = FALSE)
-# Determine objective value (larger is better)
-get_objective(features, ac, "distance")
 
 # Enable preclustering
-ac_preclust <- anticlustering(features, n_anticlusters, method = "exact",
+ac_preclust <- anticlustering(features, K = 2, method = "exact",
                               preclustering = TRUE, standardize = FALSE)
-get_objective(features, ac_preclust, "distance")
 
 }
 \references{

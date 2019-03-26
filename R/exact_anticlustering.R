@@ -10,23 +10,20 @@
 #'     standardized before groups are created?
 #' @param preclustering Boolean, should a preclustering be conducted
 #'     before anticlusters are created.
+#' @param distances Alternative data argument if \code{features} is not
+#'     passed. A n x n matrix representing the pairwise dissimilarities
+#'     between all n elements. Larger values indicate larger
+#'     dissimilarity.
 #'
 #' @return A vector representing the anticluster affiliation of
 #'     elements.
 #'
 #' @noRd
 
-exact_anticlustering <- function(features, n_anticlusters, solver,
+exact_anticlustering <- function(distances, n_anticlusters, solver,
                                  preclustering) {
 
-  ## If no solver is installed, use complete enumeration
-  if (solver == FALSE) {
-    print("Complete enumeration")
-    return(enum_anticlustering(features, n_anticlusters))
-  }
-
-  n_items <- nrow(features)
-  distances <- dist(features)
+  n_items <- nrow(distances)
 
   if (preclustering == TRUE) {
     ilp <- anticlustering_ilp(distances, n_items / n_anticlusters,
@@ -70,11 +67,10 @@ exact_anticlustering <- function(features, n_anticlusters, solver,
 #'
 equal_sized_cluster_editing <- function(features, n_clusters, solver,
                                         standardize = FALSE) {
-
   if (standardize) {
     features <- scale(features)
   }
-  distances <- dist(features)
+  distances <- as.matrix(dist(features))
   ilp <- anticlustering_ilp(distances, n_clusters, solver = solver)
   solution <- solve_ilp(ilp, solver, "min")
   assignment <- ilp_to_groups(ilp, solution)

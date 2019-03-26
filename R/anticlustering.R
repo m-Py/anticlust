@@ -7,7 +7,13 @@
 #' @param features A vector, matrix or data.frame of data points. Rows
 #'     correspond to elements and columns correspond to features. A
 #'     vector represents a single feature.
-#' @param n_anticlusters How many anticlusters should be created.
+#' @param distances Alternative data argument that can be used if
+#'     \code{features} is not used. A N x N matrix representing the
+#'     pairwise dissimilarities between all N elements. Larger values
+#'     indicate higher dissimilarity. Can be an object of class
+#'     \code{dist} (e.g., returned by \code{\link{dist}} or
+#'     \code{\link{as.dist}}.
+#' @param K How many anticlusters should be created.
 #' @param objective The objective to be maximized, either "distance"
 #'     (default) or "variance". See details.
 #' @param method One of "sampling", or "exact". See details.
@@ -17,15 +23,13 @@
 #' @param standardize Boolean - should the features be standardized
 #'     before anticlusters are created? Defaults to \code{TRUE}.
 #'     Standardization is done using the function \code{\link{scale}}
-#'     using the default settings.
+#'     using the default settings (mean = 0, SD = 1).
 #' @param nrep The number of repetitions used in the heuristic methods
 #'     "sampling" or "annealing". This argument does not have an effect
 #'     if the argument \code{method} is \code{"exact"}.
 #'
 #' @return A vector representing the anticluster affiliation.
 #'
-#' @importFrom utils installed.packages
-#' @importFrom stats as.dist dist optim
 #' @importFrom Matrix sparseMatrix
 #'
 #' @export
@@ -42,11 +46,11 @@
 #' editing and is based on a measure of the pairwise distances of data
 #' points (Grötschel & Wakabayashi, 1989). In weighted cluster editing,
 #' the optimal objective is found when the sum of within-cluster
-#' distances is minimized; for the anticlustering application, the
-#' distance objective is maximized instead.
+#' distances is minimized; for anticluster editing, the distance objective
+#' is maximized instead.
 #'
-#' The \code{anticlust} uses integer linear programming to find optimal
-#' objective for the distance criterion (Grötschel & Wakabayashi,
+#' The \code{anticlust} package uses integer linear programming to find optimal
+#' objective for the anticluster editing criterion (Grötschel & Wakabayashi,
 #' 1989). To obtain an optimal solution, a linear programming solver
 #' must be installed on the system and be usable from R. The
 #' \code{anticlust} package supports the open source GNU linear
@@ -86,9 +90,8 @@
 #' # (e) Anticlustering uses standardized features (Mean = 0, SD = 1)
 #'
 #' data(iris)
-#' # Only use numeric attributes:
-#' iris <- iris[, -5]
-#' anticlusters <- anticlustering(iris, n_anticlusters = 3)
+#' # Only use numeric attributes
+#' anticlusters <- anticlustering(iris[, -5], K = 3)
 #' # Compare feature means by anticluster
 #' by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
 #' # Plot the anticlustering
@@ -97,21 +100,16 @@
 #' plot_clusters(iris[, 3:4], anticlusters)
 #'
 #' ## The exact approach
-#' library("Rglpk") # package that calls the GNU linear programming kit
 #' # Create artifical data
 #' n_features <- 2
-#' n_anticlusters <- 2
 #' n_elements <- 20
 #' features <- matrix(rnorm(n_elements * n_features), ncol = n_features)
-#' ac <- anticlustering(features, n_anticlusters, method = "exact",
+#' ac <- anticlustering(features, K = 2, method = "exact",
 #'                      preclustering = FALSE, standardize = FALSE)
-#' # Determine objective value (larger is better)
-#' get_objective(features, ac, "distance")
 #'
 #' # Enable preclustering
-#' ac_preclust <- anticlustering(features, n_anticlusters, method = "exact",
+#' ac_preclust <- anticlustering(features, K = 2, method = "exact",
 #'                               preclustering = TRUE, standardize = FALSE)
-#' get_objective(features, ac_preclust, "distance")
 #'
 #' @references
 #'
@@ -128,35 +126,40 @@
 #' (SSPR) (pp.  875–881).
 #'
 
-anticlustering <- function(features, n_anticlusters, objective = "distance",
+anticlustering <- function(features = NULL, distances = NULL,
+                           K, objective = "distance",
                            method = "sampling", preclustering = TRUE,
                            standardize = TRUE, nrep = 10000) {
 
-  input_handling_anticlustering(features, n_anticlusters, objective,
+  input_handling_anticlustering(features, distances, K, objective,
                                 method, preclustering,
                                 standardize, nrep)
 
   ## Standardize feature values (for each feature, mean = 0, sd = 1)?
-  features <- as.matrix(features)
-  if (standardize) {
-    features <- scale(features)
+  if (argument_exists(features)) {
+    features <- as.matrix(features)
+    if (standardize) {
+      features <- scale(features)
+    }
+    distances <- as.matrix(dist(features))
+  } else {
+    distances <- as.matrix(distances)
   }
 
   ## Exact method using ILP
   if (method == "exact") {
-    return(exact_anticlustering(features, n_anticlusters,
-                                solver_available(), preclustering))
+    return(exact_anticlustering(distances, K, solver_available(),
+                                preclustering))
   }
 
   ## Heuristic method - possibly using preclustering
   preclusters <- NULL
   if (preclustering == TRUE) {
-    n_preclusters <- nrow(features) / n_anticlusters
-    preclusters   <- equal_sized_kmeans(features, n_preclusters)
+    n_preclusters <- nrow(features) / K
+      preclusters <- equal_sized_kmeans(features, n_preclusters)
   }
-  heuristic_anticlustering(features, n_anticlusters, preclusters,
-                           objective, nrep = nrep)
-
+  heuristic_anticlustering(features, K, preclusters,
+                           objective, nrep = nrep, distances)
 }
 
 
@@ -173,18 +176,22 @@ anticlustering <- function(features, n_anticlusters, objective = "distance",
 #' @return NULL
 #'
 #' @noRd
-input_handling_anticlustering <- function(features, n_anticlusters, objective,
-                                          method, preclustering, standardize, nrep) {
+input_handling_anticlustering <- function(features, distances,
+                                          K, objective, method,
+                                          preclustering, standardize,
+                                          nrep) {
 
   ## Validate feature input
-  validate_input(features, "features", c("data.frame", "matrix", "numeric"))
-  features <- as.matrix(features)
-  validate_input(features, "features", objmode = "numeric")
+  if (argument_exists(features)) {
+    validate_input(features, "features", c("data.frame", "matrix", "numeric"))
+    features <- as.matrix(features)
+    validate_input(features, "features", objmode = "numeric")
 
-  validate_input(n_anticlusters, "n_anticlusters", "numeric", len = 1,
-                 greater_than = 1, must_be_integer = TRUE)
-  if (nrow(features) %% n_anticlusters != 0) {
-    stop("The number of anticlusters must be a divider of the number of elements.")
+    validate_input(K, "K", "numeric", len = 1,
+                   greater_than = 1, must_be_integer = TRUE)
+    if (nrow(features) %% K != 0) {
+      stop("The number of anticlusters must be a divider of the number of elements.")
+    }
   }
 
   validate_input(nrep, "nrep", "numeric", len = 1, greater_than = 0,
@@ -202,7 +209,12 @@ input_handling_anticlustering <- function(features, n_anticlusters, objective,
   if (method == "exact") {
     solver <- solver_available()
     if (solver == FALSE) {
-      print("An exact solution was requested, but none of the linear programming packages 'Rglpk', 'gurobi', or 'Rcplex' is installed. Therefore, the optimal solution is searched via brute force enumeration of all possible solutions, which may take a longer time than via integer linear programming. The 'preclustering' argument was ignored.")
+      stop("An exact solution was requested, but none of the linear ",
+           "programming packages 'Rglpk', 'gurobi', or 'Rcplex' is ",
+           "installed. If you really want to use an exact approach ",
+           "without installing a linear programming solver, check out ",
+           "the `enum_anticlustering` function. This is not advised ",
+           "however, because the linear programming variant is faster.")
     }
   }
 
@@ -210,6 +222,25 @@ input_handling_anticlustering <- function(features, n_anticlusters, objective,
     stop("There is no exact method to maximize the variance criterion. ",
          "Use method = 'distance' instead")
   }
+
+  if (!argument_exists(features) && !argument_exists(distances)) {
+    stop("One of the arguments 'features' or 'distances' must be given.")
+  }
+
+  if (argument_exists(features) && argument_exists(distances)) {
+    stop("Only pass one of the arguments 'features' or 'distances'.")
+  }
+
+  if (argument_exists(distances) && preclustering == TRUE && method == "sampling") {
+    stop("Unfortunately, it is currently not possible to conduct a ",
+         "preclustering for the sampling method when a distance matrix ",
+         "is passed as input.")
+  }
+
+  if (argument_exists(distances) && objective == "variance") {
+    stop("'distances' cannot be used if 'objective' is 'variance'.")
+  }
+
   return(invisible(NULL))
 }
 
@@ -220,6 +251,9 @@ input_handling_anticlustering <- function(features, n_anticlusters, objective,
 #'
 #' @return \code{FALSE} If no solver is available; A string identifying
 #'   the solver if at least one is available ("Rcplex", "gurobi", "Rglpk")
+#'
+#' @importFrom utils installed.packages
+#'
 #' @noRd
 solver_available <- function() {
   solvers <- c("Rcplex", "gurobi", "Rglpk")

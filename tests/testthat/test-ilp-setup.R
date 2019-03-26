@@ -12,8 +12,8 @@ test_that("ILP is set up as expected", {
     p_anticlusters <- conditions[k, "p"]
     n_elements <- p_anticlusters * 2 # n must be multiplier of p
     features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
-    distances <- dist(features)
-    ilp <- anticlustering_ilp(distances, p_anticlusters, "Rglpk")
+    distances <- as.matrix(dist(features))
+    ilp <- anticlustering_ilp(distances, p_anticlusters, solver_available())
     expect_equal(nrow(ilp$constraints), choose(n_elements, 3) * 3 + n_elements)
     expect_equal(sum(is.na(ilp$constraints)), 0)
 

@@ -90,8 +90,7 @@ list_length <- function(x) sapply(x, length)
 # when the fixed distance object is used to create the ILP formulation
 # of the item assignment instance.
 #
-# @param distances A distance object or matrix of
-#     between-item-distances.
+# @param distances A n xn matrix of between-item-distances.
 #
 # @param clustering A vector representing a clustering; objects that
 #     are part of the same cluster are assigned a new distance.
@@ -104,7 +103,6 @@ list_length <- function(x) sapply(x, length)
 #
 edit_distances <- function(distances, clustering, value = -1000000) {
   n_groups <- length(unique(clustering))
-  distances <- as.matrix(distances)
   for (i in 1:n_groups) {
     items <- which(clustering == i) ## which items are in the i'th cluster
     ## two for-loops to tap all pairwise distances that may require
@@ -116,5 +114,5 @@ edit_distances <- function(distances, clustering, value = -1000000) {
       }
     }
   }
-  return(as.dist(distances))
+  return(distances)
 }

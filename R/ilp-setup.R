@@ -1,7 +1,7 @@
 
 # Construct the ILP represenation of a anticlustering problem
 #
-# @param distances An distance object or matrix representing the
+# @param distances An n x n matrix representing the
 #     distances between items
 # @param p The number of groups to be created
 # @param solver A string identifing the solver to be used ("Rglpk",
@@ -16,11 +16,11 @@
 # clustering problem,” Mathematical Programming, vol. 45, nos. 1-3, pp.
 # 59–96, 1989.
 
-anticlustering_ilp <- function(distances, p, solver = "Rglpk") {
+anticlustering_ilp <- function(distances, p, solver) {
 
   ## Initialize some constant variables:
   equality_signs <- equality_identifiers(solver)
-  n_items        <- nrow(as.matrix(distances))
+  n_items        <- nrow(distances)
   group_size     <- n_items / p
   costs          <- vectorize_weights(distances)
 
@@ -98,12 +98,11 @@ equality_identifiers <- function(solver) {
 #     that is connected; `pair` A string of form "xi_j" identifying the
 #     item pair
 vectorize_weights <- function(distances) {
-  ## Problem: I have matrix of costs but need vector for ILP
-  costs_m <- as.matrix(distances)
+  ## Problem: I have matrix of costs but need vector for ILP.
   ## Make vector of costs in data.frame (makes each cost identifiable)
-  costs <- expand.grid(1:ncol(costs_m), 1:nrow(costs_m))
+  costs <- expand.grid(1:ncol(distances), 1:nrow(distances))
   colnames(costs) <- c("i", "j")
-  costs$costs <- c(costs_m)
+  costs$costs <- c(distances)
   ## remove redundant or self distances:
   costs <- costs[costs$i < costs$j, ]
   costs$pair <- paste0("x", paste0(costs$i, "_", costs$j))
