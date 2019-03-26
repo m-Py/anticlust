@@ -7,7 +7,13 @@
 #' @param features A vector, matrix or data.frame of data points. Rows
 #'     correspond to elements and columns correspond to features. A
 #'     vector represents a single feature.
-#' @param n_anticlusters How many anticlusters should be created.
+#' @param distances Alternative data argument that can be used if
+#'     \code{features} is not used. A N x N matrix representing the
+#'     pairwise dissimilarities between all N elements. Larger values
+#'     indicate higher dissimilarity. Can be an object of class
+#'     \code{dist} (e.g., returned by \code{\link{dist}} or
+#'     \code{\link{as.dist}}.
+#' @param K How many anticlusters should be created.
 #' @param objective The objective to be maximized, either "distance"
 #'     (default) or "variance". See details.
 #' @param method One of "sampling", or "exact". See details.
@@ -17,19 +23,13 @@
 #' @param standardize Boolean - should the features be standardized
 #'     before anticlusters are created? Defaults to \code{TRUE}.
 #'     Standardization is done using the function \code{\link{scale}}
-#'     using the default settings.
+#'     using the default settings (mean = 0, SD = 1).
 #' @param nrep The number of repetitions used in the heuristic methods
 #'     "sampling" or "annealing". This argument does not have an effect
 #'     if the argument \code{method} is \code{"exact"}.
-#' @param distances Alternative data argument if \code{features} is not
-#'     passed. A n x n matrix representing the pairwise dissimilarities
-#'     between all n elements. Larger values indicate larger
-#'     dissimilarity. Can be an object of class \code{dist}.
 #'
 #' @return A vector representing the anticluster affiliation.
 #'
-#' @importFrom utils installed.packages
-#' @importFrom stats dist
 #' @importFrom Matrix sparseMatrix
 #'
 #' @export
@@ -91,7 +91,7 @@
 #'
 #' data(iris)
 #' # Only use numeric attributes
-#' anticlusters <- anticlustering(iris[, -5], n_anticlusters = 3)
+#' anticlusters <- anticlustering(iris[, -5], K = 3)
 #' # Compare feature means by anticluster
 #' by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
 #' # Plot the anticlustering
@@ -102,18 +102,14 @@
 #' ## The exact approach
 #' # Create artifical data
 #' n_features <- 2
-#' n_anticlusters <- 2
 #' n_elements <- 20
 #' features <- matrix(rnorm(n_elements * n_features), ncol = n_features)
-#' ac <- anticlustering(features, n_anticlusters, method = "exact",
+#' ac <- anticlustering(features, K = 2, method = "exact",
 #'                      preclustering = FALSE, standardize = FALSE)
-#' # Determine objective value (larger is better)
-#' get_objective(features, ac, "distance")
 #'
 #' # Enable preclustering
-#' ac_preclust <- anticlustering(features, n_anticlusters, method = "exact",
+#' ac_preclust <- anticlustering(features, K = 2, method = "exact",
 #'                               preclustering = TRUE, standardize = FALSE)
-#' get_objective(features, ac_preclust, "distance")
 #'
 #' @references
 #'
@@ -130,15 +126,14 @@
 #' (SSPR) (pp.  875–881).
 #'
 
-anticlustering <- function(features = NULL, n_anticlusters,
-                           objective = "distance",
+anticlustering <- function(features = NULL, distances = NULL,
+                           K, objective = "distance",
                            method = "sampling", preclustering = TRUE,
-                           standardize = TRUE, nrep = 10000,
-                           distances = NULL) {
+                           standardize = TRUE, nrep = 10000) {
 
-  input_handling_anticlustering(features, n_anticlusters, objective,
+  input_handling_anticlustering(features, distances, K, objective,
                                 method, preclustering,
-                                standardize, nrep, distances)
+                                standardize, nrep)
 
   ## Standardize feature values (for each feature, mean = 0, sd = 1)?
   if (argument_exists(features)) {
@@ -150,18 +145,17 @@ anticlustering <- function(features = NULL, n_anticlusters,
 
   ## Exact method using ILP
   if (method == "exact") {
-    return(exact_anticlustering(features, n_anticlusters,
-                                solver_available(), preclustering,
-                                distances))
+    return(exact_anticlustering(features, K, solver_available(),
+                                preclustering, distances))
   }
 
   ## Heuristic method - possibly using preclustering
   preclusters <- NULL
   if (preclustering == TRUE) {
-    n_preclusters <- nrow(features) / n_anticlusters
+    n_preclusters <- nrow(features) / K
     preclusters   <- equal_sized_kmeans(features, n_preclusters)
   }
-  heuristic_anticlustering(features, n_anticlusters, preclusters,
+  heuristic_anticlustering(features, K, preclusters,
                            objective, nrep = nrep)
 
 }
@@ -180,9 +174,10 @@ anticlustering <- function(features = NULL, n_anticlusters,
 #' @return NULL
 #'
 #' @noRd
-input_handling_anticlustering <- function(features, n_anticlusters, objective,
-                                          method, preclustering, standardize,
-                                          nrep, distances) {
+input_handling_anticlustering <- function(features, distances,
+                                          K, objective, method,
+                                          preclustering, standardize,
+                                          nrep) {
 
   ## Validate feature input
   if (argument_exists(features)) {
@@ -190,9 +185,9 @@ input_handling_anticlustering <- function(features, n_anticlusters, objective,
     features <- as.matrix(features)
     validate_input(features, "features", objmode = "numeric")
 
-    validate_input(n_anticlusters, "n_anticlusters", "numeric", len = 1,
+    validate_input(K, "K", "numeric", len = 1,
                    greater_than = 1, must_be_integer = TRUE)
-    if (nrow(features) %% n_anticlusters != 0) {
+    if (nrow(features) %% K != 0) {
       stop("The number of anticlusters must be a divider of the number of elements.")
     }
   }
@@ -247,6 +242,9 @@ input_handling_anticlustering <- function(features, n_anticlusters, objective,
 #'
 #' @return \code{FALSE} If no solver is available; A string identifying
 #'   the solver if at least one is available ("Rcplex", "gurobi", "Rglpk")
+#'
+#' @importFrom utils installed.packages
+#'
 #' @noRd
 solver_available <- function() {
   solvers <- c("Rcplex", "gurobi", "Rglpk")

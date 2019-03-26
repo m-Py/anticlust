@@ -11,11 +11,10 @@ test_that("complete enumeration computes optimal solution", {
     features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
     enum_anticlusters <- enum_anticlustering(features, K)
     # Use preclustering as resticting information in anticlustering
-    ilp_anticlusters <- anticlustering(features, K, preclustering = FALSE,
+    ilp_anticlusters <- anticlustering(features, K = K, preclustering = FALSE,
                                        method = "exact", standardize = FALSE)
     enum_obj <- round(get_objective(features, enum_anticlusters, "distance"), 10)
     ilp_obj  <- round(get_objective(features, ilp_anticlusters, "distance"), 10)
     expect_equal(enum_obj, ilp_obj)
   }
 })
-

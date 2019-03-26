@@ -31,9 +31,12 @@ test_that("high level anticlustering function runs through", {
     n_clusters <- conditions[k, "p"]
     n_elements <- n_clusters * 3 # n must be multiplier of p
     features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
-    anticlusters_exact <- anticlustering(features, n_clusters, method = "exact", standardize = FALSE,
+    anticlusters_exact <- anticlustering(features, K = n_clusters,
+                                         method = "exact",
+                                         standardize = FALSE,
                                          preclustering = FALSE)
-    anticlusters_heuristic <- anticlustering(features, n_clusters,
+    anticlusters_heuristic <- anticlustering(features,
+                                             K = n_clusters,
                                              method = "sampling",
                                              standardize = FALSE,
                                              nrep = 5)
@@ -65,8 +68,11 @@ test_that("all argument combinations run through", {
   for (i in 1:nrow(conditions)) {
     method <- conditions$method[i]
     preclustering <- conditions$preclustering[i]
-    anticlusters <- anticlustering(features, n_anticlusters, criterion,
-                                   method, preclustering, standardize = FALSE)
+    anticlusters <- anticlustering(features, K = n_anticlusters,
+                                   objective = criterion,
+                                   method = method,
+                                   preclustering = preclustering,
+                                   standardize = FALSE)
     obj <- get_objective(features, anticlusters, objective = criterion)
     rowname <- ifelse(preclustering, "preclustering", "no_preclustering")
     storage[rowname, method] <- obj
