@@ -29,7 +29,7 @@
 #' @return A vector representing the anticluster affiliation.
 #'
 #' @importFrom utils installed.packages
-#' @importFrom stats as.dist dist optim
+#' @importFrom stats dist
 #' @importFrom Matrix sparseMatrix
 #'
 #' @export
@@ -46,11 +46,11 @@
 #' editing and is based on a measure of the pairwise distances of data
 #' points (Grötschel & Wakabayashi, 1989). In weighted cluster editing,
 #' the optimal objective is found when the sum of within-cluster
-#' distances is minimized; for the anticlustering application, the
-#' distance objective is maximized instead.
+#' distances is minimized; for anticluster editing, the distance objective
+#' is maximized instead.
 #'
-#' The \code{anticlust} uses integer linear programming to find optimal
-#' objective for the distance criterion (Grötschel & Wakabayashi,
+#' The \code{anticlust} package uses integer linear programming to find optimal
+#' objective for the anticluster editing criterion (Grötschel & Wakabayashi,
 #' 1989). To obtain an optimal solution, a linear programming solver
 #' must be installed on the system and be usable from R. The
 #' \code{anticlust} package supports the open source GNU linear
@@ -90,11 +90,10 @@
 #' # (e) Anticlustering uses standardized features (Mean = 0, SD = 1)
 #'
 #' data(iris)
-#' # Only use numeric attributes:
-#' iris <- iris[, -5]
-#' anticlusters <- anticlustering(iris, n_anticlusters = 3)
+#' # Only use numeric attributes
+#' anticlusters <- anticlustering(iris[, -5], n_anticlusters = 3)
 #' # Compare feature means by anticluster
-#' by(iris, anticlusters, function(x) round(colMeans(x), 2))
+#' by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
 #' # Plot the anticlustering
 #' par(mfrow = c(1, 2))
 #' plot_clusters(iris[, 1:2], anticlusters)
