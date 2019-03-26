@@ -109,7 +109,7 @@ random_sampling <- function(dat, n_anticlusters, objective,
   ## Start optimizing
   best_obj <- -Inf
   # only select features so it is not done each iteration
-  features <- dat[, -(1:2)]
+  features <- dat[, -(1:2), drop = FALSE]
   for (i in 1:nrep) {
     ## 1. Random sampling without preclustering restrictions
     if (ignore_preclusters == TRUE) {
