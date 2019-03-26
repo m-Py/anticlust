@@ -12,28 +12,11 @@
 #'   the total sum of within-cluster pointwise distances
 #'   (if objective == "distance")
 #'
-#' @export
-#'
 #' @examples
 #'
-#' features <- matrix(rnorm(1000, 100, 15), ncol = 2)
-#' n_elements <- 15
-#' m_features <- 2
-#' n_clusters <- 3
-#' features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
-#' clusters_exact <- clustering(features, n_clusters, method = "exact", standardize = FALSE)
-#' clusters_heuristic <- clustering(features, n_clusters, method = "heuristic", standardize = FALSE)
-#' # Exact clustering minimizes distance criterion
-#' get_objective(features, clusters_exact, "distance")
-#' get_objective(features, clusters_heuristic, "distance")
-#' get_objective(features, clusters_exact, "variance")
-#' # Heuristic clustering tries to minimize variance criterion
-#' get_objective(features, clusters_heuristic, "variance")
+#' @importFrom stats dist
 #'
-#' # Plot the clustering
-#' par(mfrow = c(1, 2))
-#' plot_clusters(features, clusters_exact)
-#' plot_clusters(features, clusters_heuristic)
+#' @noRd
 #'
 #' @references
 #' H. Späth, “Anticlustering: Maximizing the variance criterion,”
@@ -51,15 +34,16 @@ get_objective <- function(features, anticlusters, objective) {
 }
 
 
-# Compute objective value for variance criterion
-#
-# @param features A data.frame, matrix or vector representing the
-#     features that are used in the assignment.
-# @param anticlusters A vector representing the anticluster affiliation
-#
-# @return Scalar, the total within-cluster variance.
-#
-#
+#' Compute objective value for variance criterion
+#'
+#' @param features A data.frame, matrix or vector representing the
+#'     features that are used in the assignment.
+#' @param anticlusters A vector representing the anticluster affiliation
+#'
+#' @return Scalar, the total within-cluster variance.
+#'
+#' @noRd
+
 obj_value_variance <- function(features, anticlusters) {
   ## 1. Compute cluster centers
   centers <- cluster_centers(features, anticlusters)
@@ -70,15 +54,17 @@ obj_value_variance <- function(features, anticlusters) {
   return(sum(distances))
 }
 
-# Objective value for the distance criterion
-#
-# @param features A data.frame, matrix or vector representing the
-#     features that are used in the assignment.
-# @param anticlusters A vector representing the anticluster affiliation
-#
-# @return Scalar, the total sum of within-cluster pointwise distances.
-#
-#
+#' Objective value for the distance criterion
+#'
+#' @param features A data.frame, matrix or vector representing the
+#'     features that are used in the assignment.
+#' @param anticlusters A vector representing the anticluster affiliation
+#'
+#' @return Scalar, the total sum of within-cluster distances (based
+#'     on the Euclidean distance).
+#'
+#' @noRd
+
 obj_value_distance <- function(features, anticlusters) {
   ## determine distances within each group
   distances <- by(features, anticlusters, dist)
