@@ -8,6 +8,12 @@
 #' @param features A vector, matrix or data.frame of data points. Rows
 #'     correspond to elements and columns correspond to features. A
 #'     vector represents a single feature.
+#' @param distances Alternative data argument that can be used if
+#'     \code{features} is not used. A N x N matrix representing the
+#'     pairwise dissimilarities between all N elements. Larger values
+#'     indicate higher dissimilarity. Can be an object of class
+#'     \code{dist} (e.g., returned by \code{\link{dist}} or
+#'     \code{\link{as.dist}}.
 #' @param K How many anticlusters should be created.
 #'
 #' @return The anticluster affiliation

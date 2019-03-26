@@ -62,7 +62,7 @@ groups of iris plants:
 ```{r}
 library("anticlust")
 n_clusters <- 3
-anticlusters <- anticlustering(data, n_clusters)
+anticlusters <- anticlustering(data, K = n_clusters)
 anticlusters
 table(anticlusters)
 ```
@@ -174,7 +174,7 @@ follows:
 
 ```{r, fig.width = 6.5}
 data <- iris[, -5]
-data$Anticluster <- anticlustering(data, n_clusters, objective = "variance")
+data$Anticluster <- anticlustering(data, K = n_clusters, objective = "variance")
 
 ## Display feauture means by anticluster for the variance criterion
 data %>%

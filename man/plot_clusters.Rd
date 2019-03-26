@@ -8,7 +8,7 @@ plot_clusters(features, clustering, within_connection = FALSE,
   between_connection = FALSE, show_axes = FALSE, xlab = NULL,
   ylab = NULL, xlim = NULL, ylim = NULL, col = NULL, pch = 19,
   main = "", cex = 1.2, cex.axis = 1.2, cex.lab = 1.2, lwd = 1.5,
-  frame.plot = FALSE, lty = 2)
+  lty = 2, frame.plot = FALSE)
 }
 \arguments{
 \item{features}{A data.frame or matrix representing the features that
@@ -51,18 +51,19 @@ each cluster has a different plotting symbol.}
 
 \item{cex.axis}{The size of the values on the axes}
 
+\item{cex.lab}{The size of the labels of the axes}
+
 \item{lwd}{The width of the lines connecting elements; has an effect
-  if at least one of \code{within_connection} or
-  \code{betwee_connection} is TRUE.
-@param lty The The line type of the lines connecting elements
-  (see \code{\link{par}}); only has an effect
-  if at least one of \code{within_connection} or
-  \code{betwee_connection} is TRUE.}
+if at least one of \code{within_connection} or
+\code{betwee_connection} is TRUE.}
+
+\item{lty}{The line type of the lines connecting elements
+(see \code{\link{par}}); only has an effect
+if at least one of \code{within_connection} or
+\code{betwee_connection} is TRUE.}
 
 \item{frame.plot}{a logical indicating whether a box should be drawn
 around the plot.}
-
-\item{cex.axis}{The size of the labels of the axes}
 }
 \description{
 Visualize a clustering of two features
@@ -79,10 +80,10 @@ In most cases, the argument `clustering` is a vector
 n_elements <- 9
 features <- matrix(runif(n_elements * 2), ncol = 2)
 n_groups <- 3
-clusters <- clustering(features, n_groups)
-anticlusters <- anticlustering(features, n_groups, method = "sampling")
+clusters <- clustering(features, K = n_groups)
+anticlusters <- anticlustering(features, K = n_groups, method = "sampling")
 par(mfrow = c(1, 2))
-plot_clusters(features, clusters, pch = c(15, 16, 17))
-plot_clusters(features, anticlusters, pch = c(15, 16, 17))
+plot_clusters(features, clusters, pch = c(15, 16, 17), main = "Cluster editing")
+plot_clusters(features, anticlusters, pch = c(15, 16, 17), main = "Anticluster editing")
 
 }

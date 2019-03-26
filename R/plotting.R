@@ -27,11 +27,11 @@
 #' @param main The title of the plot
 #' @param cex The size of the plotting symbols, see \code{\link{par}}
 #' @param cex.axis The size of the values on the axes
-#' @param cex.axis The size of the labels of the axes
+#' @param cex.lab The size of the labels of the axes
 #' @param lwd The width of the lines connecting elements; has an effect
 #'    if at least one of \code{within_connection} or
 #'    \code{betwee_connection} is TRUE.
-#'  @param lty The The line type of the lines connecting elements
+#' @param lty The line type of the lines connecting elements
 #'    (see \code{\link{par}}); only has an effect
 #'    if at least one of \code{within_connection} or
 #'    \code{betwee_connection} is TRUE.
@@ -41,7 +41,7 @@
 #' @export
 #'
 #' @importFrom grDevices rainbow
-#' @importFrom graphics lines par plot
+#' @importFrom graphics lines par plot points
 #'
 #' @details In most cases, the argument `clustering` is a vector
 #'   returned by one of the functions \code{\link{anticlustering}} or
@@ -54,11 +54,11 @@
 #' n_elements <- 9
 #' features <- matrix(runif(n_elements * 2), ncol = 2)
 #' n_groups <- 3
-#' clusters <- clustering(features, n_groups)
-#' anticlusters <- anticlustering(features, n_groups, method = "sampling")
+#' clusters <- clustering(features, K = n_groups)
+#' anticlusters <- anticlustering(features, K = n_groups, method = "sampling")
 #' par(mfrow = c(1, 2))
-#' plot_clusters(features, clusters, pch = c(15, 16, 17))
-#' plot_clusters(features, anticlusters, pch = c(15, 16, 17))
+#' plot_clusters(features, clusters, pch = c(15, 16, 17), main = "Cluster editing")
+#' plot_clusters(features, anticlusters, pch = c(15, 16, 17), main = "Anticluster editing")
 #'
 plot_clusters <- function(features, clustering, within_connection = FALSE,
                           between_connection = FALSE,
@@ -66,7 +66,7 @@ plot_clusters <- function(features, clustering, within_connection = FALSE,
                           xlim = NULL, ylim = NULL,
                           col = NULL, pch = 19, main = "", cex = 1.2,
                           cex.axis = 1.2, cex.lab = 1.2, lwd = 1.5,
-                          frame.plot = FALSE, lty = 2) {
+                          lty = 2, frame.plot = FALSE) {
   if (!argument_exists(xlim)) {
     xlim <- c(min(features[, 1]), max(features[, 1]))
   }

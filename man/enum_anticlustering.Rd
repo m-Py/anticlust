@@ -11,6 +11,13 @@ enum_anticlustering(features = NULL, distances = NULL, K)
 correspond to elements and columns correspond to features. A
 vector represents a single feature.}
 
+\item{distances}{Alternative data argument that can be used if
+\code{features} is not used. A N x N matrix representing the
+pairwise dissimilarities between all N elements. Larger values
+indicate higher dissimilarity. Can be an object of class
+\code{dist} (e.g., returned by \code{\link{dist}} or
+\code{\link{as.dist}}.}
+
 \item{K}{How many anticlusters should be created.}
 }
 \value{

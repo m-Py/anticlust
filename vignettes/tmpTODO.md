@@ -10,15 +10,10 @@ Tests:
 Documentation:
 
 - All exported function fully documented?
+- In anticlustering function: use "anticluster editing" as problem 
+  description
 
 ---
-
-
-Implementation:
-
-- function `anticlustering` should also take distance object as input
-- complete enumeration as alternative to ILP for method = "exact" if 
-  no solver is installed 
 
 ---
 
@@ -30,14 +25,6 @@ Implementation:
       was found etc.)
     + for ILP, print the progress of the solver
 
-- Rework method argument:
-    + "exact" is used for the exact computation only; 
-      it checks whether an ILP solver is available, if YES, the ILP 
-      is used, otherwise complete enumeration is used
-    + Add "ilp" and "enumeration" methods that specificall ask for 
-      integer linear programming and complete enumeration. Preclustering 
-      can be activated for "ilp"
-      
 --- 
 
 - maybe include a "matching" function
@@ -50,7 +37,3 @@ Implementation:
   (it is not for anticlustering)
 
 --- 
-
-- implement 'distances' argument for complete enumeration
-  and sampling methods. May be tricky for sampling. (but I had an 
-  implementation for this; use it!)
