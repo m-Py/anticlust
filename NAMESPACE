@@ -3,7 +3,7 @@
 export(anticlustering)
 export(clustering)
 export(enum_anticlustering)
-export(next_permutation)
+export(greedy_matching)
 export(plot_clusters)
 importFrom(Matrix,sparseMatrix)
 importFrom(grDevices,rainbow)
