@@ -23,10 +23,10 @@ dissimilarities.}
 
 \item{K}{How many clusters should be created.}
 
-\item{objective}{The objective to be maximized. The option
-"distance" (default) is used to optimize the cluster
-editing objective; the option "variance" is used to optimize
-the k-means variance objective. See \code{\link{anticlustering}}.}
+\item{objective}{The objective to be minimized. The option
+"distance" (default) is used to minimize the cluster editing
+objective; the option "variance" is used to minimize the
+k-means objective. See details and \code{\link{anticlustering}}.}
 
 \item{method}{One of "heuristic" or "exact". See details.}
 
@@ -43,7 +43,15 @@ A vector representing the cluster affiliation of all elements.
 Create K balanced clusters
 }
 \details{
-blbalals
+This function clusters a set of elements into K equal sized
+clusters.  Can optimize the *cluster editing* objective exactly
+using integer linear programming. The cluster editing objective
+minimizes the sum o of the pairwise distances within-clusters. Can
+also be used to optimize the k-means variance objective (when
+setting `objective = "variance"`). A heuristic is used to optimize
+the variance criterion (thus, this function implements a balanced
+variant of k-means).  A heuristic is also available to optimize the
+cluster editing distance criterion.
 }
 \examples{
 
@@ -62,13 +70,16 @@ plot_clusters(iris[, 3:4], clusters)
 # Create artifical data
 n_features <- 2
 N <- 30
+K <- 3
 features <- matrix(rnorm(N * n_features), ncol = n_features)
-ac1 <- balanced_clustering(features, K = 2, method = "exact")
-ac2 <- balanced_clustering(features, K = 2, method = "heuristic")
+ac1 <- balanced_clustering(features, K = K, method = "exact")
+ac2 <- balanced_clustering(features, K = K, method = "heuristic")
 
-## Compare with heuristic method
-plot_clusters(features, ac1, within_connection = TRUE, main = "exact", xlab = "", ylab = "")
-plot_clusters(features, ac2, within_connection = TRUE, main = "heuristic", xlab = "", ylab = "")
-par(mfrow = c(1, 1))
+## Compare exact and heuristic balanced cluster editing
+par(mfrow = c(1, 2))
+plot_clusters(features, ac1, within_connection = TRUE,
+              main = "optimal cluster editing", xlab = "", ylab = "")
+plot_clusters(features, ac2, within_connection = TRUE,
+              main = "heuristic cluster editing", xlab = "", ylab = "")
 
 }
