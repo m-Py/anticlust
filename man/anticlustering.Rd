@@ -18,16 +18,16 @@ vector represents a single feature.}
 pairwise dissimilarities between all N elements. Larger values
 indicate higher dissimilarity. Can be an object of class
 \code{dist} (e.g., returned by \code{\link{dist}} or
-\code{\link{as.dist}}) or a \code{matrix} where the entries
-of the upper and/or lower triangular matrix represent the pairwise
+\code{\link{as.dist}}) or a \code{matrix} where the entries of
+the upper and/or lower triangular matrix represent the pairwise
 dissimilarities.}
 
 \item{K}{How many anticlusters should be created.}
 
-\item{objective}{The objective to be maximized. The option "distance"
-(default) is used to optimize the anticluster editing objective;
-the option "variance" is used to optimize the k-means
-anticlustering objective. See details.}
+\item{objective}{The objective to be maximized. The option
+"distance" (default) is used to optimize the anticluster
+editing objective; the option "variance" is used to optimize
+the k-means anticlustering objective. See details.}
 
 \item{method}{One of "heuristic" or "exact". See details.}
 
@@ -40,10 +40,10 @@ before anticlusters are created? Defaults to \code{TRUE}.
 Standardization is done using the function \code{\link{scale}}
 using the default settings (mean = 0, SD = 1).}
 
-\item{nrep}{The number of repetitions for the random sampling heuristic.
-This argument only has an effect if \code{method} is
-\code{"heuristic"}. It does not have an effect if \code{method}
-is \code{"exact"}.}
+\item{nrep}{The number of repetitions for the random sampling
+heuristic.  This argument only has an effect if \code{method}
+is \code{"heuristic"}. It does not have an effect if
+\code{method} is \code{"exact"}.}
 }
 \value{
 A vector representing the anticluster affiliation.
@@ -62,46 +62,48 @@ establish similar groups in the anticlustering application.
 Optimizing the variance criterion (thus, solving *k-means
 anticlustering*) is accomplished by setting \code{objective =
 "variance"}.
+
 The \code{anticlust} package also introduces another objective
-function to the anticlustering application that has been developed in
-the problem domain of cluster editing. It is based on a measure of
-the pairwise distances of data points (Grötschel & Wakabayashi,
-1989). *Anticluster editing* maximizes the sum of pairwise distances
-within groups. The anticluster editing objective can be
+function to the anticlustering application that has been developed
+in the problem domain of cluster editing. It is based on a measure
+of the pairwise distances of data points (Grötschel & Wakabayashi,
+1989). *Anticluster editing* maximizes the sum of pairwise
+distances within groups. The anticluster editing objective can be
 optimized _exactly_ via integer linear programming. To obtain the
-optimal solution, a linear programming solver must therefore be installed and usable from R.
-The `anticlust` package supports the open
-source GNU linear programming kit (called from the package
+optimal solution, a linear programming solver must therefore be
+installed and usable from R.  The `anticlust` package supports the
+open source GNU linear programming kit (called from the package
 \code{Rglpk}) and the commercial solvers gurobi (called from the
 package \code{gurobi}) and IBM CPLEX (called from the package
 \code{Rcplex}). A license is needed to use one of the commercial
-solvers. The optimal solution is retrieved by setting \code{objective
-= "distance"}, \code{preclustering = FALSE}, and \code{method =
-"exact"}. Use this combination of arguments only for small problem
-sizes (maybe <= 30 elements). No algorithm is available to find the
-optimal solution for k-means anticlustering, i.e., to maximize
-the variance criterion.
+solvers. The optimal solution is retrieved by setting
+\code{objective = "distance"}, \code{preclustering = FALSE}, and
+\code{method = "exact"}. Use this combination of arguments only for
+small problem sizes (maybe <= 30 elements). No algorithm is
+available to find the optimal solution for k-means anticlustering,
+i.e., to maximize the variance criterion.
 
 To relax the optimality condition, it is possible to set
-\code{preclustering = TRUE}. In this case, the distance objective is
-still optimized using integer linear programming, but a preprocessing
-forbids very similar elements to be assigned to the same anticluster.
-This approach can be used to work on larger problem instances and the
-solution is usually still optimal or very close to optimal.
+\code{preclustering = TRUE}. In this case, the distance objective
+is still optimized using integer linear programming, but a
+preprocessing forbids very similar elements to be assigned to the
+same anticluster.  This approach can be used to work on larger
+problem instances and the solution is usually still optimal or very
+close to optimal.
 
-If no exact solution is required or the problem size is too large for
-integer linear programming, a heuristic method based on repeated random
-sampling is available. Across a specified number of runs,
-anticlusters are assigned randomly and the best assignment
+If no exact solution is required or the problem size is too large
+for integer linear programming, a heuristic method based on
+repeated random sampling is available. Across a specified number of
+runs, anticlusters are assigned randomly and the best assignment
 (maximizing the sum of within-group distances) is returned. This
-method works for both anticluster editing and k-means anticlustering
-(the latter is accomplished by setting `objective = "variance"`). The
-sampling approach may also incorporate a preclustering that prevents
-grouping very similar elements into the same anticluster; use
-\code{preclustering = TRUE} to activate this option, which is also
-the default. It is suggested that the preclustering condition is
-activated for the random sampling approach because it usually
-improves the quality of the solution.
+method works for both anticluster editing and k-means
+anticlustering (the latter is accomplished by setting `objective =
+"variance"`). The sampling approach may also incorporate a
+preclustering that prevents grouping very similar elements into the
+same anticluster; use \code{preclustering = TRUE} to activate this
+option, which is also the default. It is suggested that the
+preclustering condition is activated for the random sampling
+approach because it usually improves the quality of the solution.
 }
 \examples{
 
