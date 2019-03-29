@@ -153,7 +153,7 @@ anticlustering <- function(features = NULL, distances = NULL,
     }
     distances <- as.matrix(dist(features))
   } else {
-    distances <- as.matrix(distances)
+    distances <- as.matrix(as.dist(distances))
   }
 
   ## Exact method using ILP
