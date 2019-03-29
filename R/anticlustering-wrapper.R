@@ -1,5 +1,5 @@
 
-#' Balanced anticlustering
+#' Anticlustering
 #'
 #' Create equal sized groups of elements (anticlusters) that are as
 #' similar as possible.
@@ -8,17 +8,19 @@
 #'     correspond to elements and columns correspond to features. A
 #'     vector represents a single feature.
 #' @param distances Alternative data argument that can be used if
-#'     \code{features} is not used. A N x N matrix representing the
+#'     \code{features} is not passed. A N x N matrix representing the
 #'     pairwise dissimilarities between all N elements. Larger values
 #'     indicate higher dissimilarity. Can be an object of class
 #'     \code{dist} (e.g., returned by \code{\link{dist}} or
-#'     \code{\link{as.dist}}).
+#'     \code{\link{as.dist}}) or a \code{matrix} where the entries
+#'     of the upper and/or lower triangular matrix represent the pairwise
+#'     dissimilarities.
 #' @param K How many anticlusters should be created.
 #' @param objective The objective to be maximized. The option "distance"
-#'     (default) is used to optimize the anticluster editing objective; 
-#'     the option "variance" is used to optimize the k-means objective 
+#'     (default) is used to optimize the anticluster editing objective;
+#'     the option "variance" is used to optimize the k-means
 #'     anticlustering objective. See details.
-#' @param method One of "sampling", or "exact". See details.
+#' @param method One of "heuristic" or "exact". See details.
 #' @param preclustering Boolean, should a preclustering be conducted
 #'     before anticlusters are created. Defaults to \code{TRUE}. See
 #'     details.
@@ -26,13 +28,15 @@
 #'     before anticlusters are created? Defaults to \code{TRUE}.
 #'     Standardization is done using the function \code{\link{scale}}
 #'     using the default settings (mean = 0, SD = 1).
-#' @param nrep The number of repetitions used for the heuristic method
-#'     "sampling". This argument does not have an effect if 
-#'     \code{method} is \code{"exact"}.
+#' @param nrep The number of repetitions for the random sampling heuristic.
+#'     This argument only has an effect if \code{method} is
+#'     \code{"heuristic"}. It does not have an effect if \code{method}
+#'     is \code{"exact"}.
 #'
 #' @return A vector representing the anticluster affiliation.
 #'
 #' @importFrom Matrix sparseMatrix
+#' @importFrom stats as.dist
 #'
 #' @export
 #'
@@ -44,19 +48,19 @@
 #' objective functions. Späth (1986) and Valev (1998) proposed to
 #' maximize the variance criterion used in k-means clustering to
 #' establish similar groups in the anticlustering application.
-#' Optimizing the variance criterion (thus, solving k-means
-#' anticlustering) is accomplished by setting \code{objective =
-#' "variance"}. 
+#' Optimizing the variance criterion (thus, solving *k-means
+#' anticlustering*) is accomplished by setting \code{objective =
+#' "variance"}.
 
 #' The \code{anticlust} package also introduces another objective
 #' function to the anticlustering application that has been developed in
 #' the problem domain of cluster editing. It is based on a measure of
 #' the pairwise distances of data points (Grötschel & Wakabayashi,
-#' 1989). Anticluster editing maximizes the sum of pairwise distances
-#' within anticlusters. The anticluster editing objective can be
-#' optimized through an exact integer linear program. To obtain the
-#' optimal solution, a linear programming solver must be available on
-#' the system and usable from R. Support is available for the open
+#' 1989). *Anticluster editing* maximizes the sum of pairwise distances
+#' within groups. The anticluster editing objective can be
+#' optimized _exactly_ via integer linear programming. To obtain the
+#' optimal solution, a linear programming solver must therefore be installed and usable from R.
+#' The `anticlust` package supports the open
 #' source GNU linear programming kit (called from the package
 #' \code{Rglpk}) and the commercial solvers gurobi (called from the
 #' package \code{gurobi}) and IBM CPLEX (called from the package
@@ -65,8 +69,9 @@
 #' = "distance"}, \code{preclustering = FALSE}, and \code{method =
 #' "exact"}. Use this combination of arguments only for small problem
 #' sizes (maybe <= 30 elements). No algorithm is available to find the
-#' optimal solution for k-means anticlustering.
-
+#' optimal solution for k-means anticlustering, i.e., to maximize
+#' the variance criterion.
+#'
 #' To relax the optimality condition, it is possible to set
 #' \code{preclustering = TRUE}. In this case, the distance objective is
 #' still optimized using integer linear programming, but a preprocessing
@@ -75,7 +80,7 @@
 #' solution is usually still optimal or very close to optimal.
 #'
 #' If no exact solution is required or the problem size is too large for
-#' the exact approach, a heuristic method based on repeated random
+#' integer linear programming, a heuristic method based on repeated random
 #' sampling is available. Across a specified number of runs,
 #' anticlusters are assigned randomly and the best assignment
 #' (maximizing the sum of within-group distances) is returned. This
@@ -95,7 +100,7 @@
 #' # (b) Heuristic method: random sampling
 #' # (c) 10,000 sampling repetitions
 #' # (d) Preclustering is activated
-#' # (e) Anticlustering uses standardized features (each feature has 
+#' # (e) Anticlustering uses standardized features (each feature has
 #' #     mean = 0 and SD = 1)
 #'
 #' data(iris)
@@ -138,7 +143,7 @@
 
 anticlustering <- function(features = NULL, distances = NULL,
                            K, objective = "distance",
-                           method = "sampling", preclustering = TRUE,
+                           method = "heuristic", preclustering = TRUE,
                            standardize = TRUE, nrep = 10000) {
 
   input_handling_anticlustering(features, distances, K, objective,
@@ -214,7 +219,7 @@ input_handling_anticlustering <- function(features, distances,
   validate_input(nrep, "nrep", "numeric", len = 1, greater_than = 0,
                  must_be_integer = TRUE)
   validate_input(method, "method", len = 1,
-                 input_set = c("exact", "sampling"))
+                 input_set = c("exact", "heuristic"))
   validate_input(objective, "objective", len = 1,
                  input_set = c("variance", "distance"))
 
