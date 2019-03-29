@@ -1,8 +1,8 @@
 
-#' Visualize a clustering of two features
+#' Visualize a cluster analysis
 #'
 #' @param features A data.frame or matrix representing the features that
-#'     are used. Must have two columns.
+#'     are plotted. Must have two columns.
 #' @param clustering A vector representing the clustering
 #' @param within_connection Boolean. Connect the elements within each
 #'     clusters through lines? Useful to illustrate a graph structure.
@@ -45,17 +45,17 @@
 #'
 #' @details In most cases, the argument `clustering` is a vector
 #'   returned by one of the functions \code{\link{anticlustering}} or
-#'   \code{\link{clustering}}. However, the plotting function can also
-#'   be used to plot the results of other cluster functions such as
-#'   \code{\link{kmeans}}.
+#'   \code{\link{balanced_clustering}}. However, the plotting function
+#'   can also be used to plot the results of other cluster functions
+#'   such as \code{\link{kmeans}}.
 #'
 #' @examples
 #'
 #' n_elements <- 9
 #' features <- matrix(runif(n_elements * 2), ncol = 2)
 #' n_groups <- 3
-#' clusters <- clustering(features, K = n_groups)
-#' anticlusters <- anticlustering(features, K = n_groups, method = "sampling")
+#' clusters <- balanced_clustering(features, K = n_groups)
+#' anticlusters <- anticlustering(features, K = n_groups, method = "heuristic")
 #' par(mfrow = c(1, 2))
 #' plot_clusters(features, clusters, pch = c(15, 16, 17), main = "Cluster editing")
 #' plot_clusters(features, anticlusters, pch = c(15, 16, 17), main = "Anticluster editing")
@@ -110,7 +110,7 @@ plot_clusters <- function(features, clustering, within_connection = FALSE,
   if (show_axes == TRUE)
     axt <- "s"
   plot(x, y, las = 1, cex.axis = cex.axis, cex.lab = cex.lab,
-       col = col, xlab = xlab, ylab = ylab, cex = cex,
+       col = col, xlab = xlab, ylab = ylab, cex = cex, bg = col,
        xaxt = axt, yaxt = axt, pch = pch, main = main,
        frame.plot = frame.plot, xlim = xlim, ylim = ylim)
   ## Draw graph structure

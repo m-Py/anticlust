@@ -10,9 +10,10 @@
 #' @return The next higher permutation of the elements in vector
 #'     `permutation` with regard to its lexicographic ordering.
 #'
-#' @export
 #' 
 #' @author Martin Papenberg \email{martin.papenberg@@hhu.de}
+#' 
+#' @noRd
 #' 
 next_permutation <- function(permutation) {
   n    <- length(permutation)

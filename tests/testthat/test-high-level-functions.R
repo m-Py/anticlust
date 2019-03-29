@@ -9,8 +9,10 @@ test_that("high level equal sized clustering function runs through", {
     n_clusters <- conditions[k, "p"]
     n_elements <- n_clusters * 5 # n must be multiplier of p
     features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
-    clusters_exact <- clustering(features, n_clusters, method = "exact", standardize = FALSE)
-    clusters_heuristic <- clustering(features, n_clusters, method = "heuristic", standardize = FALSE)
+    clusters_exact <- balanced_clustering(features, K = n_clusters, method = "exact",
+                                          standardize = FALSE)
+    clusters_heuristic <- balanced_clustering(features, K = n_clusters,
+                                              method = "heuristic", standardize = FALSE)
     ## Check that output is valid
     expect_equal(legal_number_of_clusters(features, clusters_exact), NULL)
     expect_equal(legal_number_of_clusters(features, clusters_heuristic), NULL)
@@ -37,7 +39,7 @@ test_that("high level anticlustering function runs through", {
                                          preclustering = FALSE)
     anticlusters_heuristic <- anticlustering(features,
                                              K = n_clusters,
-                                             method = "sampling",
+                                             method = "heuristic",
                                              standardize = FALSE,
                                              nrep = 5)
     ## Check that output is valid
@@ -54,10 +56,10 @@ test_that("high level anticlustering function runs through", {
 
 test_that("all argument combinations run through", {
   conditions <- expand.grid(preclustering = c(TRUE, FALSE),
-                            method = c("exact", "sampling"))
+                            method = c("exact", "heuristic"))
   # Set up matrix to store the objective values obtained by different methods
   storage <- matrix(ncol = 2, nrow = 2)
-  colnames(storage) <- c("exact", "sampling")
+  colnames(storage) <- c("exact", "heuristic")
   rownames(storage) <- c("preclustering", "no_preclustering")
 
   criterion <- "distance"

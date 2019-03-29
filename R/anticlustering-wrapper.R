@@ -1,22 +1,26 @@
 
-#' Algorithms for anticlustering
+#' Anticlustering
 #'
-#' Create groups of elements (anticlusters) that are as similar as
-#' possible.
+#' Create equal sized groups of elements (anticlusters) that are as
+#' similar as possible.
 #'
 #' @param features A vector, matrix or data.frame of data points. Rows
 #'     correspond to elements and columns correspond to features. A
 #'     vector represents a single feature.
 #' @param distances Alternative data argument that can be used if
-#'     \code{features} is not used. A N x N matrix representing the
+#'     \code{features} is not passed. A N x N matrix representing the
 #'     pairwise dissimilarities between all N elements. Larger values
 #'     indicate higher dissimilarity. Can be an object of class
 #'     \code{dist} (e.g., returned by \code{\link{dist}} or
-#'     \code{\link{as.dist}}.
+#'     \code{\link{as.dist}}) or a \code{matrix} where the entries of
+#'     the upper and/or lower triangular matrix represent the pairwise
+#'     dissimilarities.
 #' @param K How many anticlusters should be created.
-#' @param objective The objective to be maximized, either "distance"
-#'     (default) or "variance". See details.
-#' @param method One of "sampling", or "exact". See details.
+#' @param objective The objective to be maximized. The option
+#'     "distance" (default) is used to optimize the anticluster
+#'     editing objective; the option "variance" is used to optimize
+#'     the k-means anticlustering objective. See details.
+#' @param method One of "heuristic" or "exact". See details.
 #' @param preclustering Boolean, should a preclustering be conducted
 #'     before anticlusters are created. Defaults to \code{TRUE}. See
 #'     details.
@@ -24,61 +28,71 @@
 #'     before anticlusters are created? Defaults to \code{TRUE}.
 #'     Standardization is done using the function \code{\link{scale}}
 #'     using the default settings (mean = 0, SD = 1).
-#' @param nrep The number of repetitions used in the heuristic methods
-#'     "sampling" or "annealing". This argument does not have an effect
-#'     if the argument \code{method} is \code{"exact"}.
+#' @param nrep The number of repetitions for the random sampling
+#'     heuristic.  This argument only has an effect if \code{method}
+#'     is \code{"heuristic"}. It does not have an effect if
+#'     \code{method} is \code{"exact"}.
 #'
 #' @return A vector representing the anticluster affiliation.
 #'
 #' @importFrom Matrix sparseMatrix
+#' @importFrom stats as.dist
 #'
 #' @export
 #'
 #' @details
 #'
-#' Späth (1986) and Valev (1998) proposed to maximize the variance
-#' criterion used in k-means clustering to establish similar groups in
-#' the anticlustering application. In the \code{anticlust} package,
-#' optimizing the variance criterion is accomplished by setting
-#' \code{objective = "variance"}. The \code{anticlust} package also
-#' introduces another objective function to the anticlustering
-#' application that has been developed in the problem domain of cluster
-#' editing and is based on a measure of the pairwise distances of data
-#' points (Grötschel & Wakabayashi, 1989). In weighted cluster editing,
-#' the optimal objective is found when the sum of within-cluster
-#' distances is minimized; for anticluster editing, the distance objective
-#' is maximized instead.
+#' This function is used to solve balanced K anticlustering. That is, K
+#' groups of equal size are created in such a way that similarity of
+#' these groups is maximized. Similarity is measured by one of two
+#' objective functions. Späth (1986) and Valev (1998) proposed to
+#' maximize the variance criterion used in k-means clustering to
+#' establish similar groups in the anticlustering application.
+#' Optimizing the variance criterion (thus, solving *k-means
+#' anticlustering*) is accomplished by setting \code{objective =
+#' "variance"}.
 #'
-#' The \code{anticlust} package uses integer linear programming to find optimal
-#' objective for the anticluster editing criterion (Grötschel & Wakabayashi,
-#' 1989). To obtain an optimal solution, a linear programming solver
-#' must be installed on the system and be usable from R. The
-#' \code{anticlust} package supports the open source GNU linear
-#' programming kit (called from the package \code{Rglpk}) and the
-#' commercial solvers gurobi (called from the package \code{gurobi}) and
-#' IBM CPLEX (called from the package \code{Rcplex}). A license is
-#' needed to use one of the commercial solvers.
+#' The \code{anticlust} package also introduces another objective
+#' function to the anticlustering application that has been developed
+#' in the problem domain of cluster editing. It is based on a measure
+#' of the pairwise distances of data points (Grötschel & Wakabayashi,
+#' 1989). *Anticluster editing* maximizes the sum of pairwise
+#' distances within groups. The anticluster editing objective can be
+#' optimized _exactly_ via integer linear programming. To obtain the
+#' optimal solution, a linear programming solver must therefore be
+#' installed and usable from R.  The `anticlust` package supports the
+#' open source GNU linear programming kit (called from the package
+#' \code{Rglpk}) and the commercial solvers gurobi (called from the
+#' package \code{gurobi}) and IBM CPLEX (called from the package
+#' \code{Rcplex}). A license is needed to use one of the commercial
+#' solvers. The optimal solution is retrieved by setting
+#' \code{objective = "distance"}, \code{preclustering = FALSE}, and
+#' \code{method = "exact"}. Use this combination of arguments only for
+#' small problem sizes (maybe <= 30 elements). No algorithm is
+#' available to find the optimal solution for k-means anticlustering,
+#' i.e., to maximize the variance criterion.
 #'
-#' An optimal solution can only be obtained for distance anticlustering,
-#' i.e., when setting \code{objective = "distance"}. To obtain the
-#' optimal objective for the distance criterion, use the following
-#' arguments: \code{preclustering = FALSE}, \code{method = "exact"}, and
-#' \code{objective = "distance"}. Use this combination of arguments only
-#' for small problem sizes (< 30 elements). To relax the optimality
-#' condition, it is possible to set \code{preclustering = TRUE}. In this
-#' case, the distance objective is still optimized using integer linear
-#' programming, but a preprocessing forbids very similar elements to be
-#' assigned to the same anticluster. This approach can be used to work
-#' on larger problem instances and the solution is usually optimal or
-#' very close to optimal.
+#' To relax the optimality condition, it is possible to set
+#' \code{preclustering = TRUE}. In this case, the distance objective
+#' is still optimized using integer linear programming, but a
+#' preprocessing forbids very similar elements to be assigned to the
+#' same anticluster.  This approach can be used to work on larger
+#' problem instances and the solution is usually still optimal or very
+#' close to optimal.
 #'
-#' If no exact solution is required or the problem size is too large for
-#' the exact approach, a heuristic method is available, based on
-#' repeated random sampling. The approach may rely on a preclustering
-#' that prevents grouping very similar elements into the same
-#' anticluster if \code{preclustering = TRUE}. It is strongly suggested
-#' that the preclustering condition is activated when using the heuristic
-#' because the solution is usually better with preclustering.
+#' If no exact solution is required or the problem size is too large
+#' for integer linear programming, a heuristic method based on
+#' repeated random sampling is available. Across a specified number of
+#' runs, anticlusters are assigned randomly and the best assignment
+#' (maximizing the sum of within-group distances) is returned. This
+#' method works for both anticluster editing and k-means
+#' anticlustering (the latter is accomplished by setting `objective =
+#' "variance"`). The sampling approach may also incorporate a
+#' preclustering that prevents grouping very similar elements into the
+#' same anticluster; use \code{preclustering = TRUE} to activate this
+#' option, which is also the default. It is suggested that the
+#' preclustering condition is activated for the random sampling
+#' approach because it usually improves the quality of the solution.
 #'
 #' @examples
 #'
@@ -87,7 +101,8 @@
 #' # (b) Heuristic method: random sampling
 #' # (c) 10,000 sampling repetitions
 #' # (d) Preclustering is activated
-#' # (e) Anticlustering uses standardized features (Mean = 0, SD = 1)
+#' # (e) Anticlustering uses standardized features (each feature has
+#' #     mean = 0 and SD = 1)
 #'
 #' data(iris)
 #' # Only use numeric attributes
@@ -99,17 +114,18 @@
 #' plot_clusters(iris[, 1:2], anticlusters)
 #' plot_clusters(iris[, 3:4], anticlusters)
 #'
-#' ## The exact approach
+#' ## Exact anticlustering
 #' # Create artifical data
 #' n_features <- 2
 #' n_elements <- 20
+#' K <- 2
 #' features <- matrix(rnorm(n_elements * n_features), ncol = n_features)
-#' ac <- anticlustering(features, K = 2, method = "exact",
-#'                      preclustering = FALSE, standardize = FALSE)
+#' anticlustering(features, K = K, method = "exact",
+#'                preclustering = FALSE, standardize = FALSE)
 #'
 #' # Enable preclustering
-#' ac_preclust <- anticlustering(features, K = 2, method = "exact",
-#'                               preclustering = TRUE, standardize = FALSE)
+#' anticlustering(features, K = K, method = "exact",
+#'                preclustering = TRUE, standardize = FALSE)
 #'
 #' @references
 #'
@@ -128,7 +144,7 @@
 
 anticlustering <- function(features = NULL, distances = NULL,
                            K, objective = "distance",
-                           method = "sampling", preclustering = TRUE,
+                           method = "heuristic", preclustering = TRUE,
                            standardize = TRUE, nrep = 10000) {
 
   input_handling_anticlustering(features, distances, K, objective,
@@ -143,7 +159,7 @@ anticlustering <- function(features = NULL, distances = NULL,
     }
     distances <- as.matrix(dist(features))
   } else {
-    distances <- as.matrix(distances)
+    distances <- as.matrix(as.dist(distances))
   }
 
   ## Exact method using ILP
@@ -156,7 +172,14 @@ anticlustering <- function(features = NULL, distances = NULL,
   preclusters <- NULL
   if (preclustering == TRUE) {
     n_preclusters <- nrow(features) / K
+    if (objective == "distance" && K == 2) {
+      preclusters <- greedy_matching(distances)
+    } else if (objective == "distance" && K > 2) {
+      preclusters <- greedy_balanced_k_clustering(distances, K)
+    }
+    else if (objective == "variance") {
       preclusters <- equal_sized_kmeans(features, n_preclusters)
+    }
   }
   heuristic_anticlustering(features, K, preclusters,
                            objective, nrep = nrep, distances)
@@ -190,14 +213,14 @@ input_handling_anticlustering <- function(features, distances,
     validate_input(K, "K", "numeric", len = 1,
                    greater_than = 1, must_be_integer = TRUE)
     if (nrow(features) %% K != 0) {
-      stop("The number of anticlusters must be a divider of the number of elements.")
+      stop("K must be a divider of the number of elements.")
     }
   }
 
   validate_input(nrep, "nrep", "numeric", len = 1, greater_than = 0,
                  must_be_integer = TRUE)
   validate_input(method, "method", len = 1,
-                 input_set = c("exact", "sampling",  "annealing"))
+                 input_set = c("exact", "heuristic"))
   validate_input(objective, "objective", len = 1,
                  input_set = c("variance", "distance"))
 
@@ -211,10 +234,10 @@ input_handling_anticlustering <- function(features, distances,
     if (solver == FALSE) {
       stop("An exact solution was requested, but none of the linear ",
            "programming packages 'Rglpk', 'gurobi', or 'Rcplex' is ",
-           "installed. If you really want to use an exact approach ",
-           "without installing a linear programming solver, check out ",
-           "the `enum_anticlustering` function. This is not advised ",
-           "however, because the linear programming variant is faster.")
+           "installed. Try out method = 'heuristic' or install ",
+           "the a linear programming solver. E.g., ",
+           "visit http://gnuwin32.sourceforge.net/packages/glpk.htm ",
+           " if you are using windows.")
     }
   }
 
@@ -231,35 +254,9 @@ input_handling_anticlustering <- function(features, distances,
     stop("Only pass one of the arguments 'features' or 'distances'.")
   }
 
-  if (argument_exists(distances) && preclustering == TRUE && method == "sampling") {
-    stop("Unfortunately, it is currently not possible to conduct a ",
-         "preclustering for the sampling method when a distance matrix ",
-         "is passed as input.")
-  }
-
   if (argument_exists(distances) && objective == "variance") {
     stop("'distances' cannot be used if 'objective' is 'variance'.")
   }
 
   return(invisible(NULL))
-}
-
-
-#' Check if a solver package can be used
-#'
-#' Has no parameters, checks in the installed packages from the user
-#'
-#' @return \code{FALSE} If no solver is available; A string identifying
-#'   the solver if at least one is available ("Rcplex", "gurobi", "Rglpk")
-#'
-#' @importFrom utils installed.packages
-#'
-#' @noRd
-solver_available <- function() {
-  solvers <- c("Rcplex", "gurobi", "Rglpk")
-  pcks <- rownames(installed.packages())
-  solvers_available <- solvers %in% pcks
-  if (sum(solvers_available) == 0) # no solver available
-    return(FALSE)
-  return(solvers[solvers_available][1]) # pick only one solver
 }

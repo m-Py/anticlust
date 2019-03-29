@@ -73,12 +73,16 @@ heuristic_anticlustering <- function(features, n_anticlusters,
 #'
 #'  @details
 #'
+#'  TL;DR: This function sorts the input table by precluster affiliation.
+#'
+#'  Longer version:
+#'
 #'  If the argument \code{preclusters} is NULL, no preclustering
 #'  constraint was required. This function will still add a column
-#'  preclusters, which however will not have an effect on the following
-#'  computations: The method \code{random_sampling} will ignore the
-#'  precluster column through an
-#'  argument \code{ignore_preclusters} that \code{TRUE} whenever the
+#'  preclusters and sort by this column, which however will not have an
+#'  effect on the following computations: The method \code{random_sampling}
+#'  will ignore the precluster column through an argument
+#'  \code{ignore_preclusters} that \code{TRUE} whenever the
 #'  argument \code{preclusters} is NULL.
 #'
 #' @noRd
@@ -138,12 +142,16 @@ random_sampling <- function(dat, K, objective, nrep,
   }
 
   if (objective == "variance" || use_distances == TRUE) {
+    ## In this case, `dat` is already the relevant data that is
+    ## operated on (features for variance criterion; distances for
+    ## distance criterion)
     objective_data <- dat[, -(1:2), drop = FALSE]
   } else {
-    ## Compute distances from features:
+    ## Compute distances from features if distance objective is to be
+    ## computed, but features were passed. Here `dat` is not yet
+    ## the relevant data.
     objective_data <- as.matrix(dist(dat[, -(1:2), drop = FALSE]))
   }
-
 
   for (i in 1:nrep) {
     ## 1. Random sampling without preclustering restrictions
