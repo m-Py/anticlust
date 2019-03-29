@@ -140,10 +140,10 @@ random_sampling <- function(dat, K, objective, nrep,
   if (objective == "variance" || use_distances == TRUE) {
     objective_data <- dat[, -(1:2), drop = FALSE]
   } else {
-    ## Compute distances from features:
+    ## Compute distances from features if distance objective is to be
+    ## computed, but features were passed
     objective_data <- as.matrix(dist(dat[, -(1:2), drop = FALSE]))
   }
-
 
   for (i in 1:nrep) {
     ## 1. Random sampling without preclustering restrictions
