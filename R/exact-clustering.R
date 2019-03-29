@@ -13,14 +13,9 @@
 #'
 #' @noRd
 #'
-equal_sized_cluster_editing <- function(features, n_clusters, solver,
-                                        standardize = FALSE) {
-  if (standardize) {
-    features <- scale(features)
-  }
-  distances <- as.matrix(dist(features))
+balanced_cluster_editing <- function(distances, n_clusters, solver,
+                                     standardize = FALSE) {
   ilp <- anticlustering_ilp(distances, n_clusters, solver = solver)
   solution <- solve_ilp(ilp, solver, "min")
-  assignment <- ilp_to_groups(ilp, solution)
-  return(assignment)
+  ilp_to_groups(ilp, solution)
 }
