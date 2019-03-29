@@ -1,27 +1,23 @@
 
-# Construct the ILP represenation of a anticlustering problem
-#
-# @param distances An n x n matrix representing the
-#     distances between items
-# @param p The number of groups to be created
-# @param solver A string identifing the solver to be used ("Rglpk",
-#     "gurobi", or "Rcplex")
-#
-# @return A list representing the ILP formulation of the instance
-#
-#
-# @references
-#
-# M. Grötschel and Y. Wakabayashi, “A cutting plane algorithm for a
-# clustering problem,” Mathematical Programming, vol. 45, nos. 1-3, pp.
-# 59–96, 1989.
+#' Construct the ILP represenation of a anticlustering problem
+#'
+#' @param distances An n x n matrix representing the
+#'     distances between items
+#' @param K The number of groups to be created
+#' @param solver A string identifing the solver to be used ("Rglpk",
+#'     "gurobi", or "Rcplex")
+#'
+#' @return A list representing the ILP formulation of the instance
+#'
+#' @noRd
+#'
 
-anticlustering_ilp <- function(distances, p, solver) {
+anticlustering_ilp <- function(distances, K, solver) {
 
   ## Initialize some constant variables:
   equality_signs <- equality_identifiers(solver)
   n_items        <- nrow(distances)
-  group_size     <- n_items / p
+  group_size     <- n_items / K
   costs          <- vectorize_weights(distances)
 
   ## Specify the number of triangular constraints:
@@ -46,7 +42,7 @@ anticlustering_ilp <- function(distances, p, solver) {
 
   ## return instance
   instance              <- list()
-  instance$n_groups     <- p
+  instance$n_groups     <- K
   instance$group_size   <- group_size
   instance$distances    <- distances
   instance$costs        <- costs

@@ -1,19 +1,20 @@
 
-#' Create balanced clusters of equal size
+#' Create K balanced clusters
 #'
 #' @param features A vector, matrix or data.frame of data points. Rows
 #'     correspond to elements and columns correspond to features.
-#' @param K How many anticlusters should be created.
+#' @param K How many clusters should be created.
 #' @param standardize Boolean - should the features be standardized
 #'     before anticlusters are assigned? Defaults to TRUE
 #' @param method One of "heuristic" or "exact". When "exact" is chosen,
 #'     the function minimizes the distance criterion (i.e., solves
 #'     balanced k-cluster editing); when "heuristic"
 #'     is chosen, the function tries to minimize the variance criterion
-#'     (see \code{\link{anticlustering}}). Use method exact only for
-#'     rather small problem sizes.
+#'     (see \code{\link{anticlustering}} for details). Use
+#'     \code{method = "exact"} only for rather small n.
 #'
 #' @return A vector representing the cluster affiliation of all elements.
+#'     Each cluster has the the same size.
 #'
 #' @export
 #'
@@ -38,8 +39,9 @@
 #' ac <- clustering(features, K = 2, method = "exact")
 #' plot_clusters(features, ac, within_connection = TRUE)
 #'
-clustering <- function(features, K, standardize = TRUE,
-                       method = "heuristic") {
+
+balanced_clustering <- function(features, K, standardize = TRUE,
+                                method = "heuristic") {
   features <- as.matrix(features)
   if (standardize) {
     features <- scale(features)

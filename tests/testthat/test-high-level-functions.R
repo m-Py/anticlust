@@ -9,8 +9,8 @@ test_that("high level equal sized clustering function runs through", {
     n_clusters <- conditions[k, "p"]
     n_elements <- n_clusters * 5 # n must be multiplier of p
     features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
-    clusters_exact <- clustering(features, n_clusters, method = "exact", standardize = FALSE)
-    clusters_heuristic <- clustering(features, n_clusters, method = "heuristic", standardize = FALSE)
+    clusters_exact <- balanced_clustering(features, n_clusters, method = "exact", standardize = FALSE)
+    clusters_heuristic <- balanced_clustering(features, n_clusters, method = "heuristic", standardize = FALSE)
     ## Check that output is valid
     expect_equal(legal_number_of_clusters(features, clusters_exact), NULL)
     expect_equal(legal_number_of_clusters(features, clusters_heuristic), NULL)
