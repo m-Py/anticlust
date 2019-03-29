@@ -133,8 +133,10 @@ init_clusters <- function(distances, K) {
   clusters <- rep(NA, K)
   ## Pick the first two elements per anticluster
   clusters[1:2] <- which(distances == max(distances), arr.ind = TRUE)[1, ]
+  if (K == 2) {
+    return(clusters)
+  }
   for (k in 3:K) {
-    # select the first pair if a duplicate of the minimum occurs:
     clusters[k] <- best_cluster_fit(distances, clusters[!is.na(clusters)], FALSE)
   }
   return(clusters)
