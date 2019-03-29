@@ -81,7 +81,7 @@ n_elements <- 9
 features <- matrix(runif(n_elements * 2), ncol = 2)
 n_groups <- 3
 clusters <- balanced_clustering(features, K = n_groups)
-anticlusters <- anticlustering(features, K = n_groups, method = "sampling")
+anticlusters <- anticlustering(features, K = n_groups, method = "heuristic")
 par(mfrow = c(1, 2))
 plot_clusters(features, clusters, pch = c(15, 16, 17), main = "Cluster editing")
 plot_clusters(features, anticlusters, pch = c(15, 16, 17), main = "Anticluster editing")
