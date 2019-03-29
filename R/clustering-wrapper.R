@@ -2,19 +2,33 @@
 #' Create K balanced clusters
 #'
 #' @param features A vector, matrix or data.frame of data points. Rows
-#'     correspond to elements and columns correspond to features.
+#'     correspond to elements and columns correspond to features. A
+#'     vector represents a single feature.
+#' @param distances Alternative data argument that can be used if
+#'     \code{features} is not passed. A N x N matrix representing the
+#'     pairwise dissimilarities between all N elements. Larger values
+#'     indicate higher dissimilarity. Can be an object of class
+#'     \code{dist} (e.g., returned by \code{\link{dist}} or
+#'     \code{\link{as.dist}}) or a \code{matrix} where the entries of
+#'     the upper and/or lower triangular matrix represent the pairwise
+#'     dissimilarities.
 #' @param K How many clusters should be created.
+#' @param objective The objective to be maximized. The option
+#'     "distance" (default) is used to optimize the cluster
+#'     editing objective; the option "variance" is used to optimize
+#'     the k-means variance objective. See \code{\link{anticlustering}}.
+#' @param method One of "heuristic" or "exact". See details.
 #' @param standardize Boolean - should the features be standardized
-#'     before anticlusters are assigned? Defaults to TRUE
-#' @param method One of "heuristic" or "exact". When "exact" is chosen,
-#'     the function minimizes the distance criterion (i.e., solves
-#'     balanced k-cluster editing); when "heuristic"
-#'     is chosen, the function tries to minimize the variance criterion
-#'     (see \code{\link{anticlustering}} for details). Use
-#'     \code{method = "exact"} only for rather small n.
+#'     before anticlusters are created? Defaults to \code{TRUE}.
+#'     Standardization is done using the function \code{\link{scale}}
+#'     using the default settings (mean = 0, SD = 1).
 #'
 #' @return A vector representing the cluster affiliation of all elements.
 #'     Each cluster has the the same size.
+#'
+#' @details
+#'
+#' blbalals
 #'
 #' @export
 #'
@@ -29,34 +43,53 @@
 #' par(mfrow = c(1, 2))
 #' plot_clusters(iris[, 1:2], clusters)
 #' plot_clusters(iris[, 3:4], clusters)
-#' par(mfrow = c(1, 1))
+#'
 #'
 #' ## Exact balanced cluster editing method
 #' # Create artifical data
 #' n_features <- 2
-#' n_elements <- 30
-#' features <- matrix(rnorm(n_elements * n_features), ncol = n_features)
-#' ac <- balanced_clustering(features, K = 2, method = "exact")
-#' plot_clusters(features, ac, within_connection = TRUE)
+#' N <- 30
+#' K <- 3
+#' features <- matrix(rnorm(N * n_features), ncol = n_features)
+#' ac1 <- balanced_clustering(features, K = K, method = "exact")
+#' ac2 <- balanced_clustering(features, K = K, method = "heuristic")
+#'
+#' ## Compare with heuristic method
+#' par(mfrow = c(1, 2))
+#' plot_clusters(features, ac1, within_connection = TRUE,
+#'               main = "exact", xlab = "", ylab = "")
+#' plot_clusters(features, ac2, within_connection = TRUE,
+#'               main = "heuristic", xlab = "", ylab = "")
 #'
 
-balanced_clustering <- function(features, K, standardize = TRUE,
-                                method = "heuristic") {
-  features <- as.matrix(features)
-  if (standardize) {
-    features <- scale(features)
+balanced_clustering <- function(features = NULL, distances = NULL,
+                                K, objective = "distance",
+                                method = "heuristic",
+                                standardize = TRUE) {
+
+  input_handling_anticlustering(features, distances, K,
+                                objective, method, TRUE,
+                                standardize, 1)
+
+  ## Standardize feature values (for each feature, mean = 0, sd = 1)?
+  if (argument_exists(features)) {
+    features <- as.matrix(features)
+    if (standardize) {
+      features <- scale(features)
+    }
+    distances <- as.matrix(dist(features))
+  } else {
+    distances <- as.matrix(as.dist(distances))
   }
 
-  if (method == "exact") {
-    solver <- solver_available()
-    if (solver == FALSE)
-      stop("One of the packages 'Rglpk', 'gurobi', or 'Rcplex' ",
-           "must be installed for an exact clustering")
-    clusters <- equal_sized_cluster_editing(features, K, solver)
-  } else if (method == "heuristic") {
-    clusters <- equal_sized_kmeans(features, K)
-  } else {
-    stop("Argument `method` must be 'heuristic' or 'exact'.")
+  if (objective == "variance") {
+    return(equal_sized_kmeans(features, K))
   }
-  return(clusters)
+  if (method == "exact") {
+    return(balanced_cluster_editing(distances, K, solver_available()))
+  }
+  if (K == nrow(distances) / 2) {
+    return(greedy_matching(distances))
+  }
+  greedy_balanced_k_clustering(distances, K)
 }

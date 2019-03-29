@@ -4,24 +4,36 @@
 \alias{balanced_clustering}
 \title{Create K balanced clusters}
 \usage{
-balanced_clustering(features, K, standardize = TRUE,
-  method = "heuristic")
+balanced_clustering(features = NULL, distances = NULL, K,
+  objective = "distance", method = "heuristic", standardize = TRUE)
 }
 \arguments{
 \item{features}{A vector, matrix or data.frame of data points. Rows
-correspond to elements and columns correspond to features.}
+correspond to elements and columns correspond to features. A
+vector represents a single feature.}
+
+\item{distances}{Alternative data argument that can be used if
+\code{features} is not passed. A N x N matrix representing the
+pairwise dissimilarities between all N elements. Larger values
+indicate higher dissimilarity. Can be an object of class
+\code{dist} (e.g., returned by \code{\link{dist}} or
+\code{\link{as.dist}}) or a \code{matrix} where the entries of
+the upper and/or lower triangular matrix represent the pairwise
+dissimilarities.}
 
 \item{K}{How many clusters should be created.}
 
-\item{standardize}{Boolean - should the features be standardized
-before anticlusters are assigned? Defaults to TRUE}
+\item{objective}{The objective to be maximized. The option
+"distance" (default) is used to optimize the cluster
+editing objective; the option "variance" is used to optimize
+the k-means variance objective. See \code{\link{anticlustering}}.}
 
-\item{method}{One of "heuristic" or "exact". When "exact" is chosen,
-the function minimizes the distance criterion (i.e., solves
-balanced k-cluster editing); when "heuristic"
-is chosen, the function tries to minimize the variance criterion
-(see \code{\link{anticlustering}} for details). Use
-\code{method = "exact"} only for rather small n.}
+\item{method}{One of "heuristic" or "exact". See details.}
+
+\item{standardize}{Boolean - should the features be standardized
+before anticlusters are created? Defaults to \code{TRUE}.
+Standardization is done using the function \code{\link{scale}}
+using the default settings (mean = 0, SD = 1).}
 }
 \value{
 A vector representing the cluster affiliation of all elements.
@@ -29,6 +41,9 @@ A vector representing the cluster affiliation of all elements.
 }
 \description{
 Create K balanced clusters
+}
+\details{
+blbalals
 }
 \examples{
 
@@ -41,14 +56,19 @@ by(iris[, -5], clusters, function(x) round(colMeans(x), 2))
 par(mfrow = c(1, 2))
 plot_clusters(iris[, 1:2], clusters)
 plot_clusters(iris[, 3:4], clusters)
-par(mfrow = c(1, 1))
+
 
 ## Exact balanced cluster editing method
 # Create artifical data
 n_features <- 2
-n_elements <- 30
-features <- matrix(rnorm(n_elements * n_features), ncol = n_features)
-ac <- balanced_clustering(features, K = 2, method = "exact")
-plot_clusters(features, ac, within_connection = TRUE)
+N <- 30
+features <- matrix(rnorm(N * n_features), ncol = n_features)
+ac1 <- balanced_clustering(features, K = 2, method = "exact")
+ac2 <- balanced_clustering(features, K = 2, method = "heuristic")
+
+## Compare with heuristic method
+plot_clusters(features, ac1, within_connection = TRUE, main = "exact", xlab = "", ylab = "")
+plot_clusters(features, ac2, within_connection = TRUE, main = "heuristic", xlab = "", ylab = "")
+par(mfrow = c(1, 1))
 
 }
