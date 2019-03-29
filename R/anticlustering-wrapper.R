@@ -248,12 +248,6 @@ input_handling_anticlustering <- function(features, distances,
     stop("Only pass one of the arguments 'features' or 'distances'.")
   }
 
-  if (argument_exists(distances) && preclustering == TRUE && method == "sampling") {
-    stop("Unfortunately, it is currently not possible to conduct a ",
-         "preclustering for the sampling method when a distance matrix ",
-         "is passed as input.")
-  }
-
   if (argument_exists(distances) && objective == "variance") {
     stop("'distances' cannot be used if 'objective' is 'variance'.")
   }

@@ -73,10 +73,10 @@ test_that("distance input works for heuristic without preclustering", {
     distances <- dist(features)
 
     ac_feat <- anticlustering(features, K = K, preclustering = FALSE,
-                              method = "sampling", standardize = FALSE,
+                              method = "heuristic", standardize = FALSE,
                               nrep = 100)
     ac_dist <- anticlustering(distances = distances, K = K, preclustering = FALSE,
-                              method = "sampling", standardize = FALSE,
+                              method = "heuristic", standardize = FALSE,
                               nrep = 100)
 
     expect_equal(obj_value_distance(features, ac_feat),
@@ -96,8 +96,16 @@ test_that("distance input works for heuristic with preclustering", {
     distances <- dist(features)
 
     ## does not work with distance criterion
-    expect_error(anticlustering(distances = distances, K = K, preclustering = TRUE,
-                                method = "sampling", standardize = FALSE,
-                                nrep = 100))
+    ac_feat <- anticlustering(features, K = K, preclustering = TRUE,
+                              method = "heuristic", standardize = FALSE,
+                              nrep = 100)
+    ac_dist <- anticlustering(distances = distances, K = K, preclustering = TRUE,
+                              method = "heuristic", standardize = FALSE,
+                              nrep = 100)
+
+    expect_equal(obj_value_distance(features, ac_feat),
+                 distance_objective(distances, ac_feat))
+    expect_equal(obj_value_distance(features, ac_dist),
+                 distance_objective(distances, ac_dist))
   }
 })
