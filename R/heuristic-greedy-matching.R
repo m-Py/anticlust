@@ -35,7 +35,7 @@
 #' n_features <- 2
 #' features <- matrix(rnorm(N * n_features), ncol = n_features)
 #' c1 <- greedy_matching(dist(features))
-#' c2 <- clustering(features, K = N / 2, method = "exact")
+#' c2 <- balanced_clustering(features, K = N / 2, method = "exact")
 #' par(mfrow = c(1, 2))
 #' plot_clusters(features, c1, within_connection = TRUE, cex = 2.5)
 #' plot_clusters(features, c2, within_connection = TRUE, cex = 2.5)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotting.R
 \name{plot_clusters}
 \alias{plot_clusters}
-\title{Visualize a clustering of two features}
+\title{Visualize a cluster analysis}
 \usage{
 plot_clusters(features, clustering, within_connection = FALSE,
   between_connection = FALSE, show_axes = FALSE, xlab = NULL,
@@ -12,7 +12,7 @@ plot_clusters(features, clustering, within_connection = FALSE,
 }
 \arguments{
 \item{features}{A data.frame or matrix representing the features that
-are used. Must have two columns.}
+are plotted. Must have two columns.}
 
 \item{clustering}{A vector representing the clustering}
 
@@ -66,21 +66,21 @@ if at least one of \code{within_connection} or
 around the plot.}
 }
 \description{
-Visualize a clustering of two features
+Visualize a cluster analysis
 }
 \details{
 In most cases, the argument `clustering` is a vector
   returned by one of the functions \code{\link{anticlustering}} or
-  \code{\link{clustering}}. However, the plotting function can also
-  be used to plot the results of other cluster functions such as
-  \code{\link{kmeans}}.
+  \code{\link{balanced_clustering}}. However, the plotting function
+  can also be used to plot the results of other cluster functions
+  such as \code{\link{kmeans}}.
 }
 \examples{
 
 n_elements <- 9
 features <- matrix(runif(n_elements * 2), ncol = 2)
 n_groups <- 3
-clusters <- clustering(features, K = n_groups)
+clusters <- balanced_clustering(features, K = n_groups)
 anticlusters <- anticlustering(features, K = n_groups, method = "sampling")
 par(mfrow = c(1, 2))
 plot_clusters(features, clusters, pch = c(15, 16, 17), main = "Cluster editing")

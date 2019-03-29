@@ -48,12 +48,12 @@ feature can be passed as a `vector`.
 
 ```{r}
 ## Select only the numeric attributes
-data <- iris[, -5]
-nrow(data)
+features <- iris[, -5]
+nrow(features)
 
 ## Illustrate the data set
 library("knitr")
-kable(head(data))
+kable(head(features))
 ```
 
 We now use the `anticlustering` function to create three similar
@@ -62,7 +62,7 @@ groups of iris plants:
 ```{r}
 library("anticlust")
 n_clusters <- 3
-anticlusters <- anticlustering(data, K = n_clusters)
+anticlusters <- anticlustering(features, K = n_clusters)
 anticlusters
 table(anticlusters)
 ```
@@ -78,8 +78,8 @@ find out, we first plot the plants' characteristics by anticluster:
 ```{r, fig.width = 6.5}
 par(mfrow = c(1, 2))
 pch <- c(15, 16, 17)
-plot_clusters(data[, 1:2], anticlusters, pch = pch) # a function of the anticlust package
-plot_clusters(data[, 3:4], anticlusters, pch = pch)
+plot_clusters(features[, 1:2], anticlusters, pch = pch) # a function of the anticlust package
+plot_clusters(features[, 3:4], anticlusters, pch = pch)
 ```
 
 This looks rather chaotic, but it is probably what we want: We would
@@ -89,11 +89,11 @@ created a strong separation between groups, as can be seen in the
 following example:
 
 ```{r, fig.width = 6.5}
-clusters <- clustering(data, n_clusters) # a function of the anticlust package
+clusters <- balanced_clustering(features, K = n_clusters) # a function of the anticlust package
 
 par(mfrow = c(1, 2))
-plot_clusters(data[, 1:2], clusters, pch = pch)
-plot_clusters(data[, 3:4], clusters, pch = pch)
+plot_clusters(features[, 1:2], clusters, pch = pch)
+plot_clusters(features[, 3:4], clusters, pch = pch)
 ```
 
 As the name suggests, anticlustering is the reversal of clustering.
@@ -112,8 +112,8 @@ anticluster:
 ```{r}
 library("dplyr")
 
-data <- data.frame(Anticluster = anticlusters, data)
-data %>%
+tab <- data.frame(Anticluster = anticlusters, features)
+tab %>%
   group_by(Anticluster) %>%
   summarize_all(funs(mean)) %>%
   round(2) %>%  knitr::kable()
@@ -124,10 +124,10 @@ grouping, as is illustrated by the following code:
 
 ```{r}
 ## Randomly assign plants to anticlusters
-data$Anticluster <- rep(1:n_clusters, nrow(data) / n_clusters)
-data$Anticluster <- sample(data$Anticluster)
+tab$Anticluster <- rep(1:n_clusters, nrow(features) / n_clusters)
+tab$Anticluster <- sample(tab$Anticluster)
 
-data %>%
+tab %>%
   group_by(Anticluster) %>%
   summarize_all(funs(mean)) %>%
   round(2) %>% knitr::kable()
@@ -168,16 +168,15 @@ values indicate higher similarity [@demaine2006].
 To vary the objective function in `anticlust`, it is possible change the
 parameter `objective` in the function `anticlustering`. In most cases,
 the results for the `"variance"` objective (k-means) and the
-`"distance"` objective (cluster editing) will be quite similar. The
+`"distance"` objective (anticluster editing) will be quite similar. The
 default objective is `"distance"`; you can change it to `"variance"` as
 follows:
 
 ```{r, fig.width = 6.5}
-data <- iris[, -5]
-data$Anticluster <- anticlustering(data, K = n_clusters, objective = "variance")
+tab$Anticluster <- anticlustering(features, K = n_clusters, objective = "variance")
 
 ## Display feauture means by anticluster for the variance criterion
-data %>%
+tab %>%
   group_by(Anticluster) %>%
   summarize_all(funs(mean)) %>%
   round(2) %>% knitr::kable()
@@ -189,7 +188,8 @@ If you are already happy with the results provided by the
 `anticlustering` function, you may stop here. If you wish to learn more
 about the theory of anticlustering, you may procede to the vignette
 "Technical notes" that is included with the package. It provides a
-detailed explanation of the variance and distance objectives as well as
+detailed explanation of the variance and anticluster editing objectives 
+as well as
 an explanation of the algorithms `anticlust` uses to optimize the
 objectives. The help page (`?anticlustering`) explains all of the
 parameters that can be adjusted for the `anticlusting` function.
