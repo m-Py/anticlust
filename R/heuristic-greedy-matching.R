@@ -46,7 +46,7 @@ greedy_matching <- function(distances) {
   ## Prepare the distance matrix
   distances <- as.matrix(distances)
   diag(distances) <- Inf
-  N <- nrow(features)
+  N <- nrow(distances)
   if (N %% 2 != 0) {
     stop("The number of elements has to be a divider of 2.")
   }

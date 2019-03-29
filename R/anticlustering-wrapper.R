@@ -156,7 +156,14 @@ anticlustering <- function(features = NULL, distances = NULL,
   preclusters <- NULL
   if (preclustering == TRUE) {
     n_preclusters <- nrow(features) / K
+    if (objective == "distance" && K == 2) {
+      preclusters <- greedy_matching(distances)
+    } else if (objective == "distance" && K > 2) {
+      preclusters <- greedy_balanced_k_clustering(distances, K)
+    }
+    else if (objective == "variance") {
       preclusters <- equal_sized_kmeans(features, n_preclusters)
+    }
   }
   heuristic_anticlustering(features, K, preclusters,
                            objective, nrep = nrep, distances)
