@@ -86,7 +86,7 @@ balanced_clustering <- function(features = NULL, distances = NULL,
       features <- scale(features)
     }
     distances <- as.matrix(dist(features))
-  } else {
+  } else if (argument_exists(distances)) {
     distances <- as.matrix(as.dist(distances))
   }
 
