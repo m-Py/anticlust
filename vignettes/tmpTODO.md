@@ -35,8 +35,3 @@ Documentation:
 
 - test if my branch and bound method is useful for clustering 
   (it is not for anticlustering)
-
---- 
-
-Make interfaces (i.e., arguments) consistent for `balanced_clustering`
-and `anticlustering`
