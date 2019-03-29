@@ -213,7 +213,7 @@ input_handling_anticlustering <- function(features, distances,
     validate_input(K, "K", "numeric", len = 1,
                    greater_than = 1, must_be_integer = TRUE)
     if (nrow(features) %% K != 0) {
-      stop("The number of anticlusters must be a divider of the number of elements.")
+      stop("K must be a divider of the number of elements.")
     }
   }
 
@@ -234,10 +234,10 @@ input_handling_anticlustering <- function(features, distances,
     if (solver == FALSE) {
       stop("An exact solution was requested, but none of the linear ",
            "programming packages 'Rglpk', 'gurobi', or 'Rcplex' is ",
-           "installed. If you really want to use an exact approach ",
-           "without installing a linear programming solver, check out ",
-           "the `enum_anticlustering` function. This is not advised ",
-           "however, because the linear programming variant is faster.")
+           "installed. Try out method = 'heuristic' or install ",
+           "the a linear programming solver. E.g., ",
+           "visit http://gnuwin32.sourceforge.net/packages/glpk.htm ",
+           " if you are using windows.")
     }
   }
 
