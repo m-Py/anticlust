@@ -26,7 +26,7 @@
 #'
 #' @return A vector representing which elements were matched.
 #'
-#' @export
+#' @noRd
 #'
 #' @examples
 #'

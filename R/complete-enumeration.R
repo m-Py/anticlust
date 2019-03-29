@@ -18,7 +18,7 @@
 #'
 #' @return The anticluster affiliation
 #'
-#' @export
+#' @noRd
 #'
 #' @author Martin Papenberg \email{martin.papenberg@@hhu.de}
 #'

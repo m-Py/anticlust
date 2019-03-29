@@ -2,8 +2,6 @@
 
 export(anticlustering)
 export(balanced_clustering)
-export(enum_anticlustering)
-export(greedy_matching)
 export(plot_clusters)
 importFrom(Matrix,sparseMatrix)
 importFrom(grDevices,rainbow)
