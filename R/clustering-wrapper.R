@@ -36,7 +36,7 @@
 #' n_features <- 2
 #' n_elements <- 30
 #' features <- matrix(rnorm(n_elements * n_features), ncol = n_features)
-#' ac <- clustering(features, K = 2, method = "exact")
+#' ac <- balanced_clustering(features, K = 2, method = "exact")
 #' plot_clusters(features, ac, within_connection = TRUE)
 #'
 
