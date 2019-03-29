@@ -110,7 +110,7 @@ plot_clusters <- function(features, clustering, within_connection = FALSE,
   if (show_axes == TRUE)
     axt <- "s"
   plot(x, y, las = 1, cex.axis = cex.axis, cex.lab = cex.lab,
-       col = col, xlab = xlab, ylab = ylab, cex = cex,
+       col = col, xlab = xlab, ylab = ylab, cex = cex, bg = col,
        xaxt = axt, yaxt = axt, pch = pch, main = main,
        frame.plot = frame.plot, xlim = xlim, ylim = ylim)
   ## Draw graph structure
