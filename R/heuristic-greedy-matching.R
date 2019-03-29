@@ -30,7 +30,7 @@
 #'
 #' @examples
 #'
-#' # Compare exact and greedy matching
+#' # Compare greedy matching and optimal matching
 #' N <- 10
 #' n_features <- 2
 #' features <- matrix(rnorm(N * n_features), ncol = n_features)
