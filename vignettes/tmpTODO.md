@@ -37,3 +37,6 @@ Documentation:
   (it is not for anticlustering)
 
 --- 
+
+Make interfaces (i.e., arguments) consistent for `balanced_clustering`
+and `anticlustering`
