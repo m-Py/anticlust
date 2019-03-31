@@ -10,33 +10,54 @@
 #'     indicate higher dissimilarity. Can be an object of class
 #'     \code{dist} (e.g., returned by \code{\link{dist}} or
 #'     \code{\link{as.dist}}) or a \code{matrix} where the entries of
-#'     the upper and/or lower triangular matrix represent the pairwise
+#'     the upper and lower triangular matrix represent the pairwise
 #'     dissimilarities.
 #' @param K How many clusters should be created.
-#' @param objective The objective to be minimized. The option
-#'     "distance" (default) is used to minimize the cluster editing
-#'     objective; the option "variance" is used to minimize the
-#'     k-means objective. See details and \code{\link{anticlustering}}.
+#' @param objective The objective to be minimized. The option "distance"
+#'     (default) is used to minimize the cluster editing objective; the
+#'     option "variance" is used to minimize the k-means objective. See
+#'     details.
 #' @param method One of "heuristic" or "exact". See details.
 #' @param standardize Boolean - should the features be standardized
 #'     before anticlusters are created? Defaults to \code{TRUE}.
 #'     Standardization is done using the function \code{\link{scale}}
-#'     using the default settings (mean = 0, SD = 1).
+#'     using the default settings (mean = 0, SD = 1). This argument only
+#'     works in combination with the çode{features} argument, not with
+#'     \code{distances}.
 #'
 #' @return A vector representing the cluster affiliation of all elements.
 #'     Each cluster has the the same size.
 #'
 #' @details
 #'
-#' This function clusters a set of elements into K equal sized
-#' clusters.  Can optimize the *cluster editing* objective exactly
-#' using integer linear programming. The cluster editing objective
-#' minimizes the sum o of the pairwise distances within-clusters. Can
-#' also be used to optimize the k-means variance objective (when
-#' setting `objective = "variance"`). A heuristic is used to optimize
-#' the variance criterion (thus, this function implements a balanced
-#' variant of k-means).  A heuristic is also available to optimize the
-#' cluster editing distance criterion.
+#' This function partitions a set of elements into K equal sized
+#' clusters. The objective is one of the following:
+#' 
+#' - k-means *variance* objective, setting \code{objective = "variance"}
+#'
+#' - cluster editing *distance* objective, setting \code{objective = "distance"}
+#'
+#' The k-means objective minimizes the variance within clusters. The
+#' cluster editing objective minimizes the sum of pairwise distances
+#' within clusters. If the argument \code{features} is passed together
+#' with \code{objective = "distance"}, the Euclidean distance is
+#' computed by default. If another distance measure is preferred, pass a
+#' self-computed dissimiliarity matrix via the argument
+#' \code{distances}. The optimal cluster editing objective can be found
+#' via integer linear programming; for the k-means objective, there is
+#' only a heuristic option. Vary the parameter \code{method} to select a
+#' "heuristic" or "exact" computation.
+#'
+#' To obtain an optimal solution for balanced cluster editing, a linear
+#' programming solver must be installed and usable from R. The
+#' `anticlust` package supports the open source GNU linear programming
+#' kit (called from the package \code{Rglpk}) and the commercial solvers
+#' gurobi (called from the package \code{gurobi}) and IBM CPLEX (called
+#' from the package \code{Rcplex}). A license is needed to use one of
+#' the commercial solvers. The optimal solution is retrieved by setting
+#' \code{objective = "distance"}, \code{preclustering = FALSE}, and
+#' \code{method = "exact"}. Use this combination of arguments only for
+#' rather small problem sizes.
 #'
 #' @export
 #'
@@ -69,6 +90,15 @@
 #' plot_clusters(features, ac2, within_connection = TRUE,
 #'               main = "heuristic cluster editing", xlab = "", ylab = "")
 #'
+#' @references
+#'
+#' M. Grötschel and Y. Wakabayashi, “A cutting plane algorithm for a
+#' clustering problem,” Mathematical Programming, vol. 45, nos. 1-3, pp.
+#' 59–96, 1989.
+#'
+#' H. Späth, “Anticlustering: Maximizing the variance criterion,”
+#' Control and Cybernetics, vol. 15, no. 2, pp. 213-218, 1986.
+#' 
 
 balanced_clustering <- function(features = NULL, distances = NULL,
                                 K, objective = "distance",

@@ -27,7 +27,9 @@
 #' @param standardize Boolean - should the features be standardized
 #'     before anticlusters are created? Defaults to \code{TRUE}.
 #'     Standardization is done using the function \code{\link{scale}}
-#'     using the default settings (mean = 0, SD = 1).
+#'     using the default settings (mean = 0, SD = 1). This argument only
+#'     works in combination with the çode{features} argument, not with
+#'     \code{distances}.
 #' @param nrep The number of repetitions for the random sampling
 #'     heuristic.  This argument only has an effect if \code{method}
 #'     is \code{"heuristic"}. It does not have an effect if
@@ -43,56 +45,60 @@
 #' @details
 #'
 #' This function is used to solve balanced K anticlustering. That is, K
-#' groups of equal size are created in such a way that similarity of
-#' these groups is maximized. Similarity is measured by one of two
-#' objective functions. Späth (1986) and Valev (1998) proposed to
-#' maximize the variance criterion used in k-means clustering to
-#' establish similar groups in the anticlustering application.
-#' Optimizing the variance criterion (thus, solving *k-means
-#' anticlustering*) is accomplished by setting \code{objective =
-#' "variance"}.
+#' groups of equal size are created in such a way that similarity of all
+#' groups is maximized. Set similarity is assessed using one of two
+#' objective functions:
 #'
-#' The \code{anticlust} package also introduces another objective
-#' function to the anticlustering application that has been developed
-#' in the problem domain of cluster editing. It is based on a measure
-#' of the pairwise distances of data points (Grötschel & Wakabayashi,
-#' 1989). *Anticluster editing* maximizes the sum of pairwise
-#' distances within groups. The anticluster editing objective can be
-#' optimized _exactly_ via integer linear programming. To obtain the
-#' optimal solution, a linear programming solver must therefore be
-#' installed and usable from R.  The `anticlust` package supports the
-#' open source GNU linear programming kit (called from the package
-#' \code{Rglpk}) and the commercial solvers gurobi (called from the
-#' package \code{gurobi}) and IBM CPLEX (called from the package
-#' \code{Rcplex}). A license is needed to use one of the commercial
-#' solvers. The optimal solution is retrieved by setting
+#' - k-means *variance* objective, setting \code{objective = "variance"}
+#'
+#' - cluster editing *distance* objective, setting \code{objective = "distance"}
+#'
+#' The k-means objective maximizes the variance within anticlusters. The
+#' cluster editing objective maximizes the sum of pairwise distances
+#' within anticlusters. If the argument \code{features} is passed
+#' together with \code{objective = "distance"} If another distance
+#' measure is preferred, pass a self-computed dissimiliarity matrix via
+#' the argument \code{distances}. The optimal cluster editing objective
+#' can be found via integer linear programming; for the k-means
+#' objective, there is only a heuristic option. Vary the parameter
+#' \code{method} to select a "heuristic" or "exact" computation.
+#' 
+#' Both of these objectives are maximized to establish sets that are
+#' similar; minimization of the same objectives creates a clustering,
+#' i.e., establishes sets sets such that elements are as similar as
+#' possible within a set and as different as possible between sets, see
+#' \code{\link{balanced_clustering}}.
+#'
+#' To obtain an optimal solution for anticluster editing, a linear
+#' programming solver must be installed and usable from R.  The
+#' `anticlust` package supports the open source GNU linear programming
+#' kit (called from the package \code{Rglpk}) and the commercial solvers
+#' gurobi (called from the package \code{gurobi}) and IBM CPLEX (called
+#' from the package \code{Rcplex}). A license is needed to use one of
+#' the commercial solvers. The optimal solution is retrieved by setting
 #' \code{objective = "distance"}, \code{preclustering = FALSE}, and
 #' \code{method = "exact"}. Use this combination of arguments only for
-#' small problem sizes (maybe <= 30 elements). No algorithm is
-#' available to find the optimal solution for k-means anticlustering,
-#' i.e., to maximize the variance criterion.
+#' small problem sizes (maybe <= 30 elements).
 #'
 #' To relax the optimality condition, it is possible to set
-#' \code{preclustering = TRUE}. In this case, the distance objective
-#' is still optimized using integer linear programming, but a
+#' \code{preclustering = TRUE}. In this case, the anticluster editing
+#' objective is still optimized using integer linear programming, but a
 #' preprocessing forbids very similar elements to be assigned to the
-#' same anticluster.  This approach can be used to work on larger
-#' problem instances and the solution is usually still optimal or very
-#' close to optimal.
+#' same anticluster. This approach can be used to work on larger problem
+#' instances and the solution is usually still optimal or very close to
+#' optimal.
 #'
-#' If no exact solution is required or the problem size is too large
-#' for integer linear programming, a heuristic method based on
-#' repeated random sampling is available. Across a specified number of
-#' runs, anticlusters are assigned randomly and the best assignment
-#' (maximizing the sum of within-group distances) is returned. This
-#' method works for both anticluster editing and k-means
-#' anticlustering (the latter is accomplished by setting `objective =
-#' "variance"`). The sampling approach may also incorporate a
+#' If no exact solution is required or the problem size is too large for
+#' integer linear programming, a heuristic method, based on repeated
+#' random sampling, is available. Across a specified number of runs,
+#' anticlusters are assigned randomly and the best assignment is
+#' returned. This method works for both anticluster editing and k-means
+#' anticlustering. The sampling approach may also incorporate a
 #' preclustering that prevents grouping very similar elements into the
 #' same anticluster; use \code{preclustering = TRUE} to activate this
 #' option, which is also the default. It is suggested that the
-#' preclustering condition is activated for the random sampling
-#' approach because it usually improves the quality of the solution.
+#' preclustering condition is activated for the random sampling approach
+#' because it usually improves the quality of the solution.
 #'
 #' @examples
 #'
@@ -136,10 +142,6 @@
 #' H. Späth, “Anticlustering: Maximizing the variance criterion,”
 #' Control and Cybernetics, vol. 15, no. 2, pp. 213-218, 1986.
 #'
-#' Valev, V. (1998). Set partition principles revisited. In Joint IAPR
-#' international workshops on statistical techniques in pattern
-#' recognition (SPR) and structural and syntactic pattern recognition
-#' (SSPR) (pp.  875–881).
 #'
 
 anticlustering <- function(features = NULL, distances = NULL,
@@ -232,12 +234,17 @@ input_handling_anticlustering <- function(features, distances,
   if (method == "exact") {
     solver <- solver_available()
     if (solver == FALSE) {
-      stop("An exact solution was requested, but none of the linear ",
-           "programming packages 'Rglpk', 'gurobi', or 'Rcplex' is ",
-           "installed. Try out method = 'heuristic' or install ",
-           "the a linear programming solver. E.g., ",
-           "visit http://gnuwin32.sourceforge.net/packages/glpk.htm ",
-           " if you are using windows.")
+        stop("An exact solution was requested, but none of the linear ",
+             "programming packages 'Rglpk', 'gurobi', or 'Rcplex' is ",
+             "installed. Try out method = 'heuristic' or install ",
+             "a linear programming solver. E.g., install the GNU "
+             "linear programming kit. ",
+             "Visit http://gnuwin32.sourceforge.net/packages/glpk.htm ",
+             "if you are using windows; , "
+             "use homebrew to install it on mac (brew install glpk); ",
+             "use the following command to install it on Ubuntu: ",
+             "sudo apt install libglpk-dev. Then, install the package Rglpk using ,"
+             "install.packages(Rglpk)")
     }
   }
 
