@@ -16,10 +16,8 @@ test_that("distance input works for exact ILP", {
     ac_dist <- anticlustering(distances = distances, K = K,
                               preclustering = FALSE,
                               method = "exact", standardize = FALSE)
-    expect_equal(obj_value_distance(features, ac_feat),
+    expect_equal(distance_objective_(dist(features), ac_feat),
                  distance_objective_(distances, ac_feat))
-    expect_equal(obj_value_distance(features, ac_dist),
-                 distance_objective_(distances, ac_dist))
   }
 })
 
@@ -37,10 +35,8 @@ test_that("distance input works for precluster ILP", {
     ac_dist <- anticlustering(distances = distances, K = K,
                               preclustering = TRUE,
                               method = "exact", standardize = FALSE)
-    expect_equal(obj_value_distance(features, ac_feat),
+    expect_equal(distance_objective_(dist(features), ac_feat),
                  distance_objective_(distances, ac_feat))
-    expect_equal(obj_value_distance(features, ac_dist),
-                 distance_objective_(distances, ac_dist))
   }
 })
 
@@ -56,10 +52,8 @@ test_that("distance input works for complete enumeration", {
     ac_feat <- enum_anticlustering(features, K = K)
     ac_dist <- enum_anticlustering(distances = distances, K = K)
 
-    expect_equal(obj_value_distance(features, ac_feat),
+    expect_equal(distance_objective_(dist(features), ac_feat),
                  distance_objective_(distances, ac_feat))
-    expect_equal(obj_value_distance(features, ac_dist),
-                 distance_objective_(distances, ac_dist))
   }
 })
 
@@ -72,17 +66,21 @@ test_that("distance input works for heuristic without preclustering", {
     features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
     distances <- dist(features)
 
+    ## Use a fixed seed to compare the random sampling method based on
+    ## features and distance input
+    rnd_seed <- sample(10000, size = 1)
+
+    set.seed(rnd_seed)
     ac_feat <- anticlustering(features, K = K, preclustering = FALSE,
                               method = "heuristic", standardize = FALSE,
                               nrep = 100)
+    set.seed(rnd_seed)
     ac_dist <- anticlustering(distances = distances, K = K, preclustering = FALSE,
                               method = "heuristic", standardize = FALSE,
                               nrep = 100)
 
-    expect_equal(obj_value_distance(features, ac_feat),
+    expect_equal(distance_objective_(dist(features), ac_feat),
                  distance_objective_(distances, ac_feat))
-    expect_equal(obj_value_distance(features, ac_dist),
-                 distance_objective_(distances, ac_dist))
   }
 })
 
@@ -95,18 +93,22 @@ test_that("distance input works for heuristic with preclustering", {
     features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
     distances <- dist(features)
 
+    ## Use a fixed seed to compare the random sampling method based on
+    ## features and distance input
+    rnd_seed <- sample(10000, size = 1)
+
+    set.seed(rnd_seed)
     ## does not work with distance criterion
     ac_feat <- anticlustering(features, K = K, preclustering = TRUE,
                               method = "heuristic", standardize = FALSE,
                               nrep = 100)
+    set.seed(rnd_seed)
     ac_dist <- anticlustering(distances = distances, K = K, preclustering = TRUE,
                               method = "heuristic", standardize = FALSE,
                               nrep = 100)
 
-    expect_equal(obj_value_distance(features, ac_feat),
+    expect_equal(distance_objective_(dist(features), ac_feat),
                  distance_objective_(distances, ac_feat))
-    expect_equal(obj_value_distance(features, ac_dist),
-                 distance_objective_(distances, ac_dist))
   }
 })
 
@@ -124,9 +126,7 @@ test_that("distance input works for clustering function, heuristic method", {
     ac_feat <- balanced_clustering(features, K = K, method = "heuristic", standardize = FALSE)
     ac_dist <- balanced_clustering(distances = distances, K = K, method = "heuristic", standardize = FALSE)
 
-    expect_equal(obj_value_distance(features, ac_feat),
+    expect_equal(distance_objective_(dist(features), ac_feat),
                  distance_objective_(distances, ac_feat))
-    expect_equal(obj_value_distance(features, ac_dist),
-                 distance_objective_(distances, ac_dist))
   }
 })
