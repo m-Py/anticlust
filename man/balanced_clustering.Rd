@@ -14,7 +14,7 @@ vector represents a single feature.}
 
 \item{distances}{Alternative data argument that can be used if
 \code{features} is not passed. A N x N matrix representing the
-pairwise dissimilarities between all N elements. Larger values
+pairwise dissimilarities between N elements. Larger values
 indicate higher dissimilarity. Can be an object of class
 \code{dist} (e.g., returned by \code{\link{dist}} or
 \code{\link{as.dist}}) or a \code{matrix} where the entries of
@@ -23,19 +23,19 @@ dissimilarities.}
 
 \item{K}{How many clusters should be created.}
 
-\item{objective}{The objective to be minimized. The option "distance"
-(default) is used to minimize the cluster editing objective; the
-option "variance" is used to minimize the k-means objective. See
-details.}
+\item{objective}{The objective to be minimized. The option
+"distance" (default) is used to minimize the cluster editing
+objective; the option "variance" is used to minimize the
+k-means objective. See details.}
 
 \item{method}{One of "heuristic" or "exact". See details.}
 
 \item{standardize}{Boolean - should the features be standardized
 before anticlusters are created? Defaults to \code{FALSE}.
 Standardization is done using the function \code{\link{scale}}
-using the default settings (mean = 0, SD = 1). This argument only
-works in combination with the \code{features} argument, not with
-\code{distances}.}
+using the default settings (mean = 0, SD = 1). This argument
+only works in combination with the \code{features} argument,
+not with \code{distances}.}
 }
 \value{
 A vector representing the cluster affiliation of all elements.
@@ -56,21 +56,22 @@ The k-means objective minimizes the variance within clusters. The
 cluster editing objective minimizes the sum of pairwise distances
 within clusters. If the argument \code{features} is passed together
 with \code{objective = "distance"}, the Euclidean distance is
-computed by default. If another distance measure is preferred, pass a
-self-computed dissimiliarity matrix via the argument
-\code{distances}. The optimal cluster editing objective can be found
-via integer linear programming; for the k-means objective, there is
-only a heuristic option. Vary the parameter \code{method} to select a
-"heuristic" or "exact" computation.
+computed by default. If another distance measure is preferred, pass
+a self-computed dissimiliarity matrix via the argument
+\code{distances}. The optimal cluster editing objective can be
+found via integer linear programming; for the k-means objective,
+there is only a heuristic option. Vary the parameter \code{method}
+to select a "heuristic" or "exact" computation.
 
-To obtain an optimal solution for balanced cluster editing, a linear
-programming solver must be installed and usable from R. The
+To obtain an optimal solution for balanced cluster editing, a
+linear programming solver must be installed and usable from R. The
 `anticlust` package supports the open source GNU linear programming
-kit (called from the package \code{Rglpk}) and the commercial solvers
-gurobi (called from the package \code{gurobi}) and IBM CPLEX (called
-from the package \code{Rcplex}). A license is needed to use one of
-the commercial solvers. The optimal solution is retrieved by setting
-\code{objective = "distance"} and \code{method = "exact"}.
+kit (called from the package \code{Rglpk}) and the commercial
+solvers gurobi (called from the package \code{gurobi}) and IBM
+CPLEX (called from the package \code{Rcplex}). A license is needed
+to use one of the commercial solvers. The optimal solution is
+retrieved by setting \code{objective = "distance"} and \code{method
+= "exact"}.
 }
 \examples{
 

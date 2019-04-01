@@ -35,8 +35,9 @@ objective function used in k-means clustering, see
 \note{
 When using this function to check the results of
 \code{\link{anticlustering}} or \code{\link{balanced_clustering}},
-make sure that the \code{standardization} argument has the same value
-when creating (anti)clusters and when calling \code{variance_objective}.
+make sure that the \code{standardization} argument has the same
+value when creating (anti)clusters and when calling
+\code{variance_objective}.
 }
 \examples{
 

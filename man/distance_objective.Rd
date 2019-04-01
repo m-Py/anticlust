@@ -14,11 +14,11 @@ vector represents a single feature.}
 
 \item{distances}{Alternative data argument that can be used if
 \code{features} is not passed. A N x N matrix representing the
-pairwise dissimilarities between all N elements. Larger values
+pairwise dissimilarities between N elements. Larger values
 indicate higher dissimilarity. Can be an object of class
 \code{dist} (e.g., returned by \code{\link{dist}} or
 \code{\link{as.dist}}) or a \code{matrix} where the entries of
-the upper and/or lower triangular matrix represent the pairwise
+the upper and lower triangular matrix represent the pairwise
 dissimilarities.}
 
 \item{clusters}{A vector representing (anti)clusters (e.g.,
@@ -41,6 +41,8 @@ Check the objective value for a given clustering.
 \details{
 The cluster editing objective objective is given by the sum of the
 pairwise distances between elements within the same (anti)clusters.
+When the argument \code{features} is passed, the Euclidean distance
+is used.
 }
 \note{
 When using this function to check the results of
@@ -68,6 +70,19 @@ distance_objective(iris[, -5], clusters = clusters, standardize = TRUE)
 
 anticlusters <- anticlustering(iris[, -5], K = 3, standardize = TRUE)
 distance_objective(iris[, -5], clusters = anticlusters, standardize = TRUE)
+
+# Illustrates the cluster editing objective as the sum of distances
+# within groups:
+n_elements <- 12
+features <- matrix(runif(n_elements * 2), ncol = 2)
+n_groups <- 3
+clusters <- balanced_clustering(features, K = n_groups, method = "exact")
+anticlusters <- anticlustering(features, K = n_groups, method = "exact")
+par(mfrow = c(1, 2))
+plot_clusters(features, clusters, within_connection = TRUE,
+              main = "Minimum within-group distances")
+plot_clusters(features, anticlusters, within_connection = TRUE,
+              main = "Maximum within-group distances")
 
 }
 \references{

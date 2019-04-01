@@ -9,11 +9,11 @@
 #'     vector represents a single feature.
 #' @param distances Alternative data argument that can be used if
 #'     \code{features} is not passed. A N x N matrix representing the
-#'     pairwise dissimilarities between all N elements. Larger values
+#'     pairwise dissimilarities between N elements. Larger values
 #'     indicate higher dissimilarity. Can be an object of class
 #'     \code{dist} (e.g., returned by \code{\link{dist}} or
 #'     \code{\link{as.dist}}) or a \code{matrix} where the entries of
-#'     the upper and/or lower triangular matrix represent the pairwise
+#'     the upper and lower triangular matrix represent the pairwise
 #'     dissimilarities.
 #' @param K How many anticlusters should be created.
 #' @param objective The objective to be maximized. The option
@@ -55,52 +55,66 @@
 #' - cluster editing *distance* objective, setting \code{objective =
 #'   "distance"}
 #'
-#' The k-means objective maximizes the variance within
-#' anticlusters. The cluster editing objective maximizes the sum of
-#' pairwise distances within anticlusters. If the argument
-#' \code{features} is passed together with \code{objective =
-#' "distance"}, the Euclidean distance is computed. If another measure
-#' of dissimilarity is preferred, pass a self-computed dissimiliarity
-#' matrix via the argument \code{distances}. Maximizing either of
-#' these objectives is used to create similar groups; minimization of
-#' the same objectives leads to a clustering, i.e., elements are as
-#' similar as possible within a set and as different as possible
-#' between sets, see \code{\link{balanced_clustering}}.
+#' The k-means objective maximizes the variance within anticlusters
+#' (see \code{\link{variance_objective}}). The cluster editing
+#' objective maximizes the sum of pairwise distances within
+#' anticlusters (see \code{\link{distance_objective}}). Maximizing
+#' either of these objectives is used to create similar groups;
+#' minimization of the same objectives leads to a clustering, i.e.,
+#' elements are as similar as possible within a set and as different
+#' as possible between sets, which is done via
+#' \code{\link{balanced_clustering}}.
+#'
+#' If the argument \code{features} is passed together with
+#' \code{objective = "distance"}, the Euclidean distance between
+#' elements is computed as the basic unit of the cluster editing
+#' objective. If another measure of dissimilarity is preferred, you
+#' may pass a self-generated dissimiliarity matrix via the argument
+#' \code{distances}.
 #'
 #' The optimal anticluster editing objective can be found via integer
-#' linear programming; for the k-means objective, there is only a
-#' heuristic option. Vary the parameter \code{method} to select a
-#' "heuristic" or "exact" computation. To obtain an optimal solution
-#' for anticluster editing, a linear programming solver must be
-#' installed and usable from R. The `anticlust` package supports the
-#' open source GNU linear programming kit (called from the package
-#' \code{Rglpk}) and the commercial solvers gurobi (called from the
-#' package \code{gurobi}) and IBM CPLEX (called from the package
-#' \code{Rcplex}). A license is needed to use one of the commercial
-#' solvers. The optimal solution is retrieved by setting
-#' \code{objective = "distance"}, \code{preclustering = FALSE}, and
-#' \code{method = "exact"}. Use this combination of arguments only for
-#' small problem sizes (maybe <= 30 elements).
+#' linear programming. To this end, set \code{method = "exact"}. To
+#' obtain an optimal solution for anticluster editing, a linear
+#' programming solver must be installed and usable from R. The
+#' `anticlust` package supports the open source GNU linear programming
+#' kit (called from the package \code{Rglpk}) and the commercial
+#' solvers gurobi (called from the package \code{gurobi}) and IBM
+#' CPLEX (called from the package \code{Rcplex}). A license is needed
+#' to use one of the commercial solvers. The optimal solution is
+#' retrieved by setting \code{objective = "distance"},
+#' \code{preclustering = FALSE}, and \code{method = "exact"}. Use this
+#' combination of arguments only for small problem sizes (maybe <= 30
+#' elements).
 #'
-#' To relax the optimality condition, it is possible to set
-#' \code{preclustering = TRUE}. In this case, the anticluster editing
-#' objective is still optimized using integer linear programming, but a
-#' preprocessing forbids very similar elements to be assigned to the
-#' same anticluster. This approach can be used to work on larger problem
-#' instances and the solution is usually still optimal or very close to
-#' optimal.
+#' To relax the optimality condition, it is possible to set the
+#' argument \code{preclustering = TRUE}. In this case, the anticluster
+#' editing objective is still optimized using integer linear
+#' programming, but a preprocessing forbids very similar elements to
+#' be assigned to the same anticluster. This approach can be used to
+#' work on larger problem instances and the solution is usually still
+#' optimal or very close to optimal.
 #'
-#' If no exact solution is required or the problem size is too large for
-#' integer linear programming, a heuristic method, based on repeated
-#' random sampling, is available. Across a specified number of runs,
-#' anticlusters are assigned randomly and the best assignment is
-#' returned. This method works for both anticluster editing and k-means
-#' anticlustering. The sampling approach may also incorporate a
+#' If no exact solution is required or the problem size is too large
+#' for integer linear programming, a heuristic method is available via
+#' setting \code{method = "heuristic"}. This option has to be used
+#' when optimizing the k-means objective -- there is no exact
+#' algorithm available to optimize the k-means objective -- and may be
+#' used when optimizing the anticluster editing objective. The
+#' heuristic employs repeated random sampling: across a specified
+#' number of runs, anticlusters are assigned randomly and the best
+#' assignment -- maximizing the specified objective -- is
+#' returned. The sampling approach may also incorporate a
 #' preclustering that prevents grouping very similar elements into the
 #' same anticluster; use \code{preclustering = TRUE} to activate this
 #' option, which is also the default. It is suggested that the
-#' preclustering condition is activated for the random sampling approach
-#' because it usually improves the quality of the solution.
+#' preclustering condition is activated for the random sampling
+#' approach because it usually improves the quality of the solution.
+#'
+#' Preclustering (for the exact and heuristic approach) is performed
+#' by a call to \code{\link{balanced_clustering}} where the argument
+#' \code{K} is set to the number of elements divided by the number of
+#' anticlusters that are to be created (actually, this is not exactly
+#' what is happening internally, but it is equivalent).
 #'
 #' @examples
 #'
@@ -109,8 +123,7 @@
 #' # (b) Heuristic method: random sampling
 #' # (c) 10,000 sampling repetitions
 #' # (d) Preclustering is activated
-#' # (e) Anticlustering uses standardized features (each feature has
-#' #     mean = 0 and SD = 1)
+#' # (e) Features are not standardized
 #'
 #' data(iris)
 #' # Only use numeric attributes
@@ -122,18 +135,24 @@
 #' plot_clusters(iris[, 1:2], anticlusters)
 #' plot_clusters(iris[, 3:4], anticlusters)
 #'
-#' ## Exact anticlustering
+#' # As the features are differently scaled, the solution is improved
+#' # by setting standardize = TRUE:
+#' anticlusters <- anticlustering(iris[, -5], K = 3, standardize = TRUE)
+#' by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2)) 
+#' 
+#'
+#' ## Try out exact anticlustering
 #' # Create artifical data
 #' n_features <- 2
 #' n_elements <- 20
 #' K <- 2
 #' features <- matrix(rnorm(n_elements * n_features), ncol = n_features)
 #' anticlustering(features, K = K, method = "exact",
-#'                preclustering = FALSE, standardize = FALSE)
+#'                preclustering = FALSE)
 #'
 #' # Enable preclustering
 #' anticlustering(features, K = K, method = "exact",
-#'                preclustering = TRUE, standardize = FALSE)
+#'                preclustering = TRUE)
 #'
 #' @references
 #'

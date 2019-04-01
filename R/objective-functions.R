@@ -27,8 +27,9 @@
 #'
 #' When using this function to check the results of
 #' \code{\link{anticlustering}} or \code{\link{balanced_clustering}},
-#' make sure that the \code{standardization} argument has the same value
-#' when creating (anti)clusters and when calling \code{variance_objective}.
+#' make sure that the \code{standardization} argument has the same
+#' value when creating (anti)clusters and when calling
+#' \code{variance_objective}.
 #'
 #' @references
 #'
@@ -85,11 +86,11 @@ variance_objective <- function(features, clusters,
 #'     vector represents a single feature.
 #' @param distances Alternative data argument that can be used if
 #'     \code{features} is not passed. A N x N matrix representing the
-#'     pairwise dissimilarities between all N elements. Larger values
+#'     pairwise dissimilarities between N elements. Larger values
 #'     indicate higher dissimilarity. Can be an object of class
 #'     \code{dist} (e.g., returned by \code{\link{dist}} or
 #'     \code{\link{as.dist}}) or a \code{matrix} where the entries of
-#'     the upper and/or lower triangular matrix represent the pairwise
+#'     the upper and lower triangular matrix represent the pairwise
 #'     dissimilarities.
 #' @param clusters A vector representing (anti)clusters (e.g.,
 #'     returned by \code{\link{anticlustering}} or
@@ -107,6 +108,8 @@ variance_objective <- function(features, clusters,
 #'
 #' The cluster editing objective objective is given by the sum of the
 #' pairwise distances between elements within the same (anti)clusters.
+#' When the argument \code{features} is passed, the Euclidean distance
+#' is used.
 #'
 #' @note
 #'
@@ -144,8 +147,10 @@ variance_objective <- function(features, clusters,
 #' clusters <- balanced_clustering(features, K = n_groups, method = "exact")
 #' anticlusters <- anticlustering(features, K = n_groups, method = "exact")
 #' par(mfrow = c(1, 2))
-#' plot_clusters(features, clusters, within_connection = TRUE)
-#' plot_clusters(features, anticlusters, within_connection = TRUE)
+#' plot_clusters(features, clusters, within_connection = TRUE,
+#'               main = "Minimum within-group distances")
+#' plot_clusters(features, anticlusters, within_connection = TRUE,
+#'               main = "Maximum within-group distances")
 #'
 #' @export
 #'
