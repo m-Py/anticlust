@@ -70,13 +70,13 @@ The k-means objective maximizes the variance within
 anticlusters. The cluster editing objective maximizes the sum of
 pairwise distances within anticlusters. If the argument
 \code{features} is passed together with \code{objective =
-"distance"}. If another distance measure is preferred, pass a
-self-computed dissimiliarity matrix via the argument
-\code{distances}. Maximizing either of these objectives is used to
-create similar groups; minimization of the same objectives leads to
-a clustering, i.e., elements are as similar as possible within a
-set and as different as possible between sets, see
-\code{\link{balanced_clustering}}.
+"distance"}, the Euclidean distance is computed. If another measure
+of dissimilarity is preferred, pass a self-computed dissimiliarity
+matrix via the argument \code{distances}. Maximizing either of
+these objectives is used to create similar groups; minimization of
+the same objectives leads to a clustering, i.e., elements are as
+similar as possible within a set and as different as possible
+between sets, see \code{\link{balanced_clustering}}.
 
 The optimal anticluster editing objective can be found via integer
 linear programming; for the k-means objective, there is only a
