@@ -136,9 +136,9 @@ random_sampling <- function(dat, K, objective, nrep,
   # 2. Distance objective, distances were passed
   # 3. Variance objective, features were passed
   if (objective == "distance") {
-    obj_value <- distance_objective
+    obj_value <- distance_objective_
   } else {
-    obj_value <- obj_value_variance
+    obj_value <- variance_objective
   }
 
   if (objective == "variance" || use_distances == TRUE) {
