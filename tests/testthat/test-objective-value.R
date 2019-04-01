@@ -22,7 +22,7 @@ test_that("output of objective value functions has correct structure", {
                                              preclusters, nrep = 100,
                                              objective = conditions$objective[i])
     dist_obj <- obj_value_distance(features, anticlusters)
-    var_obj <- obj_value_variance(features, anticlusters)
+    var_obj <- variance_objective(features, anticlusters)
     expect_equal(mode(dist_obj), "numeric")
     expect_equal(length(dist_obj), 1)
     expect_equal(dist_obj > 0, TRUE)
@@ -43,7 +43,7 @@ test_that("objective value for variance criterion is computed correctly", {
       features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
       cl <- kmeans(features, p_anticlusters)
       obj_kmeans <- cl$tot.withinss
-      obj_mine  <- obj_value_variance(features, cl$cluster)
+      obj_mine  <- variance_objective(features, cl$cluster)
       expect_equal(obj_kmeans, obj_mine)
     }
   }

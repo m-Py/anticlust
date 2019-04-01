@@ -17,9 +17,9 @@ test_that("distance input works for exact ILP", {
                               preclustering = FALSE,
                               method = "exact", standardize = FALSE)
     expect_equal(obj_value_distance(features, ac_feat),
-                 distance_objective(distances, ac_feat))
+                 distance_objective_(distances, ac_feat))
     expect_equal(obj_value_distance(features, ac_dist),
-                 distance_objective(distances, ac_dist))
+                 distance_objective_(distances, ac_dist))
   }
 })
 
@@ -38,9 +38,9 @@ test_that("distance input works for precluster ILP", {
                               preclustering = TRUE,
                               method = "exact", standardize = FALSE)
     expect_equal(obj_value_distance(features, ac_feat),
-                 distance_objective(distances, ac_feat))
+                 distance_objective_(distances, ac_feat))
     expect_equal(obj_value_distance(features, ac_dist),
-                 distance_objective(distances, ac_dist))
+                 distance_objective_(distances, ac_dist))
   }
 })
 
@@ -57,9 +57,9 @@ test_that("distance input works for complete enumeration", {
     ac_dist <- enum_anticlustering(distances = distances, K = K)
 
     expect_equal(obj_value_distance(features, ac_feat),
-                 distance_objective(distances, ac_feat))
+                 distance_objective_(distances, ac_feat))
     expect_equal(obj_value_distance(features, ac_dist),
-                 distance_objective(distances, ac_dist))
+                 distance_objective_(distances, ac_dist))
   }
 })
 
@@ -80,9 +80,9 @@ test_that("distance input works for heuristic without preclustering", {
                               nrep = 100)
 
     expect_equal(obj_value_distance(features, ac_feat),
-                 distance_objective(distances, ac_feat))
+                 distance_objective_(distances, ac_feat))
     expect_equal(obj_value_distance(features, ac_dist),
-                 distance_objective(distances, ac_dist))
+                 distance_objective_(distances, ac_dist))
   }
 })
 
@@ -104,9 +104,9 @@ test_that("distance input works for heuristic with preclustering", {
                               nrep = 100)
 
     expect_equal(obj_value_distance(features, ac_feat),
-                 distance_objective(distances, ac_feat))
+                 distance_objective_(distances, ac_feat))
     expect_equal(obj_value_distance(features, ac_dist),
-                 distance_objective(distances, ac_dist))
+                 distance_objective_(distances, ac_dist))
   }
 })
 
@@ -125,8 +125,8 @@ test_that("distance input works for clustering function, heuristic method", {
     ac_dist <- balanced_clustering(distances = distances, K = K, method = "heuristic", standardize = FALSE)
 
     expect_equal(obj_value_distance(features, ac_feat),
-                 distance_objective(distances, ac_feat))
+                 distance_objective_(distances, ac_feat))
     expect_equal(obj_value_distance(features, ac_dist),
-                 distance_objective(distances, ac_dist))
+                 distance_objective_(distances, ac_dist))
   }
 })

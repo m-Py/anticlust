@@ -67,7 +67,7 @@ enum_anticlustering <- function(features = NULL, distances = NULL, K) {
     }
 
     ## Check the objective value
-    cur_obj <- distance_objective(distances, anticlusters)
+    cur_obj <- distance_objective_(distances, anticlusters)
     ## Better fit was found, save the assignment
     if (cur_obj > best_objective) {
       best_assign <- anticlusters

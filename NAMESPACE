@@ -2,7 +2,9 @@
 
 export(anticlustering)
 export(balanced_clustering)
+export(distance_objective)
 export(plot_clusters)
+export(variance_objective)
 importFrom(Matrix,sparseMatrix)
 importFrom(grDevices,rainbow)
 importFrom(graphics,lines)
