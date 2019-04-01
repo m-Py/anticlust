@@ -136,6 +136,17 @@ variance_objective <- function(features, clusters,
 #' anticlusters <- anticlustering(iris[, -5], K = 3, standardize = TRUE)
 #' distance_objective(iris[, -5], clusters = anticlusters, standardize = TRUE)
 #'
+#' # Illustrates the cluster editing objective as the sum of distances
+#' # within groups:
+#' n_elements <- 12
+#' features <- matrix(runif(n_elements * 2), ncol = 2)
+#' n_groups <- 3
+#' clusters <- balanced_clustering(features, K = n_groups, method = "exact")
+#' anticlusters <- anticlustering(features, K = n_groups, method = "exact")
+#' par(mfrow = c(1, 2))
+#' plot_clusters(features, clusters, within_connection = TRUE)
+#' plot_clusters(features, anticlusters, within_connection = TRUE)
+#'
 #' @export
 #'
 #' @references
