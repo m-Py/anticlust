@@ -19,10 +19,10 @@
 #'     details.
 #' @param method One of "heuristic" or "exact". See details.
 #' @param standardize Boolean - should the features be standardized
-#'     before anticlusters are created? Defaults to \code{TRUE}.
+#'     before anticlusters are created? Defaults to \code{FALSE}.
 #'     Standardization is done using the function \code{\link{scale}}
 #'     using the default settings (mean = 0, SD = 1). This argument only
-#'     works in combination with the çode{features} argument, not with
+#'     works in combination with the \code{features} argument, not with
 #'     \code{distances}.
 #'
 #' @return A vector representing the cluster affiliation of all elements.
@@ -32,7 +32,7 @@
 #'
 #' This function partitions a set of elements into K equal sized
 #' clusters. The objective is one of the following:
-#' 
+#'
 #' - k-means *variance* objective, setting \code{objective = "variance"}
 #'
 #' - cluster editing *distance* objective, setting \code{objective = "distance"}
@@ -92,18 +92,17 @@
 #'
 #' @references
 #'
-#' M. Grötschel and Y. Wakabayashi, “A cutting plane algorithm for a
-#' clustering problem,” Mathematical Programming, vol. 45, nos. 1-3, pp.
-#' 59–96, 1989.
+#' Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
+#' for a clustering problem. Mathematical Programming, 45, 59–96.
 #'
-#' H. Späth, “Anticlustering: Maximizing the variance criterion,”
-#' Control and Cybernetics, vol. 15, no. 2, pp. 213-218, 1986.
-#' 
+#' Späth, H. (1986). Anticlustering: Maximizing the variance criterion.
+#' Control and Cybernetics, 15, 213–218.
+#'
 
 balanced_clustering <- function(features = NULL, distances = NULL,
                                 K, objective = "distance",
                                 method = "heuristic",
-                                standardize = TRUE) {
+                                standardize = FALSE) {
 
   input_handling_anticlustering(features, distances, K,
                                 objective, method, TRUE,

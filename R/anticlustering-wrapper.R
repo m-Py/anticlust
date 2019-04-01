@@ -25,11 +25,11 @@
 #'     before anticlusters are created. Defaults to \code{TRUE}. See
 #'     details.
 #' @param standardize Boolean - should the features be standardized
-#'     before anticlusters are created? Defaults to \code{TRUE}.
+#'     before anticlusters are created? Defaults to \code{FALSE}.
 #'     Standardization is done using the function \code{\link{scale}}
-#'     using the default settings (mean = 0, SD = 1). This argument only
-#'     works in combination with the çode{features} argument, not with
-#'     \code{distances}.
+#'     using the default settings (mean = 0, SD = 1). This argument
+#'     only works in combination with the \code{features} argument,
+#'     not with \code{distances}.
 #' @param nrep The number of repetitions for the random sampling
 #'     heuristic.  This argument only has an effect if \code{method}
 #'     is \code{"heuristic"}. It does not have an effect if
@@ -44,38 +44,40 @@
 #'
 #' @details
 #'
-#' This function is used to solve balanced K anticlustering. That is, K
-#' groups of equal size are created in such a way that similarity of all
-#' groups is maximized. Set similarity is assessed using one of two
-#' objective functions:
+#' This function is used to solve balanced K anticlustering. That is,
+#' K equal sized groups are created in such a way that similarity of
+#' all groups is maximized. Set similarity is assessed using one of
+#' two objective functions:
 #'
-#' - k-means *variance* objective, setting \code{objective = "variance"}
+#' - k-means *variance* objective, setting \code{objective =
+#'   "variance"}
 #'
-#' - cluster editing *distance* objective, setting \code{objective = "distance"}
+#' - cluster editing *distance* objective, setting \code{objective =
+#'   "distance"}
 #'
-#' The k-means objective maximizes the variance within anticlusters. The
-#' cluster editing objective maximizes the sum of pairwise distances
-#' within anticlusters. If the argument \code{features} is passed
-#' together with \code{objective = "distance"} If another distance
-#' measure is preferred, pass a self-computed dissimiliarity matrix via
-#' the argument \code{distances}. The optimal cluster editing objective
-#' can be found via integer linear programming; for the k-means
-#' objective, there is only a heuristic option. Vary the parameter
-#' \code{method} to select a "heuristic" or "exact" computation.
-#' 
-#' Both of these objectives are maximized to establish sets that are
-#' similar; minimization of the same objectives creates a clustering,
-#' i.e., establishes sets sets such that elements are as similar as
-#' possible within a set and as different as possible between sets, see
+#' The k-means objective maximizes the variance within
+#' anticlusters. The cluster editing objective maximizes the sum of
+#' pairwise distances within anticlusters. If the argument
+#' \code{features} is passed together with \code{objective =
+#' "distance"}. If another distance measure is preferred, pass a
+#' self-computed dissimiliarity matrix via the argument
+#' \code{distances}. Maximizing either of these objectives is used to
+#' create similar groups; minimization of the same objectives leads to
+#' a clustering, i.e., elements are as similar as possible within a
+#' set and as different as possible between sets, see
 #' \code{\link{balanced_clustering}}.
 #'
-#' To obtain an optimal solution for anticluster editing, a linear
-#' programming solver must be installed and usable from R.  The
-#' `anticlust` package supports the open source GNU linear programming
-#' kit (called from the package \code{Rglpk}) and the commercial solvers
-#' gurobi (called from the package \code{gurobi}) and IBM CPLEX (called
-#' from the package \code{Rcplex}). A license is needed to use one of
-#' the commercial solvers. The optimal solution is retrieved by setting
+#' The optimal anticluster editing objective can be found via integer
+#' linear programming; for the k-means objective, there is only a
+#' heuristic option. Vary the parameter \code{method} to select a
+#' "heuristic" or "exact" computation. To obtain an optimal solution
+#' for anticluster editing, a linear programming solver must be
+#' installed and usable from R. The `anticlust` package supports the
+#' open source GNU linear programming kit (called from the package
+#' \code{Rglpk}) and the commercial solvers gurobi (called from the
+#' package \code{gurobi}) and IBM CPLEX (called from the package
+#' \code{Rcplex}). A license is needed to use one of the commercial
+#' solvers. The optimal solution is retrieved by setting
 #' \code{objective = "distance"}, \code{preclustering = FALSE}, and
 #' \code{method = "exact"}. Use this combination of arguments only for
 #' small problem sizes (maybe <= 30 elements).
@@ -135,19 +137,18 @@
 #'
 #' @references
 #'
-#' M. Grötschel and Y. Wakabayashi, “A cutting plane algorithm for a
-#' clustering problem,” Mathematical Programming, vol. 45, nos. 1-3, pp.
-#' 59–96, 1989.
+#' Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
+#' for a clustering problem. Mathematical Programming, 45, 59–96.
 #'
-#' H. Späth, “Anticlustering: Maximizing the variance criterion,”
-#' Control and Cybernetics, vol. 15, no. 2, pp. 213-218, 1986.
+#' Späth, H. (1986). Anticlustering: Maximizing the variance criterion.
+#' Control and Cybernetics, 15, 213–218.
 #'
 #'
 
 anticlustering <- function(features = NULL, distances = NULL,
                            K, objective = "distance",
                            method = "heuristic", preclustering = TRUE,
-                           standardize = TRUE, nrep = 10000) {
+                           standardize = FALSE, nrep = 10000) {
 
   input_handling_anticlustering(features, distances, K, objective,
                                 method, preclustering,
@@ -234,17 +235,19 @@ input_handling_anticlustering <- function(features, distances,
   if (method == "exact") {
     solver <- solver_available()
     if (solver == FALSE) {
-        stop("An exact solution was requested, but none of the linear ",
-             "programming packages 'Rglpk', 'gurobi', or 'Rcplex' is ",
-             "installed. Try out method = 'heuristic' or install ",
-             "a linear programming solver. E.g., install the GNU "
-             "linear programming kit. ",
-             "Visit http://gnuwin32.sourceforge.net/packages/glpk.htm ",
-             "if you are using windows; , "
-             "use homebrew to install it on mac (brew install glpk); ",
-             "use the following command to install it on Ubuntu: ",
-             "sudo apt install libglpk-dev. Then, install the package Rglpk using ,"
-             "install.packages(Rglpk)")
+        stop("\n\nAn exact solution was requested, but none of the linear ",
+             "programming \npackages 'Rglpk', 'gurobi', or 'Rcplex' is ",
+             "available. \n\nTry `method = 'heuristic'` or install ",
+             "a linear programming solver \nto obtain an exact solution. ",
+             "For example, install the GNU linear \nprogramming kit: \n\n",
+             "- On windows, visit ",
+             "http://gnuwin32.sourceforge.net/packages/glpk.htm \n\n",
+             "- Use homebrew to install it on mac, 'brew install glpk' \n\n",
+             "- 'sudo apt install libglpk-dev' on Ubuntu ",
+             "\n\nThen, install the Rglpk package via ",
+             "`install.packages(Rglpk)`. \n\nOtherwise, you may obtain ",
+             "a license for one of ",
+             "the commercial solvers \ngurobi or IBM CPLEX.")
     }
   }
 
