@@ -70,9 +70,7 @@ kit (called from the package \code{Rglpk}) and the commercial solvers
 gurobi (called from the package \code{gurobi}) and IBM CPLEX (called
 from the package \code{Rcplex}). A license is needed to use one of
 the commercial solvers. The optimal solution is retrieved by setting
-\code{objective = "distance"}, \code{preclustering = FALSE}, and
-\code{method = "exact"}. Use this combination of arguments only for
-rather small problem sizes.
+\code{objective = "distance"} and \code{method = "exact"}.
 }
 \examples{
 
