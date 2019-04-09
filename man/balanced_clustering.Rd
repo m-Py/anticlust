@@ -28,7 +28,7 @@ dissimilarities.}
 objective; the option "variance" is used to minimize the
 k-means objective. See details.}
 
-\item{method}{One of "heuristic" or "exact". See details.}
+\item{method}{One of "heuristic" or "ilp". See details.}
 
 \item{standardize}{Boolean - should the features be standardized
 before anticlusters are created? Defaults to \code{FALSE}.
@@ -61,7 +61,7 @@ a self-computed dissimiliarity matrix via the argument
 \code{distances}. The optimal cluster editing objective can be
 found via integer linear programming; for the k-means objective,
 there is only a heuristic option. Vary the parameter \code{method}
-to select a "heuristic" or "exact" computation.
+to select a "heuristic" or exact (via "ilp") computation.
 
 To obtain an optimal solution for balanced cluster editing, a
 linear programming solver must be installed and usable from R. The
@@ -71,7 +71,7 @@ solvers gurobi (called from the package \code{gurobi}) and IBM
 CPLEX (called from the package \code{Rcplex}). A license is needed
 to use one of the commercial solvers. The optimal solution is
 retrieved by setting \code{objective = "distance"} and \code{method
-= "exact"}.
+= "ilp"}.
 }
 \examples{
 
@@ -92,7 +92,7 @@ n_features <- 2
 N <- 30
 K <- 3
 features <- matrix(rnorm(N * n_features), ncol = n_features)
-ac1 <- balanced_clustering(features, K = K, method = "exact")
+ac1 <- balanced_clustering(features, K = K, method = "ilp")
 ac2 <- balanced_clustering(features, K = K, method = "heuristic")
 
 ## Compare exact and heuristic balanced cluster editing

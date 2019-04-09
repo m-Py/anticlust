@@ -9,7 +9,7 @@ test_that("high level equal sized clustering function runs through", {
     n_clusters <- conditions[k, "p"]
     n_elements <- n_clusters * 5 # n must be multiplier of p
     features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
-    clusters_exact <- balanced_clustering(features, K = n_clusters, method = "exact",
+    clusters_exact <- balanced_clustering(features, K = n_clusters, method = "ilp",
                                           standardize = FALSE)
     clusters_heuristic <- balanced_clustering(features, K = n_clusters,
                                               method = "heuristic", standardize = FALSE)
@@ -34,7 +34,7 @@ test_that("high level anticlustering function runs through", {
     n_elements <- n_clusters * 3 # n must be multiplier of p
     features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
     anticlusters_exact <- anticlustering(features, K = n_clusters,
-                                         method = "exact",
+                                         method = "ilp",
                                          standardize = FALSE,
                                          preclustering = FALSE)
     anticlusters_heuristic <- anticlustering(features,
@@ -56,10 +56,10 @@ test_that("high level anticlustering function runs through", {
 
 test_that("all argument combinations run through", {
   conditions <- expand.grid(preclustering = c(TRUE, FALSE),
-                            method = c("exact", "heuristic"))
+                            method = c("ilp", "heuristic"))
   # Set up matrix to store the objective values obtained by different methods
   storage <- matrix(ncol = 2, nrow = 2)
-  colnames(storage) <- c("exact", "heuristic")
+  colnames(storage) <- c("ilp", "heuristic")
   rownames(storage) <- c("preclustering", "no_preclustering")
 
   criterion <- "distance"
@@ -80,5 +80,5 @@ test_that("all argument combinations run through", {
     storage[rowname, method] <- obj
   }
   ## Exact solution must be best:
-  expect_equal(all(round(storage["no_preclustering", "exact"], 10) >= round(c(storage), 10)), TRUE)
+  expect_equal(all(round(storage["no_preclustering", "ilp"], 10) >= round(c(storage), 10)), TRUE)
 })
