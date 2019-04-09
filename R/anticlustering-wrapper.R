@@ -20,7 +20,7 @@
 #'     "distance" (default) is used to optimize the anticluster
 #'     editing objective; the option "variance" is used to optimize
 #'     the k-means anticlustering objective. See details.
-#' @param method One of "heuristic" or "exact". See details.
+#' @param method One of "heuristic" or "ilp". See details.
 #' @param preclustering Boolean, should a preclustering be conducted
 #'     before anticlusters are created. Defaults to \code{TRUE}. See
 #'     details.
@@ -31,9 +31,9 @@
 #'     only works in combination with the \code{features} argument,
 #'     not with \code{distances}.
 #' @param nrep The number of repetitions for the random sampling
-#'     heuristic.  This argument only has an effect if \code{method}
+#'     heuristic. This argument only has an effect if \code{method}
 #'     is \code{"heuristic"}. It does not have an effect if
-#'     \code{method} is \code{"exact"}.
+#'     \code{method} is \code{"ilp"}.
 #'
 #' @return A vector representing the anticluster affiliation.
 #'
@@ -62,19 +62,19 @@
 #' either of these objectives is used to create similar groups;
 #' minimization of the same objectives leads to a clustering, i.e.,
 #' elements are as similar as possible within a set and as different
-#' as possible between sets, which is done via
+#' as possible between sets. This can be done via
 #' \code{\link{balanced_clustering}}.
 #'
 #' If the argument \code{features} is passed together with
 #' \code{objective = "distance"}, the Euclidean distance between
-#' elements is computed as the basic unit of the cluster editing
+#' elements is computed as the basic unit of the anticluster editing
 #' objective. If another measure of dissimilarity is preferred, you
 #' may pass a self-generated dissimiliarity matrix via the argument
 #' \code{distances}.
 #'
 #' The optimal anticluster editing objective can be found via integer
-#' linear programming. To this end, set \code{method = "exact"}. To
-#' obtain an optimal solution for anticluster editing, a linear
+#' linear programming. To this end, set \code{method = "ilp"}. To
+#' obtain an optimal solution, a linear
 #' programming solver must be installed and usable from R. The
 #' `anticlust` package supports the open source GNU linear programming
 #' kit (called from the package \code{Rglpk}) and the commercial
@@ -82,7 +82,7 @@
 #' CPLEX (called from the package \code{Rcplex}). A license is needed
 #' to use one of the commercial solvers. The optimal solution is
 #' retrieved by setting \code{objective = "distance"},
-#' \code{preclustering = FALSE}, and \code{method = "exact"}. Use this
+#' \code{method = "ilp"} and \code{preclustering = FALSE}. Use this
 #' combination of arguments only for small problem sizes (maybe <= 30
 #' elements).
 #'
@@ -92,13 +92,14 @@
 #' programming, but a preprocessing forbids very similar elements to
 #' be assigned to the same anticluster. This approach can be used to
 #' work on larger problem instances and the solution is usually still
-#' optimal or very close to optimal.
+#' optimal or very close to optimal. Note that \code{preclustering} is
+#' \code{TRUE} by default.
 #'
 #' If no exact solution is required or the problem size is too large
 #' for integer linear programming, a heuristic method is available via
 #' setting \code{method = "heuristic"}. This option has to be used
-#' when optimizing the k-means objective -- there is no exact
-#' algorithm available to optimize the k-means objective -- and may be
+#' when optimizing the variance objective -- there is no exact
+#' algorithm available to optimize the variance objective -- and may be
 #' used when optimizing the anticluster editing objective. The
 #' heuristic employs repeated random sampling: across a specified
 #' number of runs, anticlusters are assigned randomly and the best
@@ -114,7 +115,7 @@
 #' by a call to \code{\link{balanced_clustering}} where the argument
 #' \code{K} is set to the number of elements divided by the number of
 #' anticlusters that are to be created (actually, this is not exactly
-#' what is happening internally, but it is equivalent).
+#' what happens internally, but it is equivalent).
 #'
 #' @examples
 #'
@@ -138,8 +139,8 @@
 #' # As the features are differently scaled, the solution is improved
 #' # by setting standardize = TRUE:
 #' anticlusters <- anticlustering(iris[, -5], K = 3, standardize = TRUE)
-#' by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2)) 
-#' 
+#' by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
+#'
 #'
 #' ## Try out exact anticlustering
 #' # Create artifical data
@@ -147,20 +148,24 @@
 #' n_elements <- 20
 #' K <- 2
 #' features <- matrix(rnorm(n_elements * n_features), ncol = n_features)
-#' anticlustering(features, K = K, method = "exact",
+#' anticlustering(features, K = K, method = "ilp",
 #'                preclustering = FALSE)
 #'
-#' # Enable preclustering
-#' anticlustering(features, K = K, method = "exact",
+#' # Enable preclustering (preclustering = TRUE is also the default)
+#' anticlustering(features, K = K, method = "ilp",
 #'                preclustering = TRUE)
 #'
 #' @references
 #'
 #' Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
-#' for a clustering problem. Mathematical Programming, 45, 59–96.
+#' for a clustering problem. Mathematical Programming, 45, 59-96.
+#'
+#' Böcker, S., Briesemeister, S., & Klau, G. W. (2011). Exact algorithms
+#' for cluster editing: Evaluation and experiments. Algorithmica, 60,
+#' 316-334.
 #'
 #' Späth, H. (1986). Anticlustering: Maximizing the variance criterion.
-#' Control and Cybernetics, 15, 213–218.
+#' Control and Cybernetics, 15, 213-218.
 #'
 #'
 
@@ -185,7 +190,7 @@ anticlustering <- function(features = NULL, distances = NULL,
   }
 
   ## Exact method using ILP
-  if (method == "exact") {
+  if (method == "ilp") {
     return(exact_anticlustering(distances, K, solver_available(),
                                 preclustering))
   }
@@ -212,8 +217,8 @@ anticlustering <- function(features = NULL, distances = NULL,
 #'
 #' This function ensures that:
 #' (a) All arguments have correct type
-#' (b) Method "exact" can only be used with objective = "distance"
-#' (c) A solver package has to be installed if method = "exact"
+#' (b) Method "ilp" can only be used with objective = "distance"
+#' (c) A solver package has to be installed if method = "ilp"
 #' (d) A legal number of anticlusters was requested
 #'
 #' Takes the same parameters as \code{anticlustering}
@@ -242,7 +247,7 @@ input_handling_anticlustering <- function(features, distances,
   validate_input(nrep, "nrep", "numeric", len = 1, greater_than = 0,
                  must_be_integer = TRUE)
   validate_input(method, "method", len = 1,
-                 input_set = c("exact", "heuristic"))
+                 input_set = c("ilp", "heuristic"))
   validate_input(objective, "objective", len = 1,
                  input_set = c("variance", "distance"))
 
@@ -251,7 +256,7 @@ input_handling_anticlustering <- function(features, distances,
   validate_input(standardize, "standardize", "logical", len = 1,
                  input_set = c(TRUE, FALSE))
 
-  if (method == "exact") {
+  if (method == "ilp") {
     solver <- solver_available()
     if (solver == FALSE) {
         stop("\n\nAn exact solution was requested, but none of the linear ",
@@ -266,13 +271,14 @@ input_handling_anticlustering <- function(features, distances,
              "\n\nThen, install the Rglpk package via ",
              "`install.packages(Rglpk)`. \n\nOtherwise, you may obtain ",
              "a license for one of ",
-             "the commercial solvers \ngurobi or IBM CPLEX.")
+             "the commercial solvers \ngurobi or IBM CPLEX (they are free ",
+             "for academic use).")
     }
   }
 
-  if (objective == "variance" && method == "exact") {
-    stop("There is no exact method to maximize the variance criterion. ",
-         "Use method = 'distance' instead")
+  if (objective == "variance" && method == "ilp") {
+    stop("You cannot use integer linear programming method to maximize the variance criterion. ",
+         "Use objective = 'distance' or method = 'heuristic' instead")
   }
 
   if (!argument_exists(features) && !argument_exists(distances)) {
@@ -284,7 +290,7 @@ input_handling_anticlustering <- function(features, distances,
   }
 
   if (argument_exists(distances) && objective == "variance") {
-    stop("'distances' cannot be used if 'objective' is 'variance'.")
+    stop("The argument 'distances' cannot be used if the argument 'objective' is 'variance'.")
   }
 
   return(invisible(NULL))

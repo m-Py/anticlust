@@ -29,7 +29,7 @@ dissimilarities.}
 editing objective; the option "variance" is used to optimize
 the k-means anticlustering objective. See details.}
 
-\item{method}{One of "heuristic" or "exact". See details.}
+\item{method}{One of "heuristic" or "ilp". See details.}
 
 \item{preclustering}{Boolean, should a preclustering be conducted
 before anticlusters are created. Defaults to \code{TRUE}. See
@@ -43,9 +43,9 @@ only works in combination with the \code{features} argument,
 not with \code{distances}.}
 
 \item{nrep}{The number of repetitions for the random sampling
-heuristic.  This argument only has an effect if \code{method}
+heuristic. This argument only has an effect if \code{method}
 is \code{"heuristic"}. It does not have an effect if
-\code{method} is \code{"exact"}.}
+\code{method} is \code{"ilp"}.}
 }
 \value{
 A vector representing the anticluster affiliation.
@@ -73,19 +73,19 @@ anticlusters (see \code{\link{distance_objective}}). Maximizing
 either of these objectives is used to create similar groups;
 minimization of the same objectives leads to a clustering, i.e.,
 elements are as similar as possible within a set and as different
-as possible between sets, which is done via
+as possible between sets. This can be done via
 \code{\link{balanced_clustering}}.
 
 If the argument \code{features} is passed together with
 \code{objective = "distance"}, the Euclidean distance between
-elements is computed as the basic unit of the cluster editing
+elements is computed as the basic unit of the anticluster editing
 objective. If another measure of dissimilarity is preferred, you
 may pass a self-generated dissimiliarity matrix via the argument
 \code{distances}.
 
 The optimal anticluster editing objective can be found via integer
-linear programming. To this end, set \code{method = "exact"}. To
-obtain an optimal solution for anticluster editing, a linear
+linear programming. To this end, set \code{method = "ilp"}. To
+obtain an optimal solution, a linear
 programming solver must be installed and usable from R. The
 `anticlust` package supports the open source GNU linear programming
 kit (called from the package \code{Rglpk}) and the commercial
@@ -93,7 +93,7 @@ solvers gurobi (called from the package \code{gurobi}) and IBM
 CPLEX (called from the package \code{Rcplex}). A license is needed
 to use one of the commercial solvers. The optimal solution is
 retrieved by setting \code{objective = "distance"},
-\code{preclustering = FALSE}, and \code{method = "exact"}. Use this
+\code{method = "ilp"} and \code{preclustering = FALSE}. Use this
 combination of arguments only for small problem sizes (maybe <= 30
 elements).
 
@@ -103,13 +103,14 @@ editing objective is still optimized using integer linear
 programming, but a preprocessing forbids very similar elements to
 be assigned to the same anticluster. This approach can be used to
 work on larger problem instances and the solution is usually still
-optimal or very close to optimal.
+optimal or very close to optimal. Note that \code{preclustering} is
+\code{TRUE} by default.
 
 If no exact solution is required or the problem size is too large
 for integer linear programming, a heuristic method is available via
 setting \code{method = "heuristic"}. This option has to be used
-when optimizing the k-means objective -- there is no exact
-algorithm available to optimize the k-means objective -- and may be
+when optimizing the variance objective -- there is no exact
+algorithm available to optimize the variance objective -- and may be
 used when optimizing the anticluster editing objective. The
 heuristic employs repeated random sampling: across a specified
 number of runs, anticlusters are assigned randomly and the best
@@ -125,7 +126,7 @@ Preclustering (for the exact and heuristic approach) is performed
 by a call to \code{\link{balanced_clustering}} where the argument
 \code{K} is set to the number of elements divided by the number of
 anticlusters that are to be created (actually, this is not exactly
-what is happening internally, but it is equivalent).
+what happens internally, but it is equivalent).
 }
 \examples{
 
@@ -149,7 +150,7 @@ plot_clusters(iris[, 3:4], anticlusters)
 # As the features are differently scaled, the solution is improved
 # by setting standardize = TRUE:
 anticlusters <- anticlustering(iris[, -5], K = 3, standardize = TRUE)
-by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2)) 
+by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
 
 
 ## Try out exact anticlustering
@@ -158,18 +159,22 @@ n_features <- 2
 n_elements <- 20
 K <- 2
 features <- matrix(rnorm(n_elements * n_features), ncol = n_features)
-anticlustering(features, K = K, method = "exact",
+anticlustering(features, K = K, method = "ilp",
                preclustering = FALSE)
 
-# Enable preclustering
-anticlustering(features, K = K, method = "exact",
+# Enable preclustering (preclustering = TRUE is also the default)
+anticlustering(features, K = K, method = "ilp",
                preclustering = TRUE)
 
 }
 \references{
 Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
-for a clustering problem. Mathematical Programming, 45, 59–96.
+for a clustering problem. Mathematical Programming, 45, 59-96.
+
+Böcker, S., Briesemeister, S., & Klau, G. W. (2011). Exact algorithms
+for cluster editing: Evaluation and experiments. Algorithmica, 60,
+316-334.
 
 Späth, H. (1986). Anticlustering: Maximizing the variance criterion.
-Control and Cybernetics, 15, 213–218.
+Control and Cybernetics, 15, 213-218.
 }

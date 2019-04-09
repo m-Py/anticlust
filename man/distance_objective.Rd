@@ -76,8 +76,8 @@ distance_objective(iris[, -5], clusters = anticlusters, standardize = TRUE)
 n_elements <- 12
 features <- matrix(runif(n_elements * 2), ncol = 2)
 n_groups <- 3
-clusters <- balanced_clustering(features, K = n_groups, method = "exact")
-anticlusters <- anticlustering(features, K = n_groups, method = "exact")
+clusters <- balanced_clustering(features, K = n_groups, method = "ilp")
+anticlusters <- anticlustering(features, K = n_groups, method = "ilp")
 par(mfrow = c(1, 2))
 plot_clusters(features, clusters, within_connection = TRUE,
               main = "Minimum within-group distances")
@@ -86,6 +86,10 @@ plot_clusters(features, anticlusters, within_connection = TRUE,
 
 }
 \references{
+Böcker, S., Briesemeister, S., & Klau, G. W. (2011). Exact algorithms
+for cluster editing: Evaluation and experiments. Algorithmica, 60,
+316-334.
+
 Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
 for a clustering problem. Mathematical Programming, 45, 59–96.
 }

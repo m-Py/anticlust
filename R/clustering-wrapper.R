@@ -17,7 +17,7 @@
 #'     "distance" (default) is used to minimize the cluster editing
 #'     objective; the option "variance" is used to minimize the
 #'     k-means objective. See details.
-#' @param method One of "heuristic" or "exact". See details.
+#' @param method One of "heuristic" or "ilp". See details.
 #' @param standardize Boolean - should the features be standardized
 #'     before anticlusters are created? Defaults to \code{FALSE}.
 #'     Standardization is done using the function \code{\link{scale}}
@@ -46,7 +46,7 @@
 #' \code{distances}. The optimal cluster editing objective can be
 #' found via integer linear programming; for the k-means objective,
 #' there is only a heuristic option. Vary the parameter \code{method}
-#' to select a "heuristic" or "exact" computation.
+#' to select a "heuristic" or exact (via "ilp") computation.
 #'
 #' To obtain an optimal solution for balanced cluster editing, a
 #' linear programming solver must be installed and usable from R. The
@@ -56,7 +56,7 @@
 #' CPLEX (called from the package \code{Rcplex}). A license is needed
 #' to use one of the commercial solvers. The optimal solution is
 #' retrieved by setting \code{objective = "distance"} and \code{method
-#' = "exact"}.
+#' = "ilp"}.
 #'
 #' @export
 #'
@@ -79,7 +79,7 @@
 #' N <- 30
 #' K <- 3
 #' features <- matrix(rnorm(N * n_features), ncol = n_features)
-#' ac1 <- balanced_clustering(features, K = K, method = "exact")
+#' ac1 <- balanced_clustering(features, K = K, method = "ilp")
 #' ac2 <- balanced_clustering(features, K = K, method = "heuristic")
 #'
 #' ## Compare exact and heuristic balanced cluster editing
@@ -121,7 +121,7 @@ balanced_clustering <- function(features = NULL, distances = NULL,
   if (objective == "variance") {
     return(equal_sized_kmeans(features, K))
   }
-  if (method == "exact") {
+  if (method == "ilp") {
     return(balanced_cluster_editing(distances, K, solver_available()))
   }
   if (K == nrow(distances) / 2) {

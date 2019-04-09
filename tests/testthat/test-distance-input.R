@@ -12,10 +12,10 @@ test_that("distance input works for exact ILP", {
     distances <- dist(features)
 
     ac_feat <- anticlustering(features, K = K, preclustering = FALSE,
-                              method = "exact", standardize = FALSE)
+                              method = "ilp", standardize = FALSE)
     ac_dist <- anticlustering(distances = distances, K = K,
                               preclustering = FALSE,
-                              method = "exact", standardize = FALSE)
+                              method = "ilp", standardize = FALSE)
     expect_equal(distance_objective_(dist(features), ac_feat),
                  distance_objective_(distances, ac_feat))
   }
@@ -31,10 +31,10 @@ test_that("distance input works for precluster ILP", {
     distances <- dist(features)
 
     ac_feat <- anticlustering(features, K = K, preclustering = TRUE,
-                              method = "exact", standardize = FALSE)
+                              method = "ilp", standardize = FALSE)
     ac_dist <- anticlustering(distances = distances, K = K,
                               preclustering = TRUE,
-                              method = "exact", standardize = FALSE)
+                              method = "ilp", standardize = FALSE)
     expect_equal(distance_objective_(dist(features), ac_feat),
                  distance_objective_(distances, ac_feat))
   }
