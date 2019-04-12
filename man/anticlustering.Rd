@@ -130,12 +130,7 @@ what happens internally, but it is equivalent).
 }
 \examples{
 
-## Use anticlustering on the iris data set with the default settings:
-# (a) Optimizes the distance objective
-# (b) Heuristic method: random sampling
-# (c) 10,000 sampling repetitions
-# (d) Preclustering is activated
-# (e) Features are not standardized
+## Use anticlustering on the iris data set
 
 data(iris)
 # Only use numeric attributes
@@ -150,6 +145,10 @@ plot_clusters(iris[, 3:4], anticlusters)
 # As the features are differently scaled, the solution is improved
 # by setting standardize = TRUE:
 anticlusters <- anticlustering(iris[, -5], K = 3, standardize = TRUE)
+by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
+
+# Optimize the variance criterion:
+anticlusters <- anticlustering(iris[, -5], K = 3, standardize = TRUE, objective = "variance")
 by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
 
 
