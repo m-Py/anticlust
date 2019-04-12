@@ -6,10 +6,23 @@ output:
   md_document:
     variant: markdown_github
 
-bibliography: ./vignettes/lit.bib
+bibliography: lit.bib
 ---
 
+# Anticlustering
+
+Anticlustering creates sets of elements that are as similar as possible
+[@spath1986; @valev1998]. The better known twin of anticlustering is
+cluster analysis that is used to create sets where elements within each
+cluster are similar, but dissimilar from elements in other clusters. The
+`R` package `anticlust` provides functions to tackle anticlustering
+algorithmically.
+
 ```{r setup, include = FALSE}
+library("knitr")
+library("anticlust")
+library("dplyr")
+
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -19,21 +32,27 @@ knitr::opts_chunk$set(
   warning = FALSE
 )
 
-set.seed(123)
+## Function to print descriptive statistics by anticluster
+print_table <- function(features, anticlusters) {
+  features$Anticluster <- anticlusters
+  M <- features %>%
+    group_by(Anticluster) %>%
+    summarize_all(list(mean)) %>%
+    round(2)
+  SD <- features %>%
+    group_by(Anticluster) %>%
+    summarize_all(list(sd)) %>%
+    round(2)
+  tab <- rbind(M, SD)
+  tab_ <- apply(tab[, -1], 2, prmisc::force_decimals)
+  n_clusters <- length(unique(anticlusters))
+  empty <- rep("", n_clusters - 1)
+  funrow <- c("Mean", empty, "SD", empty)
+  kable(data.frame(Statistic = funrow, tab_, Anticluster = tab$Anticluster))
+}
+
+set.seed(12345)
 ```
-
-# Using anticlustering to create equivalent sets
-
-Clustering algorithms establish groups of elements while ensuring that
-elements within each cluster are similar, but clearly separated from
-elements in other clusters. Anticlustering reverses this logic and
-creates groups (anticlusters) that are as similar as possible
-[@spath1986; @valev1998]. The `R` package `anticlust` provides
-functions to tackle this problem algorithmically. I initially created
-this package to assign stimuli in psychological experiments to different
-conditions so that conditions are as equal as possible, a priori. But I
-am sure that a wide range of applications is possible (for an example,
-see section 'A quick start').
 
 ## Installation
 
@@ -47,168 +66,116 @@ install_github("m-Py/anticlust")
 library("anticlust")
 ```
 
-
 ## A quick start
 
 The main function of the package is `anticlustering`. For most users, it
 should be sufficient to know this function. It takes as input a data
-matrix of features describing the elements that we want to assign to
-groups. In the data matrix, each row is an element, for example a
-person, picture, word, or a photo. Each column is a numeric variable
-describing one of the elements' features.
+table describing the elements we want to assign to groups. In the data
+table, each row is an element, for example a person, picture, word, or a
+photo. Each column is a numeric variable describing one of the elements'
+features. The table may be an R `matrix` or `data.frame`; a single
+feature can also be passed as a `vector`.
 
-To illustrate the usage of the function, we use the classical iris data
-set describing the characteristics of 150 iris plants:
+To illustrate the usage of the `anticlustering` function, we use the
+classical iris data set describing the characteristics of 150 iris
+plants:
 
 ```{r}
 ## Select only the numeric attributes
-data <- iris[, -5]
-nrow(data)
-
-## Illustrate the data set
-library("knitr")
-kable(head(data))
+features <- iris[, -5]
+nrow(features)
 ```
 
-We now use the `anticlustering` function to create three similar
-groups of iris plants:
+The first rows of the data set look as follows:
+
+```{r, echo = FALSE}
+kable(head(features))
+```
+
+We now use the `anticlustering` function to create two similar groups
+of iris plants:
 
 ```{r}
-library("anticlust")
-n_clusters <- 3
-anticlusters <- anticlustering(data, n_clusters)
+anticlusters <- anticlustering(features, K = 2, standardize = TRUE)
 anticlusters
 table(anticlusters)
 ```
 
-The vector `anticlusters` contains the anticluster affiliation of each
-plant. The `anticlustering` function created an equal number of plants
-per anticluster. Currently, it is not possible to create anticlusters
-of different sizes.
+Now, we wish to know how well the anticluster assignment worked. To get
+an intuition for how an anticluster looks like, we first plot the
+plants' characteristics by anticluster:
 
-Next, we wish to know how well the anticluster assignment worked. To
-find out, we first plot the plants' characteristics by anticluster:
-
-```{r, fig.width = 7.5}
+```{r, fig.width = 6.5}
 par(mfrow = c(1, 2))
-pch <- c(15, 16, 17)
-plot_clusters(data[, 1:2], anticlusters, pch = pch) # a function of the anticlust package
-plot_clusters(data[, 3:4], anticlusters, pch = pch)
+pch <- 15:16
+# plot_clusters is also a function of the anticlust package
+plot_clusters(features[, 1:2], anticlusters, pch = pch) 
+plot_clusters(features[, 3:4], anticlusters, pch = pch)
+
 ```
 
-This looks rather chaotic, but it is probably what we want: We would
-expect a strong overlap in all of the plants' characteristics between
-the three anticlusters. In constrast, a clustering of plants would have
-created a strong separation between groups, as can be seen in the
-following example:
+This looks rather chaotic, but it is probably what we want: We want a
+strong overlap in all of the plants' characteristics because the
+anticlusters should be similar. In addition to visually inspecting the
+anticlustering plots, we probably want to investigate the descriptive
+statistics of the plants' characteristics by anticluster. Ideally, the
+distribution of plant characteristics should be the same for each
+anticluster. In the following, we see that the means and standard
+deviations of the plants' features are very similar:
 
-```{r, fig.width = 7.5}
-clusters <- clustering(data, n_clusters) # a function of the anticlust package
-
-par(mfrow = c(1, 2))
-plot_clusters(data[, 1:2], clusters, pch = pch)
-plot_clusters(data[, 3:4], clusters, pch = pch)
-```
-
-As the name suggests, anticlustering is the reversal of clustering.
-Instead of *separating* groups as well as possible, we create a *strong
-overlap* between groups; anticlusters should at best be
-indistinguishable.
-
-In addition to visually inspecting the anticlustering plots, we probably
-want to investigate the descriptive statistics of the plants'
-characteristics by anticluster. This gives us some intuition about how
-well the anticluster assignment worked. Ideally, the distribution of
-plant characteristics should be the same for each anticluster. The
-following code example prints the mean values of each plant feature by
-anticluster:
-
-```{r}
-library("dplyr")
-
-data <- data.frame(Anticluster = anticlusters, data)
-data %>%
-  group_by(Anticluster) %>%
-  summarize_all(funs(mean)) %>%
-  round(2) %>%  knitr::kable()
-```
-
-A completely random assignment very likely produces a much worse
-grouping, as is illustrated by the following code:
-
-```{r}
-## Randomly assign plants to anticlusters
-data$Anticluster <- rep(1:n_clusters, nrow(data) / n_clusters)
-data$Anticluster <- sample(data$Anticluster)
-
-data %>%
-  group_by(Anticluster) %>%
-  summarize_all(funs(mean)) %>%
-  round(2) %>% knitr::kable()
+```{r, echo = FALSE}
+print_table(features, anticlusters)
 ```
 
 ## The anticlustering objective
 
 In the example above, the `anticlustering` function established
 anticlusters that were very similar with regard to the mean of each
-plant feature, outperforming a simple random allocation. However, it was
-just a side effect that group means turned out to be similar -- the
-anticlustering method does not directly minimize differences in groups
-means. Instead, anticlustering operates on measures of group similarity
-that have been developed in the context of cluster analysis; `anticlust`
-adapts two clustering methods: k-means [@spath1986; @valev1998] and
-cluster editing [@bocker2013]. The vignette "Technical notes" that is
-included with the package discusses the objectives of these clustering
-methods in more detail, but a short primer is given here:
+plant feature. However, it was just a side effect that group means
+turned out to be similar -- the anticlustering method does not directly
+minimize differences in groups means. Instead, anticlustering employs
+two objectives that have been developed in the context of cluster
+analysis: 
 
-K-means is probably the best-known cluster algorithm. K-Means tries to
-minimize the within-cluster variance of feature values across a
-pre-specified number of clusters (*k*) [@jain2010]. @spath1986 and
-@valev1998 proposed to maximize the variance criterion for the
-anticlustering application. The basic unit underlying the cluster
-editing objective is a measure $d_{ij}$ quantifying the dissimilarity
-between two elements $i$ and $j$, for example as the common Euclidean
-distance.[^2] The optimal cluster editing objective is found when the
-sum of pairwise within-cluster dissimilarities is minimized
-[@miyauchi2015; @grotschel1989]. Adapting the cluster editing objective
-to anticlustering, the package `anticlust` maximizes the sum of all
-pairwise euclidean distances within anticlusters. This approach
-maximizes group similarity as measured by the average linkage method
-employed in hierarchical clustering methods.
+- the k-means "variance" objective [@spath1986; @valev1998] 
+- the cluster editing "distance" objective [@bocker2013; @miyauchi2015; @grotschel1989]
 
-[^2]: Similarity measures can be used as well, in which case larger
-values indicate higher similarity [@demaine2006].
+The k-means objective is given by the sum of the squared errors between
+cluster centers and individual data points [@jain2010]. The cluster
+editing objective is the sum of pairwise distances within anticlusters.
+Maximizing either of these objectives leads to similar groups, i.e.,
+anticlusters. Minimization of the same objectives leads to a clustering,
+i.e., elements are as similar as possible within a set and as different
+as possible between sets. 
 
-To vary the objective function in `anticlust`, it is possible change the
-parameter `objective` in the function `anticlustering`. In most cases,
-the results for the `"variance"` objective (k-means) and the
-`"distance"` objective (cluster editing) will be quite similar. The
-default objective is `"distance"`; you can change it to `"variance"` as
-follows:
+To vary the objective function, it is possible change the parameter
+`objective`. To apply anticluster editing, use `objective = "distance"`,
+(this is also the default). To maximize the k-means variance objective,
+set `objective = "variance"`. In many cases, the results for the
+`"variance"` objective (k-means) and the `"distance"` objective
+(anticluster editing) will be quite similar.
 
 ```{r}
-data <- iris[, -5]
-data$Anticluster <- anticlustering(data, n_clusters, objective = "variance")
-
-## Display feauture means by anticluster for the variance criterion
-data %>%
-  group_by(Anticluster) %>%
-  summarize_all(funs(mean)) %>%
-  round(2) %>% knitr::kable()
+anticlusters <- anticlustering(features, K = 2, standardize = TRUE,
+                               objective = "variance")
 ```
 
-## An exact approach
+```{r, echo = FALSE}
+print_table(features, anticlusters)
+```
 
-Finding an optimal partioning that maximizes the distance or variance
-criterion is computationally hard. For the distance criterion, the
-package `anticlust` offers the possibility to find the best possible
-partition, relying on [integer linear
-programming](https://en.wikipedia.org/wiki/Integer_programming).  The
-exact approach relies on an algorithm developed by @grotschel1989 that
-can be used to rather efficiently solve the cluster editing  problem
-exactly []@bocker2011]. To use obtain an optimal solution, a linear
-programming solver must be installed on your system; `anticlust`
-supports the commercial solvers [gurobi](https://www.gurobi.com/) and
+## Exact anticluster editing
+
+Finding an optimal partitioning that maximizes the anticluster editing
+or variance objective is computationally demanding. For anticluster
+editing, the package `anticlust` still offers the possibility to find
+the best possible partition, relying on [integer linear
+programming](https://en.wikipedia.org/wiki/Integer_programming). This
+exact approach relies on a formulation developed by @grotschel1989 that
+has been used to rather efficiently solve the cluster editing problem
+[@bocker2011]. To obtain an optimal solution, a linear programming
+solver must be installed on the system. `anticlust` supports the
+commercial solvers [gurobi](https://www.gurobi.com/) and
 [CPLEX](https://www.ibm.com/analytics/cplex-optimizer) as well as the
 open source [GNU linear programming
 kit](https://www.gnu.org/software/glpk/glpk.html). The commercial
@@ -221,58 +188,57 @@ the software gurobi),
 installed.
 
 To find the optimal solution, we have to set the arguments `method =
-"exact"` and `preclustering = FALSE` and `objective = "distance"` (the
-latter is the default argument, however)
+"ilp"` and `preclustering = FALSE`:
 
-```{r}
-# Create random data to illustrate exact solution
-n_elements <- 16
-n_anticlusters <- 2
-features <- matrix(runif(n_elements * n_anticlusters), ncol = 2)
-anticlusters <- anticlustering(features, n_anticlusters = 2,
-                               method = "exact", preclustering = FALSE,
-                               objective = "distance")
-
-# Display partitioning
-data <- data.frame(features, Anticluster = anticlusters)
-data %>%
-  group_by(Anticluster) %>%
-  summarize_all(funs(mean, sd)) %>%
-  round(2) %>% knitr::kable()
+```R
+anticlustering(features, K = 2, method = "ilp", preclustering = FALSE)
 ```
 
 Note that this approach will only work for small problem sizes (< 30
-elements). We can increase the problem size that the exact approach can
-handle by setting the argument `preclustering = TRUE`. In this case, we
-insert a minor restriction that precludes very similar elements to be
-assigned to the same set. In some occasions, this prohibits the integer
-linear programming solver to find the very best partitioning, but the
-solution will still be very good:
+elements). We can increase the problem size that the integer linear
+programming approach can handle by setting the argument `preclustering =
+TRUE`. In this case, a cluster analysis is first performed, creating
+small groups of elements that are very similar. The preclustering finds
+pairs of similar stimuli if K = 2, triplets if K = 3, and so forth.
+Then, a restriction is enforced that precludes very similar elements to
+be assigned to the same set. This procedure is illustrated in the
+following plot for K = 2 and n = 10:
 
-```{r}
-# Create random data to illustrate exact solution
-n_elements <- 32
-n_anticlusters <- 2
-features <- matrix(runif(n_elements * n_anticlusters), ncol = 2)
-anticlusters <- anticlustering(features, n_anticlusters = 2,
-                               method = "exact", preclustering = TRUE,
-                               objective = "distance")
-
-# Display partitioning
-data <- data.frame(features, Anticluster = anticlusters)
-data %>%
-  group_by(Anticluster) %>%
-  summarize_all(funs(mean, sd)) %>%
-  round(2) %>% knitr::kable()
+```{r, out.width = '60%', echo = FALSE}
+knitr::include_graphics("./README_files/preclustering.jpg")
 ```
+
+The preclustering restrictions improve the running time of the integer
+linear programming solver by a large margin (often 100x as fast).
+However, in some occasions, the restrictions prohibit the integer linear
+programming solver to find the very best partitioning, because this may
+be only obtained when some of the very similar preclustered elements are
+assigned to thethe same group. But in general, the solution is still
+very good and often optimal. This code can be used to employ integer
+linear programming under preclustering constraints.
+
+```R
+anticlustering(features, K = 2, method = "ilp", preclustering = TRUE)
+```
+
+## Random search
+
+To solve larger problem instances that cannot be processed using integer
+linear programming, a heuristic method based on random sampling is
+available. Across a user-specified number of runs (specified via the
+argument `nrep`), each element is first randomly assigned to an
+anticluster and then the objective value is computed. In the end, the
+best assignment is returned as output. To activate the heuristic,  set
+`method = "heuristic"` (this is also the default argument). When we set
+`preclustering = TRUE`, the random assignment is conducted under the
+restriction that preclustered elements cannot be part of the same
+anticluster. 
 
 ## How to procede
 
-If you are already happy with the results provided by the
-`anticlustering` function, you may stop here. The help page
-(`?anticlustering`) explains all of the parameters that can be adjusted
-for the `anticlusting` function. Currently, there is also a paper in
-preparation that will explain the theoretical background of the
-`anticlust` package in detail.
+The help page of the `anticlustering` function (`?anticlustering`)
+provides additional explanations of all function parameters. Currently,
+there is also a paper in preparation that will explain the theoretical
+background of the `anticlust` package in detail.
 
 ## References

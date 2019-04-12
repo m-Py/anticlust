@@ -45,18 +45,17 @@
 #'
 #' data(iris)
 #' ## Clustering
-#' clusters <- balanced_clustering(iris[, -5], K = 3, standardize = TRUE)
+#' clusters <- balanced_clustering(iris[, -5], K = 3, standardize = TRUE, objective = "variance")
 #' # This is low:
 #' variance_objective(iris[, -5], clusters, standardize = TRUE)
 #' ## Anticlustering
-#' anticlusters <- anticlustering(iris[, -5], K = 3, standardize = TRUE)
+#' anticlusters <- anticlustering(iris[, -5], K = 3, standardize = TRUE, objective = "variance")
 #' # This is higher:
 #' variance_objective(iris[, -5], anticlusters, standardize = TRUE)
 #'
 
 variance_objective <- function(features, clusters,
                                standardize = FALSE) {
-
   validate_input(features, "features", c("data.frame", "matrix", "numeric"))
   features <- as.matrix(features)
   validate_input(features, "features", objmode = "numeric")
@@ -67,7 +66,11 @@ variance_objective <- function(features, clusters,
   if (standardize) {
     features <- scale(features)
   }
+  variance_objective_(features, clusters)
+}
 
+# Internal function - no input handling
+variance_objective_ <- function(features, clusters) {
   ## 1. Compute cluster centers
   centers <- cluster_centers(features, clusters)
   ## 2. For each item, compute distance to each cluster center

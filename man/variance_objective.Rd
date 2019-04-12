@@ -43,11 +43,11 @@ value when creating (anti)clusters and when calling
 
 data(iris)
 ## Clustering
-clusters <- balanced_clustering(iris[, -5], K = 3, standardize = TRUE)
+clusters <- balanced_clustering(iris[, -5], K = 3, standardize = TRUE, objective = "variance")
 # This is low:
 variance_objective(iris[, -5], clusters, standardize = TRUE)
 ## Anticlustering
-anticlusters <- anticlustering(iris[, -5], K = 3, standardize = TRUE)
+anticlusters <- anticlustering(iris[, -5], K = 3, standardize = TRUE, objective = "variance")
 # This is higher:
 variance_objective(iris[, -5], anticlusters, standardize = TRUE)
 
