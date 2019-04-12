@@ -164,8 +164,8 @@ print_table(features, anticlusters)
 
 Finding an optimal partitioning that maximizes the anticluster editing
 or variance objective is computationally demanding. For anticluster
-editing, the package `anticlust` offers the possibility to find the best
-possible partition, relying on [integer linear
+editing, the package `anticlust` still offers the possibility to find
+the best possible partition, relying on [integer linear
 programming](https://en.wikipedia.org/wiki/Integer_programming). This
 exact approach relies on a formulation developed by @grotschel1989 that
 has been used to rather efficiently solve the cluster editing problem
