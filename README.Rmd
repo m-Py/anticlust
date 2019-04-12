@@ -200,7 +200,7 @@ Then, a restriction is enforced that precludes very similar elements to
 be assigned to the same set. This procedure is illustrated in the
 following plot for K = 2 and n = 10:
 
-```{r, out.width = '80%', echo = FALSE}
+```{r, out.width = '60%', echo = FALSE}
 knitr::include_graphics("./README_files/preclustering.jpg")
 ```
 

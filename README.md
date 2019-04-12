@@ -116,7 +116,7 @@ anticlustering(features, K = 2, method = "ilp", preclustering = FALSE)
 
 Note that this approach will only work for small problem sizes (&lt; 30 elements). We can increase the problem size that the integer linear programming approach can handle by setting the argument `preclustering = TRUE`. In this case, a cluster analysis is first performed, creating small groups of elements that are very similar. The preclustering finds pairs of similar stimuli if K = 2, triplets if K = 3, and so forth. Then, a restriction is enforced that precludes very similar elements to be assigned to the same set. This procedure is illustrated in the following plot for K = 2 and n = 10:
 
-<img src="./README_files/preclustering.jpg" width="80%" style="display: block; margin: auto;" />
+<img src="./README_files/preclustering.jpg" width="60%" style="display: block; margin: auto;" />
 
 The preclustering restrictions improve the running time of the integer linear programming solver by a large margin (often 100x as fast). However, in some occasions, the restrictions prohibit the integer linear programming solver to find the very best partitioning, because this may be only obtained when some of the very similar preclustered elements are assigned to thethe same group. But in general, the solution is still very good and often optimal. This code can be used to employ integer linear programming under preclustering constraints.
 
