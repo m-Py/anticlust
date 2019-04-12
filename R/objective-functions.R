@@ -56,7 +56,6 @@
 
 variance_objective <- function(features, clusters,
                                standardize = FALSE) {
-
   validate_input(features, "features", c("data.frame", "matrix", "numeric"))
   features <- as.matrix(features)
   validate_input(features, "features", objmode = "numeric")
@@ -67,7 +66,11 @@ variance_objective <- function(features, clusters,
   if (standardize) {
     features <- scale(features)
   }
+  variance_objective_(features, clusters)
+}
 
+# Internal function - no input handling
+variance_objective_ <- function(features, clusters) {
   ## 1. Compute cluster centers
   centers <- cluster_centers(features, clusters)
   ## 2. For each item, compute distance to each cluster center

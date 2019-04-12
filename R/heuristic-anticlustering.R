@@ -135,24 +135,16 @@ random_sampling <- function(dat, K, objective, nrep,
   # 1. Distance objective, features were passed
   # 2. Distance objective, distances were passed
   # 3. Variance objective, features were passed
-  if (objective == "distance") {
+  if (objective == "distance" && use_distances == TRUE) {
     obj_value <- distance_objective_
+  } else if (objective == "distance" && use_distances == FALSE) {
+    obj_value <- obj_value_distance
   } else {
-    obj_value <- variance_objective
+    obj_value <- variance_objective_
   }
 
-  if (objective == "variance" || use_distances == TRUE) {
-    ## In this case, `dat` is already the relevant data that is
-    ## operated on (features for variance criterion; distances for
-    ## distance criterion)
-    objective_data <- dat[, -(1:2), drop = FALSE]
-  } else {
-    ## Compute distances from features if distance objective is to be
-    ## computed, but features were passed. Here `dat` is not yet
-    ## the relevant data.
-    objective_data <- as.matrix(dist(dat[, -(1:2), drop = FALSE]))
-  }
-
+  ## Select the relevant data from which the objective is computed
+  objective_data <- dat[, -(1:2), drop = FALSE]
   for (i in 1:nrep) {
     ## 1. Random sampling without preclustering restrictions
     if (ignore_preclusters == TRUE) {
