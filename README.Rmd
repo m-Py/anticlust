@@ -6,7 +6,7 @@ output:
   md_document:
     variant: markdown_github
 
-bibliography: ./vignettes/lit.bib
+bibliography: lit.bib
 ---
 
 # Anticlustering
@@ -70,14 +70,15 @@ library("anticlust")
 
 The main function of the package is `anticlustering`. For most users, it
 should be sufficient to know this function. It takes as input a data
-matrix of features describing the elements that we want to assign to
-groups. In the data matrix, each row is an element, for example a
-person, picture, word, or a photo. Each column is a numeric variable
-describing one of the elements' features. The input may be an R `matrix`
-or `data.frame`. A single feature can be passed as a `vector`.
+table describing the elements we want to assign to groups. In the data
+table, each row is an element, for example a person, picture, word, or a
+photo. Each column is a numeric variable describing one of the elements'
+features. The table may be an R `matrix` or `data.frame`; a single
+feature can also be passed as a `vector`.
 
-To illustrate the usage of the function, we use the classical iris data
-set describing the characteristics of 150 iris plants:
+To illustrate the usage of the `anticlustering` function, we use the
+classical iris data set describing the characteristics of 150 iris
+plants:
 
 ```{r}
 ## Select only the numeric attributes
@@ -113,14 +114,14 @@ plot_clusters(features[, 3:4], anticlusters, pch = pch)
 
 ```
 
-This looks rather chaotic, but it is probably what we want: We would
-expect a strong overlap in all of the plants' characteristics between
-the three anticlusters. In addition to visually inspecting the
+This looks rather chaotic, but it is probably what we want: We want a
+strong overlap in all of the plants' characteristics because the
+anticlusters should be similar. In addition to visually inspecting the
 anticlustering plots, we probably want to investigate the descriptive
 statistics of the plants' characteristics by anticluster. Ideally, the
 distribution of plant characteristics should be the same for each
-anticluster. In the following, we find the means and standard deviations
-of each plant feature by anticluster:
+anticluster. In the following, we see that the means and standard
+deviations of the plants' features are very similar:
 
 ```{r, echo = FALSE}
 print_table(features, anticlusters)
@@ -149,7 +150,7 @@ as possible between sets.
 
 To vary the objective function, it is possible change the parameter
 `objective`. To apply anticluster editing, use `objective = "distance"`,
-which is also the default. To maximize the k-means variance objective,
+(this is also the default). To maximize the k-means variance objective,
 set `objective = "variance"`. In many cases, the results for the
 `"variance"` objective (k-means) and the `"distance"` objective
 (anticluster editing) will be quite similar:
@@ -225,7 +226,7 @@ available. Across a user-specified number of runs (specified via the
 argument `nrep`), each element is first randomly assigned to an
 anticluster and then the objective value is computed. In the end, the
 best assignment is returned as output. To activate the heuristic,  set
-`method = "heuristic"`, which is also the default argument. When we set
+`method = "heuristic"` (this is also the default argument). When we set
 `preclustering = TRUE`, the random assignment is conducted under the
 restriction that preclustered elements cannot be part of the same
 anticluster. 
@@ -233,8 +234,8 @@ anticluster.
 ## How to procede
 
 The help page of the `anticlustering` function (`?anticlustering`)
-provides more explanations of all of the parameters that can be
-adjusted. Currently, there is also a paper in preparation that will
-explain the theoretical background of the `anticlust` package in detail.
+provides additional explanations of all function parameters. Currently,
+there is also a paper in preparation that will explain the theoretical
+background of the `anticlust` package in detail.
 
 ## References

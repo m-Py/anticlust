@@ -19,9 +19,9 @@ library("anticlust")
 A quick start
 -------------
 
-The main function of the package is `anticlustering`. For most users, it should be sufficient to know this function. It takes as input a data matrix of features describing the elements that we want to assign to groups. In the data matrix, each row is an element, for example a person, picture, word, or a photo. Each column is a numeric variable describing one of the elements' features. The input may be an R `matrix` or `data.frame`. A single feature can be passed as a `vector`.
+The main function of the package is `anticlustering`. For most users, it should be sufficient to know this function. It takes as input a data table describing the elements we want to assign to groups. In the data table, each row is an element, for example a person, picture, word, or a photo. Each column is a numeric variable describing one of the elements' features. The table may be an R `matrix` or `data.frame`; a single feature can also be passed as a `vector`.
 
-To illustrate the usage of the function, we use the classical iris data set describing the characteristics of 150 iris plants:
+To illustrate the usage of the `anticlustering` function, we use the classical iris data set describing the characteristics of 150 iris plants:
 
 ``` r
 ## Select only the numeric attributes
@@ -69,7 +69,7 @@ plot_clusters(features[, 3:4], anticlusters, pch = pch)
 
 <img src="README_files/figure-markdown_github/unnamed-chunk-5-1.png" style="display: block; margin: auto;" />
 
-This looks rather chaotic, but it is probably what we want: We would expect a strong overlap in all of the plants' characteristics between the three anticlusters. In addition to visually inspecting the anticlustering plots, we probably want to investigate the descriptive statistics of the plants' characteristics by anticluster. Ideally, the distribution of plant characteristics should be the same for each anticluster. In the following, we find the means and standard deviations of each plant feature by anticluster:
+This looks rather chaotic, but it is probably what we want: We want a strong overlap in all of the plants' characteristics because the anticlusters should be similar. In addition to visually inspecting the anticlustering plots, we probably want to investigate the descriptive statistics of the plants' characteristics by anticluster. Ideally, the distribution of plant characteristics should be the same for each anticluster. In the following, we see that the means and standard deviations of the plants' features are very similar:
 
 | Statistic | Sepal.Length | Sepal.Width | Petal.Length | Petal.Width |  Anticluster|
 |:----------|:-------------|:------------|:-------------|:------------|------------:|
@@ -88,7 +88,7 @@ In the example above, the `anticlustering` function established anticlusters tha
 
 The k-means objective is given by the sum of the squared errors between cluster centers and individual data points (Jain 2010). The cluster editing objective is the sum of pairwise distances within anticlusters. Maximizing either of these objectives leads similar groups, i.e., anticlusters. Minimization of the same objectives leads to a clustering, i.e., elements are as similar as possible within a set and as different as possible between sets.
 
-To vary the objective function, it is possible change the parameter `objective`. To apply anticluster editing, use `objective = "distance"`, which is also the default. To maximize the k-means variance objective, set `objective = "variance"`. In many cases, the results for the `"variance"` objective (k-means) and the `"distance"` objective (anticluster editing) will be quite similar:
+To vary the objective function, it is possible change the parameter `objective`. To apply anticluster editing, use `objective = "distance"`, (this is also the default). To maximize the k-means variance objective, set `objective = "variance"`. In many cases, the results for the `"variance"` objective (k-means) and the `"distance"` objective (anticluster editing) will be quite similar:
 
 ``` r
 anticlusters <- anticlustering(features, K = 2, standardize = TRUE,
@@ -127,12 +127,12 @@ anticlustering(features, K = 2, method = "ilp", preclustering = TRUE)
 Random search
 -------------
 
-To solve larger problem instances that cannot be processed using integer linear programming, a heuristic method based on random sampling is available. Across a user-specified number of runs (specified via the argument `nrep`), each element is first randomly assigned to an anticluster and then the objective value is computed. In the end, the best assignment is returned as output. To activate the heuristic, set `method = "heuristic"`, which is also the default argument. When we set `preclustering = TRUE`, the random assignment is conducted under the restriction that preclustered elements cannot be part of the same anticluster.
+To solve larger problem instances that cannot be processed using integer linear programming, a heuristic method based on random sampling is available. Across a user-specified number of runs (specified via the argument `nrep`), each element is first randomly assigned to an anticluster and then the objective value is computed. In the end, the best assignment is returned as output. To activate the heuristic, set `method = "heuristic"` (this is also the default argument). When we set `preclustering = TRUE`, the random assignment is conducted under the restriction that preclustered elements cannot be part of the same anticluster.
 
 How to procede
 --------------
 
-The help page of the `anticlustering` function (`?anticlustering`) provides more explanations of all of the parameters that can be adjusted. Currently, there is also a paper in preparation that will explain the theoretical background of the `anticlust` package in detail.
+The help page of the `anticlustering` function (`?anticlustering`) provides additional explanations of all function parameters. Currently, there is also a paper in preparation that will explain the theoretical background of the `anticlust` package in detail.
 
 References
 ----------
