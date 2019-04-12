@@ -169,7 +169,7 @@ the best possible partition, relying on [integer linear
 programming](https://en.wikipedia.org/wiki/Integer_programming). This
 exact approach relies on a formulation developed by @grotschel1989 that
 has been used to rather efficiently solve the cluster editing problem
-exactly [@bocker2011]. To use obtain an optimal solution, a linear
+exactly [@bocker2011]. To obtain an optimal solution, a linear
 programming solver must be installed on the system. `anticlust` supports
 the commercial solvers [gurobi](https://www.gurobi.com/) and
 [CPLEX](https://www.ibm.com/analytics/cplex-optimizer) as well as the
@@ -194,7 +194,7 @@ Note that this approach will only work for small problem sizes (< 30
 elements). We can increase the problem size that the integer linear
 programming approach can handle by setting the argument `preclustering =
 TRUE`. In this case, a cluster analysis is first performed, creating
-small groups of elements that are very similar. The preclustering  finds
+small groups of elements that are very similar. The preclustering finds
 pairs of similar stimuli if K = 2, triplets if K = 3, and so forth.
 Then, a restriction is enforced that precludes very similar elements to
 be assigned to the same set. This procedure is illustrated in the
