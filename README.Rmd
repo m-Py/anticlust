@@ -11,12 +11,12 @@ bibliography: lit.bib
 
 # Anticlustering
 
-Anticlustering is used to create sets of elements that are as similar as
-possible [@spath1986; @valev1998]. The better known twin of
-anticlustering is cluster analysis that is used to create sets where
-elements within each cluster are similar, but dissimilar from elements
-in other clusters. The `R` package `anticlust` provides functions to
-tackle anticlustering algorithmically.
+Anticlustering creates sets of elements that are as similar as possible
+[@spath1986; @valev1998]. The better known twin of anticlustering is
+cluster analysis that is used to create sets where elements within each
+cluster are similar, but dissimilar from elements in other clusters. The
+`R` package `anticlust` provides functions to tackle anticlustering
+algorithmically.
 
 ```{r setup, include = FALSE}
 library("knitr")
@@ -143,7 +143,7 @@ analysis:
 The k-means objective is given by the sum of the squared errors between
 cluster centers and individual data points [@jain2010]. The cluster
 editing objective is the sum of pairwise distances within anticlusters.
-Maximizing either of these objectives leads similar groups, i.e.,
+Maximizing either of these objectives leads to similar groups, i.e.,
 anticlusters. Minimization of the same objectives leads to a clustering,
 i.e., elements are as similar as possible within a set and as different
 as possible between sets. 
@@ -153,11 +153,14 @@ To vary the objective function, it is possible change the parameter
 (this is also the default). To maximize the k-means variance objective,
 set `objective = "variance"`. In many cases, the results for the
 `"variance"` objective (k-means) and the `"distance"` objective
-(anticluster editing) will be quite similar:
+(anticluster editing) will be quite similar.
 
 ```{r}
 anticlusters <- anticlustering(features, K = 2, standardize = TRUE,
                                objective = "variance")
+```
+
+```{r, echo = FALSE}
 print_table(features, anticlusters)
 ```
 
@@ -170,9 +173,9 @@ the best possible partition, relying on [integer linear
 programming](https://en.wikipedia.org/wiki/Integer_programming). This
 exact approach relies on a formulation developed by @grotschel1989 that
 has been used to rather efficiently solve the cluster editing problem
-exactly [@bocker2011]. To obtain an optimal solution, a linear
-programming solver must be installed on the system. `anticlust` supports
-the commercial solvers [gurobi](https://www.gurobi.com/) and
+[@bocker2011]. To obtain an optimal solution, a linear programming
+solver must be installed on the system. `anticlust` supports the
+commercial solvers [gurobi](https://www.gurobi.com/) and
 [CPLEX](https://www.ibm.com/analytics/cplex-optimizer) as well as the
 open source [GNU linear programming
 kit](https://www.gnu.org/software/glpk/glpk.html). The commercial
@@ -185,7 +188,7 @@ the software gurobi),
 installed.
 
 To find the optimal solution, we have to set the arguments `method =
-"ilp"` and `preclustering = FALSE` and `objective = "distance"`:
+"ilp"` and `preclustering = FALSE`:
 
 ```R
 anticlustering(features, K = 2, method = "ilp", preclustering = FALSE)
