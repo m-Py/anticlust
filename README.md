@@ -1,7 +1,7 @@
 Anticlustering
 ==============
 
-Anticlustering creates sets of elements that are as similar as possible (Späth 1986; Valev 1998). The better known twin of anticlustering is cluster analysis that is used to create sets where elements within each cluster are similar, but dissimilar from elements in other clusters. The `R` package `anticlust` provides functions to tackle anticlustering algorithmically.
+Anticlustering is a method to create sets of elements in such a way that the sets are as similar as possible (Späth 1986; Valev 1998). Cluster analysis is the better known twin of anticlustering; cluster analysis is used to create sets in such a way that elements within each set are similar, but dissimilar from elements in other sets. The `R` package `anticlust` provides functions to tackle the anticlustering problem.
 
 Installation
 ------------
