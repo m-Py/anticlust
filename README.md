@@ -27,7 +27,7 @@ This page contains a quick start on how to employ anticlustering using the `anti
 
 3.  There is a paper in preparation that will explain the theoretical background of the `anticlust` package in detail.
 
-4.  If you have any question on the anticlustering method and the `anticlust` package, I encourage you to contact me via email (<martin.papenberg@hhu.de>) or Twitter (<span class="citeproc-not-found" data-reference-id="MPapenberg">**???**</span>)(<https://twitter.com/MPapenberg>) or to open an issue on this Github repository.
+4.  If you have any question on the anticlustering method and the `anticlust` package, I encourage you to contact me via email (<martin.papenberg@hhu.de>) or Twitter [`@MPapenberg`](https://twitter.com/MPapenberg) or to open an issue on this Github repository.
 
 A quick start
 -------------
