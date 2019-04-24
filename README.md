@@ -1,7 +1,7 @@
 anticlust
 =========
 
-Anticlustering is a method to create sets of elements in such a way that the sets are as similar as possible (Späth 1986; Valev 1998). Cluster analysis is the better known twin of anticlustering; cluster analysis is used to create sets in such a way that elements within each set are similar, but dissimilar from elements in other sets.
+`anticlust` is an `R` package that is used for »anticlustering«. Anticlustering is a method to create sets of elements in such a way that the sets are as similar as possible (Späth 1986; Valev 1998). Cluster analysis is the better known twin of anticlustering; cluster analysis is used to create sets in such a way that elements within each set are similar, but dissimilar from elements in other sets.
 
 Installation
 ------------
@@ -21,13 +21,13 @@ How do I learn about anticlustering
 
 This page contains a quick start on how to employ anticlustering using the `anticlust` package. So, you should start by simply continuing to read. More information is available via the following sources:
 
-1.  The R help. The main function of the package is `anticlustering()`. The help page of the function (`?anticlustering`) is useful to learn more about anticlustering. It provides explanations of all function parameters and how they relate to the theoretical background of anticlustering.
+1.  The R help. The main function of the package is `anticlustering()` and the help page of the function (`?anticlustering`) is useful to learn more about anticlustering. It provides explanations of all function parameters and how they relate to the theoretical background of anticlustering.
 
-2.  I created a repository on the [Open Science Framework](https://osf.io/cd5sr/) that includes materials to better understand the anticlustering method. Currently, it contains the slides of a talk that I gave a the TeaP conference (Annual meeting of Experimental Psychologists) in London in April, 2019. The slides can be retrieved [here](https://osf.io/jbthk/); they contain a visual illustration of the anticlustering method and example code for different applications.
+2.  I created a repository on the [Open Science Framework](https://osf.io/cd5sr/) that includes materials for a better understanding of the anticlustering method. Currently, it contains the slides of a talk that I gave a the TeaP conference (Annual meeting of Experimental Psychologists) in London in April, 2019. The slides can be retrieved [here](https://osf.io/jbthk/); they contain a visual illustration of the anticlustering method and example code for different applications.
 
 3.  There is a paper in preparation that will explain the theoretical background of the `anticlust` package in detail.
 
-If you have any question on the anticlustering method and the `anticlust` package, I encourage you to contact me via email (<martin.papenberg@hhu.de>) or Twitter (`@MPapenberg`) or to open an issue on this Github repository.
+4.  If you have any question on the anticlustering method and the `anticlust` package, I encourage you to contact me via email (<martin.papenberg@hhu.de>) or Twitter (`@MPapenberg`) or to open an issue on this Github repository.
 
 A quick start
 -------------
