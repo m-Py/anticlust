@@ -12,3 +12,5 @@ by grouping variables.
 - `categories` overrides the value of `preclustering`; it is not 
   possible to use categorical and preclustering constraints at the same
   time
+
+In `anticlustering`, the default value of `preclustering` is now FALSE.

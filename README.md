@@ -120,10 +120,10 @@ Exact anticluster editing
 
 Finding an optimal assignment of elements to sets that maximizes the anticluster editing or variance objective is computationally demanding. For anticluster editing, the package `anticlust` still offers the possibility to find the best possible assignment, relying on [integer linear programming](https://en.wikipedia.org/wiki/Integer_programming). This exact approach employs a formulation developed by Grötschel and Wakabayashi (1989), which has been used to rather efficiently solve the cluster editing problem (Böcker, Briesemeister, and Klau 2011). To obtain an optimal solution, a linear programming solver must be installed on your system; `anticlust` supports the commercial solvers [gurobi](https://www.gurobi.com/) and [CPLEX](https://www.ibm.com/analytics/cplex-optimizer) as well as the open source [GNU linear programming kit](https://www.gnu.org/software/glpk/glpk.html). The commercial solvers are generally faster. Researchers can install a commercial solver for free using an academic licence. To use any of the solvers from within `R`, one of the interface packages `gurobi` (is shipped with the software gurobi), [Rcplex](https://CRAN.R-project.org/package=Rcplex) or [Rglpk](https://CRAN.R-project.org/package=Rglpk) must also be installed.
 
-To find the optimal solution, we have to set the arguments `method = "ilp"` and `preclustering = FALSE`:
+To find the optimal solution, we have to set the arguments `method = "ilp"`:
 
 ``` r
-anticlustering(features, K = 2, method = "ilp", preclustering = FALSE)
+anticlustering(features, K = 2, method = "ilp")
 ```
 
 Preclustering
