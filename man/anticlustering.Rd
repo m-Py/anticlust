@@ -6,7 +6,7 @@
 \usage{
 anticlustering(features = NULL, distances = NULL, K,
   objective = "distance", method = "heuristic", preclustering = TRUE,
-  standardize = FALSE, nrep = 10000)
+  standardize = FALSE, nrep = 10000, categories = NULL)
 }
 \arguments{
 \item{features}{A vector, matrix or data.frame of data points. Rows
@@ -46,6 +46,15 @@ not with \code{distances}.}
 heuristic. This argument only has an effect if \code{method}
 is \code{"heuristic"}. It does not have an effect if
 \code{method} is \code{"ilp"}.}
+
+\item{categories}{A vector, data.frame or matrix representing
+one or several categorical constraints. The categorical grouping
+variables are balanced out across anticlusters. Currently
+this functionality is only available in
+combination with the heuristic random sampling method. If
+categorical contraints
+are employed, the value of the argument \code{preclustering}
+will be ignored.}
 }
 \value{
 A vector representing the anticluster affiliation.
