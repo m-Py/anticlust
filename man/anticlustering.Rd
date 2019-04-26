@@ -9,9 +9,9 @@ anticlustering(features = NULL, distances = NULL, K,
   standardize = FALSE, nrep = 10000, categories = NULL)
 }
 \arguments{
-\item{features}{A vector, matrix or data.frame of data points. Rows
-correspond to elements and columns correspond to features. A
-vector represents a single feature.}
+\item{features}{A numeric vector, matrix or data.frame of data points.
+Rows correspond to elements and columns correspond to features. A
+vector represents a single numeric feature.}
 
 \item{distances}{Alternative data argument that can be used if
 \code{features} is not passed. A N x N matrix representing the
@@ -48,13 +48,13 @@ is \code{"heuristic"}. It does not have an effect if
 \code{method} is \code{"ilp"}.}
 
 \item{categories}{A vector, data.frame or matrix representing
-one or several categorical constraints. The categorical grouping
+one or several categorical constraints. These grouping
 variables are balanced out across anticlusters. Currently
-this functionality is only available in
-combination with the heuristic random sampling method. If
-categorical contraints
-are employed, the value of the argument \code{preclustering}
-will be ignored.}
+this functionality is only available in combination with the
+heuristic random sampling method and not with the ILP approach. If
+categorical contraints are employed, the value of the argument
+\code{preclustering} will be ignored (that is, there will be no
+preclustering).}
 }
 \value{
 A vector representing the anticluster affiliation.
@@ -64,7 +64,7 @@ Create equal sized groups of elements (anticlusters) that are as
 similar as possible.
 }
 \details{
-This function is used to solve balanced K anticlustering. That is,
+This function is used to solve »balanced K anticlustering« That is,
 K equal sized groups are created in such a way that similarity of
 all groups is maximized. Set similarity is assessed using one of
 two objective functions:
@@ -139,29 +139,36 @@ what happens internally, but it is equivalent).
 }
 \examples{
 
-## Use anticlustering on the iris data set
+## Use anticlustering on the iris data set. Create sets of plants
+## that are as similar as possible with regard to all four features
+## of the iris plants#'
 
 data(iris)
-# Only use numeric attributes
+head(iris[, -5]) # these features are made similar across sets
 anticlusters <- anticlustering(iris[, -5], K = 3)
 # Compare feature means by anticluster
 by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
-# Plot the anticlustering
-par(mfrow = c(1, 2))
-plot_clusters(iris[, 1:2], anticlusters)
-plot_clusters(iris[, 3:4], anticlusters)
 
-# As the features are differently scaled, the solution is improved
+# As the features are differently scaled, the solution might be improved
 # by setting standardize = TRUE:
 anticlusters <- anticlustering(iris[, -5], K = 3, standardize = TRUE)
 by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
 
 # Optimize the variance criterion:
-anticlusters <- anticlustering(iris[, -5], K = 3, standardize = TRUE, objective = "variance")
+anticlusters <- anticlustering(iris[, -5], K = 3, objective = "variance")
 by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
+table(iris[, 5], anticlusters)
+
+# Incorporate categorical restrictions:
+# 1. Case: no restrictions, iris species may not be balanced across anticlusters
+anticlusters <- anticlustering(iris[, -5], K = 2, nrep = 100)
+table(iris[, 5], anticlusters)
+# 2. Case: Include restrictions, iris species are balanced across anticlusters
+anticlusters <- anticlustering(iris[, -5], K = 2, categories = iris[, 5], nrep = 100)
+table(iris[, 5], anticlusters)
 
 
-## Try out exact anticlustering
+## Try out exact anticlustering using integer linear programming.
 # Create artifical data
 n_features <- 2
 n_elements <- 20
