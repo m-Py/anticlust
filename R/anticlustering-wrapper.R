@@ -34,6 +34,14 @@
 #'     heuristic. This argument only has an effect if \code{method}
 #'     is \code{"heuristic"}. It does not have an effect if
 #'     \code{method} is \code{"ilp"}.
+#' @param categories A vector, data.frame or matrix representing
+#'     one or several categorical constraints. The categorical grouping
+#'     variables are balanced out across anticlusters. Currently
+#'     this functionality is only available in
+#'     combination with the heuristic random sampling method. If
+#'     categorical contraints
+#'     are employed, the value of the argument \code{preclustering}
+#'     will be ignored.
 #'
 #' @return A vector representing the anticluster affiliation.
 #'
@@ -171,7 +179,8 @@
 anticlustering <- function(features = NULL, distances = NULL,
                            K, objective = "distance",
                            method = "heuristic", preclustering = TRUE,
-                           standardize = FALSE, nrep = 10000) {
+                           standardize = FALSE, nrep = 10000,
+                           categories = NULL) {
 
   input_handling_anticlustering(features, distances, K, objective,
                                 method, preclustering,
@@ -207,8 +216,13 @@ anticlustering <- function(features = NULL, distances = NULL,
       preclusters <- equal_sized_kmeans(features, n_preclusters)
     }
   }
+  if (argument_exists(categories)) {
+    ## categorical constraints cannot be used with preclustering
+    preclusters <- NULL
+  }
   heuristic_anticlustering(features, K, preclusters,
-                           objective, nrep = nrep, distances)
+                           objective, nrep = nrep, distances,
+                           categories)
 }
 
 
