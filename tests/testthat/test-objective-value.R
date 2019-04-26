@@ -3,36 +3,6 @@
 context("Test computation of objective values")
 library("anticlust")
 
-test_that("output of objective value functions has correct structure", {
-  conditions <- expand.grid(m = 1:4, p = 2:4, objective = c("distance", "variance"),
-                            preclustering = c(TRUE, FALSE))
-  for (i in nrow(conditions)) {
-    m_features <- conditions[i, "m"]
-    p_anticlusters <- conditions[i, "p"]
-    n_elements <- p_anticlusters * 5 # n must be multiplier of p
-    features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
-    # Precluster cases
-    preclusters <- NULL
-    if (conditions$preclustering[i] == TRUE) {
-      n_preclusters <- n_elements / p_anticlusters
-      preclusters <- equal_sized_kmeans(features, n_preclusters)
-    }
-    # Use preclustering as resticting information in anticlustering
-    anticlusters <- heuristic_anticlustering(features, p_anticlusters,
-                                             preclusters, nrep = 100,
-                                             objective = conditions$objective[i])
-    dist_obj <- obj_value_distance(features, anticlusters)
-    var_obj <- variance_objective(features, anticlusters)
-    expect_equal(mode(dist_obj), "numeric")
-    expect_equal(length(dist_obj), 1)
-    expect_equal(dist_obj > 0, TRUE)
-    expect_equal(mode(var_obj), "numeric")
-    expect_equal(length(var_obj), 1)
-    expect_equal(var_obj > 0, TRUE)
-  }
-})
-
-
 test_that("objective value for variance criterion is computed correctly", {
   for (m in 1:4) {
     m_features <- m
