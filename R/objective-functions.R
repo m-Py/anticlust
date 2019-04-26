@@ -221,9 +221,6 @@ unique_combinations <- function(elements) {
 
 #' Objective value for the distance criterion
 #'
-#' Currently I am using `distance_objective_`, even though this function
-#' may sometimes be faster.
-#'
 #' @param features A data.frame, matrix or vector representing the
 #'     features that are used in the assignment.
 #' @param anticlusters A vector representing the anticluster affiliation
