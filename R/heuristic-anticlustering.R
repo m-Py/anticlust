@@ -45,9 +45,7 @@ heuristic_anticlustering <- function(features, K, preclusters, objective,
     categories <- merge_into_one_variable(categories)
   }
 
-  ## Sort by grouping variable (precluster or category)
-  dat <- sort_data(input, preclusters, categories)
-
+  dat <- sort_by_group(input, preclusters, categories)
   best_assignment <- random_sampling(dat, K, objective, nrep,
                                      sampling_plan, use_distances)
 
@@ -75,32 +73,34 @@ merge_into_one_variable <- function(categories) {
   factor(do.call(paste0, as.list(categories)))
 }
 
-#' Bring features into the data format required by preclustering
-#' heuristic
+#' Sort data by a grouping variable
 #'
-#' @param input A matrix representing features or distances.
+#' @param input A data matrix representing features or distances.
 #' @param preclusters A vector of precluster affiliations. Can be NULL,
 #'     see Details.
+#' @param categories A vector that represents categorical constraints.
+#'     Can be NULL, see Details.
 #'
 #' @return An extended data matrix. The first column indicates the
 #'     group category of each element (precluster or categorical variable).
 #'     The matrix is sorted by the group, i.e. by the first column.
-#'     The second column is a
-#'     unique number identifying the original position of each
-#'     element. The second column is used in
+#'     The second column is a unique number identifying the original
+#'     position of each element. This column is used in
 #'     \code{heuristic_anticlustering} to restore the original order of
-#'     the data. The other columns represent the original features that
-#'     were passed to this function.
+#'     the data. The other columns represent the original data inpute that
+#'     was passed to this function.
 #'
 #'  @details
 #'
 #'  This function sorts the input table by precluster affiliation
-#'  or by a categorical variable.
+#'  or by a categorical variable; neither needs to be present, if no
+#'  grouping restrictions are passed (precluster or categories), the data
+#'  is not sorted.
 #'
 #' @noRd
 #'
 
-sort_data <- function(input, preclusters, categories) {
+sort_by_group <- function(input, preclusters, categories) {
   sort_by <- 1 # default: data does not need to be sorted
   if (argument_exists(preclusters)) {
     sort_by <- preclusters
