@@ -5,7 +5,7 @@
 \title{Anticlustering}
 \usage{
 anticlustering(features = NULL, distances = NULL, K,
-  objective = "distance", method = "heuristic", preclustering = TRUE,
+  objective = "distance", method = "heuristic", preclustering = FALSE,
   standardize = FALSE, nrep = 10000, categories = NULL)
 }
 \arguments{
@@ -141,7 +141,7 @@ what happens internally, but it is equivalent).
 
 ## Use anticlustering on the iris data set. Create sets of plants
 ## that are as similar as possible with regard to all four features
-## of the iris plants#'
+## of the iris plants
 
 data(iris)
 head(iris[, -5]) # these features are made similar across sets
@@ -168,18 +168,16 @@ anticlusters <- anticlustering(iris[, -5], K = 2, categories = iris[, 5], nrep =
 table(iris[, 5], anticlusters)
 
 
-## Try out exact anticlustering using integer linear programming.
+## Try out exact anticlustering using integer linear programming
 # Create artifical data
 n_features <- 2
 n_elements <- 20
 K <- 2
 features <- matrix(rnorm(n_elements * n_features), ncol = n_features)
-anticlustering(features, K = K, method = "ilp",
-               preclustering = FALSE)
+anticlustering(features, K = K, method = "ilp")
 
-# Enable preclustering (preclustering = TRUE is also the default)
-anticlustering(features, K = K, method = "ilp",
-               preclustering = TRUE)
+# Enable preclustering
+anticlustering(features, K = K, method = "ilp", preclustering = TRUE)
 
 }
 \references{
