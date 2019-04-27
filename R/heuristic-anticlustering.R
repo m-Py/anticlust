@@ -42,10 +42,7 @@ heuristic_anticlustering <- function(features, K, preclusters, objective,
     sampling_plan <- "preclustering"
   } else if (argument_exists(categories)) {
     sampling_plan <- "categorical"
-    ## `categories` may be a data.frame, but one vector is needed.
-    ## Thus, convert the several categories into one.
-    categories <- data.frame(categories)
-    categories <- factor(do.call(paste0, as.list(categories)))
+    categories <- merge_into_one_variable(categories)
   }
 
   ## Sort by grouping variable (precluster or category)
@@ -60,6 +57,22 @@ heuristic_anticlustering <- function(features, K, preclusters, objective,
   anticlusters <- dat[, 1]
   names(anticlusters) <- NULL
   return(anticlusters)
+}
+
+#' Merge several grouping variable into one
+#'
+#' @param categories A vector, data.frame or matrix that represents
+#'     one or several categorical constraints.
+#'
+#' @return A vector representing the group membership (or the combination
+#'     of group memberships) as one variable
+#'
+#' @noRd
+#'
+
+merge_into_one_variable <- function(categories) {
+  categories <- data.frame(categories)
+  factor(do.call(paste0, as.list(categories)))
 }
 
 #' Bring features into the data format required by preclustering
