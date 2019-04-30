@@ -1,7 +1,7 @@
 anticlust
 =========
 
-`anticlust` is an `R` package that is used for »anticlustering«. Anticlustering is a method to create sets of elements in such a way that the sets are as similar as possible (Späth 1986; Valev 1998). The package was developed to assign items to experimental conditions in experimental psychology, but it can be applied whenever similar sets are desired. Currently, the package `anticlust` can be used to create sets of equal size. Cluster analysis is the better known twin of anticlustering; cluster analysis is used to create sets in such a way that elements within each set are similar, but dissimilar from elements in other sets.
+`anticlust` is an `R` package that is used for »anticlustering«. Anticlustering is a method to assign elements to sets in such a way that the sets are as similar as possible (Späth 1986; Valev 1998). The package `anticlust` was originally developed to assign items to experimental conditions in experimental psychology, but it can be applied whenever similar sets are desired. Currently, `anticlust` supports the possibility to create sets of equal size.
 
 Installation
 ------------
