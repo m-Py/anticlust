@@ -16,8 +16,16 @@ Anticlustering is a method to assign elements to sets in such a way that
 the sets are as similar as possible [@spath1986; @valev1998]. The
 package `anticlust` was originally developed to assign items to
 experimental conditions in experimental psychology, but it can be
-applied whenever similar sets are desired. Currently, `anticlust`
-supports the possibility to create sets of equal size. 
+applied whenever similar sets are desired. 
+
+Currently, `anticlust` offers the following features:
+
+- Create any number of sets that are similar with regard to the numeric
+  features of the input elements (e.g., create school classes with pupils 
+  of similar grades)
+- All sets are of equal size
+- Group memberships may be balanced out across sets (e.g., each school 
+  class has the same number of female and male students)
 
 ```{r setup, include = FALSE}
 library("knitr")
