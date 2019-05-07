@@ -5,8 +5,9 @@
 \title{Anticlustering}
 \usage{
 anticlustering(features = NULL, distances = NULL, K,
-  objective = "distance", method = "heuristic", preclustering = FALSE,
-  standardize = FALSE, nrep = 10000, categories = NULL)
+  objective = "distance", method = "heuristic",
+  preclustering = FALSE, standardize = FALSE, nrep = 10000,
+  categories = NULL)
 }
 \arguments{
 \item{features}{A numeric vector, matrix or data.frame of data points.
@@ -82,7 +83,7 @@ anticlusters (see \code{\link{distance_objective}}). Maximizing
 either of these objectives is used to create similar groups;
 minimization of the same objectives leads to a clustering, i.e.,
 elements are as similar as possible within a set and as different
-as possible between sets. This can be done via
+as possible between sets. Clustering could be done with the function
 \code{\link{balanced_clustering}}.
 
 If the argument \code{features} is passed together with
@@ -112,8 +113,7 @@ editing objective is still optimized using integer linear
 programming, but a preprocessing forbids very similar elements to
 be assigned to the same anticluster. This approach can be used to
 work on larger problem instances and the solution is usually still
-optimal or very close to optimal. Note that \code{preclustering} is
-\code{TRUE} by default.
+optimal or very close to optimal.
 
 If no exact solution is required or the problem size is too large
 for integer linear programming, a heuristic method is available via
@@ -126,16 +126,11 @@ number of runs, anticlusters are assigned randomly and the best
 assignment -- maximizing the specified objective -- is
 returned. The sampling approach may also incorporate a
 preclustering that prevents grouping very similar elements into the
-same anticluster; use \code{preclustering = TRUE} to activate this
-option, which is also the default. It is suggested that the
-preclustering condition is activated for the random sampling
-approach because it usually improves the quality of the solution.
-
-Preclustering (for the exact and heuristic approach) is performed
-by a call to \code{\link{balanced_clustering}} where the argument
-\code{K} is set to the number of elements divided by the number of
-anticlusters that are to be created (actually, this is not exactly
-what happens internally, but it is equivalent).
+same anticluster. Preclustering (for the exact and heuristic approach)
+is performed by a call to \code{\link{balanced_clustering}} where the
+argument \code{K} is set to the number of elements divided by the
+number of anticlusters that are to be created (actually, this is not
+exactly what happens internally, but it is equivalent).
 }
 \examples{
 
