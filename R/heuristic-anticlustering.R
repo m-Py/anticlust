@@ -141,16 +141,23 @@ sort_by_group <- function(input, preclusters, categories) {
 random_sampling <- function(dat, K, objective, nrep, sampling_plan,
                             use_distances) {
 
-  ## Initialize variables
+  ## 1. Generate random anticlusters
   N <- nrow(dat)
   n_preclusters <- N / K
-  ## Start optimizing
-  best_obj <- -Inf
+  anticlusters <- rep_len(1:K, N) # initialization for unrestricted sampling
+  categories <- dat[, 1]
+  assignments <- sample_anticlusters(
+    nrep,
+    sampling_plan,
+    anticlusters,
+    categories,
+    n_preclusters
+  )
 
-  ## Determine how to compute objective, three cases:
+  ## 2. Compute objective values, three input cases are possible:
   # 1. Distance objective, features were passed
   # 2. Distance objective, distances were passed
-  # 3. Variance objective, features were passed
+  # 3. Variance objective (features have to be passed)
   if (objective == "distance" && use_distances == TRUE) {
     obj_value <- distance_objective_
   } else if (objective == "distance" && use_distances == FALSE) {
@@ -159,26 +166,53 @@ random_sampling <- function(dat, K, objective, nrep, sampling_plan,
     obj_value <- variance_objective_
   }
 
-  ## Select the relevant data from which the objective is computed
-  objective_data <- dat[, -(1:2), drop = FALSE]
-  anticlusters <- rep_len(1:K, N) # initialization for unrestricted sampling
-  categories <- dat[, 1]
-  for (i in 1:nrep) {
-    if (sampling_plan == "unrestricted") {
-      anticlusters <- sample(anticlusters)
-    } else if (sampling_plan == "preclustering") {
-      anticlusters <- replicate_sample(n_preclusters, K)
-    } else if (sampling_plan == "categorical") {
-      anticlusters <- categorical_sampling(categories, K)
-    }
-    cur_obj <- obj_value(objective_data, anticlusters)
-    if (cur_obj > best_obj) {
-      best_assignment <- anticlusters
-      best_obj <- cur_obj
-    }
-  }
-  return(best_assignment)
+  ## Compute all objectives and return the best assignment
+  obj_values <- lapply(
+    assignments,
+    FUN = obj_value,
+    data = dat[, -(1:2), drop = FALSE]
+  )
+  best_obj   <- which.max(obj_values)
+  assignments[[best_obj]]
 }
+
+
+#' Sample anticlusters many times
+#'
+#' Called from within random_sampling
+#'
+sample_anticlusters <- function(nrep, sampling_plan, anticlusters,
+                                categories, n_preclusters) {
+  if (sampling_plan == "unrestricted") {
+    anticlusters <- lapply(
+      1:nrep,
+      FUN = unrestricted_sampling,
+      anticlusters = anticlusters
+    )
+  } else if (sampling_plan == "preclustering") {
+    anticlusters <- lapply(
+      1:nrep,
+      FUN = replicate_sample,
+      n_preclusters = n_preclusters,
+      K = K
+    )
+  } else if (sampling_plan == "categorical") {
+    anticlusters <- lapply(
+      1:nrep,
+      FUN = categorical_sampling,
+      categories = categories,
+      K = K
+    )
+  }
+  anticlusters
+}
+
+# Just a wrapper for sample, called from `random_sampling`;
+# an argument was added to be usable by lapply
+unrestricted_sampling <- function(x, anticlusters) {
+  sample(anticlusters)
+}
+
 
 #' Random sampling employing a categorical constraint
 #'
