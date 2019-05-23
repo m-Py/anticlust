@@ -26,50 +26,65 @@
 
 random_sampling <- function(dat, K, objective, nrep, sampling_plan,
                             use_distances) {
-  ## 1. Generate random anticlusters
-  assignments <- sample_anticlusters(dat, K, nrep, sampling_plan)
-  ## 2. Compute objective value for each assignment
-  objectives <- all_objectives(assignments, dat, objective, use_distances)
-  ## 3. Return the best assignment
-  best_obj <- which.max(objectives)
-  assignments[[best_obj]]
-}
-
-
-#' Sample anticlusters many times
-#'
-#' Called from within random_sampling
-#'
-#' @noRd
-sample_anticlusters <- function(dat, K, nrep, sampling_plan) {
 
   N <- nrow(dat)
   n_preclusters <- N / K
   anticlusters <- rep_len(1:K, N) # initialization for unrestricted sampling
   categories <- dat[, 1]
 
+  ## - Determine how the objective has to be computed
+  if (objective == "distance" && use_distances == TRUE) {
+    obj_value <- distance_objective_
+  } else if (objective == "distance" && use_distances == FALSE) {
+    obj_value <- obj_value_distance
+  } else {
+    obj_value <- variance_objective_
+  }
+
+
+  ## 1. Generate random anticlusters
+  ncores <- parallel::detectCores() - 1
+  cl <- parallel::makeCluster(ncores)
+  clusterEvalQ(cl, library("anticlust"))
+
   if (sampling_plan == "unrestricted") {
-    anticlusters <- lapply(
+    assignments <- parallel::parLapply(
       1:nrep,
-      FUN = unrestricted_sampling,
+      fun = unrestricted_sampling,
+      cl = cl,
       anticlusters = anticlusters
     )
   } else if (sampling_plan == "preclustering") {
-    anticlusters <- lapply(
+    assignments <- parallel::parLapply(
       1:nrep,
-      FUN = replicate_sample,
+      fun = replicate_sample,
+      cl = cl,
       times = n_preclusters,
       N = K
     )
   } else if (sampling_plan == "categorical") {
-    anticlusters <- lapply(
+    assignments <- parallel::parLapply(
       1:nrep,
-      FUN = categorical_sampling,
+      fun = categorical_sampling,
+      cl = cl,
       categories = categories,
       K = K
     )
   }
-  anticlusters
+
+  ## 2. Compute objective value for each assignment
+  objectives <- parallel::parLapply(
+    assignments,
+    fun = obj_value,
+    cl = cl,
+    data = dat[, -(1:2), drop = FALSE]
+  )
+  parallel::stopCluster(cl)
+
+
+  ## 3. Return the best assignment
+  best_obj <- which.max(objectives)
+  assignments[[best_obj]]
 }
 
 #' A wrapper for sample
