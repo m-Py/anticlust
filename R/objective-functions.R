@@ -1,4 +1,40 @@
 
+
+#' Compute objective values for several anticluster assignments
+#'
+#' This function is used with the random sampling method where
+#' the objective value is computed several times.
+#'
+#' @param assignments A list where each entry is an anticluster assignment
+#'   for the input data
+#' @inheritParams random_sampling
+#'
+#' @return A list where each entry is an objective value
+#'
+#'
+#' @noRd
+
+all_objectives <- function(assignments, dat, objective, use_distances) {
+
+  ## 1. Determine how the objective has to be computed
+  if (objective == "distance" && use_distances == TRUE) {
+    obj_value <- distance_objective_
+  } else if (objective == "distance" && use_distances == FALSE) {
+    obj_value <- obj_value_distance
+  } else {
+    obj_value <- variance_objective_
+  }
+
+  ## 2. Compute all objectives
+  lapply(
+    assignments,
+    FUN = obj_value,
+    data = dat[, -(1:2), drop = FALSE]
+  )
+}
+
+
+
 #' Objective value for the variance criterion
 #'
 #' Check the objective value for a given clustering.
