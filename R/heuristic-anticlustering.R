@@ -46,7 +46,7 @@ heuristic_anticlustering <- function(features, K, preclusters, objective,
   }
 
   dat <- sort_by_group(input, preclusters, categories)
-  best_assignment <- random_sampling(dat, K, objective, nrep,
+  best_assignment <- parallel_sampling(dat, K, objective, nrep,
                                      sampling_plan, use_distances)
 
   ## Return anticluster assignment in original order
