@@ -5,11 +5,18 @@ parallel_sampling <- function(dat, K, objective, nrep, sampling_plan,
   cl <- parallel::makeCluster(ncores)
   reps_per_cluster <- ceiling(nrep / ncores)
   ## this is missing apparently:
-  # parallel::clusterExport(
-  #   cl = cl,
-  #   varlist = c("..."),
-  #   envir = environment()
-  # )
+  parallel::clusterExport(
+    cl = cl,
+    varlist = c(
+      "anticlust:::distance_objective_",
+      "anticlust:::obj_value_distance",
+      "anticlust:::variance_objective_",
+      "anticlust:::replicate_sample",
+      "anticlust:::categorical_sampling",
+      "anticlust:::random_sampling"
+    ),
+    envir = environment()
+  )
 
 
   assignments <- parallel::parLapply(
