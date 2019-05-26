@@ -66,15 +66,15 @@ variance_objective <- function(features, clusters,
   if (standardize) {
     features <- scale(features)
   }
-  variance_objective_(features, clusters)
+  variance_objective_(clusters, features)
 }
 
 # Internal function - no input handling
-variance_objective_ <- function(features, clusters) {
+variance_objective_ <- function(clusters, data) {
   ## 1. Compute cluster centers
-  centers <- cluster_centers(features, clusters)
+  centers <- cluster_centers(data, clusters)
   ## 2. For each item, compute distance to each cluster center
-  distances <- dist_from_centers(features, centers, squared = TRUE)
+  distances <- dist_from_centers(data, centers, squared = TRUE)
   ## 3. Use two-column matrix to select relevant distances
   distances <- distances[cbind(1:nrow(distances), clusters)]
   return(sum(distances))
@@ -191,20 +191,20 @@ distance_objective <- function(features = NULL, distances = NULL,
   validate_input(distances, "distances", c("matrix", "dist"))
 
   ## Compute the objective; the above only validates the input
-  distance_objective_(distances, clusters)
+  distance_objective_(clusters, distances)
 }
 
 
 #' Internal function for distance objective via input through distances
 #' @noRd
-distance_objective_ <- function(distances, anticlusters) {
+distance_objective_ <- function(anticlusters, data) {
   K <- length(unique(anticlusters))
-  distances <- as.matrix(distances)
+  data <- as.matrix(data)
   sums_within <- rep(NA, K)
   for (k in 1:K) {
     elements <- which(anticlusters == k)
     selection <- unique_combinations(elements)
-    sums_within[k] <- sum(distances[selection])
+    sums_within[k] <- sum(data[selection])
   }
   return(sum(sums_within))
 }
@@ -221,20 +221,24 @@ unique_combinations <- function(elements) {
 
 #' Objective value for the distance criterion
 #'
-#' @param features A data.frame, matrix or vector representing the
-#'     features that are used in the assignment.
 #' @param anticlusters A vector representing the anticluster affiliation
+#' @param data A data.frame, matrix or vector representing the
+#'     features that are used in the assignment.
 #'
 #' @return Scalar, the total sum of within-cluster distances (based
 #'     on the Euclidean distance).
+#'
+#' @details
+#' The second argument is named `data` to have a consistent
+#' interface with the other objective value computation functions.
 #'
 #' @importFrom stats dist
 #'
 #' @noRd
 
-obj_value_distance <- function(features, anticlusters) {
+obj_value_distance <- function(anticlusters, data) {
   ## determine distances within each group
-  distances <- by(features, anticlusters, dist)
+  distances <- by(data, anticlusters, dist)
   ## determine objective as the sum of all distances per group
   objective <- sum(sapply(distances, sum))
   return(objective)
