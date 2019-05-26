@@ -191,7 +191,7 @@ distance_objective <- function(features = NULL, distances = NULL,
   validate_input(distances, "distances", c("matrix", "dist"))
 
   ## Compute the objective; the above only validates the input
-  distance_objective_(distances, clusters)
+  distance_objective_(clusters, distances)
 }
 
 
@@ -205,12 +205,13 @@ distance_objective <- function(features = NULL, distances = NULL,
 #' interface with the other objective value computation functions.
 #'
 #' @noRd
-distance_objective_ <- function(clusters, data) {
-  K <- length(unique(clusters))
+
+distance_objective_ <- function(anticlusters, data) {
+  K <- length(unique(anticlusters))
   data <- as.matrix(data)
   sums_within <- rep(NA, K)
   for (k in 1:K) {
-    elements <- which(clusters == k)
+    elements <- which(anticlusters == k)
     selection <- unique_combinations(elements)
     sums_within[k] <- sum(data[selection])
   }
@@ -229,7 +230,7 @@ unique_combinations <- function(elements) {
 
 #' Objective value for the distance criterion
 #'
-#' @param clusters A vector representing the anticluster affiliation
+#' @param anticlusters A vector representing the anticluster affiliation
 #' @param data A data.frame, matrix or vector representing the
 #'     features that are used in the assignment.
 #'
@@ -244,9 +245,9 @@ unique_combinations <- function(elements) {
 #'
 #' @noRd
 
-obj_value_distance <- function(clusters, data) {
+obj_value_distance <- function(anticlusters, data) {
   ## determine distances within each group
-  distances <- by(data, clusters, dist)
+  distances <- by(data, anticlusters, dist)
   ## determine objective as the sum of all distances per group
   objective <- sum(sapply(distances, sum))
   return(objective)
