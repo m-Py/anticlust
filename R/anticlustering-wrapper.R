@@ -42,6 +42,8 @@
 #'     categorical contraints are employed, the value of the argument
 #'     \code{preclustering} will be ignored (that is, there will be no
 #'     preclustering).
+#' @param parallelize Boolean. Indicates whether multiple processors should
+#'     be used for the random sampling method.
 #'
 #' @return A vector representing the anticluster affiliation.
 #'
@@ -180,7 +182,7 @@ anticlustering <- function(features = NULL, distances = NULL,
                            K, objective = "distance",
                            method = "heuristic", preclustering = FALSE,
                            standardize = FALSE, nrep = 10000,
-                           categories = NULL) {
+                           categories = NULL, parallelize = FALSE) {
 
   input_handling_anticlustering(features, distances, K, objective,
                                 method, preclustering,
@@ -222,7 +224,7 @@ anticlustering <- function(features = NULL, distances = NULL,
   }
   heuristic_anticlustering(features, K, preclusters,
                            objective, nrep = nrep, distances,
-                           categories)
+                           categories, parallelize)
 }
 
 

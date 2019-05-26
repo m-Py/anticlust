@@ -18,6 +18,8 @@
 #'     \code{\link{as.dist}}.
 #' @param categories A vector, data.frame or matrix that represents
 #'     one or several categorical constraints.
+#' @param parallelize Boolean. Indicates whether multiple processors should
+#'     be used.
 #'
 #' @return A vector representing the anticlustering.
 #'
@@ -25,7 +27,8 @@
 #'
 
 heuristic_anticlustering <- function(features, K, preclusters, objective,
-                                     nrep, distances, categories) {
+                                     nrep, distances, categories,
+                                     parallelize) {
 
   ## What was the input: features or distances
   use_distances <- FALSE
@@ -46,8 +49,25 @@ heuristic_anticlustering <- function(features, K, preclusters, objective,
   }
 
   dat <- sort_by_group(input, preclusters, categories)
-  best_assignment <- parallel_sampling(dat, K, objective, nrep,
-                                     sampling_plan, use_distances)
+  if (parallelize) {
+    best_assignment <- parallel_sampling(
+      dat,
+      K,
+      objective,
+      nrep,
+      sampling_plan,
+      use_distances
+    )
+  } else {
+    best_assignment <- random_sampling(
+      dat,
+      K,
+      objective,
+      nrep,
+      sampling_plan,
+      use_distances
+    )
+  }
 
   ## Return anticluster assignment in original order
   dat[, 1] <- best_assignment
@@ -131,6 +151,8 @@ sort_by_group <- function(input, preclusters, categories) {
 #'     is balanced out between anticlusters).
 #' @param use_distances A boolean flag indicating whether `dat` contains
 #'     distances or features. (TRUE = distances were passed)
+#' @param parallelize Boolean. Indicates whether multiple processors should
+#'     be used.
 #'
 #'
 #' @return A vector representing the anticlustering.
@@ -171,7 +193,7 @@ random_sampling <- function(dat, K, objective, nrep, sampling_plan,
     } else if (sampling_plan == "categorical") {
       anticlusters <- categorical_sampling(categories, K)
     }
-    cur_obj <- obj_value(objective_data, anticlusters)
+    cur_obj <- obj_value(anticlusters, objective_data)
     if (cur_obj > best_obj) {
       best_assignment <- anticlusters
       best_obj <- cur_obj
