@@ -197,7 +197,7 @@ distance_objective <- function(features = NULL, distances = NULL,
 
 #' Internal function for distance objective via input through distances
 #'
-#' @param clusters A vector of n clusters
+#' @param anticlusters A vector of n anticlusters
 #' @param data A n x n matrix of
 #'
 #' @details
