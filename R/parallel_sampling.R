@@ -4,24 +4,10 @@ parallel_sampling <- function(dat, K, objective, nrep, sampling_plan,
   ncores <- parallel::detectCores() - 1
   cl <- parallel::makeCluster(ncores)
   reps_per_cluster <- ceiling(nrep / ncores)
-  ## this is missing apparently:
-  parallel::clusterExport(
-    cl = cl,
-    varlist = c(
-      "anticlust:::distance_objective_",
-      "anticlust:::obj_value_distance",
-      "anticlust:::variance_objective_",
-      "anticlust:::replicate_sample",
-      "anticlust:::categorical_sampling",
-      "anticlust:::random_sampling"
-    ),
-    envir = environment()
-  )
-
 
   assignments <- parallel::parLapply(
     X = 1:ncores,
-    fun = random_sampling,
+    fun = lapply_random_samling,
     cl = cl,
     dat = dat,
     K = K,
@@ -42,9 +28,17 @@ parallel_sampling <- function(dat, K, objective, nrep, sampling_plan,
 
   objectives <- lapply(
     assignments,
-    fun = obj_value,
+    FUN = obj_value,
     data = dat[, -(1:2), drop = FALSE]
   )
   best_obj <- which.max(objectives)
   assignments[[best_obj]]
 }
+
+# Make random_sampling usable for lapply (additional argument x)
+lapply_random_samling <- function(x, dat, K, objective, nrep, sampling_plan,
+                                use_distances) {
+  random_sampling(dat, K, objective, nrep, sampling_plan,
+                  use_distances)
+}
+
