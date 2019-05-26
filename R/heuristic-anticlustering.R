@@ -74,7 +74,7 @@ heuristic_anticlustering <- function(features, K, preclusters, objective,
   dat <- sort_by_col(dat, 2)
   anticlusters <- dat[, 1]
   names(anticlusters) <- NULL
-  return(anticlusters)
+  anticlusters
 }
 
 #' Merge several grouping variable into one
@@ -131,7 +131,6 @@ sort_by_group <- function(input, preclusters, categories) {
   dat <- sort_by_col(dat, 1)
   return(dat)
 }
-
 
 #' Random sampling for anticlustering
 #'

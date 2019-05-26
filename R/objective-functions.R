@@ -196,7 +196,16 @@ distance_objective <- function(features = NULL, distances = NULL,
 
 
 #' Internal function for distance objective via input through distances
+#'
+#' @param clusters A vector of n clusters
+#' @param data A n x n matrix of
+#'
+#' @details
+#' The second argument is named `data` to have a consistent
+#' interface with the other objective value computation functions.
+#'
 #' @noRd
+
 distance_objective_ <- function(anticlusters, data) {
   K <- length(unique(anticlusters))
   data <- as.matrix(data)

@@ -162,7 +162,6 @@ table(iris[, 5], anticlusters)
 anticlusters <- anticlustering(iris[, -5], K = 2, categories = iris[, 5], nrep = 100)
 table(iris[, 5], anticlusters)
 
-
 ## Try out exact anticlustering using integer linear programming
 # Create artifical data
 n_features <- 2
