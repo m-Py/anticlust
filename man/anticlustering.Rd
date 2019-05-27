@@ -7,7 +7,7 @@
 anticlustering(features = NULL, distances = NULL, K,
   objective = "distance", method = "heuristic",
   preclustering = FALSE, standardize = FALSE, nrep = 10000,
-  categories = NULL)
+  categories = NULL, parallelize = FALSE, seed = NULL)
 }
 \arguments{
 \item{features}{A numeric vector, matrix or data.frame of data points.
@@ -33,15 +33,15 @@ the k-means anticlustering objective. See details.}
 \item{method}{One of "heuristic" or "ilp". See details.}
 
 \item{preclustering}{Boolean, should a preclustering be conducted
-before anticlusters are created. Defaults to \code{TRUE}. See
+before anticlusters are created? Defaults to \code{FALSE} See
 details.}
 
 \item{standardize}{Boolean - should the features be standardized
 before anticlusters are created? Defaults to \code{FALSE}.
 Standardization is done using the function \code{\link{scale}}
 using the default settings (mean = 0, SD = 1). This argument
-only works in combination with the \code{features} argument,
-not with \code{distances}.}
+only works when the input data is given via \code{features},
+not via \code{distances}.}
 
 \item{nrep}{The number of repetitions for the random sampling
 heuristic. This argument only has an effect if \code{method}
@@ -56,16 +56,24 @@ heuristic random sampling method and not with the ILP approach. If
 categorical contraints are employed, the value of the argument
 \code{preclustering} will be ignored (that is, there will be no
 preclustering).}
+
+\item{parallelize}{Boolean. Indicates whether multiple processors should
+be used for the random sampling method.}
+
+\item{seed}{A value to fixate the random seed when using the random
+sampling method. When \code{parallelize} is \code{TRUE}, using
+this argument is the only way to ensure reproducibility.}
 }
 \value{
-A vector representing the anticluster affiliation.
+A vector representing the anticluster affiliation of each
+    input element.
 }
 \description{
 Create equal sized groups of elements (anticlusters) that are as
 similar as possible.
 }
 \details{
-This function is used to solve »balanced K anticlustering« That is,
+This function is used to solve »balanced K anticlustering«. That is,
 K equal sized groups are created in such a way that similarity of
 all groups is maximized. Set similarity is assessed using one of
 two objective functions:
@@ -117,20 +125,28 @@ optimal or very close to optimal.
 
 If no exact solution is required or the problem size is too large
 for integer linear programming, a heuristic method is available via
-setting \code{method = "heuristic"}. This option has to be used
-when optimizing the variance objective -- there is no exact
-algorithm available to optimize the variance objective -- and may be
-used when optimizing the anticluster editing objective. The
+setting \code{method = "heuristic"}. Note that this is the only
+method when optimizing the variance criterion. The
 heuristic employs repeated random sampling: across a specified
 number of runs, anticlusters are assigned randomly and the best
-assignment -- maximizing the specified objective -- is
-returned. The sampling approach may also incorporate a
+assignment is returned. The sampling approach may also incorporate a
 preclustering that prevents grouping very similar elements into the
 same anticluster. Preclustering (for the exact and heuristic approach)
 is performed by a call to \code{\link{balanced_clustering}} where the
 argument \code{K} is set to the number of elements divided by the
 number of anticlusters that are to be created (actually, this is not
 exactly what happens internally, but it is equivalent).
+
+As the heuristic method relies on random sampling, the output will
+vary between function calls. To make a computation results
+reproducible, you can use the argument \code{seed} -- a specific
+value will produce the same results when the function is called with
+the same input parameters. Note that the
+same seed will produce different results when the parameter
+\code{parallelize} is varied. For the parallel computation, the
+random seed is set using the function
+\code{\link[parallel]{clusterSetRNGStream}}; otherwise, the function
+\code{\link{set.seed}} is called.
 }
 \examples{
 
@@ -152,7 +168,7 @@ by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
 # Optimize the variance criterion:
 anticlusters <- anticlustering(iris[, -5], K = 3, objective = "variance")
 by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
-table(iris[, 5], anticlusters)
+
 
 # Incorporate categorical restrictions:
 # 1. Case: no restrictions, iris species may not be balanced across anticlusters

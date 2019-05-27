@@ -6,7 +6,7 @@
 \title{Consistency rating for 96 German words}
 \format{A data frame with 96 rows and 7 variables
 \describe{
-  \item{Item}{The word}
+  \item{Item}{The object (in German language)}
   \item{Room}{1 = the item is typically found in a kitchen;
     2 = the item is typically found in a bathroom}
   \item{ConsistencyRating}{How expected would it
@@ -27,8 +27,30 @@ schaper2019
 }
 \description{
 A dataset containing average consistency and inconsistency ratings,
-number of syllables and frequency for 96 German words representing
-objects.
+number of syllables and frequency for 96 objects.
+}
+\examples{
+
+features <- schaper2019[, 3:6]
+# This scales all features to have a similar range in their values:
+features <- apply(features, 2, function(x) x / max(x))
+
+# Optimize the variance criterion
+start <- Sys.time()
+anticlusters <- anticlustering(
+  features,
+  K = 3,
+  objective = "variance",
+  parallelize = TRUE,
+  categories = schaper2019$Room,
+  seed = 451
+)
+Sys.time() - start
+# Room is balanced between the three sets:
+table(schaper2019$Room, anticlusters)
+# Means are quite similar across sets:
+by(schaper2019[, 3:6], anticlusters, function(x) round(colMeans(x), 2))
+
 }
 \references{
 Schaper, M. L., Kuhlmann, B. G., & Bayen, U. J. (2019). Metamemory
