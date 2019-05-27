@@ -273,7 +273,6 @@ input_handling_anticlustering <- function(features, distances,
 
   ## Validate feature input
   if (argument_exists(features)) {
-    validate_input(features, "features", c("data.frame", "matrix", "numeric"))
     features <- as.matrix(features)
     validate_input(features, "features", objmode = "numeric")
     validate_input(K, "K", "numeric", len = 1,
@@ -295,9 +294,6 @@ input_handling_anticlustering <- function(features, distances,
   validate_input(standardize, "standardize", "logical", len = 1,
                  input_set = c(TRUE, FALSE))
 
-  if (argument_exists(categories)) {
-    validate_input(categories, "categories", c("numeric", "matrix", "data.frame", "factor", "character"))
-  }
   validate_input(parallelize, "parallelize", "logical", len = 1,
                  input_set = c(TRUE, FALSE))
   if (argument_exists(seed)) {
