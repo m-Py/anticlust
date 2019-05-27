@@ -199,7 +199,8 @@ anticlustering <- function(features = NULL, distances = NULL,
 
   input_handling_anticlustering(features, distances, K, objective,
                                 method, preclustering,
-                                standardize, nrep)
+                                standardize, nrep, categories,
+                                parallelize, seed)
 
   ## Standardize feature values (for each feature, mean = 0, sd = 1)?
   if (argument_exists(features)) {
@@ -257,14 +258,14 @@ anticlustering <- function(features = NULL, distances = NULL,
 input_handling_anticlustering <- function(features, distances,
                                           K, objective, method,
                                           preclustering, standardize,
-                                          nrep) {
+                                          nrep, categories,
+                                          parallelize, seed) {
 
   ## Validate feature input
   if (argument_exists(features)) {
     validate_input(features, "features", c("data.frame", "matrix", "numeric"))
     features <- as.matrix(features)
     validate_input(features, "features", objmode = "numeric")
-
     validate_input(K, "K", "numeric", len = 1,
                    greater_than = 1, must_be_integer = TRUE)
     if (nrow(features) %% K != 0) {
@@ -283,6 +284,15 @@ input_handling_anticlustering <- function(features, distances,
                  input_set = c(TRUE, FALSE))
   validate_input(standardize, "standardize", "logical", len = 1,
                  input_set = c(TRUE, FALSE))
+
+  if (argument_exists(categories)) {
+    validate_input(categories, "categories", c("numeric", "matrix", "data.frame"))
+  }
+  validate_input(parallelize, "parallelize", "logical", len = 1,
+                 input_set = c(TRUE, FALSE))
+  if (argument_exists(seed)) {
+    validate_input(seed, "seed", "numeric", len = 1, not_na = TRUE)
+  }
 
   if (method == "ilp") {
     solver <- solver_available()
@@ -319,6 +329,10 @@ input_handling_anticlustering <- function(features, distances,
 
   if (argument_exists(distances) && objective == "variance") {
     stop("The argument 'distances' cannot be used if the argument 'objective' is 'variance'.")
+  }
+
+  if (argument_exists(categories) && method == "ilp") {
+    stop("The ILP method cannot incorporate categorical restrictions")
   }
 
   return(invisible(NULL))
