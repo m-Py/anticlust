@@ -47,7 +47,7 @@ clusters <- balanced_clustering(iris[, -5], K = 3, standardize = TRUE, objective
 # This is low:
 variance_objective(iris[, -5], clusters, standardize = TRUE)
 ## Anticlustering
-anticlusters <- anticlustering(iris[, -5], K = 3, standardize = TRUE, objective = "variance")
+anticlusters <- anticlustering(iris[, -5], K = 3, standardize = TRUE, objective = "variance", nrep = 100)
 # This is higher:
 variance_objective(iris[, -5], anticlusters, standardize = TRUE)
 

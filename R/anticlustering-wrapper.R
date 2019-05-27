@@ -142,39 +142,49 @@
 #'
 #' data(iris)
 #' head(iris[, -5]) # these features are made similar across sets
-#' anticlusters <- anticlustering(iris[, -5], K = 3)
+#' anticlusters <- anticlustering(
+#'   iris[, -5],
+#'   K = 3,
+#'   nrep = 100 # increase for better results
+#' )
 #' # Compare feature means by anticluster
 #' by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
 #'
 #' # As the features are differently scaled, the solution might be improved
 #' # by setting standardize = TRUE:
-#' anticlusters <- anticlustering(iris[, -5], K = 3, standardize = TRUE)
-#' by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
+#' anticlusters <- anticlustering(
+#'   iris[, -5],
+#'   K = 3,
+#'   standardize = TRUE,
+#'   nrep = 100
+#' )
 #'
 #' # Optimize the variance criterion:
-#' anticlusters <- anticlustering(iris[, -5], K = 3, objective = "variance")
-#' by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
+#' anticlusters <- anticlustering(
+#'   iris[, -5],
+#'   K = 3,
+#'   objective = "variance",
+#'   nrep = 100
+#' )
 #'
+#' # Increase nrep for better solutions; setting preclustering = TRUE
+#' # sometimes also improves the solution
+#' anticlusters <- anticlustering(
+#'   iris[, -5],
+#'   K = 3,
+#'   nrep = 100,
+#'   preclustering = TRUE,
+#'   objective = "variance"
+#' )
 #'
 #' # Incorporate categorical restrictions:
-#' # 1. Case: no restrictions, iris species may not be balanced across anticlusters
-#' anticlusters <- anticlustering(iris[, -5], K = 2, nrep = 100)
+#' anticlusters <- anticlustering(
+#'   iris[, -5],
+#'   K = 2,
+#'   categories = iris[, 5],
+#'   nrep = 10
+#' )
 #' table(iris[, 5], anticlusters)
-#' # 2. Case: Include restrictions, iris species are balanced across anticlusters
-#' anticlusters <- anticlustering(iris[, -5], K = 2, categories = iris[, 5], nrep = 100)
-#' table(iris[, 5], anticlusters)
-#'
-
-#' ## Try out exact anticlustering using integer linear programming
-#' # Create artifical data
-#' n_features <- 2
-#' n_elements <- 20
-#' K <- 2
-#' features <- matrix(rnorm(n_elements * n_features), ncol = n_features)
-#' anticlustering(features, K = K, method = "ilp")
-#'
-#' # Enable preclustering
-#' anticlustering(features, K = K, method = "ilp", preclustering = TRUE)
 #'
 #' @references
 #'
@@ -238,7 +248,7 @@ anticlustering <- function(features = NULL, distances = NULL,
   }
   heuristic_anticlustering(features, K, preclusters,
                            objective, nrep = nrep, distances,
-                           categories, parallelize, seed)
+                           categories, parallelize, seed, ncores = NULL)
 }
 
 

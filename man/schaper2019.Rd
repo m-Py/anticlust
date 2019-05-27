@@ -43,9 +43,9 @@ anticlusters <- anticlustering(
   features,
   K = 3,
   objective = "variance",
-  parallelize = TRUE,
   categories = schaper2019$Room,
-  seed = 451
+  seed = 558,
+  nrep = 1000 # increase for better results
 )
 
 # Means are quite similar across sets:
