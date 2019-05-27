@@ -12,6 +12,8 @@
 #'
 #' @noRd
 #'
+#' @importFrom parallel detectCores makeCluster clusterSetRNGStream parLapply stopCluster
+#'
 
 parallel_sampling <- function(dat, K, objective, nrep, sampling_plan,
                               use_distances, seed) {
