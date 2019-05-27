@@ -27,3 +27,5 @@ Suggests:
     rmarkdown,
     dplyr
 VignetteBuilder: knitr
+Depends:
+  R (>= 3.00)
