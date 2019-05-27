@@ -182,7 +182,8 @@ anticlustering <- function(features = NULL, distances = NULL,
                            K, objective = "distance",
                            method = "heuristic", preclustering = FALSE,
                            standardize = FALSE, nrep = 10000,
-                           categories = NULL, parallelize = FALSE) {
+                           categories = NULL, parallelize = FALSE,
+                           seed = NULL) {
 
   input_handling_anticlustering(features, distances, K, objective,
                                 method, preclustering,
@@ -224,7 +225,7 @@ anticlustering <- function(features = NULL, distances = NULL,
   }
   heuristic_anticlustering(features, K, preclusters,
                            objective, nrep = nrep, distances,
-                           categories, parallelize)
+                           categories, parallelize, seed)
 }
 
 

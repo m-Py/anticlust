@@ -28,7 +28,7 @@
 
 heuristic_anticlustering <- function(features, K, preclusters, objective,
                                      nrep, distances, categories,
-                                     parallelize) {
+                                     parallelize, seed) {
 
   ## What was the input: features or distances
   use_distances <- FALSE
@@ -56,9 +56,13 @@ heuristic_anticlustering <- function(features, K, preclusters, objective,
       objective,
       nrep,
       sampling_plan,
-      use_distances
+      use_distances,
+      seed
     )
   } else {
+    if (argument_exists(seed)) {
+      set.seed(seed)
+    }
     best_assignment <- random_sampling(
       dat,
       K,
