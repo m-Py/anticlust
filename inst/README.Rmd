@@ -4,7 +4,7 @@ author: "Martin Papenberg"
 date: "`r Sys.Date()`"
 output:
   md_document:
-    variant: markdown_github
+    variant: gfm
 
 bibliography: lit.bib
 ---
@@ -139,22 +139,7 @@ anticlusters
 table(anticlusters)
 ```
 
-To get an intuition for how an anticluster looks like, we first plot the
-plants' characteristics by anticluster:
-
-```{r, fig.width = 6.5}
-par(mfrow = c(1, 2))
-pch <- 15:16
-# plot_clusters is also a function of the anticlust package
-plot_clusters(features[, 1:2], anticlusters, pch = pch) 
-plot_clusters(features[, 3:4], anticlusters, pch = pch)
-
-```
-
-This looks rather chaotic, but it is probably what we want: We want a
-strong overlap in all of the plants' characteristics because the
-anticlusters should be similar. In addition to visually inspecting the
-anticlustering plots, we want to investigate the descriptive statistics
+We want to investigate the descriptive statistics
 of the plants' characteristics like the mean and standard deviation by
 anticluster. Ideally, the values should be the same for each
 anticluster. As we can see in the following, this worked quite well: 
@@ -243,12 +228,6 @@ that are very similar. The preclustering step identifies pairs of
 similar stimuli if K = 2, triplets if K = 3, and so forth. After this
 preclustering, a restriction is enforced to the integer linear program
 that precludes very similar elements to be assigned to the same set.
-This procedure is illustrated in the following plot for K = 2 and n =
-10:
-
-```{r, out.width = '60%', echo = FALSE}
-knitr::include_graphics("./README_files/preclustering.jpg")
-```
 
 The preclustering restrictions improve the running time of the integer
 linear programming solver by a large margin (often 100x as fast) because
