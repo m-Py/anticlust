@@ -1,23 +1,23 @@
 
-#' Consistency rating for 96 German words
+#' Ratings for 96 objects
 #'
-#' A dataset containing consistency and inconsistency ratings,
-#' number of syllables and frequency for 96 items used in experiments
-#' by Schaper, Kuhlmann and Bayen (2019; in press).
+#' An item set that was used in experiments by Schaper, Kuhlmann and
+#' Bayen (2019; in press).
 #'
 #' @format A data frame with 96 rows and 7 variables
 #' \describe{
-#'   \item{Item}{The object (in German language)}
-#'   \item{Room}{1 = the item is typically found in a kitchen;
-#'     2 = the item is typically found in a bathroom}
-#'   \item{ConsistencyRating}{How expected would it
-#'      be to find the \code{Item} in the typical \code{Room}}
-#'   \item{InconsistencyRating}{How expected would it
-#'      be to find the \code{Item} in the atypical \code{Room}}
-#'   \item{Syllables}{The number of syllables of the word}
-#'   \item{Frequency}{A value indicating the relative frequency of the word}
-#'   \item{List}{Represents the set affiliation of the \code{Item} as
-#'       realized in experiments by Schaper et al}
+#'   \item{item}{The name of the object (in German)}
+#'   \item{room}{The room in which the item is typically found; can be
+#'       'kitchen' or 'bathroom'}
+#'   \item{rating_consistent}{How expected would it
+#'       be to find the \code{item} in the typical \code{room}}
+#'   \item{rating_inconsistent}{How expected would it
+#'       be to find the \code{item} in the atypical \code{room}}
+#'   \item{syllables}{The number of syllables in the object name}
+#'   \item{frequency}{A value indicating the relative frequency of the
+#'       object name in German language}
+#'   \item{list}{Represents the set affiliation of the \code{item} as
+#'       realized in experiments by Schaper et al.}
 #' }
 #'
 #' @source
@@ -31,21 +31,22 @@
 #' features <- apply(features, 2, function(x) x / max(x))
 #' head(features)
 #'
+#'
 #' # Optimize the variance criterion
 #' # (tends to maximize similarity in feature means)
 #' anticlusters <- anticlustering(
 #'   features,
 #'   K = 3,
 #'   objective = "variance",
-#'   categories = schaper2019$Room,
-#'   seed = 558,
+#'   categories = schaper2019$room,
+#'   seed = 625,
 #'   nrep = 1000 # increase for better results
 #' )
 #'
 #' # Means are quite similar across sets:
 #' by(schaper2019[, 3:6], anticlusters, function(x) round(colMeans(x), 2))
 #' # Room is balanced between the three sets:
-#' table(Room = schaper2019$Room, Set = anticlusters)
+#' table(Room = schaper2019$room, Set = anticlusters)
 #'
 #' @references
 #'
