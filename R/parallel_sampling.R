@@ -1,4 +1,18 @@
 
+#' Parallel random sampling for anticlustering
+#'
+#' A wrapper function that sets up some clusters and sends part of
+#' all required reptitions to each cluster. In the end, the best solution
+#' across the solutions found by each cluster is returned.#'
+#'
+#' @inheritParams random_sampling
+#' @param seed A seed passed to \code{parallel::clusterSetRNGStream}
+#'
+#' @return The best anticlustering solution
+#'
+#' @noRd
+#'
+
 parallel_sampling <- function(dat, K, objective, nrep, sampling_plan,
                               use_distances, seed) {
   ncores <- parallel::detectCores() - 1
@@ -20,7 +34,7 @@ parallel_sampling <- function(dat, K, objective, nrep, sampling_plan,
     sampling_plan = sampling_plan,
     use_distances = use_distances
   )
-  parallel::stopCluster(cl)
+  on.exit(parallel::stopCluster(cl))
 
   if (objective == "distance" && use_distances == TRUE) {
     obj_value <- distance_objective_
