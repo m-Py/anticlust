@@ -16,8 +16,10 @@
 #'
 
 parallel_sampling <- function(dat, K, objective, nrep, sampling_plan,
-                              use_distances, seed) {
-  ncores <- parallel::detectCores() - 1
+                              use_distances, seed, ncores = NULL) {
+  if (!argument_exists(ncores)) {
+    ncores <- parallel::detectCores() - 1
+  }
   cl <- parallel::makeCluster(ncores)
   reps_per_cluster <- ceiling(nrep / ncores)
 

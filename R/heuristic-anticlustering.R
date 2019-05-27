@@ -20,6 +20,14 @@
 #'     one or several categorical constraints.
 #' @param parallelize Boolean. Indicates whether multiple processors should
 #'     be used.
+#' @param seed A value to fixate the random seed when using the random
+#'     sampling method. When \code{parallelize} is \code{TRUE}, using
+#'     this argument is the only way to ensure reproducibility.
+#' @param ncores The number of cores to be used when parallelize is TRUE.
+#'     This argument is not
+#'     accessible from the exported function \code{anticlustering} and
+#'     only exists because R CMD check does not allows to use more than
+#'     two cores.
 #'
 #' @return A vector representing the anticlustering.
 #'
@@ -28,7 +36,7 @@
 
 heuristic_anticlustering <- function(features, K, preclusters, objective,
                                      nrep, distances, categories,
-                                     parallelize, seed) {
+                                     parallelize, seed, ncores = NULL) {
 
   ## What was the input: features or distances
   use_distances <- FALSE
@@ -57,7 +65,8 @@ heuristic_anticlustering <- function(features, K, preclusters, objective,
       nrep,
       sampling_plan,
       use_distances,
-      seed
+      seed,
+      ncores
     )
   } else {
     if (argument_exists(seed)) {
