@@ -1,8 +1,9 @@
 
 #' Consistency rating for 96 German words
 #'
-#' A dataset containing average consistency and inconsistency ratings,
-#' number of syllables and frequency for 96 objects.
+#' A dataset containing consistency and inconsistency ratings,
+#' number of syllables and frequency for 96 items used in experiments
+#' by Schaper, Kuhlmann and Bayen (2019; in press).
 #'
 #' @format A data frame with 96 rows and 7 variables
 #' \describe{
@@ -16,8 +17,7 @@
 #'   \item{Syllables}{The number of syllables of the word}
 #'   \item{Frequency}{A value indicating the relative frequency of the word}
 #'   \item{List}{Represents the set affiliation of the \code{Item} as
-#'       realized in experiments by Schaper, Kuhlmann and Bayen
-#'       (2019; in press)}
+#'       realized in experiments by Schaper et al}
 #' }
 #'
 #' @source

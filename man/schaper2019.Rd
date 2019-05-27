@@ -16,8 +16,7 @@
   \item{Syllables}{The number of syllables of the word}
   \item{Frequency}{A value indicating the relative frequency of the word}
   \item{List}{Represents the set affiliation of the \code{Item} as
-      realized in experiments by Schaper, Kuhlmann and Bayen
-      (2019; in press)}
+      realized in experiments by Schaper et al}
 }}
 \source{
 Courteously provided by Marie Lusia Schaper and Ute Bayen.
@@ -26,8 +25,9 @@ Courteously provided by Marie Lusia Schaper and Ute Bayen.
 schaper2019
 }
 \description{
-A dataset containing average consistency and inconsistency ratings,
-number of syllables and frequency for 96 objects.
+A dataset containing consistency and inconsistency ratings,
+number of syllables and frequency for 96 items used in experiments
+by Schaper, Kuhlmann and Bayen (2019; in press).
 }
 \examples{
 
