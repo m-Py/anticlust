@@ -71,13 +71,17 @@ test_that("heuristic anticlustering produces expected output", {
     }
 
     ## Now anticlustering:
-    anticlusters <- heuristic_anticlustering(as.matrix(features), p_anticlusters,
-                                             preclusters, nrep = 100,
-                                             objective = conditions$objective[i],
-                                             categories = NULL)
-    ## Legal number of anticlusters?
-    expect_equal(legal_number_of_clusters(features, anticlusters), NULL)
-    ## Expected number of anticlusters?
-    expect_equal(as.numeric(table(anticlusters)[1]), n_elements / p_anticlusters)
+    # Test parallel and non-parallel anticlustering:
+    for (parallel in c(TRUE, FALSE)) {
+      anticlusters <- heuristic_anticlustering(as.matrix(features), p_anticlusters,
+                                               preclusters, nrep = 100,
+                                               objective = conditions$objective[i],
+                                               categories = NULL, parallelize = parallel,
+                                               seed = NULL)
+      ## Legal number of anticlusters?
+      expect_equal(legal_number_of_clusters(features, anticlusters), NULL)
+      ## Expected number of anticlusters?
+      expect_equal(as.numeric(table(anticlusters)[1]), n_elements / p_anticlusters)
+    }
   }
 })

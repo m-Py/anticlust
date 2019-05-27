@@ -186,7 +186,7 @@ distance_objective <- function(features = NULL, distances = NULL,
     if (standardize) {
       features <- scale(features)
     }
-    return(obj_value_distance(features, clusters))
+    return(obj_value_distance(clusters, features))
   }
   validate_input(distances, "distances", c("matrix", "dist"))
 
