@@ -6,14 +6,15 @@ The new version of anticlust now enables parallelization of the random
 sampling method, improving run time.
 
 - The `anticlustering` function now has an additional argument 
-  (`parallelization`) that can be used to activate parallel computation 
+  (`parallelize`) that can be used to activate parallel computation 
   when using the heuristic method
-- For now, the default value of `parallelization` is `FALSE`
+- For now, the default value of `parallelize` is `FALSE`
 - Another argument was added (`seed`) to make the random sampling method 
   reproducible
-    + Just using `set.seed` prior to the computation does not make 
-    the function call reproducible when `parallelization` is `TRUE` 
+    + Just using `set.seed()` prior to the computation does not make 
+    a function call reproducible when `parallelize` is `TRUE` 
     because each core has its own random seed
+    + The `seed` argument is optional
 
 An example data set is now included with the package, courteously 
 provided by Marie Lusia Schaper and Ute Bayen. For details, see 
