@@ -10,14 +10,14 @@
 #'   \item{Room}{1 = the item is typically found in a kitchen;
 #'     2 = the item is typically found in a bathroom}
 #'   \item{ConsistencyRating}{How expected would it
-#'      be to find the item in the typical room
-#'      (see\code{Room})}
+#'      be to find the \code{Item} in the typical \code{Room}}
 #'   \item{InconsistencyRating}{How expected would it
-#'      be to find the item in the atypical room
-#'      (see\code{Room})}
-#'   \item{Syllables}{The number of syllables}
-#'   \item{Frequency}{A value indicating the relative frequency of a word}
-#'   \item{List}{The group the item was affiliated with.}
+#'      be to find the \code{Item} in the atypical \code{Room}}
+#'   \item{Syllables}{The number of syllables of the word}
+#'   \item{Frequency}{A value indicating the relative frequency of the word}
+#'   \item{List}{Represents the set affiliation of the \code{Item} as
+#'       realized in experiments by Schaper, Kuhlmann and Bayen
+#'       (2019; in press)}
 #' }
 #'
 #' @source
@@ -26,11 +26,13 @@
 #' @examples
 #'
 #' features <- schaper2019[, 3:6]
-#' # This scales all features to have a similar range in their values:
+#' head(features)
+#' # This command scales all features to have a similar range:
 #' features <- apply(features, 2, function(x) x / max(x))
+#' head(features)
 #'
 #' # Optimize the variance criterion
-#' start <- Sys.time()
+#' # (tends to maximize similarity in feature means)
 #' anticlusters <- anticlustering(
 #'   features,
 #'   K = 3,
@@ -39,11 +41,11 @@
 #'   categories = schaper2019$Room,
 #'   seed = 451
 #' )
-#' Sys.time() - start
-#' # Room is balanced between the three sets:
-#' table(schaper2019$Room, anticlusters)
+#'
 #' # Means are quite similar across sets:
 #' by(schaper2019[, 3:6], anticlusters, function(x) round(colMeans(x), 2))
+#' # Room is balanced between the three sets:
+#' table(Room = schaper2019$Room, Set = anticlusters)
 #'
 #' @references
 #'
