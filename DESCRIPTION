@@ -1,13 +1,12 @@
 Package: anticlust
 Type: Package
 Title: Create similar groups using anticlustering
-Version: 0.2.4
+Version: 0.2.5
 Authors@R: person("Papenberg", "Martin", email = "martin.papenberg@hhu.de",
   role = c("aut", "cre"))
 Description: Anticlustering establishes groups of elements (i.e., 
-    anticlusters) that are as similar as possible, reversing the logic
-    of cluster analysis that creates groups that can be clearly 
-    separated. The package includes exact and heuristic approaches 
+    anticlusters) that are as similar as possible. The package 
+    includes exact and heuristic approaches 
     to solve anticlustering. The exact approach requires that a linear 
     programming solver is installed. The package also offers methods 
     to classical clustering problems under size constraints, i.e., 
@@ -16,7 +15,9 @@ Encoding: UTF-8
 License: MIT + file LICENSE
 LazyData: true
 RoxygenNote: 6.1.1
-Imports: Matrix
+Imports: 
+    Matrix,
+    parallel
 Suggests:
     gurobi,
     Rglpk,
@@ -26,3 +27,5 @@ Suggests:
     rmarkdown,
     dplyr
 VignetteBuilder: knitr
+Depends:
+  R (>= 3.00)

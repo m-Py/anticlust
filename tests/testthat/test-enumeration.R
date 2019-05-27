@@ -13,8 +13,8 @@ test_that("complete enumeration computes optimal solution", {
     # Use preclustering as resticting information in anticlustering
     ilp_anticlusters <- anticlustering(features, K = K, preclustering = FALSE,
                                        method = "ilp", standardize = FALSE)
-    enum_obj <- round(obj_value_distance(features, enum_anticlusters), 10)
-    ilp_obj  <- round(obj_value_distance(features, ilp_anticlusters), 10)
+    enum_obj <- round(obj_value_distance(enum_anticlusters, features), 10)
+    ilp_obj  <- round(obj_value_distance(ilp_anticlusters, features), 10)
     expect_equal(enum_obj, ilp_obj)
   }
 })

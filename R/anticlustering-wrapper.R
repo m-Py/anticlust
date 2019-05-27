@@ -22,14 +22,14 @@
 #'     the k-means anticlustering objective. See details.
 #' @param method One of "heuristic" or "ilp". See details.
 #' @param preclustering Boolean, should a preclustering be conducted
-#'     before anticlusters are created. Defaults to \code{TRUE}. See
+#'     before anticlusters are created? Defaults to \code{FALSE} See
 #'     details.
 #' @param standardize Boolean - should the features be standardized
 #'     before anticlusters are created? Defaults to \code{FALSE}.
 #'     Standardization is done using the function \code{\link{scale}}
 #'     using the default settings (mean = 0, SD = 1). This argument
-#'     only works in combination with the \code{features} argument,
-#'     not with \code{distances}.
+#'     only works when the input data is given via \code{features},
+#'     not via \code{distances}.
 #' @param nrep The number of repetitions for the random sampling
 #'     heuristic. This argument only has an effect if \code{method}
 #'     is \code{"heuristic"}. It does not have an effect if
@@ -42,8 +42,14 @@
 #'     categorical contraints are employed, the value of the argument
 #'     \code{preclustering} will be ignored (that is, there will be no
 #'     preclustering).
+#' @param parallelize Boolean. Indicates whether multiple processors should
+#'     be used for the random sampling method.
+#' @param seed A value to fixate the random seed when using the random
+#'     sampling method. When \code{parallelize} is \code{TRUE}, using
+#'     this argument is the only way to ensure reproducibility.
 #'
-#' @return A vector representing the anticluster affiliation.
+#' @return A vector representing the anticluster affiliation of each
+#'     input element.
 #'
 #' @importFrom Matrix sparseMatrix
 #' @importFrom stats as.dist
@@ -52,7 +58,7 @@
 #'
 #' @details
 #'
-#' This function is used to solve »balanced K anticlustering« That is,
+#' This function is used to solve »balanced K anticlustering«. That is,
 #' K equal sized groups are created in such a way that similarity of
 #' all groups is maximized. Set similarity is assessed using one of
 #' two objective functions:
@@ -104,20 +110,29 @@
 #'
 #' If no exact solution is required or the problem size is too large
 #' for integer linear programming, a heuristic method is available via
-#' setting \code{method = "heuristic"}. This option has to be used
-#' when optimizing the variance objective -- there is no exact
-#' algorithm available to optimize the variance objective -- and may be
-#' used when optimizing the anticluster editing objective. The
+#' setting \code{method = "heuristic"}. Note that this is the only
+#' method when optimizing the variance criterion. The
 #' heuristic employs repeated random sampling: across a specified
 #' number of runs, anticlusters are assigned randomly and the best
-#' assignment -- maximizing the specified objective -- is
-#' returned. The sampling approach may also incorporate a
+#' assignment is returned. The sampling approach may also incorporate a
 #' preclustering that prevents grouping very similar elements into the
 #' same anticluster. Preclustering (for the exact and heuristic approach)
 #' is performed by a call to \code{\link{balanced_clustering}} where the
 #' argument \code{K} is set to the number of elements divided by the
 #' number of anticlusters that are to be created (actually, this is not
 #' exactly what happens internally, but it is equivalent).
+#'
+#' As the heuristic method relies on random sampling, the output will
+#' vary between function calls. To make a computation results
+#' reproducible, you can use the argument \code{seed} -- a specific
+#' value will produce the same results when the function is called with
+#' the same input parameters. Note that the
+#' same seed will produce different results when the parameter
+#' \code{parallelize} is varied. For the parallel computation, the
+#' random seed is set using the function
+#' \code{\link[parallel]{clusterSetRNGStream}}; otherwise, the function
+#' \code{\link{set.seed}} is called.
+#'
 #'
 #' @examples
 #'
@@ -127,40 +142,49 @@
 #'
 #' data(iris)
 #' head(iris[, -5]) # these features are made similar across sets
-#' anticlusters <- anticlustering(iris[, -5], K = 3)
+#' anticlusters <- anticlustering(
+#'   iris[, -5],
+#'   K = 3,
+#'   nrep = 100 # increase for better results
+#' )
 #' # Compare feature means by anticluster
 #' by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
 #'
 #' # As the features are differently scaled, the solution might be improved
 #' # by setting standardize = TRUE:
-#' anticlusters <- anticlustering(iris[, -5], K = 3, standardize = TRUE)
-#' by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
+#' anticlusters <- anticlustering(
+#'   iris[, -5],
+#'   K = 3,
+#'   standardize = TRUE,
+#'   nrep = 100
+#' )
 #'
 #' # Optimize the variance criterion:
-#' anticlusters <- anticlustering(iris[, -5], K = 3, objective = "variance")
-#' by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
-#' table(iris[, 5], anticlusters)
-
+#' anticlusters <- anticlustering(
+#'   iris[, -5],
+#'   K = 3,
+#'   objective = "variance",
+#'   nrep = 100
+#' )
+#'
+#' # Increase nrep for better solutions; setting preclustering = TRUE
+#' # sometimes also improves the solution
+#' anticlusters <- anticlustering(
+#'   iris[, -5],
+#'   K = 3,
+#'   nrep = 100,
+#'   preclustering = TRUE,
+#'   objective = "variance"
+#' )
 #'
 #' # Incorporate categorical restrictions:
-#' # 1. Case: no restrictions, iris species may not be balanced across anticlusters
-#' anticlusters <- anticlustering(iris[, -5], K = 2, nrep = 100)
+#' anticlusters <- anticlustering(
+#'   iris[, -5],
+#'   K = 2,
+#'   categories = iris[, 5],
+#'   nrep = 10
+#' )
 #' table(iris[, 5], anticlusters)
-#' # 2. Case: Include restrictions, iris species are balanced across anticlusters
-#' anticlusters <- anticlustering(iris[, -5], K = 2, categories = iris[, 5], nrep = 100)
-#' table(iris[, 5], anticlusters)
-#'
-
-#' ## Try out exact anticlustering using integer linear programming
-#' # Create artifical data
-#' n_features <- 2
-#' n_elements <- 20
-#' K <- 2
-#' features <- matrix(rnorm(n_elements * n_features), ncol = n_features)
-#' anticlustering(features, K = K, method = "ilp")
-#'
-#' # Enable preclustering
-#' anticlustering(features, K = K, method = "ilp", preclustering = TRUE)
 #'
 #' @references
 #'
@@ -180,11 +204,13 @@ anticlustering <- function(features = NULL, distances = NULL,
                            K, objective = "distance",
                            method = "heuristic", preclustering = FALSE,
                            standardize = FALSE, nrep = 10000,
-                           categories = NULL) {
+                           categories = NULL, parallelize = FALSE,
+                           seed = NULL) {
 
   input_handling_anticlustering(features, distances, K, objective,
                                 method, preclustering,
-                                standardize, nrep)
+                                standardize, nrep, categories,
+                                parallelize, seed)
 
   ## Standardize feature values (for each feature, mean = 0, sd = 1)?
   if (argument_exists(features)) {
@@ -222,7 +248,7 @@ anticlustering <- function(features = NULL, distances = NULL,
   }
   heuristic_anticlustering(features, K, preclusters,
                            objective, nrep = nrep, distances,
-                           categories)
+                           categories, parallelize, seed, ncores = NULL)
 }
 
 
@@ -242,14 +268,14 @@ anticlustering <- function(features = NULL, distances = NULL,
 input_handling_anticlustering <- function(features, distances,
                                           K, objective, method,
                                           preclustering, standardize,
-                                          nrep) {
+                                          nrep, categories,
+                                          parallelize, seed) {
 
   ## Validate feature input
   if (argument_exists(features)) {
     validate_input(features, "features", c("data.frame", "matrix", "numeric"))
     features <- as.matrix(features)
     validate_input(features, "features", objmode = "numeric")
-
     validate_input(K, "K", "numeric", len = 1,
                    greater_than = 1, must_be_integer = TRUE)
     if (nrow(features) %% K != 0) {
@@ -268,6 +294,15 @@ input_handling_anticlustering <- function(features, distances,
                  input_set = c(TRUE, FALSE))
   validate_input(standardize, "standardize", "logical", len = 1,
                  input_set = c(TRUE, FALSE))
+
+  if (argument_exists(categories)) {
+    validate_input(categories, "categories", c("numeric", "matrix", "data.frame", "factor", "character"))
+  }
+  validate_input(parallelize, "parallelize", "logical", len = 1,
+                 input_set = c(TRUE, FALSE))
+  if (argument_exists(seed)) {
+    validate_input(seed, "seed", "numeric", len = 1, not_na = TRUE)
+  }
 
   if (method == "ilp") {
     solver <- solver_available()
@@ -304,6 +339,10 @@ input_handling_anticlustering <- function(features, distances,
 
   if (argument_exists(distances) && objective == "variance") {
     stop("The argument 'distances' cannot be used if the argument 'objective' is 'variance'.")
+  }
+
+  if (argument_exists(categories) && method == "ilp") {
+    stop("The ILP method cannot incorporate categorical restrictions")
   }
 
   return(invisible(NULL))

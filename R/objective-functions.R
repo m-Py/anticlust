@@ -45,13 +45,32 @@
 #'
 #' data(iris)
 #' ## Clustering
-#' clusters <- balanced_clustering(iris[, -5], K = 3, standardize = TRUE, objective = "variance")
+#' clusters <- balanced_clustering(
+#'   iris[, -5],
+#'   K = 3,
+#'   standardize = TRUE,
+#'   objective = "variance"
+#' )
 #' # This is low:
-#' variance_objective(iris[, -5], clusters, standardize = TRUE)
+#' variance_objective(
+#'   iris[, -5],
+#'   clusters,
+#'   standardize = TRUE
+#' )
 #' ## Anticlustering
-#' anticlusters <- anticlustering(iris[, -5], K = 3, standardize = TRUE, objective = "variance")
+#' anticlusters <- anticlustering(
+#'   iris[, -5],
+#'   K = 3,
+#'   standardize = TRUE,
+#'   objective = "variance",
+#'   nrep = 100
+#' )
 #' # This is higher:
-#' variance_objective(iris[, -5], anticlusters, standardize = TRUE)
+#' variance_objective(
+#'   iris[, -5],
+#'   anticlusters,
+#'   standardize = TRUE
+#' )
 #'
 
 variance_objective <- function(features, clusters,
@@ -66,15 +85,15 @@ variance_objective <- function(features, clusters,
   if (standardize) {
     features <- scale(features)
   }
-  variance_objective_(features, clusters)
+  variance_objective_(clusters, features)
 }
 
 # Internal function - no input handling
-variance_objective_ <- function(features, clusters) {
+variance_objective_ <- function(clusters, data) {
   ## 1. Compute cluster centers
-  centers <- cluster_centers(features, clusters)
+  centers <- cluster_centers(data, clusters)
   ## 2. For each item, compute distance to each cluster center
-  distances <- dist_from_centers(features, centers, squared = TRUE)
+  distances <- dist_from_centers(data, centers, squared = TRUE)
   ## 3. Use two-column matrix to select relevant distances
   distances <- distances[cbind(1:nrow(distances), clusters)]
   return(sum(distances))
@@ -131,16 +150,10 @@ variance_objective_ <- function(features, clusters) {
 #' # This is low:
 #' distance_objective(distances = distances, clusters = clusters)
 #' ## Anticlustering
-#' anticlusters <- anticlustering(distances = distances, K = 3)
+#' anticlusters <- anticlustering(distances = distances, K = 3, nrep = 100)
 #' # This is higher:
 #' distance_objective(distances = distances, clusters = anticlusters)
 #'
-#' ## We can also use the features as input, using a standardization
-#' clusters <- balanced_clustering(iris[, -5], K = 3, standardize = TRUE)
-#' distance_objective(iris[, -5], clusters = clusters, standardize = TRUE)
-#'
-#' anticlusters <- anticlustering(iris[, -5], K = 3, standardize = TRUE)
-#' distance_objective(iris[, -5], clusters = anticlusters, standardize = TRUE)
 #'
 #' # Illustrates the cluster editing objective as the sum of distances
 #' # within groups:
@@ -186,25 +199,34 @@ distance_objective <- function(features = NULL, distances = NULL,
     if (standardize) {
       features <- scale(features)
     }
-    return(obj_value_distance(features, clusters))
+    return(obj_value_distance(clusters, features))
   }
   validate_input(distances, "distances", c("matrix", "dist"))
 
   ## Compute the objective; the above only validates the input
-  distance_objective_(distances, clusters)
+  distance_objective_(clusters, distances)
 }
 
 
 #' Internal function for distance objective via input through distances
+#'
+#' @param anticlusters A vector of n anticlusters
+#' @param data A n x n matrix of
+#'
+#' @details
+#' The second argument is named `data` to have a consistent
+#' interface with the other objective value computation functions.
+#'
 #' @noRd
-distance_objective_ <- function(distances, anticlusters) {
+
+distance_objective_ <- function(anticlusters, data) {
   K <- length(unique(anticlusters))
-  distances <- as.matrix(distances)
+  data <- as.matrix(data)
   sums_within <- rep(NA, K)
   for (k in 1:K) {
     elements <- which(anticlusters == k)
     selection <- unique_combinations(elements)
-    sums_within[k] <- sum(distances[selection])
+    sums_within[k] <- sum(data[selection])
   }
   return(sum(sums_within))
 }
@@ -221,20 +243,24 @@ unique_combinations <- function(elements) {
 
 #' Objective value for the distance criterion
 #'
-#' @param features A data.frame, matrix or vector representing the
-#'     features that are used in the assignment.
 #' @param anticlusters A vector representing the anticluster affiliation
+#' @param data A data.frame, matrix or vector representing the
+#'     features that are used in the assignment.
 #'
 #' @return Scalar, the total sum of within-cluster distances (based
 #'     on the Euclidean distance).
+#'
+#' @details
+#' The second argument is named `data` to have a consistent
+#' interface with the other objective value computation functions.
 #'
 #' @importFrom stats dist
 #'
 #' @noRd
 
-obj_value_distance <- function(features, anticlusters) {
+obj_value_distance <- function(anticlusters, data) {
   ## determine distances within each group
-  distances <- by(features, anticlusters, dist)
+  distances <- by(data, anticlusters, dist)
   ## determine objective as the sum of all distances per group
   objective <- sum(sapply(distances, sum))
   return(objective)
