@@ -33,7 +33,7 @@ parallel_sampling <- function(dat, K, objective, nrep, sampling_plan,
     cl = cl,
     dat = dat,
     K = K,
-    objective = dat,
+    objective = objective,
     nrep = reps_per_cluster,
     sampling_plan = sampling_plan,
     use_distances = use_distances
