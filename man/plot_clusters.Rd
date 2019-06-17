@@ -5,10 +5,11 @@
 \title{Visualize a cluster analysis}
 \usage{
 plot_clusters(features, clustering, within_connection = FALSE,
-  between_connection = FALSE, show_axes = FALSE, xlab = NULL,
-  ylab = NULL, xlim = NULL, ylim = NULL, col = NULL, pch = 19,
-  main = "", cex = 1.2, cex.axis = 1.2, cex.lab = 1.2, lwd = 1.5,
-  lty = 2, frame.plot = FALSE)
+  between_connection = FALSE, illustrate_variance = FALSE,
+  show_axes = FALSE, xlab = NULL, ylab = NULL, xlim = NULL,
+  ylim = NULL, col = NULL, pch = 19, main = "", cex = 1.2,
+  cex.axis = 1.2, cex.lab = 1.2, lwd = 1.5, lty = 2,
+  frame.plot = FALSE)
 }
 \arguments{
 \item{features}{A data.frame or matrix representing the features that
@@ -21,7 +22,10 @@ clusters through lines? Useful to illustrate a graph structure.}
 
 \item{between_connection}{Boolean. Connect the elements between each
 clusters through lines? Useful to illustrate a graph structure.
-Only works for two anticlusters in \code{clustering}.}
+(This argument only works for two clusters).}
+
+\item{illustrate_variance}{Boolean. Illustrate the variance criterion
+in the plot?}
 
 \item{show_axes}{Boolean, display values on the x and y-axis? Defaults
 to `FALSE`.}
@@ -53,14 +57,10 @@ each cluster has a different plotting symbol.}
 
 \item{cex.lab}{The size of the labels of the axes}
 
-\item{lwd}{The width of the lines connecting elements; has an effect
-if at least one of \code{within_connection} or
-\code{betwee_connection} is TRUE.}
+\item{lwd}{The width of the lines connecting elements.}
 
 \item{lty}{The line type of the lines connecting elements
-(see \code{\link{par}}); only has an effect
-if at least one of \code{within_connection} or
-\code{betwee_connection} is TRUE.}
+(see \code{\link{par}}).}
 
 \item{frame.plot}{a logical indicating whether a box should be drawn
 around the plot.}
