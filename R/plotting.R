@@ -8,7 +8,9 @@
 #'     clusters through lines? Useful to illustrate a graph structure.
 #' @param between_connection Boolean. Connect the elements between each
 #'     clusters through lines? Useful to illustrate a graph structure.
-#'     Only works for two anticlusters in \code{clustering}.
+#'     (This argument only works for two clusters).
+#' @param illustrate_variance Boolean. Illustrate the variance criterion
+#'     in the plot?
 #' @param show_axes Boolean, display values on the x and y-axis? Defaults
 #'     to `FALSE`.
 #' @param xlab The label for the x-axis
@@ -28,13 +30,9 @@
 #' @param cex The size of the plotting symbols, see \code{\link{par}}
 #' @param cex.axis The size of the values on the axes
 #' @param cex.lab The size of the labels of the axes
-#' @param lwd The width of the lines connecting elements; has an effect
-#'    if at least one of \code{within_connection} or
-#'    \code{betwee_connection} is TRUE.
+#' @param lwd The width of the lines connecting elements.
 #' @param lty The line type of the lines connecting elements
-#'    (see \code{\link{par}}); only has an effect
-#'    if at least one of \code{within_connection} or
-#'    \code{betwee_connection} is TRUE.
+#'    (see \code{\link{par}}).
 #' @param frame.plot a logical indicating whether a box should be drawn
 #'    around the plot.
 #'
@@ -61,7 +59,7 @@
 #' plot_clusters(features, anticlusters, pch = c(15, 16, 17), main = "Anticluster editing")
 #'
 plot_clusters <- function(features, clustering, within_connection = FALSE,
-                          between_connection = FALSE,
+                          between_connection = FALSE, illustrate_variance = FALSE,
                           show_axes = FALSE, xlab = NULL, ylab = NULL,
                           xlim = NULL, ylim = NULL,
                           col = NULL, pch = 19, main = "", cex = 1.2,
@@ -127,6 +125,9 @@ plot_clusters <- function(features, clustering, within_connection = FALSE,
               "not drawn because there were more than two anticlusters")
     }
   }
+  if (illustrate_variance) {
+    illustrate_variance(features, clustering, col, lwd, lty)
+  }
 }
 
 # Note: length(cols) must be == length(x)
@@ -176,4 +177,24 @@ draw_between_cliques <- function(x, y, assignment, lwd = 1.5,
             col = col, lwd = lwd, lty = lty)
     }
   }
+}
+
+illustrate_variance <- function(features, clusters, cols, lwd, lty) {
+  K <- length(unique(clusters))
+  centers <- cluster_centers(features, clusters)
+  # only K colors; in the order implied by "clusters" so that the color
+  # scheme is consistent with the points
+  cols <- unique(cols[order(clusters)])
+  for (i in 1:K) {
+    feats <- features[clusters == i, ]
+    draw_between_cliques(
+      c(feats[, 1], centers[i, 1]),
+      c(feats[, 2], centers[i, 2]),
+      c(rep(1, nrow(feats)), 2),
+      lwd = lwd,
+      col = cols[i],
+      lty = lty
+    )
+  }
+  points(centers, cex = 6, pch = 24, col = "black", bg = cols, lwd = 7)
 }
