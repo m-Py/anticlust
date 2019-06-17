@@ -165,7 +165,7 @@ connections_within_clique <- function(x, y) {
 ## Function to illustrate distances between elements of different cliques
 ## (does not work in general, but only for K = 2)
 draw_between_cliques <- function(x, y, assignment, lwd = 1.5,
-                                 lty = 2) {
+                                 lty = 2, col = "darkgrey") {
   selfx <- x[assignment == 1] ## first cluster
   selfy <- y[assignment == 1]
   otherx <- x[assignment != 1] ## second cluster
@@ -173,7 +173,7 @@ draw_between_cliques <- function(x, y, assignment, lwd = 1.5,
   for (j in seq_along(selfx)) {
     for (k in seq_along(otherx)) {
       lines(c(selfx[j], otherx[k]), c(selfy[j], othery[k]),
-            col = "darkgrey", lwd = lwd, lty = lty)
+            col = col, lwd = lwd, lty = lty)
     }
   }
 }
