@@ -1,3 +1,12 @@
+
+# anticlust 0.2.6
+
+2019-06-19
+
+Minor update: `plot_clusters` now has an additional argument 
+`illustrate_variance`. If this argument is set to `TRUE`, a cluster
+solution is illustrated with the k-means variance criterion.
+
 # anticlust 0.2.5
 
 2019-05-27
