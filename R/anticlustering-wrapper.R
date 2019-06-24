@@ -218,7 +218,9 @@ anticlustering <- function(features = NULL, distances = NULL,
     if (standardize) {
       features <- scale(features)
     }
-    distances <- as.matrix(dist(features))
+    if (objective == "distance") {
+      distances <- as.matrix(dist(features))
+    }
   } else {
     distances <- as.matrix(as.dist(distances))
   }
