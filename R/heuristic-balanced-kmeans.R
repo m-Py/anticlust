@@ -84,8 +84,7 @@ clusters_to_long <- function(assignments) {
 #
 
 cluster_centers <- function(features, clusters) {
-  features <- as.matrix(features) #  if features is a vector
-  centers <- by(features, clusters, colMeans)
+  centers <- by(features, clusters, colMeans, na.rm = TRUE)
   do.call(rbind, as.list(centers)) # as.list for the case of only one feature
 }
 
@@ -117,9 +116,9 @@ dist_from_centers <- function(features, centers, squared) {
   z <- matrix(0, nrow = nrow(features), ncol = nrow(centers))
   for (k in 1:nrow(centers)) {
     if (squared)
-      z[,k] <- colSums((t(features) - centers[k,])^2)
+      z[,k] <- colSums((t(features) - centers[k,])^2, na.rm = TRUE)
     else
-      z[,k] <- sqrt( colSums((t(features) - centers[k,])^2) )
+      z[,k] <- sqrt( colSums((t(features) - centers[k,])^2, na.rm = TRUE) )
   }
   z
 }

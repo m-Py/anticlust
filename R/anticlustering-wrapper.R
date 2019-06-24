@@ -275,6 +275,9 @@ input_handling_anticlustering <- function(features, distances,
 
   ## Validate feature input
   if (argument_exists(features)) {
+    if (sum(!complete.cases(features)) >= 1) {
+      warning("There NAs in your data, take care!")
+    }
     features <- as.matrix(features)
     validate_input(features, "features", objmode = "numeric")
     validate_input(K, "K", "numeric", len = 1,
