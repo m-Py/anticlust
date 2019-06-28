@@ -2,7 +2,9 @@
 #' Wrapper for the exchange method algorithm below
 #'
 #' This function takes the input and determines the objective function;
-#' i.e., just some preprocessing for the algorithm.
+#' i.e., just some preprocessing for the algorithm. (
+#'
+#' For the arguments, see \code{anticlustering}
 #'
 #' @noRd
 #'
@@ -33,13 +35,11 @@ exchange_method <- function(features, distances, K, objective,
 #'
 #' @noRd
 #'
-#' @export
 #'
 
 exchange_method_ <- function(data, K, obj_function, categories = NULL) {
   if (!is.null(categories)) {
-    ## generate an initial cluster assignment satisfying the
-    ## categorical constraints
+    # An initial cluster assignment satisfying the categorical constraints
     clusters <- heuristic_anticlustering(data, K, NULL, "distance",
                                          1, NULL, categories, FALSE, NULL, ncores = NULL)
   } else {
