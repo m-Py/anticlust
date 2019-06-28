@@ -59,8 +59,8 @@
 #' @details
 #'
 #' This function is used to solve »balanced K anticlustering«. That is,
-#' K equal sized groups are created in such a way that similarity of
-#' all groups is maximized. Set similarity is assessed using one of
+#' K groups of equal size are created in such a way that all groups are
+#' as similar as possible. Set similarity is assessed using one of
 #' two objective functions:
 #'
 #' - k-means *variance* objective, setting \code{objective =
@@ -76,8 +76,8 @@
 #' either of these objectives is used to create similar groups;
 #' minimization of the same objectives leads to a clustering, i.e.,
 #' elements are as similar as possible within a set and as different
-#' as possible between sets. Clustering could be done with the function
-#' \code{\link{balanced_clustering}}.
+#' as possible between sets. (Clustering is also possible with the function
+#' \code{\link{balanced_clustering}}).
 #'
 #' If the argument \code{features} is passed together with
 #' \code{objective = "distance"}, the Euclidean distance between
@@ -108,21 +108,27 @@
 #' work on larger problem instances and the solution is usually still
 #' optimal or very close to optimal.
 #'
-#' If no exact solution is required or the problem size is too large
-#' for integer linear programming, a heuristic method is available via
-#' setting \code{method = "heuristic"}. Note that this is the only
-#' method when optimizing the variance criterion. The
-#' heuristic employs repeated random sampling: across a specified
+#' In addition to the exact approach---that is only feasible for small
+#' N---the function employs two heuristic approaches. The
+#' first option is repeated random sampling: Across a specified
 #' number of runs, anticlusters are assigned randomly and the best
-#' assignment is returned. The sampling approach may also incorporate a
+#' assignment is returned. The second is the exchange method: From an
+#' initial anticluster assignment, items are swapped systematically in
+#' such a way that the similarity is improved in the best way that is
+#' possible (see Späth, 1986). This method outperforms the random
+#' sampling approach. Note however, that the number of swaps grows
+#' quadratically with input size so that the random sampling method
+#' is recommended for large N.
+#'
+#' The random sampling approach may also incorporate a
 #' preclustering that prevents grouping very similar elements into the
-#' same anticluster. Preclustering (for the exact and heuristic approach)
+#' same anticluster. Preclustering (for the exact and random sampling approach)
 #' is performed by a call to \code{\link{balanced_clustering}} where the
 #' argument \code{K} is set to the number of elements divided by the
 #' number of anticlusters that are to be created (actually, this is not
 #' exactly what happens internally, but it is equivalent).
 #'
-#' As the heuristic method relies on random sampling, the output will
+#' For the random sampling method, the output will
 #' vary between function calls. To make a computation results
 #' reproducible, you can use the argument \code{seed} -- a specific
 #' value will produce the same results when the function is called with
@@ -142,39 +148,26 @@
 #'
 #' data(iris)
 #' head(iris[, -5]) # these features are made similar across sets
-#' anticlusters <- anticlustering(
-#'   iris[, -5],
-#'   K = 3,
-#'   nrep = 100 # increase for better results
-#' )
-#' # Compare feature means by anticluster
-#' by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
 #'
-#' # As the features are differently scaled, the solution might be improved
-#' # by setting standardize = TRUE:
-#' anticlusters <- anticlustering(
-#'   iris[, -5],
-#'   K = 3,
-#'   standardize = TRUE,
-#'   nrep = 100
-#' )
-#'
-#' # Optimize the variance criterion:
+#' # Optimize the variance criterion (create similar feature means)
 #' anticlusters <- anticlustering(
 #'   iris[, -5],
 #'   K = 3,
 #'   objective = "variance",
-#'   nrep = 100
+#'   method = "exchange"
 #' )
+#' # Compare feature means by anticluster
+#' by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
 #'
-#' # Increase nrep for better solutions; setting preclustering = TRUE
-#' # sometimes also improves the solution
+#' # Optimize the cluster editing objective using random sampling
+#' # (cluster editing maximizes total pairwise similarity of plants,
+#' # not just the feature means)
 #' anticlusters <- anticlustering(
 #'   iris[, -5],
 #'   K = 3,
-#'   nrep = 100,
-#'   preclustering = TRUE,
-#'   objective = "variance"
+#'   method = "heuristic",
+#'   objective = "distance",
+#'   nrep = 10000
 #' )
 #'
 #' # Incorporate categorical restrictions:
@@ -182,6 +175,7 @@
 #'   iris[, -5],
 #'   K = 2,
 #'   categories = iris[, 5],
+#'   method = "heuristic",
 #'   nrep = 10
 #' )
 #' table(iris[, 5], anticlusters)
