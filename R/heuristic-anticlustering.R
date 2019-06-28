@@ -77,7 +77,7 @@ heuristic_anticlustering <- function(features, K, preclusters, objective,
   anticlusters
 }
 
-#' Extracted from the above function for readability
+# Extracted from the above function for readability
 get_sampling_plan <- function(preclusters, categories) {
   ## Determine plan for random sampling
   sampling_plan <- "unrestricted"
