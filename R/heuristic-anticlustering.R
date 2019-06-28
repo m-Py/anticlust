@@ -40,9 +40,9 @@ heuristic_anticlustering <- function(features, K, preclusters, objective,
 
   ## Determine objective function to be used
   categories <- merge_into_one_variable(categories) # may be NULL
-  obj_function <- get_objective_function(features, distances, method)
+  obj_function <- get_objective_function(features, distances, objective)
   sampling_plan <- get_sampling_plan(preclusters, categories)
-  dat <- sort_by_group(input, preclusters, categories)
+  dat <- sort_by_group(features, distances, preclusters, categories)
 
   if (parallelize) {
     best_assignment <- parallel_sampling(
@@ -144,7 +144,12 @@ get_objective_function <- function(features, distances, objective) {
 #' @noRd
 #'
 
-sort_by_group <- function(input, preclusters, categories) {
+sort_by_group <- function(features, distances, preclusters, categories) {
+  if (argument_exists(features)) {
+    input <- features
+  } else {
+    input <- distances
+  }
   sort_by <- 1 # default: data does not need to be sorted
   if (argument_exists(preclusters)) {
     sort_by <- preclusters
