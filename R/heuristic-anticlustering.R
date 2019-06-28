@@ -38,25 +38,12 @@ heuristic_anticlustering <- function(features, K, preclusters, objective,
                                      nrep, distances, categories,
                                      parallelize, seed, ncores = NULL) {
 
-  ## What was the input: features or distances
-  use_distances <- FALSE
-  if (argument_exists(features)) {
-    input <- features
-  } else {
-    input <- distances
-    use_distances <- TRUE
-  }
-
-  ## Determine plan for random sampling
-  sampling_plan <- "unrestricted"
-  if (argument_exists(preclusters)) {
-    sampling_plan <- "preclustering"
-  } else if (argument_exists(categories)) {
-    sampling_plan <- "categorical"
-    categories <- merge_into_one_variable(categories)
-  }
-
+  ## Determine objective function to be used
+  categories <- merge_into_one_variable(categories) # may be NULL
+  obj_function <- get_objective_function(features, distances, method)
+  sampling_plan <- get_sampling_plan(preclusters, categories)
   dat <- sort_by_group(input, preclusters, categories)
+
   if (parallelize) {
     best_assignment <- parallel_sampling(
       dat,
@@ -64,7 +51,7 @@ heuristic_anticlustering <- function(features, K, preclusters, objective,
       objective,
       nrep,
       sampling_plan,
-      use_distances,
+      obj_function,
       seed,
       ncores
     )
@@ -78,7 +65,7 @@ heuristic_anticlustering <- function(features, K, preclusters, objective,
       objective,
       nrep,
       sampling_plan,
-      use_distances
+      obj_function
     )
   }
 
@@ -90,20 +77,43 @@ heuristic_anticlustering <- function(features, K, preclusters, objective,
   anticlusters
 }
 
-#' Merge several grouping variable into one
-#'
-#' @param categories A vector, data.frame or matrix that represents
-#'     one or several categorical constraints.
-#'
-#' @return A vector representing the group membership (or the combination
-#'     of group memberships) as one variable
+#' Extracted from the above function for readability
+get_sampling_plan <- function(preclusters, categories) {
+  ## Determine plan for random sampling
+  sampling_plan <- "unrestricted"
+  if (argument_exists(preclusters)) {
+    sampling_plan <- "preclustering"
+  } else if (argument_exists(categories)) {
+    sampling_plan <- "categorical"
+  }
+  sampling_plan
+}
+
+
+#' Determine the objective function needed for the input
 #'
 #' @noRd
-#'
+get_objective_function <- function(features, distances, objective) {
+  ## What was the input: features or distances
+  use_distances <- FALSE
+  if (argument_exists(features)) {
+    input <- features
+  } else {
+    input <- distances
+    use_distances <- TRUE
+  }
+  ## Determine how to compute objective, three cases:
+  # 1. Distance objective, features were passed
+  # 2. Distance objective, distances were passed
+  # 3. Variance objective, features were passed
+  if (objective == "distance" && use_distances == TRUE) {
+    obj_value <- distance_objective_
+  } else if (objective == "distance" && use_distances == FALSE) {
+    obj_value <- obj_value_distance
+  } else {
+    obj_value <- variance_objective_
+  }
 
-merge_into_one_variable <- function(categories) {
-  categories <- data.frame(categories)
-  factor(do.call(paste0, as.list(categories)))
 }
 
 #' Sort data by a grouping variable
@@ -128,7 +138,8 @@ merge_into_one_variable <- function(categories) {
 #'  This function sorts the input table by precluster affiliation
 #'  or by a categorical variable; neither needs to be present, if no
 #'  grouping restrictions are passed (precluster or categories), the data
-#'  is not sorted.
+#'  is not sorted. It assumes that at most one of the arguments is not
+#'  NULL.
 #'
 #' @noRd
 #'
@@ -173,25 +184,13 @@ sort_by_group <- function(input, preclusters, categories) {
 #'
 
 random_sampling <- function(dat, K, objective, nrep, sampling_plan,
-                            use_distances) {
+                            obj_function) {
 
   ## Initialize variables
   N <- nrow(dat)
   n_preclusters <- N / K
   ## Start optimizing
   best_obj <- -Inf
-
-  ## Determine how to compute objective, three cases:
-  # 1. Distance objective, features were passed
-  # 2. Distance objective, distances were passed
-  # 3. Variance objective, features were passed
-  if (objective == "distance" && use_distances == TRUE) {
-    obj_value <- distance_objective_
-  } else if (objective == "distance" && use_distances == FALSE) {
-    obj_value <- obj_value_distance
-  } else {
-    obj_value <- variance_objective_
-  }
 
   ## Select the relevant data from which the objective is computed
   objective_data <- dat[, -(1:2), drop = FALSE]
@@ -205,7 +204,7 @@ random_sampling <- function(dat, K, objective, nrep, sampling_plan,
     } else if (sampling_plan == "categorical") {
       anticlusters <- categorical_sampling(categories, K)
     }
-    cur_obj <- obj_value(anticlusters, objective_data)
+    cur_obj <- obj_function(anticlusters, objective_data)
     if (cur_obj > best_obj) {
       best_assignment <- anticlusters
       best_obj <- cur_obj
@@ -245,3 +244,22 @@ replicate_sample <- function(times, N) {
   c(replicate(times, sample(N)))
 }
 
+
+#' Merge several grouping variable into one
+#'
+#' @param categories A vector, data.frame or matrix that represents
+#'     one or several categorical constraints.
+#'
+#' @return A vector representing the group membership (or the combination
+#'     of group memberships) as one variable
+#'
+#' @noRd
+#'
+
+merge_into_one_variable <- function(categories) {
+  if (is.null(categories)) {
+    return(NULL)
+  }
+  categories <- data.frame(categories)
+  factor(do.call(paste0, as.list(categories)))
+}
