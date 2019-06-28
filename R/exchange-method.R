@@ -40,8 +40,9 @@ exchange_method <- function(features, distances, K, objective,
 exchange_method_ <- function(data, K, obj_function, categories = NULL) {
   if (!is.null(categories)) {
     # An initial cluster assignment satisfying the categorical constraints
-    clusters <- heuristic_anticlustering(data, K, NULL, "distance",
-                                         1, NULL, categories, FALSE, NULL, ncores = NULL)
+    clusters <- random_sampling(data, K, NULL, "distance",
+                                1, NULL, categories, FALSE,
+                                NULL, ncores = NULL)
   } else {
     clusters <- rep_len(1:K, length.out = nrow(data))
   }

@@ -53,7 +53,7 @@ parallel_sampling <- function(dat, K, objective, nrep, sampling_plan,
 # Make random_sampling usable for lapply (additional argument x)
 lapply_random_samling <- function(x, dat, K, objective, nrep, sampling_plan,
                                   obj_function) {
-  random_sampling(dat, K, objective, nrep, sampling_plan,
+  random_sampling_(dat, K, objective, nrep, sampling_plan,
                   obj_function)
 }
 

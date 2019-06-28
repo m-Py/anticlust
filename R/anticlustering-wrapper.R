@@ -114,8 +114,7 @@
 #' assignment is returned. The second is the exchange method: From an
 #' initial anticluster assignment, items are swapped systematically in
 #' such a way that the similarity is improved in the best way that is
-#' possible (see Späth, 1986). This method outperforms the random
-#' sampling approach. Note however, that the number of swaps grows
+#' possible (see Späth, 1986). Note, that the number of swaps grows
 #' quadratically with input size so that the random sampling method
 #' is recommended for large N.
 #'
@@ -164,7 +163,7 @@
 #' anticlusters <- anticlustering(
 #'   iris[, -5],
 #'   K = 3,
-#'   method = "heuristic",
+#'   method = "sampling",
 #'   objective = "distance",
 #'   nrep = 10000
 #' )
@@ -174,7 +173,7 @@
 #'   iris[, -5],
 #'   K = 2,
 #'   categories = iris[, 5],
-#'   method = "heuristic",
+#'   method = "sampling",
 #'   nrep = 10
 #' )
 #' table(iris[, 5], anticlusters)
@@ -191,11 +190,10 @@
 #' Späth, H. (1986). Anticlustering: Maximizing the variance criterion.
 #' Control and Cybernetics, 15, 213-218.
 #'
-#'
 
 anticlustering <- function(features = NULL, distances = NULL,
                            K, objective = "distance",
-                           method = "heuristic", preclustering = FALSE,
+                           method = "sampling", preclustering = FALSE,
                            standardize = FALSE, nrep = 10000,
                            categories = NULL, parallelize = FALSE,
                            seed = NULL) {
@@ -222,9 +220,9 @@ anticlustering <- function(features = NULL, distances = NULL,
   if (method == "ilp") {
     return(exact_anticlustering(distances, K, solver_available(),
                                 preclustering))
-  } else if (method == "heuristic") {
+  } else if (method == "sampling") {
     preclusters <- get_preclusters(categories, preclustering, features, distances, K, objective)
-    return(heuristic_anticlustering(features, K, preclusters,
+    return(random_sampling(features, K, preclusters,
                                     objective, nrep = nrep, distances,
                                     categories, parallelize, seed,
                                     ncores = NULL))
@@ -290,7 +288,7 @@ input_handling_anticlustering <- function(features, distances,
   validate_input(nrep, "nrep", "numeric", len = 1, greater_than = 0,
                  must_be_integer = TRUE)
   validate_input(method, "method", len = 1,
-                 input_set = c("ilp", "heuristic", "exchange"))
+                 input_set = c("ilp", "sampling", "exchange"))
   validate_input(objective, "objective", len = 1,
                  input_set = c("variance", "distance"))
 
@@ -310,7 +308,7 @@ input_handling_anticlustering <- function(features, distances,
     if (solver == FALSE) {
         stop("\n\nAn exact solution was requested, but none of the linear ",
              "programming \npackages 'Rglpk', 'gurobi', or 'Rcplex' is ",
-             "available. \n\nTry `method = 'heuristic'`, `method = 'exchange'` or install ",
+             "available. \n\nTry `method = 'sampling'`, `method = 'exchange'` or install ",
              "a linear programming solver \nto obtain an exact solution. ",
              "For example, install the GNU linear \nprogramming kit: \n\n",
              "- On windows, visit ",
