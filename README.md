@@ -1,20 +1,12 @@
 # anticlust
 
-`anticlust` is an `R` package that is used for »anticlustering«.
-Anticlustering is a method to assign elements to sets in such a way that
-the sets are as similar as possible (Späth 1986; Valev 1998). The
-package `anticlust` was originally developed to assign items to
-experimental conditions in experimental psychology, but it can be
-applied whenever similar sets are desired.
-
-Currently, `anticlust` offers the following features:
-
-  - Create any number of sets that are similar with regard to the
-    numeric features of the input elements (e.g., create school classes
-    with pupils of similar grades)
-  - All sets are of equal size
-  - Group memberships may be balanced out across sets (e.g., each school
-    class has the same number of female and male students)
+`anticlust` is an `R` package for »anticlustering«, a method to assign
+elements to sets in such a way that the sets are as similar as possible
+(Späth 1986; Valev 1998). The package `anticlust` was originally
+developed to assign items to experimental conditions in experimental
+psychology, but it can be applied whenever sets that are similar to each
+other are desired. Currently, the `anticlust` package offers the
+possibility to create similar sets of equal size.
 
 ## Installation
 
@@ -23,9 +15,45 @@ library("devtools") # if not available: install.packages("devtools")
 install_github("m-Py/anticlust")
 ```
 
+## Example
+
+In the following example, I use the function `anticlustering()` to
+create three sets from the iris data set:
+
 ``` r
 # load the package via
 library("anticlust")
+
+# Optimize the variance criterion (create similar feature means)
+anticlusters <- anticlustering(
+  iris[, -5],
+  K = 3,
+  objective = "variance",
+  method = "exchange",
+  categories = iris[, 5]
+)
+## Look at the output: Per element in the iris data set, I obtain 
+## a group affiliation:
+anticlusters
+#>   [1] 3 3 3 2 3 2 3 2 1 1 2 1 1 3 1 2 1 1 2 1 2 2 3 2 2 1 2 1 3 2 2 2 1 1 1
+#>  [36] 3 3 3 3 1 3 1 3 2 2 1 2 3 1 3 3 3 1 3 3 1 2 3 1 3 1 1 2 1 2 3 3 3 2 3
+#>  [71] 1 2 2 1 3 3 1 1 1 2 3 2 2 2 1 3 3 2 1 1 3 1 2 2 2 2 3 1 1 2 2 2 3 1 2
+#> [106] 2 3 3 1 3 2 3 3 3 1 2 1 3 1 3 3 2 2 1 1 3 3 1 1 2 2 3 3 2 1 1 2 2 3 3
+#> [141] 1 1 1 1 3 2 2 2 1 2
+
+## Compare the feature means by anticluster:
+by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
+#> anticlusters: 1
+#> Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
+#>         5.84         3.06         3.76         1.20 
+#> -------------------------------------------------------- 
+#> anticlusters: 2
+#> Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
+#>         5.85         3.06         3.76         1.20 
+#> -------------------------------------------------------- 
+#> anticlusters: 3
+#> Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
+#>         5.84         3.06         3.76         1.20
 ```
 
 ## How do I learn about anticlustering
@@ -66,105 +94,96 @@ should be assigned to sets. In the data table, each row represents an
 element, for example a person, word or a photo. Each column is a numeric
 variable describing one of the elements’ features. The table may be an R
 `matrix` or `data.frame`; a single feature can also be passed as a
-`vector`.
+`vector`. The number of groups is specified through the argument `K`.
 
-To illustrate the usage of the `anticlustering` function, we use the
-classical iris data set describing the characteristics of 150 iris
-plants:
+### The anticlustering objective
 
-``` r
-## Select only the numeric attributes
-features <- iris[, -5]
-nrow(features)
-#> [1] 150
-```
-
-The first rows of the data set look as follows:
-
-| Sepal.Length | Sepal.Width | Petal.Length | Petal.Width |
-| -----------: | ----------: | -----------: | ----------: |
-|          5.1 |         3.5 |          1.4 |         0.2 |
-|          4.9 |         3.0 |          1.4 |         0.2 |
-|          4.7 |         3.2 |          1.3 |         0.2 |
-|          4.6 |         3.1 |          1.5 |         0.2 |
-|          5.0 |         3.6 |          1.4 |         0.2 |
-|          5.4 |         3.9 |          1.7 |         0.4 |
-
-We now use the `anticlustering` function to create two similar groups of
-iris plants:
-
-``` r
-anticlusters <- anticlustering(features, K = 2, standardize = TRUE)
-anticlusters
-#>   [1] 1 2 2 1 1 2 2 1 1 2 1 1 1 1 1 2 2 1 1 1 2 1 2 2 2 2 2 1 1 1 1 2 2 1 2
-#>  [36] 1 1 2 2 2 2 1 2 2 2 1 2 1 1 2 2 2 2 2 1 2 2 2 2 2 2 2 1 2 1 1 1 1 2 1
-#>  [71] 1 2 2 1 2 1 1 1 2 2 1 2 1 1 1 1 2 2 2 2 2 2 1 1 1 1 2 1 1 2 2 2 2 2 1
-#> [106] 1 2 1 2 1 1 1 2 1 2 2 2 2 2 1 1 1 2 2 2 1 1 1 1 1 1 2 2 1 1 2 1 1 2 1
-#> [141] 1 2 1 2 1 1 1 2 1 2
-table(anticlusters)
-#> anticlusters
-#>  1  2 
-#> 75 75
-```
-
-We want to investigate the descriptive statistics of the plants’
-characteristics like the mean and standard deviation by anticluster.
-Ideally, the values should be the same for each anticluster. As we can
-see in the following, this worked quite
-well:
-
-| Statistic | Sepal.Length | Sepal.Width | Petal.Length | Petal.Width | Anticluster |
-| :-------- | :----------- | :---------- | :----------- | :---------- | ----------: |
-| Mean      | 5.84         | 3.05        | 3.75         | 1.20        |           1 |
-|           | 5.85         | 3.07        | 3.76         | 1.20        |           2 |
-| SD        | 0.80         | 0.42        | 1.78         | 0.78        |           1 |
-|           | 0.86         | 0.46        | 1.76         | 0.75        |           2 |
-
-## The anticlustering objective
-
-In the example above, the `anticlustering` function established
-anticlusters that were very similar with regard to the mean and standard
-deviation of each plant feature. However, it was just a side effect that
-group means turned out to be similar – the anticlustering method does
-not directly minimize differences in groups means. Instead,
-anticlustering makes use of two measures of set similarity that have
-been developed in the context of cluster analysis:
+To measure set similarity, `anticlust` may employ one of two measures of
+set similarity that have been developed in the context of cluster
+analysis:
 
   - the k-means “variance” objective (Späth 1986; Valev 1998)
   - the cluster editing “distance” objective (Böcker and Baumbach 2013;
     Miyauchi and Sukegawa 2015; Grötschel and Wakabayashi 1989)
 
 The k-means objective is given by the sum of the squared errors between
-cluster centers and individual data points (Jain 2010). The cluster
-editing objective is the sum of pairwise distances within anticlusters.
-Maximizing either of these objectives leads to similar groups, i.e.,
-anticlusters. Minimization of the same objectives leads to a clustering,
-i.e., elements are as similar as possible within a set and as different
-as possible between sets. Thus, anticlustering is generally accomplished
-by maximizing the spread of the data in each group, whereas clustering
-minimizes the spread.
+cluster centers and individual data points (Jain 2010). It was maximized
+in the example above, making the average of each feature similar between
+groups. The cluster editing objective is the sum of pairwise distances
+within anticlusters. This way, the total similarity between items in
+different sets is maximized, whereas the k-means variance objective
+tends to concentrate on the mean values.
+
+Maximizing either of the cluster editing or k-means objectives leads to
+similar groups, i.e., anticlusters. Minimization of the same objectives
+leads to a clustering, i.e., elements are as similar as possible within
+a set and as different as possible between sets. Thus, anticlustering is
+generally accomplished by maximizing the spread of the data in each
+group, whereas clustering minimizes the spread. The following code
+illustrates maximizing and minimizing both objectives:
+
+``` r
+
+features <- matrix(rnorm(20), ncol = 2)
+anticlusters_dist <- anticlustering(
+  features, 
+  K = 2,
+  method = "ilp",
+  objective = "distance"
+)
+## anticlust can also be used for cluster analysis:
+clusters_dist <- balanced_clustering( 
+  features, 
+  K = 2,
+  method = "ilp",
+  objective = "distance"
+)
+
+anticlusters_var <- anticlustering(
+  features, 
+  K = 2,
+  method = "exchange",
+  objective = "variance"
+)
+## anticlust can also be used for cluster analysis:
+clusters_var <- balanced_clustering( 
+  features, 
+  K = 2,
+  method = "heuristic",
+  objective = "variance"
+)
+
+par(mfrow = c(2, 2))
+plot_clusters(features, anticlusters_dist, within_connection = TRUE, xlab = "", ylab = "")
+plot_clusters(features, clusters_dist, within_connection = TRUE, xlab = "", ylab = "")
+plot_clusters(features, anticlusters_var, illustrate_variance = TRUE, xlab = "", ylab = "")
+plot_clusters(features, clusters_var, illustrate_variance = TRUE, xlab = "", ylab = "")
+```
+
+<img src="inst/README_files/figure-gfm/unnamed-chunk-2-1.png" style="display: block; margin: auto;" />
 
 To vary the objective function, we may change the parameter `objective`.
 To apply anticluster editing, use `objective = "distance"`, which is
 also the default. To maximize the k-means variance objective, set
-`objective = "variance"`. In many cases, the results for the
-`"variance"` objective (k-means) and the `"distance"` objective
-(anticluster editing) will be quite similar. The following shows the
-results of the maximizing the variance objective on the iris data:
+`objective = "variance"`.
 
 ``` r
-anticlusters <- anticlustering(features, K = 2, standardize = TRUE,
-                               objective = "variance")
+
+## Example code for varying the objective:
+anticlustering(
+  features, 
+  K = 3, 
+  objective = "distance"
+)
+
+anticlustering(
+  features, 
+  K = 3, 
+  objective = "variance"
+)
 ```
 
-| Statistic | Sepal.Length | Sepal.Width | Petal.Length | Petal.Width | Anticluster |
-| :-------- | :----------- | :---------- | :----------- | :---------- | ----------: |
-| Mean      | 5.85         | 3.06        | 3.75         | 1.20        |           1 |
-|           | 5.84         | 3.06        | 3.77         | 1.20        |           2 |
-| SD        | 0.83         | 0.46        | 1.77         | 0.77        |           1 |
-|           | 0.83         | 0.41        | 1.77         | 0.76        |           2 |
-
-## Exact anticluster editing
+### Exact anticluster editing
 
 Finding an optimal assignment of elements to sets that maximizes the
 anticluster editing or variance objective is computationally demanding.
@@ -192,19 +211,26 @@ To find the optimal solution, we have to set the arguments `method =
 "ilp"`:
 
 ``` r
-anticlustering(features, K = 2, method = "ilp")
+## Code example for using integer linear programming:
+anticlustering(
+  features, 
+  K = 2, 
+  method = "ilp",
+  objective = "distance" # "variance" does not work with ILP method
+)
 ```
 
-## Preclustering
+### Preclustering
 
 The exact integer linear programming approach will only work for small
-problem sizes (\< 30 elements). We can increase the problem size that
-can be handled by setting the argument `preclustering = TRUE`. In this
-case, an initial cluster analysis performed, creating small groups of
-elements that are very similar. The preclustering step identifies pairs
-of similar stimuli if K = 2, triplets if K = 3, and so forth. After this
-preclustering, a restriction is enforced to the integer linear program
-that precludes very similar elements to be assigned to the same set.
+problem sizes (maybe \<= 30 elements). We can increase the problem size
+that can be handled by setting the argument `preclustering = TRUE`. In
+this case, an initial cluster editing is performed, creating small
+groups of elements that are very similar. The preclustering step
+identifies pairs of similar stimuli if K = 2, triplets if K = 3, and so
+forth. After this preclustering, a restriction is enforced to the
+integer linear program that precludes very similar elements to be
+assigned to the same set.
 
 The preclustering restrictions improve the running time of the integer
 linear programming solver by a large margin (often 100x as fast) because
@@ -220,10 +246,17 @@ can be used to employ integer linear programming under preclustering
 constraints.
 
 ``` r
-anticlustering(features, K = 2, method = "ilp", preclustering = TRUE)
+## Code example using ILP and preclustering:
+anticlustering(
+  features, 
+  K = 2, 
+  method = "ilp", 
+  objective = "distance",
+  preclustering = TRUE
+)
 ```
 
-## Random search
+### Random search
 
 To solve larger problem instances that cannot be processed using integer
 linear programming, a heuristic method based on random sampling is
@@ -231,7 +264,7 @@ available. Across a user-specified number of runs (specified via the
 argument `nrep`), each element is first randomly assigned to an
 anticluster and then the objective value is computed. In the end, the
 best assignment is returned as output. To activate the heuristic, set
-`method = "heuristic"` (this is also the default argument). When we set
+`method = "sampling"` (this is also the default argument). When we set
 `preclustering = TRUE`, the random assignment is conducted under the
 restriction that preclustered elements cannot be part of the same
 anticluster. In my experience, the preclustering restrictions often
@@ -239,6 +272,26 @@ improve the output of the random sampling approach, because the
 preclustering itself serves as a useful heuristic: when very similar
 items are guaranteed to be in different sets, these different sets tend
 to become similar.
+
+``` r
+## Code example using random sampling
+anticlustering(
+  features, 
+  K = 2, 
+  method = "sampling",
+  objective = "distance" 
+)
+
+## Random sampling may also use preclustering (this often improves the
+## solution):
+anticlustering(
+  features, 
+  K = 2, 
+  method = "sampling",
+  objective = "variance",
+  preclustering = TRUE
+)
+```
 
 ## References
 

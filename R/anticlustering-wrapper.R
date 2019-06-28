@@ -17,10 +17,11 @@
 #'     dissimilarities.
 #' @param K How many anticlusters should be created.
 #' @param objective The objective to be maximized. The option
-#'     "distance" (default) is used to optimize the anticluster
-#'     editing objective; the option "variance" is used to optimize
-#'     the k-means anticlustering objective. See details.
-#' @param method One of "exchange", "sampling" or "ilp". See details.
+#'     "distance" (default) maximizes the anticluster
+#'     editing objective; the option "variance" maximizes the k-means
+#'     objective. See details.
+#' @param method One of "sampling" (default), "exchange", or "ilp".
+#'     See details.
 #' @param preclustering Boolean, should a preclustering be conducted
 #'     before anticlusters are created? Defaults to \code{FALSE} See
 #'     details.
@@ -31,18 +32,18 @@
 #'     only works when the input data is given via \code{features},
 #'     not via \code{distances}.
 #' @param nrep The number of repetitions for the random sampling
-#'     heuristic. This argument only has an effect if \code{method}
-#'     is \code{"sampling"}.
+#'     heuristic. Defaults to 10,000. This argument only has an effect
+#'     if \code{method} is \code{"sampling"}.
 #' @param categories A vector, data.frame or matrix representing
 #'     one or several categorical constraints. These grouping
 #'     variables are balanced out across anticlusters. Currently
 #'     this functionality is only available in combination with the
-#'     sampling and exchange method but not with the ILP approach. If
+#'     random sampling and exchange method but not with the ILP approach. If
 #'     categorical contraints are employed, the value of the argument
 #'     \code{preclustering} will be ignored (that is, there will be no
 #'     preclustering).
 #' @param parallelize Boolean. Indicates whether multiple processors should
-#'     be used for the random sampling method.
+#'     be used for the random sampling method. Defaults to \code{FALSE}.
 #' @param seed A value to fixate the random seed when using the random
 #'     sampling method. When \code{parallelize} is \code{TRUE}, using
 #'     this argument is the only way to ensure reproducibility.
@@ -69,13 +70,16 @@
 #'   "distance"}
 #'
 #' The k-means objective maximizes the variance within anticlusters
-#' (see \code{\link{variance_objective}}). The cluster editing
+#' (see \code{\link{variance_objective}}), which tends to make the feature
+#' means similar. The cluster editing
 #' objective maximizes the sum of pairwise distances within
-#' anticlusters (see \code{\link{distance_objective}}). Maximizing
-#' either of these objectives is used to create similar groups;
+#' anticlusters (see \code{\link{distance_objective}}). This way, the total
+#' similarity between elements in different sets is maximized, not just
+#' the means of the items' features. Maximizing
+#' either the cluster editing or the k-means objective is used to create similar groups;
 #' minimization of the same objectives leads to a clustering, i.e.,
 #' elements are as similar as possible within a set and as different
-#' as possible between sets. (Clustering is also possible with the function
+#' as possible between sets. (Such a clustering is also possible with the function
 #' \code{\link{balanced_clustering}}).
 #'
 #' If the argument \code{features} is passed together with
@@ -84,6 +88,8 @@
 #' objective. If another measure of dissimilarity is preferred, you
 #' may pass a self-generated dissimiliarity matrix via the argument
 #' \code{distances}.
+#'
+#' \strong{Exact anticlustering}
 #'
 #' The optimal anticluster editing objective can be found via integer
 #' linear programming. To this end, set \code{method = "ilp"}. To
@@ -107,20 +113,29 @@
 #' work on larger problem instances and the solution is usually still
 #' optimal or very close to optimal.
 #'
+#' \strong{Heuristic anticlustering}
+#'
 #' In addition to the exact approach---that is only feasible for small
 #' N---the function employs two heuristic approaches. The
 #' first option is repeated random sampling: Across a specified
 #' number of runs, anticlusters are assigned randomly and the best
 #' assignment is returned. The second is the exchange method: From an
 #' initial anticluster assignment, items are swapped systematically in
-#' such a way that the similarity is improved in the best way that is
-#' possible (see Späth, 1986). Note, that the number of swaps grows
-#' quadratically with input size so that the random sampling method
-#' is recommended for large N.
+#' such a way that the similarity in each step by the largest amount that
+#' is possible (see Späth, 1986). Note that the total number of swaps grows
+#' quadratically with input size; the random sampling method is therefore
+#' recommended for large N. The exchange method is recommended for
+#' small to moderately large N when the objective is "variance" (random
+#' sampling performs better than the exchange method for objective =
+#' "distance").
 #'
 #' The random sampling approach may also incorporate a
 #' preclustering that prevents grouping very similar elements into the
-#' same anticluster. Preclustering (for the exact and random sampling approach)
+#' same anticluster (setting \code{preclustering = TRUE}. For large N,
+#' the preclustering tends to improve the
+#' quality of the solution because the random sampling is conducted on
+#' a restricted solution space that consists of rather good solutions.
+#' Preclustering (for the exact and random sampling approach)
 #' is performed by a call to \code{\link{balanced_clustering}} where the
 #' argument \code{K} is set to the number of elements divided by the
 #' number of anticlusters that are to be created (actually, this is not
