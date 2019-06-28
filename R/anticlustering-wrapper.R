@@ -226,7 +226,7 @@ anticlustering <- function(features = NULL, distances = NULL,
                                     objective, nrep = nrep, distances,
                                     categories, parallelize, seed,
                                     ncores = NULL))
-  } else if (method == "exchange") {
+  } else if (method == "exchange" || method == "heuristic") {
     return(exchange_method(features, distances, K, objective, categories))
   }
 }
@@ -288,7 +288,7 @@ input_handling_anticlustering <- function(features, distances,
   validate_input(nrep, "nrep", "numeric", len = 1, greater_than = 0,
                  must_be_integer = TRUE)
   validate_input(method, "method", len = 1,
-                 input_set = c("ilp", "sampling", "exchange"))
+                 input_set = c("ilp", "sampling", "exchange", "heuristic"))
   validate_input(objective, "objective", len = 1,
                  input_set = c("variance", "distance"))
 
