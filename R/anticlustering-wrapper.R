@@ -235,6 +235,8 @@ anticlustering <- function(features = NULL, distances = NULL,
                                     objective, nrep = nrep, distances,
                                     categories, parallelize, seed,
                                     ncores = NULL))
+  } else if (method == "exchange") {
+    return(exchange_method(features, distances, K, objective, categories))
   }
 }
 
@@ -290,7 +292,7 @@ input_handling_anticlustering <- function(features, distances,
   validate_input(nrep, "nrep", "numeric", len = 1, greater_than = 0,
                  must_be_integer = TRUE)
   validate_input(method, "method", len = 1,
-                 input_set = c("ilp", "heuristic"))
+                 input_set = c("ilp", "heuristic", "exchange"))
   validate_input(objective, "objective", len = 1,
                  input_set = c("variance", "distance"))
 
@@ -310,7 +312,7 @@ input_handling_anticlustering <- function(features, distances,
     if (solver == FALSE) {
         stop("\n\nAn exact solution was requested, but none of the linear ",
              "programming \npackages 'Rglpk', 'gurobi', or 'Rcplex' is ",
-             "available. \n\nTry `method = 'heuristic'` or install ",
+             "available. \n\nTry `method = 'heuristic'`, `method = 'exchange'` or install ",
              "a linear programming solver \nto obtain an exact solution. ",
              "For example, install the GNU linear \nprogramming kit: \n\n",
              "- On windows, visit ",
@@ -327,7 +329,7 @@ input_handling_anticlustering <- function(features, distances,
 
   if (objective == "variance" && method == "ilp") {
     stop("You cannot use integer linear programming method to maximize the variance criterion. ",
-         "Use objective = 'distance' or method = 'heuristic' instead")
+         "Use objective = 'distance', method = 'sampling', or method = 'exchange' instead")
   }
 
   if (!argument_exists(features) && !argument_exists(distances)) {
