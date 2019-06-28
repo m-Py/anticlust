@@ -3,7 +3,6 @@
 export(anticlustering)
 export(balanced_clustering)
 export(distance_objective)
-export(exchange_method)
 export(plot_clusters)
 export(variance_objective)
 importFrom(Matrix,sparseMatrix)
