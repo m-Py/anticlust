@@ -16,7 +16,7 @@
 #'
 
 parallel_sampling <- function(dat, K, objective, nrep, sampling_plan,
-                              use_distances, seed, ncores = NULL) {
+                              obj_function, seed, ncores = NULL) {
   if (!argument_exists(ncores)) {
     ncores <- parallel::detectCores() - 1
   }
@@ -36,21 +36,14 @@ parallel_sampling <- function(dat, K, objective, nrep, sampling_plan,
     objective = objective,
     nrep = reps_per_cluster,
     sampling_plan = sampling_plan,
-    use_distances = use_distances
+    obj_function = obj_function
   )
   on.exit(parallel::stopCluster(cl))
 
-  if (objective == "distance" && use_distances == TRUE) {
-    obj_value <- distance_objective_
-  } else if (objective == "distance" && use_distances == FALSE) {
-    obj_value <- obj_value_distance
-  } else {
-    obj_value <- variance_objective_
-  }
-
+  ## Compute objectives for the best values of each core:
   objectives <- lapply(
     assignments,
-    FUN = obj_value,
+    FUN = obj_function,
     data = dat[, -(1:2), drop = FALSE]
   )
   best_obj <- which.max(objectives)
@@ -59,8 +52,8 @@ parallel_sampling <- function(dat, K, objective, nrep, sampling_plan,
 
 # Make random_sampling usable for lapply (additional argument x)
 lapply_random_samling <- function(x, dat, K, objective, nrep, sampling_plan,
-                                use_distances) {
+                                  obj_function) {
   random_sampling(dat, K, objective, nrep, sampling_plan,
-                  use_distances)
+                  obj_function)
 }
 
