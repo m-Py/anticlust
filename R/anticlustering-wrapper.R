@@ -1,7 +1,7 @@
 
 #' Anticlustering
 #'
-#' Create equal sized groups of elements (anticlusters) that are as
+#' Create equally-sized groups of elements (anticlusters) that are as
 #' similar as possible.
 #'
 #' @param features A numeric vector, matrix or data.frame of data points.
@@ -20,7 +20,7 @@
 #'     "distance" (default) is used to optimize the anticluster
 #'     editing objective; the option "variance" is used to optimize
 #'     the k-means anticlustering objective. See details.
-#' @param method One of "heuristic" or "ilp". See details.
+#' @param method One of "exchange", "sampling" or "ilp". See details.
 #' @param preclustering Boolean, should a preclustering be conducted
 #'     before anticlusters are created? Defaults to \code{FALSE} See
 #'     details.
@@ -32,13 +32,12 @@
 #'     not via \code{distances}.
 #' @param nrep The number of repetitions for the random sampling
 #'     heuristic. This argument only has an effect if \code{method}
-#'     is \code{"heuristic"}. It does not have an effect if
-#'     \code{method} is \code{"ilp"}.
+#'     is \code{"sampling"}.
 #' @param categories A vector, data.frame or matrix representing
 #'     one or several categorical constraints. These grouping
 #'     variables are balanced out across anticlusters. Currently
 #'     this functionality is only available in combination with the
-#'     heuristic random sampling method and not with the ILP approach. If
+#'     sampling and exchange method but not with the ILP approach. If
 #'     categorical contraints are employed, the value of the argument
 #'     \code{preclustering} will be ignored (that is, there will be no
 #'     preclustering).
@@ -272,14 +271,19 @@ input_handling_anticlustering <- function(features, distances,
   ## Validate feature input
   if (argument_exists(features)) {
     if (sum(!complete.cases(features)) >= 1) {
-      warning("There NAs in your data, take care!")
+      warning("There are NAs in your data, take care!")
     }
     features <- as.matrix(features)
     validate_input(features, "features", objmode = "numeric")
     validate_input(K, "K", "numeric", len = 1,
                    greater_than = 1, must_be_integer = TRUE)
     if (nrow(features) %% K != 0) {
-      stop("K must be a divider of the number of elements.")
+      if (method == "ilp") {
+        stop("K must be a divider of the number of elements with the ILP method. (Try out method = 'exchange' or method = 'sampling'.)")
+      }
+      if (preclustering == TRUE) {
+        stop("K must be a divider of the number of elements with preclustering. (Try out preclustering = FALSE.)")
+      }
     }
   }
 
