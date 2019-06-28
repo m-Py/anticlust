@@ -72,11 +72,11 @@ test_that("distance input works for heuristic without preclustering", {
 
     set.seed(rnd_seed)
     ac_feat <- anticlustering(features, K = K, preclustering = FALSE,
-                              method = "heuristic", standardize = FALSE,
+                              method = "sampling", standardize = FALSE,
                               nrep = 100)
     set.seed(rnd_seed)
     ac_dist <- anticlustering(distances = distances, K = K, preclustering = FALSE,
-                              method = "heuristic", standardize = FALSE,
+                              method = "sampling", standardize = FALSE,
                               nrep = 100)
 
     expect_equal(distance_objective_(ac_feat, dist(features)),
@@ -100,11 +100,11 @@ test_that("distance input works for heuristic with preclustering", {
     set.seed(rnd_seed)
     ## does not work with distance criterion
     ac_feat <- anticlustering(features, K = K, preclustering = TRUE,
-                              method = "heuristic", standardize = FALSE,
+                              method = "sampling", standardize = FALSE,
                               nrep = 100)
     set.seed(rnd_seed)
     ac_dist <- anticlustering(distances = distances, K = K, preclustering = TRUE,
-                              method = "heuristic", standardize = FALSE,
+                              method = "sampling", standardize = FALSE,
                               nrep = 100)
 
     expect_equal(distance_objective_(ac_feat, dist(features)),
@@ -123,8 +123,8 @@ test_that("distance input works for clustering function, heuristic method", {
     distances <- dist(features)
 
     ## does not work with distance criterion
-    ac_feat <- balanced_clustering(features, K = K, method = "heuristic", standardize = FALSE)
-    ac_dist <- balanced_clustering(distances = distances, K = K, method = "heuristic", standardize = FALSE)
+    ac_feat <- balanced_clustering(features, K = K, method = "sampling", standardize = FALSE)
+    ac_dist <- balanced_clustering(distances = distances, K = K, method = "sampling", standardize = FALSE)
 
     expect_equal(distance_objective_(ac_feat, dist(features)),
                  distance_objective_(ac_feat, distances))

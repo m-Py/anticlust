@@ -72,7 +72,7 @@ test_that("heuristic anticlustering produces expected output", {
 
     ## Now anticlustering:
     # Test parallel and non-parallel anticlustering:
-    anticlusters <- heuristic_anticlustering(
+    anticlusters <- random_sampling(
       features = as.matrix(features),
       distances = NULL,
       K = p_anticlusters,
@@ -112,7 +112,7 @@ test_that("parallel heuristic anticlustering produces expected output", {
 
     ## Now anticlustering:
     # Test parallel and non-parallel anticlustering:
-    anticlusters <- heuristic_anticlustering(
+    anticlusters <- random_sampling(
       features = as.matrix(features),
       distances = NULL,
       K = p_anticlusters,

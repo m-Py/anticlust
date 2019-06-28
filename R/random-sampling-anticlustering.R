@@ -1,5 +1,5 @@
 
-#' Heuristic anticlustering using random search methods
+#' Heuristic anticlustering using random sampling
 #'
 #' @param features A data.frame, matrix or vector representing the
 #'     features that are used.
@@ -34,9 +34,9 @@
 #' @noRd
 #'
 
-heuristic_anticlustering <- function(features, K, preclusters, objective,
-                                     nrep, distances, categories,
-                                     parallelize, seed, ncores = NULL) {
+random_sampling <- function(features, K, preclusters, objective,
+                            nrep, distances, categories,
+                            parallelize, seed, ncores = NULL) {
 
   ## Determine objective function to be used
   categories <- merge_into_one_variable(categories) # may be NULL
@@ -59,7 +59,7 @@ heuristic_anticlustering <- function(features, K, preclusters, objective,
     if (argument_exists(seed)) {
       set.seed(seed)
     }
-    best_assignment <- random_sampling(
+    best_assignment <- random_sampling_(
       dat,
       K,
       objective,
@@ -188,7 +188,7 @@ sort_by_group <- function(features, distances, preclusters, categories) {
 #' @noRd
 #'
 
-random_sampling <- function(dat, K, objective, nrep, sampling_plan,
+random_sampling_ <- function(dat, K, objective, nrep, sampling_plan,
                             obj_function) {
 
   ## Initialize variables
