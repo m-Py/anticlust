@@ -229,30 +229,30 @@ anticlustering <- function(features = NULL, distances = NULL,
   if (method == "ilp") {
     return(exact_anticlustering(distances, K, solver_available(),
                                 preclustering))
+  } else if (method == "heuristic") {
+    preclusters <- get_preclusters(categories, preclustering, features, distances, K, objective)
+    return(heuristic_anticlustering(features, K, preclusters,
+                                    objective, nrep = nrep, distances,
+                                    categories, parallelize, seed,
+                                    ncores = NULL))
   }
-
-  ## Heuristic method - possibly using preclustering
-  preclusters <- NULL
-  if (preclustering == TRUE) {
-    n_preclusters <- nrow(features) / K
-    if (objective == "distance" && K == 2) {
-      preclusters <- greedy_matching(distances)
-    } else if (objective == "distance" && K > 2) {
-      preclusters <- greedy_balanced_k_clustering(distances, K)
-    }
-    else if (objective == "variance") {
-      preclusters <- equal_sized_kmeans(features, n_preclusters)
-    }
-  }
-  if (argument_exists(categories)) {
-    ## categorical constraints cannot be used with preclustering
-    preclusters <- NULL
-  }
-  heuristic_anticlustering(features, K, preclusters,
-                           objective, nrep = nrep, distances,
-                           categories, parallelize, seed, ncores = NULL)
 }
 
+## Extracted function that computes the preclusters. May return NULL.
+get_preclusters <- function(categories, preclustering, features, distances, K, objective) {
+  if (argument_exists(categories) || preclustering == FALSE) {
+    return(NULL) # categorical constraints cannot be used with preclustering
+  }
+  if (objective == "distance" && K == 2) {
+    preclusters <- greedy_matching(distances)
+  } else if (objective == "distance" && K > 2) {
+    preclusters <- greedy_balanced_k_clustering(distances, K)
+  } else if (objective == "variance") {
+    n_preclusters <- nrow(features) / K
+    preclusters <- equal_sized_kmeans(features, n_preclusters)
+  }
+  preclusters
+}
 
 #' Validating the arguments passed to `anticlustering`
 #'
