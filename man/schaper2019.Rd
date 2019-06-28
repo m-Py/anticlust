@@ -31,12 +31,8 @@ Bayen (2019; in press).
 }
 \examples{
 
+head(schaper2019)
 features <- schaper2019[, 3:6]
-head(features)
-# This command scales all features to have a similar range:
-features <- apply(features, 2, function(x) x / max(x))
-head(features)
-
 
 # Optimize the variance criterion
 # (tends to maximize similarity in feature means)
@@ -45,8 +41,7 @@ anticlusters <- anticlustering(
   K = 3,
   objective = "variance",
   categories = schaper2019$room,
-  seed = 625,
-  nrep = 1000 # increase for better results
+  method = "exchange"
 )
 
 # Means are quite similar across sets:
