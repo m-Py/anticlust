@@ -28,6 +28,9 @@ Minor changes:
 
 - The "variance" criterion can now be computed when there are missing 
   values in the input data.
+- In `plot_clusters`, it is now possible to adjust the size of the 
+  cluster centroid using the new argument `cex_centroid`
+  
 
 # anticlust 0.2.6
 
