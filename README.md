@@ -35,11 +35,11 @@ anticlusters <- anticlustering(
 ## Look at the output: Per element in the iris data set, I obtain 
 ## a group affiliation:
 anticlusters
-#>   [1] 3 3 3 2 3 2 3 2 1 1 2 1 1 3 1 2 1 1 2 1 2 2 3 2 2 1 2 1 3 2 2 2 1 1 1
-#>  [36] 3 3 3 3 1 3 1 3 2 2 1 2 3 1 3 3 3 1 3 3 1 2 3 1 3 1 1 2 1 2 3 3 3 2 3
-#>  [71] 1 2 2 1 3 3 1 1 1 2 3 2 2 2 1 3 3 2 1 1 3 1 2 2 2 2 3 1 1 2 2 2 3 1 2
-#> [106] 2 3 3 1 3 2 3 3 3 1 2 1 3 1 3 3 2 2 1 1 3 3 1 1 2 2 3 3 2 1 1 2 2 3 3
-#> [141] 1 1 1 1 3 2 2 2 1 2
+#>   [1] 3 2 3 2 3 1 3 2 3 2 1 2 1 3 3 2 3 3 2 1 1 1 3 1 1 2 1 1 2 1 2 1 2 2 2
+#>  [36] 3 2 3 3 2 3 1 3 1 1 1 1 3 2 2 2 2 1 3 3 1 3 2 3 3 1 3 2 2 3 3 1 1 2 1
+#>  [71] 1 3 2 2 1 1 2 1 1 1 2 2 3 1 2 1 1 1 3 3 2 3 3 1 3 2 2 2 3 3 2 2 2 3 3
+#> [106] 3 2 2 2 2 3 3 2 2 3 3 3 3 1 3 2 2 1 1 1 3 1 1 3 1 3 3 1 1 3 3 2 1 1 3
+#> [141] 2 2 1 2 1 1 2 2 1 1
 
 ## Compare the feature means by anticluster:
 by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
@@ -49,7 +49,7 @@ by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
 #> -------------------------------------------------------- 
 #> anticlusters: 2
 #> Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
-#>         5.85         3.06         3.76         1.20 
+#>         5.84         3.05         3.76         1.20 
 #> -------------------------------------------------------- 
 #> anticlusters: 3
 #> Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
@@ -124,40 +124,71 @@ illustrates maximizing and minimizing both objectives:
 
 ``` r
 
-features <- matrix(rnorm(20), ncol = 2)
-anticlusters_dist <- anticlustering(
-  features, 
-  K = 2,
-  method = "ilp",
-  objective = "distance"
-)
-## anticlust can also be used for cluster analysis:
-clusters_dist <- balanced_clustering( 
-  features, 
-  K = 2,
-  method = "ilp",
-  objective = "distance"
+## Create N random elements:
+N <- 12
+features <- matrix(sample(N * 2, replace = TRUE), ncol = 2)
+K <- 2
+
+## Generate all possible partitions to divide N items in K sets:
+partitions <- generate_partitions(K, N)
+length(partitions) # number of possible partitions
+#> [1] 462
+
+## Create an objective function that takes the partition
+## as first argument (then, we can use sapply to compute
+## the objective for each partition)
+var_obj <- function(clusters, features) {
+  variance_objective(features, clusters)
+}
+
+dist_obj <- function(clusters, features) {
+  distance_objective(features, clusters = clusters)
+}
+
+var_objectives <- sapply(
+  partitions,
+  FUN = var_obj,
+  features = features
 )
 
-anticlusters_var <- anticlustering(
-  features, 
-  K = 2,
-  method = "exchange",
-  objective = "variance"
-)
-## anticlust can also be used for cluster analysis:
-clusters_var <- balanced_clustering( 
-  features, 
-  K = 2,
-  method = "heuristic",
-  objective = "variance"
+dist_objectives <- sapply(
+  partitions,
+  FUN = dist_obj,
+  features = features
 )
 
+## Select the best partitions:
+max_var <- partitions[var_objectives == max(var_objectives)][[1]]
+min_var <- partitions[var_objectives == min(var_objectives)][[1]]
+max_dist <- partitions[dist_objectives == max(dist_objectives)][[1]]
+min_dist <- partitions[dist_objectives == min(dist_objectives)][[1]]
+
+## Plot minimum and maximum objectives:
 par(mfrow = c(2, 2))
-plot_clusters(features, anticlusters_dist, within_connection = TRUE, xlab = "", ylab = "")
-plot_clusters(features, clusters_dist, within_connection = TRUE, xlab = "", ylab = "")
-plot_clusters(features, anticlusters_var, illustrate_variance = TRUE, xlab = "", ylab = "")
-plot_clusters(features, clusters_var, illustrate_variance = TRUE, xlab = "", ylab = "")
+plot_clusters(
+  features,
+  max_var,
+  illustrate_variance = TRUE,
+  main = "Maximum variance"
+)
+plot_clusters(
+  features,
+  min_var,
+  illustrate_variance = TRUE,
+  main = "Minimum variance"
+)
+plot_clusters(
+  features,
+  max_dist,
+  within_connection = TRUE,
+  main = "Maximum distance"
+)
+plot_clusters(
+  features,
+  min_dist,
+  within_connection = TRUE,
+  main = "Minimum distance"
+)
 ```
 
 <img src="inst/README_files/figure-gfm/unnamed-chunk-2-1.png" style="display: block; margin: auto;" />
@@ -308,7 +339,7 @@ Böcker, Sebastian, and Jan Baumbach. 2013. “Cluster Editing.” In
 
 Böcker, Sebastian, Sebastian Briesemeister, and Gunnar W Klau. 2011.
 “Exact Algorithms for Cluster Editing: Evaluation and Experiments.”
-*Algorithmica* 60 (2). Springer: 316–34.
+*Algorithmica* 60 (2): 316–34.
 
 </div>
 
@@ -316,14 +347,14 @@ Böcker, Sebastian, Sebastian Briesemeister, and Gunnar W Klau. 2011.
 
 Grötschel, Martin, and Yoshiko Wakabayashi. 1989. “A Cutting Plane
 Algorithm for a Clustering Problem.” *Mathematical Programming* 45
-(1-3). Springer: 59–96.
+(1-3): 59–96.
 
 </div>
 
 <div id="ref-jain2010">
 
 Jain, Anil K. 2010. “Data Clustering: 50 Years Beyond K-Means.” *Pattern
-Recognition Letters* 31 (8). Elsevier: 651–66.
+Recognition Letters* 31 (8): 651–66.
 
 </div>
 
@@ -331,7 +362,7 @@ Recognition Letters* 31 (8). Elsevier: 651–66.
 
 Miyauchi, Atsushi, and Noriyoshi Sukegawa. 2015. “Redundant Constraints
 in the Standard Formulation for the Clique Partitioning Problem.”
-*Optimization Letters* 9 (1). Springer: 199–207.
+*Optimization Letters* 9 (1): 199–207.
 
 </div>
 

@@ -135,40 +135,70 @@ minimizing both objectives:
 
 ```{r}
 
-features <- matrix(rnorm(20), ncol = 2)
-anticlusters_dist <- anticlustering(
-  features, 
-  K = 2,
-  method = "ilp",
-  objective = "distance"
-)
-## anticlust can also be used for cluster analysis:
-clusters_dist <- balanced_clustering( 
-  features, 
-  K = 2,
-  method = "ilp",
-  objective = "distance"
+## Create N random elements:
+N <- 12
+features <- matrix(sample(N * 2, replace = TRUE), ncol = 2)
+K <- 2
+
+## Generate all possible partitions to divide N items in K sets:
+partitions <- generate_partitions(K, N)
+length(partitions) # number of possible partitions
+
+## Create an objective function that takes the partition
+## as first argument (then, we can use sapply to compute
+## the objective for each partition)
+var_obj <- function(clusters, features) {
+  variance_objective(features, clusters)
+}
+
+dist_obj <- function(clusters, features) {
+  distance_objective(features, clusters = clusters)
+}
+
+var_objectives <- sapply(
+  partitions,
+  FUN = var_obj,
+  features = features
 )
 
-anticlusters_var <- anticlustering(
-  features, 
-  K = 2,
-  method = "exchange",
-  objective = "variance"
-)
-## anticlust can also be used for cluster analysis:
-clusters_var <- balanced_clustering( 
-  features, 
-  K = 2,
-  method = "heuristic",
-  objective = "variance"
+dist_objectives <- sapply(
+  partitions,
+  FUN = dist_obj,
+  features = features
 )
 
+## Select the best partitions:
+max_var <- partitions[var_objectives == max(var_objectives)][[1]]
+min_var <- partitions[var_objectives == min(var_objectives)][[1]]
+max_dist <- partitions[dist_objectives == max(dist_objectives)][[1]]
+min_dist <- partitions[dist_objectives == min(dist_objectives)][[1]]
+
+## Plot minimum and maximum objectives:
 par(mfrow = c(2, 2))
-plot_clusters(features, anticlusters_dist, within_connection = TRUE, xlab = "", ylab = "")
-plot_clusters(features, clusters_dist, within_connection = TRUE, xlab = "", ylab = "")
-plot_clusters(features, anticlusters_var, illustrate_variance = TRUE, xlab = "", ylab = "")
-plot_clusters(features, clusters_var, illustrate_variance = TRUE, xlab = "", ylab = "")
+plot_clusters(
+  features,
+  max_var,
+  illustrate_variance = TRUE,
+  main = "Maximum variance"
+)
+plot_clusters(
+  features,
+  min_var,
+  illustrate_variance = TRUE,
+  main = "Minimum variance"
+)
+plot_clusters(
+  features,
+  max_dist,
+  within_connection = TRUE,
+  main = "Maximum distance"
+)
+plot_clusters(
+  features,
+  min_dist,
+  within_connection = TRUE,
+  main = "Minimum distance"
+)
 
 ```
 
