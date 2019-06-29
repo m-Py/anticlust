@@ -3,26 +3,95 @@
 #'
 #' @param K How many partitions
 #' @param N The total N. \code{K} has to be dividble
-#'     by distinct.
+#'     by \code{N}.
 #' @param generate_permutations If TRUE, all permutations are returned,
 #'     resulting in duplicate partitions.
 #'
-#' @param A list of all partitions.
+#' @param A list of all partitions (or permutations if
+#' \code{generate_permutations} is \code{TRUE}).
+#'
+#' @details
+#'
+#' In principle, anticlustering can be solved to optimality by
+#' generating all possible partitions of N items in K groups.
+#' The example code below illustrates how to do this.
+#' However, this approach only works for small N because the
+#' number of partitions grows exponentially with N.
+#'
+#' The partition c(1, 1, 2, 2)
+#' is the same as the partition c(2, 2, 1, 1) but they correspond
+#' to different permutations. If the argument
+#' \code{generate_permutations} is \code{TRUE}, all permutations are
+#' returned. To solve balanced anticlustering, we only need to
+#' look at all partitions, not at all permutations.
 #'
 #' @examples
 #'
-#' start <- Sys.time()
-#' partitions <- generate_partitions(2, 10)
-#' intermediate <- Sys.time()
-#' permutations <- generate_partitions(2, 10, TRUE)
-#' end <- Sys.time()
-#' intermediate - start
-#' end - intermediate
+#' ## Generate all partitions to solve k-means anticlustering
+#' ## to optimality.
 #'
-#' @noRd
+#' N <- 14
+#' K <- 2
+#' features <- matrix(sample(N * 2, replace = TRUE), ncol = 2)
+#' partitions <- generate_partitions(K, N)
+#' length(partitions) # number of possible partitions
+#'
+#' ## Create an objective function that takes the partition
+#' ## as first argument (then, we can use sapply to compute
+#' ## the objective for each partition)
+#' var_obj <- function(clusters, features) {
+#'   variance_objective(features, clusters)
+#' }
+#'
+#' all_objectives <- sapply(
+#'   partitions,
+#'   FUN = var_obj,
+#'   features = features
+#' )
+#'
+#' ## Check out distribution of the objective over all partitions:
+#' hist(all_objectives) # many large, few low objectives
+#' ## Get best k-means anticlustering objective:
+#' best_obj <- max(all_objectives)
+#' ## It is possible that there are multiple best solutions:
+#' sum(all_objectives == best_obj)
+#' ## Select one best partition:
+#' best_anticlustering <- partitions[all_objectives == best_obj][[1]]
+#' ## Look at mean for each partition:
+#' by(features, best_anticlustering, function(x) round(colMeans(x), 2))
+#'
+#'
+#' ## Get best k-means clustering objective:
+#' min_obj <- min(all_objectives)
+#' sum(all_objectives == min_obj)
+#' ## Select one best partition:
+#' best_clustering <- partitions[all_objectives == min_obj][[1]]
+#'
+#' ## Plot minimum and maximum objectives:
+#' par(mfrow = c(1, 2))
+#' plot_clusters(
+#'   features,
+#'   best_anticlustering,
+#'   illustrate_variance = TRUE,
+#'   main = "Maximum variance"
+#' )
+#' plot_clusters(
+#'   features,
+#'   best_clustering,
+#'   illustrate_variance = TRUE,
+#'   main = "Minimum variance"
+#' )
+#' par(mfrow = c(1, 1))
+#'
+#'
+#'
+#' @export
 #'
 
 generate_partitions <- function(K, N, generate_permutations = FALSE) {
+  if (N %% K != 0) {
+    stop("K must be a divider of N.")
+  }
   partitions <- 1:K
   init <- rep(partitions, each = N / K)
   anticlusters <- init
