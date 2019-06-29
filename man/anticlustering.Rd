@@ -85,21 +85,20 @@ two objective functions:
   "distance"}
 
 The k-means objective maximizes the variance within anticlusters
-(see \code{\link{variance_objective}}), which tends to make the feature
-means similar. The cluster editing
+(see \code{\link{variance_objective}}), which tends to make the mean
+values of the input features similar. The cluster editing
 objective maximizes the sum of pairwise distances within
 anticlusters (see \code{\link{distance_objective}}). This way, the total
-similarity between elements in different sets is maximized, not just
-the means of the items' features. Maximizing
-either the cluster editing or the k-means objective is used to create similar groups;
+average similarity between elements in different sets is maximized. Maximizing
+the clustering objectives is used to create similar groups;
 minimization of the same objectives leads to a clustering, i.e.,
 elements are as similar as possible within a set and as different
 as possible between sets. (Such a clustering is also possible with the function
-\code{\link{balanced_clustering}}).
+\code{\link{balanced_clustering}}.)
 
 If the argument \code{features} is passed together with
-\code{objective = "distance"}, the Euclidean distance between
-elements is computed as the basic unit of the anticluster editing
+\code{objective = "distance"}, the Euclidean distance is computed
+as the basic unit of the anticluster editing
 objective. If another measure of dissimilarity is preferred, you
 may pass a self-generated dissimiliarity matrix via the argument
 \code{distances}.
@@ -124,29 +123,34 @@ To relax the optimality condition, it is possible to set the
 argument \code{preclustering = TRUE}. In this case, the anticluster
 editing objective is still optimized using integer linear
 programming, but a preprocessing forbids very similar elements to
-be assigned to the same anticluster. This approach can be used to
+be assigned to the same anticluster. Therefore, the size of the solution
+space is reduced drastically. The preclustering approach can therefore be used to
 work on larger problem instances and the solution is usually still
 optimal or very close to optimal.
+
+The variance criterion cannot be solved to optimality using integer
+linear programming; however, it is possible to employ the function
+\code{\link{generate_partitions}} to obtain optimal solutions for
+small problem instances.
 
 \strong{Heuristic anticlustering}
 
 In addition to the exact approach---that is only feasible for small
 N---the function employs two heuristic approaches. The
 first option is repeated random sampling: Across a specified
-number of runs, anticlusters are assigned randomly and the best
-assignment is returned. The second is the exchange method: From an
-initial anticluster assignment, items are swapped systematically in
-such a way that the similarity in each step by the largest amount that
-is possible (see Späth, 1986). Note that the total number of swaps grows
-quadratically with input size; the random sampling method is therefore
-recommended for large N. The exchange method is recommended for
-small to moderately large N when the objective is "variance" (random
-sampling performs better than the exchange method for objective =
-"distance").
+number of runs, anticlusters are assigned randomly. In the end, the best
+assignment is returned. The second approach is an exchange method: Building on an
+initial random assignment, items are swapped systematically in
+such a way that each swap improves set similarity by the largest amount that
+is possible (cf. Späth, 1986). Random sampling is recommended when the objective
+is "distance" (cluster editing). The exchange method is recommended when
+the objective is "variance" (k-means). Note, however, that the total number
+of exchanges grows quadratically with input size; the random sampling
+method is therefore generally recommended for large N.
 
 The random sampling approach may also incorporate a
 preclustering that prevents grouping very similar elements into the
-same anticluster (setting \code{preclustering = TRUE}. For large N,
+same anticluster (setting \code{preclustering = TRUE}). For large N (> 100),
 the preclustering tends to improve the
 quality of the solution because the random sampling is conducted on
 a restricted solution space that consists of rather good solutions.
@@ -218,4 +222,13 @@ for cluster editing: Evaluation and experiments. Algorithmica, 60,
 
 Späth, H. (1986). Anticlustering: Maximizing the variance criterion.
 Control and Cybernetics, 15, 213-218.
+}
+\seealso{
+\code{\link{variance_objective}}
+
+\code{\link{distance_objective}}
+
+\code{\link{balanced_clustering}}
+
+\code{\link{generate_partitions}}
 }
