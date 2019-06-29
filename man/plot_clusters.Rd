@@ -9,7 +9,7 @@ plot_clusters(features, clustering, within_connection = FALSE,
   show_axes = FALSE, xlab = NULL, ylab = NULL, xlim = NULL,
   ylim = NULL, col = NULL, pch = 19, main = "", cex = 1.2,
   cex.axis = 1.2, cex.lab = 1.2, lwd = 1.5, lty = 2,
-  frame.plot = FALSE)
+  frame.plot = FALSE, cex_centroid = 2)
 }
 \arguments{
 \item{features}{A data.frame or matrix representing the features that
@@ -64,6 +64,9 @@ each cluster has a different plotting symbol.}
 
 \item{frame.plot}{a logical indicating whether a box should be drawn
 around the plot.}
+
+\item{cex_centroid}{The size of the cluster center symbol (has an
+effect only if \code{illustrate_variance} is \code{TRUE})}
 }
 \description{
 Visualize a cluster analysis
