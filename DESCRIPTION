@@ -1,7 +1,7 @@
 Package: anticlust
 Type: Package
 Title: Create similar groups using anticlustering
-Version: 0.2.6
+Version: 0.2.7
 Authors@R: person("Papenberg", "Martin", email = "martin.papenberg@hhu.de",
   role = c("aut", "cre"))
 Description: Anticlustering establishes groups of elements (i.e., 
