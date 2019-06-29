@@ -1,4 +1,34 @@
 
+# anticlust 0.2.7
+
+A bigger update:
+
+- A new algorithm for anticlustering is available: the exchange method.
+  It is based on investigating the "neighborhood" of a given partition and
+  swapping the anticlusters of two elements. The neighborhood is defined 
+  as all possible swaps with elements in the other groups. The swap that 
+  improves the objective the most across all possible swaps is made.
+  This method outperforms the random sampling heuristic for k-means 
+  anticlustering but it has quadratic run time. For anticluster editing, 
+  the random sampling approach is better than the exchange method.
+  As there are two heuristic methods now (random sampling and exchange
+  method) the argument `method` of the function `anticlustering()`
+  now has the following three possible values: "sampling", "exchange", 
+  "ilp". In earlier versions, the two options were "heuristic" and "ilp"; 
+  hence this change possibly breaks earlier code.
+- A new function `generate_partitions` can be used to generate all
+  partitions, making it possible to solve anticlustering via complete
+  enumeration. In particular, it is now possible---for small
+  problem instances---to solve k-means anticlustering optimally, which
+  cannot be done with integer linear programming.  The help file 
+  (`?generate_partitions`) contains example code illustrating how to do 
+  this.
+
+Minor changes:
+
+- The "variance" criterion can now be computed when there are missing 
+  values in the input data.
+
 # anticlust 0.2.6
 
 2019-06-19
