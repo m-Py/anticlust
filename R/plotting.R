@@ -35,6 +35,8 @@
 #'    (see \code{\link{par}}).
 #' @param frame.plot a logical indicating whether a box should be drawn
 #'    around the plot.
+#' @param cex_centroid The size of the cluster center symbol (has an
+#'    effect only if \code{illustrate_variance} is \code{TRUE})
 #'
 #' @export
 #'
@@ -64,7 +66,7 @@ plot_clusters <- function(features, clustering, within_connection = FALSE,
                           xlim = NULL, ylim = NULL,
                           col = NULL, pch = 19, main = "", cex = 1.2,
                           cex.axis = 1.2, cex.lab = 1.2, lwd = 1.5,
-                          lty = 2, frame.plot = FALSE) {
+                          lty = 2, frame.plot = FALSE, cex_centroid = 2) {
   if (!argument_exists(xlim)) {
     xlim <- c(min(features[, 1]), max(features[, 1]))
   }
@@ -126,7 +128,7 @@ plot_clusters <- function(features, clustering, within_connection = FALSE,
     }
   }
   if (illustrate_variance) {
-    illustrate_variance(features, clustering, col, lwd, lty)
+    illustrate_variance(features, clustering, col, lwd, lty, cex_centroid)
   }
 }
 
@@ -179,7 +181,7 @@ draw_between_cliques <- function(x, y, assignment, lwd = 1.5,
   }
 }
 
-illustrate_variance <- function(features, clusters, cols, lwd, lty) {
+illustrate_variance <- function(features, clusters, cols, lwd, lty, cex_centroid) {
   K <- length(unique(clusters))
   centers <- cluster_centers(features, clusters)
   # only K colors; in the order implied by "clusters" so that the color
@@ -196,5 +198,6 @@ illustrate_variance <- function(features, clusters, cols, lwd, lty) {
       lty = lty
     )
   }
-  points(centers, cex = 6, pch = 24, col = "black", bg = cols, lwd = 7)
+  points(centers, cex = cex_centroid, pch = 24,
+         col = "black", bg = cols, lwd = cex_centroid + 1)
 }
