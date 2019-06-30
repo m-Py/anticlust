@@ -44,7 +44,7 @@ exchange_method_ <- function(data, K, obj_function, categories = NULL) {
                                 1, NULL, categories, FALSE,
                                 NULL, ncores = NULL)
   } else {
-    clusters <- rep_len(1:K, length.out = nrow(data))
+    clusters <- sample(rep_len(1:K, length.out = nrow(data)))
   }
 
   N <- nrow(data)
