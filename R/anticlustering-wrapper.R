@@ -17,31 +17,25 @@
 #'     dissimilarities.
 #' @param K How many anticlusters should be created.
 #' @param objective The objective to be maximized. The option
-#'     "distance" (default) maximizes the anticluster
-#'     editing objective; the option "variance" maximizes the k-means
-#'     objective. See details.
+#'     "distance" (default) maximizes the cluster
+#'     editing objective function; the option "variance" maximizes the k-means
+#'     objective function. See details.
 #' @param method One of "sampling" (default), "exchange", or "ilp".
 #'     See details.
-#' @param preclustering Boolean, should a preclustering be conducted
-#'     before anticlusters are created? Defaults to \code{FALSE} See
+#' @param preclustering Boolean. Should a preclustering be conducted
+#'     before anticlusters are created? Defaults to \code{FALSE}. See
 #'     details.
-#' @param standardize Boolean - should the features be standardized
+#' @param standardize Boolean. Should the features be standardized
 #'     before anticlusters are created? Defaults to \code{FALSE}.
 #'     Standardization is done using the function \code{\link{scale}}
 #'     using the default settings (mean = 0, SD = 1). This argument
 #'     only works when the input data is given via \code{features},
 #'     not via \code{distances}.
 #' @param nrep The number of repetitions for the random sampling
-#'     heuristic. Defaults to 10,000. This argument only has an effect
+#'     method. Defaults to 10,000. This argument only has an effect
 #'     if \code{method} is \code{"sampling"}.
 #' @param categories A vector, data.frame or matrix representing
-#'     one or several categorical constraints. These grouping
-#'     variables are balanced out across anticlusters. Currently
-#'     this functionality is only available in combination with the
-#'     random sampling and exchange method but not with the ILP approach. If
-#'     categorical contraints are employed, the value of the argument
-#'     \code{preclustering} will be ignored (that is, there will be no
-#'     preclustering).
+#'     one or several categorical constraints. See details.
 #' @param parallelize Boolean. Indicates whether multiple processors should
 #'     be used for the random sampling method. Defaults to \code{FALSE}.
 #' @param seed A value to fixate the random seed when using the random
@@ -69,13 +63,12 @@
 #' - cluster editing *distance* objective, setting \code{objective =
 #'   "distance"}
 #'
-#' The k-means objective maximizes the variance within anticlusters
-#' (see \code{\link{variance_objective}}), which tends to make the mean
-#' values of the input features similar. The cluster editing
+#' The k-means objective maximizes the variance within anticlusters---that
+#' is, the sum of the squared distances between each element and its cluster center
+#' (see \code{\link{variance_objective}}). The cluster editing
 #' objective maximizes the sum of pairwise distances within
-#' anticlusters (see \code{\link{distance_objective}}). This way, the total
-#' average similarity between elements in different sets is maximized. Maximizing
-#' the clustering objectives is used to create similar groups;
+#' anticlusters (see \code{\link{distance_objective}}). Maximizing
+#' either clustering objective will create create similar groups;
 #' minimization of the same objectives leads to a clustering, i.e.,
 #' elements are as similar as possible within a set and as different
 #' as possible between sets. (Such a clustering is also possible with the function
@@ -94,7 +87,7 @@
 #' linear programming. To this end, set \code{method = "ilp"}. To
 #' obtain an optimal solution, a linear
 #' programming solver must be installed and usable from R. The
-#' `anticlust` package supports the open source GNU linear programming
+#' \code{anticlust} package supports the open source GNU linear programming
 #' kit (called from the package \code{Rglpk}) and the commercial
 #' solvers gurobi (called from the package \code{gurobi}) and IBM
 #' CPLEX (called from the package \code{Rcplex}). A license is needed
@@ -109,12 +102,12 @@
 #' editing objective is still optimized using integer linear
 #' programming, but a preprocessing forbids very similar elements to
 #' be assigned to the same anticluster. Therefore, the size of the solution
-#' space is reduced drastically. The preclustering approach can therefore be used to
-#' work on larger problem instances and the solution is usually still
-#' optimal or very close to optimal.
+#' space is reduced and the ILP approach can be used to
+#' work on larger problem instances while the solution is usually optimal
+#' or very close to optimal.
 #'
 #' The variance criterion cannot be solved to optimality using integer
-#' linear programming; however, it is possible to employ the function
+#' linear programming. However, it is possible to employ the function
 #' \code{\link{generate_partitions}} to obtain optimal solutions for
 #' small problem instances.
 #'
@@ -122,18 +115,23 @@
 #'
 #' In addition to the exact approach---that is only feasible for small
 #' N---the function employs two heuristic approaches. The
-#' first option is repeated random sampling: Across a specified
-#' number of runs, anticlusters are assigned randomly. In the end, the best
-#' assignment is returned. The second approach is an exchange method: Building on an
-#' initial random assignment, items are swapped systematically in
+#' first option is repeated random sampling (\code{method = "sampling"}):
+#' Across a specified
+#' number of runs, each element is assigned to an anticluster at random and the objective
+#' value associated with this assignment is computed. In the end,
+#' the best assignment---the assignment that maximized the objective
+#' function---is returned.
+#' The second heuristic is the exchange method
+#' (\code{method = "exchange"}): Building on an
+#' initial random assignment, elements are swapped between anticlusters in
 #' such a way that each swap improves set similarity by the largest amount that
-#' is possible (cf. Späth, 1986). Random sampling is recommended when the objective
-#' is "distance" (cluster editing). The exchange method is recommended when
-#' the objective is "variance" (k-means). Note, however, that the total number
-#' of exchanges grows quadratically with input size. Setting
+#' is possible in each situation (cf. Späth, 1986). The swapping procedure is repeated for each
+#' element; because each possible swap is investigated for each element, the total number
+#' of exchanges grows quadratically with input size, rendering the exchange method unsuitable
+#' for large N. Setting
 #' \code{preclustering = TRUE} will limit the legal exchange partners to
 #' very similar elements, resulting in improved run time while preserving
-#' a rather good solution. This option is recommended for large N. For very
+#' a rather good solution. This option is recommended for larger N. For very
 #' large N, the random sampling method is the recommended approach.
 #'
 #' The random sampling approach may also incorporate a
@@ -142,7 +140,7 @@
 #' the preclustering tends to improve the
 #' quality of the solution because the random sampling is conducted on
 #' a restricted solution space that consists of rather good solutions.
-#' Preclustering (for the exact and random sampling approach)
+#' Preclustering (for the exact and heuristic approaches)
 #' is performed by a call to \code{\link{balanced_clustering}} where the
 #' argument \code{K} is set to the number of elements divided by the
 #' number of anticlusters that are to be created (actually, this is not
@@ -159,6 +157,24 @@
 #' \code{\link[parallel]{clusterSetRNGStream}}; otherwise, the function
 #' \code{\link{set.seed}} is called.
 #'
+#' Random sampling is recommended when the objective
+#' is "distance" (cluster editing). The exchange method is recommended when
+#' the objective is "variance" (k-means).
+#'
+#' \strong{Categorical constraints}
+#'
+#' The argument \code{categories} may induce categorical constraints.
+#' The grouping variables indicated by  \code{categories} will be balanced
+#' out across anticlusters. Currently,
+#' this functionality is only available in combination with the
+#' random sampling and exchange method, but not with the exact ILP approach. Note
+#' that for the random sampling method, it is \strong{not} possible to apply
+#' preclustering constraints and categorical constraints at the
+#' same time. Instead, the argument \code{preclustering} will be
+#' ignored (that is, there will be no preclustering). The exchange
+#' method will try to adhere to both preclustering and categorical
+#' constraints if \code{preclustering = TRUE} while giving priority to
+#' the categorical constraints.
 #'
 #'
 #' @seealso
