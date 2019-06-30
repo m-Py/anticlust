@@ -200,19 +200,19 @@ the categorical constraints.
 data(iris)
 head(iris[, -5]) # these features are made similar across sets
 
-# Optimize the variance criterion (create similar feature means)
+# Optimize the variance criterion using the exchange method
+# and preclustering
 anticlusters <- anticlustering(
   iris[, -5],
   K = 3,
   objective = "variance",
-  method = "exchange"
+  method = "exchange",
+  preclustering = TRUE
 )
 # Compare feature means by anticluster
 by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
 
 # Optimize the cluster editing objective using random sampling
-# (cluster editing maximizes total pairwise similarity of plants,
-# not just the feature means)
 anticlusters <- anticlustering(
   iris[, -5],
   K = 3,
