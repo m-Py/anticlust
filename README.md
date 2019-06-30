@@ -7,7 +7,8 @@ developed to assign items to experimental conditions in experimental
 psychology, but it can be applied whenever a user requires that a given
 set of elements has to be partitioned into similar subsets. Currently,
 the `anticlust` package offers the possibility to create subsets of
-equal size.
+equal size. The package is still under active developement; expect 
+changes and improvements before it will be submitted to CRAN.
 
 ## Installation
 
