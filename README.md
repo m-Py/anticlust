@@ -4,9 +4,10 @@
 elements to sets in such a way that the sets are as similar as possible
 (Späth 1986; Valev 1998). The package `anticlust` was originally
 developed to assign items to experimental conditions in experimental
-psychology, but it can be applied whenever sets that are similar to each
-other are desired. Currently, the `anticlust` package offers the
-possibility to create similar sets of equal size.
+psychology, but it can be applied whenever a user requires that a given
+set of elements has to be partitioned into similar subsets. Currently,
+the `anticlust` package offers the possibility to create subsets of
+equal size.
 
 ## Installation
 
@@ -17,29 +18,34 @@ install_github("m-Py/anticlust")
 
 ## Example
 
-In the following example, I use the function `anticlustering()` to
-create three sets from the iris data set:
+In this initial example, I use the main function `anticlustering()` to
+create three similar sets of plants using the classical iris data set:
 
 ``` r
 # load the package via
 library("anticlust")
 
-# Optimize the variance criterion (create similar feature means)
 anticlusters <- anticlustering(
   iris[, -5],
   K = 3,
   objective = "variance",
-  method = "exchange",
-  categories = iris[, 5]
+  method = "exchange"
 )
-## Look at the output: Per element in the iris data set, I obtain 
-## a group affiliation:
+
+## The output is a vector that assigns a group (i.e, a number 
+## between 1 and K) to each input element:
 anticlusters
-#>   [1] 3 2 3 2 3 1 3 2 3 2 1 2 1 3 3 2 3 3 2 1 1 1 3 1 1 2 1 1 2 1 2 1 2 2 2
-#>  [36] 3 2 3 3 2 3 1 3 1 1 1 1 3 2 2 2 2 1 3 3 1 3 2 3 3 1 3 2 2 3 3 1 1 2 1
-#>  [71] 1 3 2 2 1 1 2 1 1 1 2 2 3 1 2 1 1 1 3 3 2 3 3 1 3 2 2 2 3 3 2 2 2 3 3
-#> [106] 3 2 2 2 2 3 3 2 2 3 3 3 3 1 3 2 2 1 1 1 3 1 1 3 1 3 3 1 1 3 3 2 1 1 3
-#> [141] 2 2 1 2 1 1 2 2 1 1
+#>   [1] 1 1 1 1 2 2 2 3 2 3 3 3 2 1 3 2 1 2 3 2 3 2 1 2 3 2 2 1 3 3 2 2 3 1 1
+#>  [36] 1 3 1 1 3 1 1 1 2 3 2 3 1 3 3 2 3 2 3 2 3 1 2 2 2 3 3 1 3 3 3 3 1 3 2
+#>  [71] 1 2 2 1 1 1 3 2 2 2 1 2 3 2 1 2 1 3 1 2 2 1 2 2 1 2 1 1 2 3 3 3 2 1 2
+#> [106] 2 3 3 3 2 3 3 3 3 3 1 2 2 1 1 1 1 2 1 3 1 1 2 1 3 1 1 2 3 3 1 2 1 1 1
+#> [141] 1 3 3 2 3 3 3 2 1 2
+
+## Each group has the same number of items:
+table(anticlusters)
+#> anticlusters
+#>  1  2  3 
+#> 50 50 50
 
 ## Compare the feature means by anticluster:
 by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
@@ -49,7 +55,7 @@ by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
 #> -------------------------------------------------------- 
 #> anticlusters: 2
 #> Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
-#>         5.84         3.05         3.76         1.20 
+#>         5.84         3.06         3.76         1.20 
 #> -------------------------------------------------------- 
 #> anticlusters: 3
 #> Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
@@ -88,13 +94,14 @@ read. More information is available via the following sources:
 
 ## A quick start
 
-We can use the function `anticlustering()` to create similar sets of
-elements. It takes as input a data table describing the elements that
-should be assigned to sets. In the data table, each row represents an
-element, for example a person, word or a photo. Each column is a numeric
-variable describing one of the elements’ features. The table may be an R
-`matrix` or `data.frame`; a single feature can also be passed as a
-`vector`. The number of groups is specified through the argument `K`.
+We illustrated in the example above, we can use the function
+`anticlustering()` to create similar sets of elements. The function
+takes as input a data table describing the elements that should be
+assigned to sets. In the data table, each row represents an element, for
+example a person, word or a photo. Each column is a numeric variable
+describing one of the elements’ features. The table may be an R `matrix`
+or `data.frame`; a single feature can also be passed as a `vector`. The
+number of groups is specified through the argument `K`.
 
 ### The anticlustering objective
 
@@ -106,97 +113,31 @@ analysis:
   - the cluster editing “distance” objective (Böcker and Baumbach 2013;
     Miyauchi and Sukegawa 2015; Grötschel and Wakabayashi 1989)
 
-The k-means objective is given by the sum of the squared errors between
-cluster centers and individual data points (Jain 2010). It was maximized
-in the example above, making the average of each feature similar between
-groups. The cluster editing objective is the sum of pairwise distances
-within anticlusters. This way, the total similarity between items in
-different sets is maximized, whereas the k-means variance objective
-tends to concentrate on the mean values.
-
-Maximizing either of the cluster editing or k-means objectives leads to
-similar groups, i.e., anticlusters. Minimization of the same objectives
-leads to a clustering, i.e., elements are as similar as possible within
-a set and as different as possible between sets. Thus, anticlustering is
-generally accomplished by maximizing the spread of the data in each
-group, whereas clustering minimizes the spread. The following code
-illustrates maximizing and minimizing both objectives:
-
-``` r
-
-## Create N random elements:
-N <- 12
-features <- matrix(sample(N * 2, replace = TRUE), ncol = 2)
-K <- 2
-
-## Generate all possible partitions to divide N items in K sets:
-partitions <- generate_partitions(K, N)
-length(partitions) # number of possible partitions
-#> [1] 462
-
-## Create an objective function that takes the partition
-## as first argument (then, we can use sapply to compute
-## the objective for each partition)
-var_obj <- function(clusters, features) {
-  variance_objective(features, clusters)
-}
-
-dist_obj <- function(clusters, features) {
-  distance_objective(features, clusters = clusters)
-}
-
-var_objectives <- sapply(
-  partitions,
-  FUN = var_obj,
-  features = features
-)
-
-dist_objectives <- sapply(
-  partitions,
-  FUN = dist_obj,
-  features = features
-)
-
-## Select the best partitions:
-max_var <- partitions[var_objectives == max(var_objectives)][[1]]
-min_var <- partitions[var_objectives == min(var_objectives)][[1]]
-max_dist <- partitions[dist_objectives == max(dist_objectives)][[1]]
-min_dist <- partitions[dist_objectives == min(dist_objectives)][[1]]
-
-## Plot minimum and maximum objectives:
-par(mfrow = c(2, 2))
-plot_clusters(
-  features,
-  max_var,
-  illustrate_variance = TRUE,
-  main = "Maximum variance"
-)
-plot_clusters(
-  features,
-  min_var,
-  illustrate_variance = TRUE,
-  main = "Minimum variance"
-)
-plot_clusters(
-  features,
-  max_dist,
-  within_connection = TRUE,
-  main = "Maximum distance"
-)
-plot_clusters(
-  features,
-  min_dist,
-  within_connection = TRUE,
-  main = "Minimum distance"
-)
-```
+The k-means objective is given by the sum of the squared distances
+between cluster centers and individual data points (Jain 2010). The
+cluster editing objective is the sum of pairwise distances within each
+anticluster. The following plot illustrates both objectives for 12 that
+are assigned to three sets; each element is described by two numeric
+features, displayed as the x- and
+y-axis:
 
 <img src="inst/README_files/figure-gfm/unnamed-chunk-2-1.png" style="display: block; margin: auto;" />
 
-To vary the objective function, we may change the parameter `objective`.
-To apply anticluster editing, use `objective = "distance"`, which is
-also the default. To maximize the k-means variance objective, set
-`objective = "variance"`.
+The lines connecting the dots illustrate the distances that enter the
+objective functions. For anticluster editing (“distance” objective),
+lines are drawn between pairs of elements within the same anticluster.
+For k-means anticlustering (“variance” objective), lines are drawn
+between each element and the cluster centroid. Minimization creates two
+distinct clusters of elements, whereas maximization leads to a strong
+overlap of the three sets. When we use the objectives for the
+anticlustering application, the distance objective maximizes the average
+similarity between elements in different sets, whereas the k-means
+objective tends to maximize the similarity of the cluster centers.
+
+To vary the objective function in the package `anticlust`, we may change
+the parameter `objective`. To apply anticluster editing, use `objective
+= "distance"` (this is also the default). To maximize the k-means
+variance objective, set `objective = "variance"`.
 
 ``` r
 
@@ -238,7 +179,7 @@ the software gurobi),
 [Rglpk](https://CRAN.R-project.org/package=Rglpk) must also be
 installed.
 
-To find the optimal solution, we have to set the arguments `method =
+To find the optimal solution, we have to set the argument `method =
 "ilp"`:
 
 ``` r
@@ -251,30 +192,33 @@ anticlustering(
 )
 ```
 
+The “variance” objective cannot by optimized to optimality using integer
+linear programming. Check out the help page for the `anticlust` function
+`generate_partitions` (`?generate_partitions`) to see how k-means
+anticlustering can nevertheless be solved optimally using complete
+enumeration (only feasible for small N).
+
 ### Preclustering
 
-The exact integer linear programming approach will only work for small
-problem sizes (maybe \<= 30 elements). We can increase the problem size
-that can be handled by setting the argument `preclustering = TRUE`. In
-this case, an initial cluster editing is performed, creating small
-groups of elements that are very similar. The preclustering step
-identifies pairs of similar stimuli if K = 2, triplets if K = 3, and so
-forth. After this preclustering, a restriction is enforced to the
-integer linear program that precludes very similar elements to be
-assigned to the same set.
+The exact integer linear programming approach will only work for
+moderate problem sizes. We can increase the problem size that can be
+handled by setting the argument `preclustering = TRUE`. In this case, an
+initial cluster editing is performed, creating small groups of elements
+that are very similar. The preclustering step identifies pairs of
+similar stimuli if K = 2, triplets if K = 3, and so forth. After this
+preclustering, a restriction is enforced to the integer linear program
+that precludes very similar elements to be assigned to the same set.
 
 The preclustering restrictions improve the running time of the integer
 linear programming solver by a large margin (often 100x as fast) because
 many possible assignment are rendered illegal; the integer linear
 programming solver is smart and disregards these assignments from the
-space of feasible assignments. In some occasions, these restrictions
-prohibit the integer linear programming solver to find the very best
-partitioning (i.e., the assignment with the maximum distance /
-variance), because this may be only obtained when some of the
-preclustered elements are assigned to the same group. However, in
-general, the solution is still very good and often optimal. This code
-can be used to employ integer linear programming under preclustering
-constraints.
+space of feasible solutions In some occasions, these restrictions
+prohibit the integer linear programming solver to find the best solution
+because this may be only obtained when some of the preclustered elements
+are assigned to the same anticluster. However, in general, the solution
+is still very good and often optimal. This code can be used to employ
+integer linear programming under preclustering constraints.
 
 ``` r
 ## Code example using ILP and preclustering:
@@ -287,22 +231,20 @@ anticlustering(
 )
 ```
 
-### Random search
+### Heuristic anticlustering
 
-To solve larger problem instances that cannot be processed using integer
-linear programming, a heuristic method based on random sampling is
-available. Across a user-specified number of runs (specified via the
-argument `nrep`), each element is first randomly assigned to an
-anticluster and then the objective value is computed. In the end, the
-best assignment is returned as output. To activate the heuristic, set
-`method = "sampling"` (this is also the default argument). When we set
-`preclustering = TRUE`, the random assignment is conducted under the
-restriction that preclustered elements cannot be part of the same
-anticluster. In my experience, the preclustering restrictions often
-improve the output of the random sampling approach, because the
-preclustering itself serves as a useful heuristic: when very similar
-items are guaranteed to be in different sets, these different sets tend
-to become similar.
+In addition to the exact approach—that is only feasible for small N—the
+`anticlust` package may employ two heuristic approaches. The first
+option is repeated random sampling: Across a specified number of runs,
+anticlusters are assigned randomly. In the end, the assignment that
+maximized set similarity is returned. The second approach is an exchange
+method: Building on an initial random assignment, items are swapped
+systematically in such a way that each swap improves set similarity by
+the largest amount that is possible (cf. Späth, 1986). Random sampling
+is recommended when the objective is “distance” (cluster editing). The
+exchange method is recommended when the objective is “variance”
+(k-means). The following code contains examples of how to use the
+heuristic methods:
 
 ``` r
 ## Code example using random sampling
@@ -319,8 +261,35 @@ anticlustering(
   features, 
   K = 2, 
   method = "sampling",
-  objective = "variance",
+  objective = "distance",
   preclustering = TRUE
+)
+
+## Code example using the exchange method
+anticlustering(
+  features, 
+  K = 2, 
+  method = "exchange",
+  objective = "variance",
+)
+```
+
+### Categorical constraints
+
+Sometimes, it is required that sets are not only similar with regard to
+some numeric variables, but we also want to ensure that each set
+contains an equal number of elements of a certain category. Coming back
+to the initial iris data set, we may want to require that each set has a
+balanced number of plants of the three iris species. To this end, we can
+use the argument `categories` as follows:
+
+``` r
+anticlusters <- anticlustering(
+  iris[, -5],
+  K = 3,
+  objective = "variance",
+  method = "exchange",
+  categories = iris[, 5]
 )
 ```
 
