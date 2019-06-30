@@ -130,8 +130,11 @@
 #' is possible (cf. Späth, 1986). Random sampling is recommended when the objective
 #' is "distance" (cluster editing). The exchange method is recommended when
 #' the objective is "variance" (k-means). Note, however, that the total number
-#' of exchanges grows quadratically with input size; the random sampling
-#' method is therefore generally recommended for large N.
+#' of exchanges grows quadratically with input size. Setting
+#' \code{preclustering = TRUE} will limit the legal exchange partners to
+#' very similar elements, resulting in improved run time while preserving
+#' a rather good solution. This option is recommended for large N. For very
+#' large N, the random sampling method is the recommended approach.
 #'
 #' The random sampling approach may also incorporate a
 #' preclustering that prevents grouping very similar elements into the
@@ -250,22 +253,26 @@ anticlustering <- function(features = NULL, distances = NULL,
   if (method == "ilp") {
     return(exact_anticlustering(distances, K, solver_available(),
                                 preclustering))
-  } else if (method == "sampling") {
-    preclusters <- get_preclusters(categories, preclustering, features, distances, K, objective)
+  }
+  preclusters <- NULL
+  if (method == "sampling" || method == "heuristic") {
+    if (!argument_exists(categories) && preclustering == TRUE) {
+      preclusters <- get_preclusters(features, distances, K, objective)
+    }
     return(random_sampling(features, K, preclusters,
-                                    objective, nrep = nrep, distances,
-                                    categories, parallelize, seed,
-                                    ncores = NULL))
-  } else if (method == "exchange" || method == "heuristic") {
-    return(exchange_method(features, distances, K, objective, categories))
+                           objective, nrep = nrep, distances,
+                           categories, parallelize, seed,
+                           ncores = NULL))
+  } else if (method == "exchange") {
+    if (preclustering == TRUE) {
+      preclusters <- get_preclusters(features, distances, K, objective)
+    }
+    return(exchange_method(features, distances, K, objective, categories, preclusters))
   }
 }
 
 ## Extracted function that computes the preclusters. May return NULL.
-get_preclusters <- function(categories, preclustering, features, distances, K, objective) {
-  if (argument_exists(categories) || preclustering == FALSE) {
-    return(NULL) # categorical constraints cannot be used with preclustering
-  }
+get_preclusters <- function(features, distances, K, objective) {
   if (objective == "distance" && K == 2) {
     preclusters <- greedy_matching(distances)
   } else if (objective == "distance" && K > 2) {

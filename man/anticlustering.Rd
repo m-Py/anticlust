@@ -145,8 +145,11 @@ such a way that each swap improves set similarity by the largest amount that
 is possible (cf. Späth, 1986). Random sampling is recommended when the objective
 is "distance" (cluster editing). The exchange method is recommended when
 the objective is "variance" (k-means). Note, however, that the total number
-of exchanges grows quadratically with input size; the random sampling
-method is therefore generally recommended for large N.
+of exchanges grows quadratically with input size. Setting
+\code{preclustering = TRUE} will limit the legal exchange partners to
+very similar elements, resulting in improved run time while preserving
+a rather good solution. This option is recommended for large N. For very
+large N, the random sampling method is the recommended approach.
 
 The random sampling approach may also incorporate a
 preclustering that prevents grouping very similar elements into the
