@@ -94,7 +94,7 @@ read. More information is available via the following sources:
 
 ## A quick start
 
-We illustrated in the example above, we can use the function
+As illustrated in the example above, we can use the function
 `anticlustering()` to create similar sets of elements. The function
 takes as input a data table describing the elements that should be
 assigned to sets. In the data table, each row represents an element, for
