@@ -7,13 +7,15 @@
 #' @param generate_permutations If TRUE, all permutations are returned,
 #'     resulting in duplicate partitions.
 #'
-#' @param A list of all partitions (or permutations if
+#' @return A list of all partitions (or permutations if
 #' \code{generate_permutations} is \code{TRUE}).
+#'
+#' @importFrom stats complete.cases
 #'
 #' @details
 #'
 #' In principle, anticlustering can be solved to optimality by
-#' generating all possible partitions of N items in K groups.
+#' generating all possible partitions of N items into K groups.
 #' The example code below illustrates how to do this.
 #' However, this approach only works for small N because the
 #' number of partitions grows exponentially with N.
