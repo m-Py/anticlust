@@ -284,6 +284,14 @@ anticlustering <- function(features = NULL, distances = NULL,
       preclusters <- get_preclusters(features, distances, K, objective)
     }
     return(exchange_method(features, distances, K, objective, categories, preclusters))
+  } else if (method == "fast-exchange") {
+    neighbours <- RANN::nn2(features, features)
+    categories <- merge_into_one_variable(categories) # may be NULL
+    obj_function <- get_objective_function(features, distances, objective)
+    clusters <- random_sampling(features, K, NULL, objective,
+                                1, distances, categories, FALSE,
+                                NULL, NULL)
+    fast_exchange_(features, clusters, obj_function, categories, neighbours$nn.idx)
   }
 }
 
@@ -341,7 +349,7 @@ input_handling_anticlustering <- function(features, distances,
   validate_input(nrep, "nrep", "numeric", len = 1, greater_than = 0,
                  must_be_integer = TRUE)
   validate_input(method, "method", len = 1,
-                 input_set = c("ilp", "sampling", "exchange", "heuristic"))
+                 input_set = c("ilp", "sampling", "exchange", "heuristic", "fast-exchange"))
   validate_input(objective, "objective", len = 1,
                  input_set = c("variance", "distance"))
 
@@ -359,20 +367,20 @@ input_handling_anticlustering <- function(features, distances,
   if (method == "ilp") {
     solver <- solver_available()
     if (solver == FALSE) {
-        stop("\n\nAn exact solution was requested, but none of the linear ",
-             "programming \npackages 'Rglpk', 'gurobi', or 'Rcplex' is ",
-             "available. \n\nTry `method = 'sampling'`, `method = 'exchange'` or install ",
-             "a linear programming solver \nto obtain an exact solution. ",
-             "For example, install the GNU linear \nprogramming kit: \n\n",
-             "- On windows, visit ",
-             "http://gnuwin32.sourceforge.net/packages/glpk.htm \n\n",
-             "- Use homebrew to install it on mac, 'brew install glpk' \n\n",
-             "- 'sudo apt install libglpk-dev' on Ubuntu ",
-             "\n\nThen, install the Rglpk package via ",
-             "`install.packages(Rglpk)`. \n\nOtherwise, you may obtain ",
-             "a license for one of ",
-             "the commercial solvers \ngurobi or IBM CPLEX (they are free ",
-             "for academic use).")
+      stop("\n\nAn exact solution was requested, but none of the linear ",
+           "programming \npackages 'Rglpk', 'gurobi', or 'Rcplex' is ",
+           "available. \n\nTry `method = 'sampling'`, `method = 'exchange'` or install ",
+           "a linear programming solver \nto obtain an exact solution. ",
+           "For example, install the GNU linear \nprogramming kit: \n\n",
+           "- On windows, visit ",
+           "http://gnuwin32.sourceforge.net/packages/glpk.htm \n\n",
+           "- Use homebrew to install it on mac, 'brew install glpk' \n\n",
+           "- 'sudo apt install libglpk-dev' on Ubuntu ",
+           "\n\nThen, install the Rglpk package via ",
+           "`install.packages(Rglpk)`. \n\nOtherwise, you may obtain ",
+           "a license for one of ",
+           "the commercial solvers \ngurobi or IBM CPLEX (they are free ",
+           "for academic use).")
     }
   }
 
