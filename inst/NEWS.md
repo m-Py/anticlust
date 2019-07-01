@@ -6,16 +6,17 @@
 A big update:
 
 - A new algorithm for anticlustering is available: the exchange method.
-  It is based on investigating the "neighborhood" of a given partition and
-  swapping the anticlusters of two elements. The neighborhood of an 
-  element is defined as all possible swaps that can be done with elements 
-  that are currently assigned to a different cluster. The swap is made that 
-  improves the objective function the most across all possible swaps.
-  This method outperforms the random sampling heuristic for k-means 
-  anticlustering but it has quadratic run time; when setting 
-  `preclustering = TRUE`, the number of swaps is reduced because only
-  very similar elements are legal swap partners, making the exchange
-  method applicable for larger N. The exchange method may incorporate
+  Building on an initial random assignment, elements are swapped between 
+  anticlusters in such a way that each swap improves anticluster similarity by 
+  the largest amount that is possible (cf. Späth, 1986).
+  This procedure is repeated for each element; because each 
+  possible swap is investigated for each element, the total number of 
+  exchanges grows quadratically with input size, rendering the exchange 
+  method unsuitable for large N. Setting `preclustering = TRUE` will 
+  limit the legal exchange partners to very similar elements, resulting 
+  in improved run time while preserving a rather good solution.
+  The exchange method outperforms the random sampling heuristic for k-means 
+  anticlustering. The exchange method may incorporate
   both categorical and preclustering constraints, which is not possible
   for the random sampling approach. For anticluster editing, 
   the random sampling approach is better than the exchange method.
