@@ -8,7 +8,9 @@ psychology, but it can be applied whenever a user requires that a given
 set of elements has to be partitioned into similar subsets. Currently,
 the `anticlust` package offers the possibility to create subsets of
 equal size. The package is still under active developement; expect 
-changes and improvements before it will be submitted to CRAN.
+changes and improvements before it will be submitted to CRAN. Check out the 
+[NEWS file](https://github.com/m-Py/anticlust/blob/devel/inst/NEWS.md) 
+for recent changes.
 
 ## Installation
 
