@@ -7,14 +7,20 @@ A big update:
 
 - A new algorithm for anticlustering is available: the exchange method.
   It is based on investigating the "neighborhood" of a given partition and
-  swapping the anticlusters of two elements. The neighborhood is defined 
-  as all possible swaps with elements in the other groups. The swap that 
-  improves the objective the most across all possible swaps is made.
+  swapping the anticlusters of two elements. The neighborhood of an 
+  element is defined as all possible swaps that can be done with elements 
+  that are currently assigned to a different cluster. The swap is made that 
+  improves the objective function the most across all possible swaps.
   This method outperforms the random sampling heuristic for k-means 
-  anticlustering but it has quadratic run time. For anticluster editing, 
+  anticlustering but it has quadratic run time; when setting 
+  `preclustering = TRUE`, the number of swaps is reduced because only
+  very similar elements are legal swap partners, making the exchange
+  method applicable for larger N. The exchange method may incorporate
+  both categorical and preclustering constraints, which is not possible
+  for the random sampling approach. For anticluster editing, 
   the random sampling approach is better than the exchange method.
-  As there are two heuristic methods now (random sampling and exchange
-  method) the argument `method` of the function `anticlustering()`
+  As there are now two heuristic methods (random sampling and exchange) 
+  the argument `method` of the function `anticlustering()`
   now has the following three possible values: "sampling", "exchange", 
   "ilp". In earlier versions, the two options were "heuristic" and "ilp"; 
   hence this change possibly breaks earlier code.
