@@ -96,7 +96,7 @@ variance_objective_ <- function(clusters, data) {
   distances <- dist_from_centers(data, centers, squared = TRUE)
   ## 3. Use two-column matrix to select relevant distances
   distances <- distances[cbind(1:nrow(distances), clusters)]
-  return(sum(distances))
+  sum(distances)
 }
 
 #' Objective value for the cluster editing distance objective

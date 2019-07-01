@@ -42,6 +42,8 @@
 #' @param seed A value to fixate the random seed when using the random
 #'     sampling method. When \code{parallelize} is \code{TRUE}, using
 #'     this argument is the only way to ensure reproducibility.
+#' @para k_neighbours The number of neighbours that serve as exchange
+#'     partner for each element when method = "fast-exchange"
 #'
 #' @return A vector of length \code{nrow(features)} (or
 #'     \code{nrow(distances)}) that assigns a group (i.e, a number
@@ -245,7 +247,7 @@ anticlustering <- function(features = NULL, distances = NULL,
                            method = "sampling", preclustering = FALSE,
                            standardize = FALSE, nrep = 10000,
                            categories = NULL, parallelize = FALSE,
-                           seed = NULL) {
+                           seed = NULL, k_neighbours = 10) {
 
   input_handling_anticlustering(features, distances, K, objective,
                                 method, preclustering,
@@ -285,13 +287,16 @@ anticlustering <- function(features = NULL, distances = NULL,
     }
     return(exchange_method(features, distances, K, objective, categories, preclusters))
   } else if (method == "fast-exchange") {
-    neighbours <- RANN::nn2(features, features)
+    if (!is.null(categories)) {
+      neighbours <- get_neigbours(features, k_neighbours, categories)
+    } else {
+      neighbours <- RANN::nn2(features, k = k_neighbours + 1)$nn.idx
+    }
     categories <- merge_into_one_variable(categories) # may be NULL
-    obj_function <- get_objective_function(features, distances, objective)
     clusters <- random_sampling(features, K, NULL, objective,
                                 1, distances, categories, FALSE,
                                 NULL, NULL)
-    fast_exchange_(features, clusters, obj_function, categories, neighbours$nn.idx)
+    fast_exchange_(features, clusters, categories, neighbours)
   }
 }
 

@@ -3,9 +3,6 @@
 #'
 #' @param data the data -- an N x M table of item features
 #' @param clusters An initial cluster assignment
-#' @param obj_function the objective function (to compute ACE or
-#'     K-Means criterion). Takes as first argument a cluster assignment
-#'     and as second argument the data set `data`.
 #' @param categories A vector representing categorical constraints
 #' @param nearest_neighbors A matrix of nearest neighbors given by RANN::nn2
 #'
@@ -15,9 +12,10 @@
 #'
 #'
 
-fast_exchange_ <- function(data, clusters, obj_function, categories, nearest_neighbors) {
+fast_exchange_ <- function(data, clusters, categories, nearest_neighbors) {
   N <- nrow(data)
-  best_total <- obj_function(clusters, data)
+  best_total <- variance_objective_(clusters, data)
+  n_damns <- 0
   for (i in 1:N) {
     # cluster of current item
     group_i <- clusters[i]
@@ -30,6 +28,7 @@ fast_exchange_ <- function(data, clusters, obj_function, categories, nearest_nei
     exchange_partners <- exchange_partners[clusters[exchange_partners] != group_i]
     ## Sometimes an exchange cannot take place
     if (length(exchange_partners) == 0) {
+      n_damns <- n_damns + 1
       next
     }
     # container to store objectives associated with each exchange of item i:
@@ -53,5 +52,30 @@ fast_exchange_ <- function(data, clusters, obj_function, categories, nearest_nei
       best_total <- best_this_round
     }
   }
+  print(n_damns)
   clusters
+}
+
+
+#' Get neigbours for fast preclustering (by category)
+
+get_neigbours <- function(features, k_neighbours, categories) {
+  ncategories <- length(unique(categories))
+  nns <- by(features, categories, RANN::nn2, k = k_neighbours + 1)
+  nns <- lapply(nns, function(x) x$nn.idx)
+  ## get original indices for each category
+  ## (converts indices per category in global indices)
+  get_index <- function(i, x) {
+    which(categories == i)[x[[i]]]
+  }
+  idx <- lapply(1:ncategories, get_index, x = nns)
+  dims <- lapply(nns, function(x) dim(x))
+  ## change dimensions to original nearest neighbour structure
+  adjust_dims <- function(a, b) {
+    dim(a) <- dim(b)
+    a
+  }
+  idx <- mapply(adjust_dims, idx, nns)
+  idx <- do.call(rbind, idx)
+  sort_by_col(idx, 1)
 }
