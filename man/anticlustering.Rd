@@ -10,12 +10,12 @@ anticlustering(features = NULL, distances = NULL, K,
   parallelize = FALSE, seed = NULL)
 }
 \arguments{
-\item{features}{A numeric vector, matrix or data.frame of data points.
-Rows correspond to elements and columns correspond to features. A
-vector represents a single numeric feature.}
+\item{features}{A numeric vector, matrix or data.frame of data
+points.  Rows correspond to elements and columns correspond to
+features. A vector represents a single numeric feature.}
 
 \item{distances}{Alternative data argument that can be used if
-\code{features} is not passed. A N x N matrix representing the
+\code{features} is not passed. An N x N matrix representing the
 pairwise dissimilarities between N elements. Larger values
 indicate higher dissimilarity. Can be an object of class
 \code{dist} (e.g., returned by \code{\link{dist}} or
@@ -25,13 +25,13 @@ dissimilarities.}
 
 \item{K}{How many anticlusters should be created.}
 
-\item{objective}{The objective to be maximized. The option
-"distance" (default) maximizes the cluster
-editing objective function; the option "variance" maximizes the k-means
-objective function. See details.}
+\item{objective}{The objective to be maximized. The option "distance"
+(default) maximizes the cluster editing objective function; the
+option "variance" maximizes the k-means objective function. See
+details.}
 
-\item{method}{One of "sampling" (default), "exchange", or "ilp".
-See details.}
+\item{method}{One of "sampling" (default), "exchange", or "ilp".  See
+details.}
 
 \item{preclustering}{Boolean. Should a preclustering be conducted
 before anticlusters are created? Defaults to \code{FALSE}. See
@@ -40,86 +40,89 @@ details.}
 \item{standardize}{Boolean. Should the features be standardized
 before anticlusters are created? Defaults to \code{FALSE}.
 Standardization is done using the function \code{\link{scale}}
-using the default settings (mean = 0, SD = 1). This argument
-only works when the input data is given via \code{features},
-not via \code{distances}.}
+using the default settings (mean = 0, SD = 1). This argument only
+works when the input data is given via \code{features}, not via
+\code{distances}.}
 
 \item{nrep}{The number of repetitions for the random sampling
-method. Defaults to 10,000. This argument only has an effect
-if \code{method} is \code{"sampling"}.}
+method. Defaults to 10,000. This argument only has an effect if
+\code{method} is \code{"sampling"}.}
 
-\item{categories}{A vector, data.frame or matrix representing
-one or several categorical constraints. See details.}
+\item{categories}{A vector, data.frame or matrix representing one or
+several categorical constraints. See details.}
 
-\item{parallelize}{Boolean. Indicates whether multiple processors should
-be used for the random sampling method. Defaults to \code{FALSE}.}
+\item{parallelize}{Boolean. Indicates whether multiple processors
+should be used for the random sampling method. Defaults to
+\code{FALSE}.}
 
 \item{seed}{A value to fixate the random seed when using the random
 sampling method. When \code{parallelize} is \code{TRUE}, using
 this argument is the only way to ensure reproducibility.}
 }
 \value{
-A vector representing the anticluster affiliation of each
-    input element.
+A vector of length \code{nrow(features)} (or
+    \code{nrow(distances)}) that assigns a group (i.e, a number
+    between 1 and K) to each input element.
 }
 \description{
-Create equally-sized groups of elements (anticlusters) that are as
+Create equal-sized groups of elements (anticlusters) that are as
 similar as possible.
 }
 \details{
 This function is used to solve »balanced K anticlustering«. That is,
 K groups of equal size are created in such a way that all groups are
-as similar as possible. Set similarity is assessed using one of
-two objective functions:
+as similar as possible. Set similarity is assessed using one of two
+objective functions:
 
-- k-means *variance* objective, setting \code{objective =
-  "variance"}
+- k-means *variance* objective, setting \code{objective = "variance"}
 
 - cluster editing *distance* objective, setting \code{objective =
   "distance"}
 
-The k-means objective maximizes the variance within anticlusters---that
-is, the sum of the squared distances between each element and its cluster center
-(see \code{\link{variance_objective}}). The cluster editing
-objective maximizes the sum of pairwise distances within
-anticlusters (see \code{\link{distance_objective}}). Maximizing
-either clustering objective will create create similar groups;
-minimization of the same objectives leads to a clustering, i.e.,
-elements are as similar as possible within a set and as different
-as possible between sets. (Such a clustering is also possible with the function
+The k-means objective maximizes the variance within
+anticlusters---that is, the sum of the squared distances between each
+element and its cluster center (see
+\code{\link{variance_objective}}). The cluster editing objective
+maximizes the sum of pairwise distances within anticlusters (see
+\code{\link{distance_objective}}). Maximizing either clustering
+objective will create create similar groups; minimization of the same
+objectives leads to a clustering, i.e., elements are as similar as
+possible within a set and as different as possible between
+sets. (Such a clustering is also possible with the function
 \code{\link{balanced_clustering}}.)
 
 If the argument \code{features} is passed together with
-\code{objective = "distance"}, the Euclidean distance is computed
-as the basic unit of the anticluster editing
-objective. If another measure of dissimilarity is preferred, you
-may pass a self-generated dissimiliarity matrix via the argument
-\code{distances}.
+\code{objective = "distance"}, the Euclidean distance is computed as
+the basic unit of the anticluster editing objective. If a different
+measure of dissimilarity is preferred, you may pass a self-generated
+dissimiliarity matrix via the argument \code{distances}.
 
 \strong{Exact anticlustering}
 
 The optimal anticluster editing objective can be found via integer
-linear programming. To this end, set \code{method = "ilp"}. To
-obtain an optimal solution, a linear
-programming solver must be installed and usable from R. The
-\code{anticlust} package supports the open source GNU linear programming
-kit (called from the package \code{Rglpk}) and the commercial
-solvers gurobi (called from the package \code{gurobi}) and IBM
-CPLEX (called from the package \code{Rcplex}). A license is needed
-to use one of the commercial solvers. The optimal solution is
-retrieved by setting \code{objective = "distance"},
-\code{method = "ilp"} and \code{preclustering = FALSE}. Use this
-combination of arguments only for small problem sizes (maybe <= 30
-elements).
+linear programming. To this end, set \code{method = "ilp"}. To obtain
+an optimal solution, a linear programming solver must be installed
+and usable from R. The \code{anticlust} package supports the open
+source GNU linear programming kit (called from the package
+\code{Rglpk}) and the commercial solvers gurobi (called from the
+package \code{gurobi}) and IBM CPLEX (called from the package
+\code{Rcplex}). A license is needed to use one of the commercial
+solvers. The optimal solution is retrieved by setting \code{objective
+= "distance"}, \code{method = "ilp"} and \code{preclustering =
+FALSE}. Use this combination of arguments only for small problem
+sizes (maybe <= 30 elements).
 
-To relax the optimality condition, it is possible to set the
-argument \code{preclustering = TRUE}. In this case, the anticluster
-editing objective is still optimized using integer linear
-programming, but a preprocessing forbids very similar elements to
-be assigned to the same anticluster. Therefore, the size of the solution
-space is reduced and the ILP approach can be used to
-work on larger problem instances while the solution is usually optimal
-or very close to optimal.
+To relax the optimality condition, it is possible to set the argument
+\code{preclustering = TRUE}. In this case, the anticluster editing
+objective is still optimized using integer linear programming, but a
+preprocessing forbids very similar elements to be assigned to the
+same anticluster. Thus, before the anticlustering objective is
+optimized, a cluster analysis identifies small groups of similar
+elements (pairs if K = 2, triplets if K = 3, and so forth). The
+preclustering reduces the size of the solution space, making the ILP
+approach applicable for larger problem instances. With preclustering,
+optimality is no longer guaranteed, but the solution is usually
+optimal or very close to optimal.
 
 The variance criterion cannot be solved to optimality using integer
 linear programming. However, it is possible to employ the function
@@ -129,67 +132,64 @@ small problem instances.
 \strong{Heuristic anticlustering}
 
 In addition to the exact approach---that is only feasible for small
-N---the function employs two heuristic approaches. The
-first option is repeated random sampling (\code{method = "sampling"}):
-Across a specified
-number of runs, each element is assigned to an anticluster at random and the objective
-value associated with this assignment is computed. In the end,
-the best assignment---the assignment that maximized the objective
-function---is returned.
-The second heuristic is the exchange method
-(\code{method = "exchange"}): Building on an
-initial random assignment, elements are swapped between anticlusters in
-such a way that each swap improves set similarity by the largest amount that
-is possible in each situation (cf. Späth, 1986). The swapping procedure is repeated for each
-element; because each possible swap is investigated for each element, the total number
-of exchanges grows quadratically with input size, rendering the exchange method unsuitable
-for large N. Setting
-\code{preclustering = TRUE} will limit the legal exchange partners to
-very similar elements, resulting in improved run time while preserving
-a rather good solution. This option is recommended for larger N. For very
-large N, the random sampling method is the recommended approach.
+N---the function employs two heuristic approaches. The first option
+is repeated random sampling (\code{method = "sampling"}): Across a
+specified number of runs, each element is assigned to an anticluster
+at random and the objective value associated with this assignment is
+computed. In the end, the best assignment---the assignment that
+maximized the objective function---is returned.  The second heuristic
+is the exchange method (\code{method = "exchange"}): Building on an
+initial random assignment, elements are swapped between anticlusters
+in such a way that each swap improves set similarity by the largest
+amount that is possible in each situation (cf. Späth, 1986). The
+swapping procedure is repeated for each element; because each
+possible swap is investigated for each element, the total number of
+exchanges grows quadratically with input size, rendering the exchange
+method unsuitable for large N. Setting \code{preclustering = TRUE}
+will limit the legal exchange partners to very similar elements,
+resulting in improved run time while preserving a rather good
+solution. This option is recommended for larger N. For very large N,
+the random sampling method is the recommended approach.
 
-The random sampling approach may also incorporate a
-preclustering that prevents grouping very similar elements into the
-same anticluster (setting \code{preclustering = TRUE}). For large N (> 100),
-the preclustering tends to improve the
-quality of the solution because the random sampling is conducted on
-a restricted solution space that consists of rather good solutions.
-Preclustering (for the exact and heuristic approaches)
-is performed by a call to \code{\link{balanced_clustering}} where the
-argument \code{K} is set to the number of elements divided by the
-number of anticlusters that are to be created (actually, this is not
-exactly what happens internally, but it is equivalent).
+The random sampling approach may also incorporate a preclustering
+that prevents grouping very similar elements into the same
+anticluster (setting \code{preclustering = TRUE}). For large N (N >
+100), the preclustering tends to improve the quality of the solution
+because the random sampling is conducted on a restricted solution
+space that consists of rather good solutions.  Preclustering (for the
+exact and heuristic approaches) is performed by a call to
+\code{\link{balanced_clustering}} where the argument \code{K} is set
+to the number of elements divided by the number of anticlusters that
+are to be created (actually, this is not exactly what happens
+internally, but it is equivalent).
 
-For the random sampling method, the output will
-vary between function calls. To make a computation results
-reproducible, you can use the argument \code{seed} -- a specific
-value will produce the same results when the function is called with
-the same input parameters. Note that the
-same seed will produce different results when the parameter
-\code{parallelize} is varied. For the parallel computation, the
-random seed is set using the function
+For the random sampling method, the output will vary between function
+calls. To make a computation results reproducible, you can use the
+argument \code{seed} -- a specific value will produce the same
+results when the function is called with the same input
+parameters. Note that the same seed will produce different results
+when the parameter \code{parallelize} is varied. For the parallel
+computation, the random seed is set using the function
 \code{\link[parallel]{clusterSetRNGStream}}; otherwise, the function
 \code{\link{set.seed}} is called.
 
-Random sampling is recommended when the objective
-is "distance" (cluster editing). The exchange method is recommended when
-the objective is "variance" (k-means).
+Random sampling is recommended when the objective is "distance"
+(cluster editing). The exchange method is recommended when the
+objective is "variance" (k-means).
 
 \strong{Categorical constraints}
 
 The argument \code{categories} may induce categorical constraints.
-The grouping variables indicated by  \code{categories} will be balanced
-out across anticlusters. Currently,
-this functionality is only available in combination with the
-random sampling and exchange method, but not with the exact ILP approach. Note
-that for the random sampling method, it is \strong{not} possible to apply
-preclustering constraints and categorical constraints at the
-same time. Instead, the argument \code{preclustering} will be
-ignored (that is, there will be no preclustering). The exchange
-method will try to adhere to both preclustering and categorical
-constraints if \code{preclustering = TRUE} while giving priority to
-the categorical constraints.
+The grouping variables indicated by \code{categories} will be
+balanced out across anticlusters. Currently, this functionality is
+only available in combination with the random sampling and exchange
+method, but not with the exact ILP approach. Note that for the random
+sampling method, it is \strong{not} possible to apply preclustering
+constraints and categorical constraints at the same time. Instead,
+the argument \code{preclustering} will be ignored (that is, there
+will be no preclustering). The exchange method will try to adhere to
+both preclustering and categorical constraints if \code{preclustering
+= TRUE} while giving priority to the categorical constraints.
 }
 \examples{
 

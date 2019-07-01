@@ -1,7 +1,9 @@
 
 # anticlust 0.2.7
 
-A bigger update:
+2019-07-01
+
+A big update:
 
 - A new algorithm for anticlustering is available: the exchange method.
   It is based on investigating the "neighborhood" of a given partition and
