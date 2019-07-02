@@ -74,6 +74,13 @@ fast_exchange_ <- function(data, clusters, categories, nearest_neighbors) {
 
 get_neigbours <- function(features, k_neighbours, categories) {
 
+  if (argument_exists(categories)) {
+    min_n <- min(table(categories))
+    k_neighbours <- min(k_neighbours + 1, min_n)
+  } else {
+    k_neighbours <- min(nrow(features), k_neighbours + 1)
+  }
+
   ## indicices of non NA values; RANN::nn2 does not deal with NA
   bool_complete <- complete.cases(features)
   complete <- which(bool_complete)
@@ -87,12 +94,11 @@ get_neigbours <- function(features, k_neighbours, categories) {
   ## Compute nearest neighbors; within categories if categories
   ## are available!
   if (!argument_exists(categories)) {
-    k_neighbours <- min(nrow(features), k_neighbours + 1)
     idx <- RANN::nn2(features, k = k_neighbours)$nn.idx
   } else {
+    categories <- as.numeric(as.factor(categories))
     ncategories <- length(unique(categories))
-    min_n <- min(table(categories))
-    nns <- by(features, categories, RANN::nn2, k = min(k_neighbours + 1, min_n))
+    nns <- by(features, categories, RANN::nn2, k = k_neighbours)
     nns <- lapply(nns, function(x) x$nn.idx)
     ## get original indices for each category
     ## (converts indices per category in global indices)
@@ -119,7 +125,7 @@ get_neigbours <- function(features, k_neighbours, categories) {
     dim(idx) <- dims ## recover original structure
     ## make elements with NA exchange partners among each other:
     NA_partners <- sample(not_complete, size = (k_neighbours - 1) * length(not_complete), replace = TRUE)
-    not_complete_idx <- cbind(not_complete, matrix(NA_partners, ncol = (k_neighbours - 1)))
+    not_complete_idx <- cbind(not_complete, matrix(NA_partners, ncol = k_neighbours - 1))
     idx <- rbind(idx, not_complete_idx)
     colnames(idx) <- NULL
   }
