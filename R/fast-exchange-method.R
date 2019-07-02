@@ -58,7 +58,7 @@ fast_exchange_ <- function(data, clusters, categories, nearest_neighbors) {
 
 
 #' Get neigbours for fast preclustering (by category)
-#' @roRd
+#' @noRd
 #'
 #' @details
 #'
@@ -86,12 +86,13 @@ get_neigbours <- function(features, k_neighbours, categories) {
 
   ## Compute nearest neighbors; within categories if categories
   ## are available!
-  k_neighbours <- min(nrow(features), k_neighbours + 1)
   if (!argument_exists(categories)) {
+    k_neighbours <- min(nrow(features), k_neighbours + 1)
     idx <- RANN::nn2(features, k = k_neighbours)$nn.idx
   } else {
     ncategories <- length(unique(categories))
-    nns <- by(features, categories, RANN::nn2, k = k_neighbours)
+    min_n <- min(table(categories))
+    nns <- by(features, categories, RANN::nn2, k = min(k_neighbours + 1, min_n))
     nns <- lapply(nns, function(x) x$nn.idx)
     ## get original indices for each category
     ## (converts indices per category in global indices)
