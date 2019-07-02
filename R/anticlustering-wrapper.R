@@ -42,7 +42,7 @@
 #' @param seed A value to fixate the random seed when using the random
 #'     sampling method. When \code{parallelize} is \code{TRUE}, using
 #'     this argument is the only way to ensure reproducibility.
-#' @para k_neighbours The number of neighbours that serve as exchange
+#' @param k_neighbours The number of neighbours that serve as exchange
 #'     partner for each element when method = "fast-exchange"
 #'
 #' @return A vector of length \code{nrow(features)} (or
@@ -287,11 +287,7 @@ anticlustering <- function(features = NULL, distances = NULL,
     }
     return(exchange_method(features, distances, K, objective, categories, preclusters))
   } else if (method == "fast-exchange") {
-    if (!is.null(categories)) {
-      neighbours <- get_neigbours(features, k_neighbours, categories)
-    } else {
-      neighbours <- RANN::nn2(features, k = k_neighbours + 1)$nn.idx
-    }
+    neighbours <- get_neigbours(features, k_neighbours, categories)
     categories <- merge_into_one_variable(categories) # may be NULL
     clusters <- random_sampling(features, K, NULL, objective,
                                 1, distances, categories, FALSE,
