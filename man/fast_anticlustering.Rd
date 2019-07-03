@@ -30,12 +30,12 @@ start <- Sys.time()
 features <- iris[, - 5]
 ac_exchange <- fast_anticlustering(features, K = 3)
 Sys.time() - start
-by(features, ac_exchange, function(x) round(colMeans(x, na.rm = TRUE), 2))
+by(features, ac_exchange, function(x) round(colMeans(x), 2))
 
 start <- Sys.time()
 features <- schaper2019[, 3:6]
 ac_exchange <- fast_anticlustering(features, K = 3, categories = schaper2019$room)
 Sys.time() - start
-by(features, ac_exchange, function(x) round(colMeans(x, na.rm = TRUE), 2))
+by(features, ac_exchange, function(x) round(colMeans(x), 2))
 
 }
