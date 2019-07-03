@@ -42,8 +42,6 @@
 #' @param seed A value to fixate the random seed when using the random
 #'     sampling method. When \code{parallelize} is \code{TRUE}, using
 #'     this argument is the only way to ensure reproducibility.
-#' @param k_neighbours The number of neighbours that serve as exchange
-#'     partner for each element when method = "fast-exchange"
 #'
 #' @return A vector of length \code{nrow(features)} (or
 #'     \code{nrow(distances)}) that assigns a group (i.e, a number
@@ -264,11 +262,23 @@
 #'
 
 anticlustering <- function(features = NULL, distances = NULL,
-                           K, objective = "distance",
-                           method = "sampling", preclustering = FALSE,
-                           standardize = FALSE, nrep = 10000,
-                           categories = NULL, parallelize = FALSE,
-                           seed = NULL, k_neighbours = 10) {
+                            K, objective = "distance",
+                            method = "sampling", preclustering = FALSE,
+                            standardize = FALSE, nrep = 10000,
+                            categories = NULL, parallelize = FALSE,
+                            seed = NULL) {
+  anticlustering_(features, distances, K, objective,
+                  method, preclustering, standardize, nrep,
+                  categories, parallelize,
+                  seed, k_neighbours = Inf)
+}
+
+anticlustering_ <- function(features = NULL, distances = NULL,
+                            K, objective = "distance",
+                            method = "sampling", preclustering = FALSE,
+                            standardize = FALSE, nrep = 10000,
+                            categories = NULL, parallelize = FALSE,
+                            seed = NULL, k_neighbours = 10) {
 
   input_handling_anticlustering(features, distances, K, objective,
                                 method, preclustering,
