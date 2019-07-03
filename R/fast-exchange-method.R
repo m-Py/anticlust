@@ -12,7 +12,9 @@
 #'     partner for each element. Defaults to Inf, i.e., each element
 #'     is exchanged with each element in other groups.
 #' @param categories A vector, data.frame or matrix representing one or
-#'     several categorical constraints. See details.
+#'     several categorical constraints.
+#'
+#' @importFrom RANN nn2
 #'
 #' @export
 #'
@@ -153,7 +155,7 @@ update_centers <- function(centers, features, i, j, cluster_i, cluster_j, tab) {
 #' for the exchange algorithm)
 #'
 
-get_neigbours <- function(features, k_neighbours, categories) {
+get_neighbours <- function(features, k_neighbours, categories) {
 
   if (argument_exists(categories)) {
     min_n <- min(table(categories))

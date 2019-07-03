@@ -200,6 +200,8 @@
 #'
 #' @seealso
 #'
+#' \code{\link{fast_anticlustering}}
+#'
 #' \code{\link{variance_objective}}
 #'
 #' \code{\link{distance_objective}}
@@ -318,7 +320,7 @@ anticlustering_ <- function(features = NULL, distances = NULL,
     }
     return(exchange_method(features, distances, K, objective, categories, preclusters))
   } else if (method == "fast-exchange") {
-    neighbours <- get_neigbours(features, k_neighbours, categories)
+    neighbours <- get_neighbours(features, k_neighbours, categories)
     categories <- merge_into_one_variable(categories) # may be NULL
     clusters <- random_sampling(features, K, NULL, objective,
                                 1, distances, categories, FALSE,
