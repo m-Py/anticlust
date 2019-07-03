@@ -39,7 +39,8 @@ fast_anticlustering <- function(features, K, k_neighbours = Inf, categories = NU
     K = K,
     k_neighbours = k_neighbours,
     method = "fast-exchange",
-    categories = categories
+    categories = categories,
+    objective = "variance"
   )
 }
 
