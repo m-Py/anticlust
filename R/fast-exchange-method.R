@@ -16,16 +16,18 @@ fast_exchange_ <- function(data, clusters, categories, nearest_neighbors) {
   N <- nrow(data)
   best_total <- variance_objective_(clusters, data)
   n_damns <- 0
+  centers <- cluster_centers(data, clusters)
+  tab <- c(table(clusters))
   for (i in 1:N) {
     # cluster of current item
-    group_i <- clusters[i]
+    cluster_i <- clusters[i]
     # are there categorical variables?
     exchange_partners <- nearest_neighbors[i, -1]
     if (!is.null(categories)) {
       exchange_partners <- exchange_partners[categories[exchange_partners] == categories[i]]
     }
-    ## do not change with item in the same group
-    exchange_partners <- exchange_partners[clusters[exchange_partners] != group_i]
+    ## Do not change with other elements that are in the same cluster
+    exchange_partners <- exchange_partners[clusters[exchange_partners] != cluster_i]
     ## Sometimes an exchange cannot take place
     if (length(exchange_partners) == 0) {
       n_damns <- n_damns + 1
@@ -35,19 +37,32 @@ fast_exchange_ <- function(data, clusters, categories, nearest_neighbors) {
     comparison_objectives <- rep(NA, length(exchange_partners))
     for (j in seq_along(exchange_partners)) {
       ## Swap item i with all legal exchange partners and check out objective
+      # (a) Determine clusters of to-be-swapped elements
       tmp_clusters <- clusters
-      tmp_clusters[i] <- tmp_clusters[exchange_partners[j]]
-      tmp_clusters[exchange_partners[j]] <- group_i
-      comparison_objectives[j] <- variance_objective_(tmp_clusters, data)
+      tmp_swap <- exchange_partners[j]
+      cluster_j <- tmp_clusters[tmp_swap]
+      tmp_clusters[i] <- cluster_j
+      tmp_clusters[tmp_swap] <- cluster_i
+      # (b) Update centers
+      tmp_centers <- update_centers(centers, data, i, tmp_swap, cluster_i, cluster_j, tab)
+      # (c) Compute distance from updated centers
+      distances <- dist_from_centers(data, tmp_centers, squared = TRUE)
+      # (d) Use two-column matrix to select distances that enter the
+      #     objective function
+      distances <- distances[cbind(1:nrow(distances), tmp_clusters)]
+      # (e) Compute objective after exchange
+      comparison_objectives[j] <- sum(distances)
     }
     ## Do the swap if an improvement occured
     best_this_round <- max(comparison_objectives)
     if (best_this_round > best_total) {
       # which element has to be swapped
       swap <- exchange_partners[comparison_objectives == best_this_round][1]
-      # swap the elements
+      ## Update centers
+      centers <- update_centers(centers, data, i, swap, clusters[i], clusters[swap], tab)
+      # swap the elements - update clusters
       clusters[i] <- clusters[swap]
-      clusters[swap] <- group_i
+      clusters[swap] <- cluster_i
       # update best solution
       best_total <- best_this_round
     }
@@ -56,6 +71,33 @@ fast_exchange_ <- function(data, clusters, categories, nearest_neighbors) {
   clusters
 }
 
+
+
+#' Update a cluster center after swapping two elements
+#'
+#' @param centers The current cluster centers
+#' @param features The features
+#' @param i the index of the first element to be swapped
+#' @param j the index of the second element to be swapped
+#' @param cluster_i the cluster of element i
+#' @param cluster_j the cluster of element j
+#' @param tab A table of the cluster frequencies
+#'
+#' @details
+#'
+#' This should make the fast exchange method much faster, because
+#' most time is spent on finding the cluster centers. After swapping
+#' only two elements, it should be possible to update the two centers
+#' very fast
+#' @noRd
+
+update_centers <- function(centers, features, i, j, cluster_i, cluster_j, tab) {
+  ## First cluster: item i is removed, item j is added
+  centers[cluster_i, ] <- centers[cluster_i, ] - (features[i, ] / tab[cluster_i]) + (features[j, ] / tab[cluster_j])
+  ## Other cluster: item j is removed, item i is added
+  centers[cluster_j, ] <- centers[cluster_j, ] + (features[i, ] / tab[cluster_i]) - (features[j, ] / tab[cluster_j])
+  centers
+}
 
 #' Get neigbours for fast preclustering (by category)
 #' @noRd
