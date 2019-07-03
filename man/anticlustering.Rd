@@ -265,6 +265,8 @@ Späth, H. (1986). Anticlustering: Maximizing the variance criterion.
 Control and Cybernetics, 15, 213-218.
 }
 \seealso{
+\code{\link{fast_anticlustering}}
+
 \code{\link{variance_objective}}
 
 \code{\link{distance_objective}}

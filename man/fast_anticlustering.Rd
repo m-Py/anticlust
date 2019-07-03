@@ -18,7 +18,7 @@ partner for each element. Defaults to Inf, i.e., each element
 is exchanged with each element in other groups.}
 
 \item{categories}{A vector, data.frame or matrix representing one or
-several categorical constraints. See details.}
+several categorical constraints.}
 }
 \description{
 The most efficient way to solve anticlustering optimizing the
