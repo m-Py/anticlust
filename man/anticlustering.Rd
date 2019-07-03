@@ -7,7 +7,7 @@
 anticlustering(features = NULL, distances = NULL, K,
   objective = "distance", method = "sampling", preclustering = FALSE,
   standardize = FALSE, nrep = 10000, categories = NULL,
-  parallelize = FALSE, seed = NULL, k_neighbours = 10)
+  parallelize = FALSE, seed = NULL)
 }
 \arguments{
 \item{features}{A numeric vector, matrix or data.frame of data
@@ -58,9 +58,6 @@ should be used for the random sampling method. Defaults to
 \item{seed}{A value to fixate the random seed when using the random
 sampling method. When \code{parallelize} is \code{TRUE}, using
 this argument is the only way to ensure reproducibility.}
-
-\item{k_neighbours}{The number of neighbours that serve as exchange
-partner for each element when method = "fast-exchange"}
 }
 \value{
 A vector of length \code{nrow(features)} (or

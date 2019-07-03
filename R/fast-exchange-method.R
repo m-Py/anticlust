@@ -1,4 +1,46 @@
 
+#' Fast anticlustering
+#'
+#' The most efficient way to solve anticlustering optimizing the
+#' k-means variance criterion. Can be used for very large data sets.
+#'
+#' @param features A numeric vector, matrix or data.frame of data
+#'     points.  Rows correspond to elements and columns correspond to
+#'     features. A vector represents a single numeric feature.
+#' @param K How many anticlusters should be created.
+#' @param k_neighbours The number of neighbours that serve as exchange
+#'     partner for each element. Defaults to Inf, i.e., each element
+#'     is exchanged with each element in other groups.
+#' @param categories A vector, data.frame or matrix representing one or
+#'     several categorical constraints. See details.
+#'
+#' @export
+#'
+#' @examples
+#'
+#' start <- Sys.time()
+#' features <- iris[, - 5]
+#' ac_exchange <- fast_anticlustering(features, K = 3)
+#' Sys.time() - start
+#' by(features, ac_exchange, function(x) round(colMeans(x, na.rm = TRUE), 2))
+#'
+#' start <- Sys.time()
+#' features <- schaper2019[, 3:6]
+#' ac_exchange <- fast_anticlustering(features, K = 3, categories = schaper2019$room)
+#' Sys.time() - start
+#' by(features, ac_exchange, function(x) round(colMeans(x, na.rm = TRUE), 2))
+#'
+
+fast_anticlustering <- function(features, K, k_neighbours = Inf, categories = NULL) {
+  anticlustering_(
+    features,
+    K = K,
+    k_neighbours = k_neighbours,
+    method = "fast-exchange",
+    categories = categories
+  )
+}
+
 #' Solve anticlustering using the fast exchange method
 #'
 #' @param data the data -- an N x M table of item features
@@ -10,13 +52,12 @@
 #'
 #' @noRd
 #'
-#'
 
 fast_exchange_ <- function(data, clusters, categories, nearest_neighbors) {
   N <- nrow(data)
   best_total <- variance_objective_(clusters, data)
-  n_damns <- 0
   centers <- cluster_centers(data, clusters)
+  ## frequencies of each cluster are required for updating cluster centers:
   tab <- c(table(clusters))
   for (i in 1:N) {
     # cluster of current item
@@ -30,7 +71,6 @@ fast_exchange_ <- function(data, clusters, categories, nearest_neighbors) {
     exchange_partners <- exchange_partners[clusters[exchange_partners] != cluster_i]
     ## Sometimes an exchange cannot take place
     if (length(exchange_partners) == 0) {
-      n_damns <- n_damns + 1
       next
     }
     # container to store objectives associated with each exchange of item i:
@@ -67,7 +107,6 @@ fast_exchange_ <- function(data, clusters, categories, nearest_neighbors) {
       best_total <- best_this_round
     }
   }
-  print(n_damns)
   clusters
 }
 
@@ -150,11 +189,9 @@ get_neigbours <- function(features, k_neighbours, categories) {
     }
     idx <- lapply(1:ncategories, get_index, x = nns)
     ## change dimensions to original nearest neighbour structure
-    adjust_dims <- function(a, b) {
-      dim(a) <- dim(b)
-      a
+    for (i in 1:length(idx)) {
+      dim(idx[[i]]) <- dim(nns[[i]])
     }
-    idx <- mapply(adjust_dims, idx, nns)
     idx <- do.call(rbind, idx)
     idx <- sort_by_col(idx, 1)
   }
