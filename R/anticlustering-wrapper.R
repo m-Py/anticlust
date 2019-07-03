@@ -160,9 +160,30 @@
 #' \code{\link[parallel]{clusterSetRNGStream}}; otherwise, the function
 #' \code{\link{set.seed}} is called.
 #'
-#' Random sampling is recommended when the objective is "distance"
-#' (cluster editing). The exchange method is recommended when the
-#' objective is "variance" (k-means).
+#' \strong{Recommendations}
+#'
+#' The following recommendations are provided on using this function:
+#'
+#' \enumerate{
+#'  \item If it is desired that the feature means are as similar as possible
+#'      between sets, select \code{objective = "variance"}
+#'  \item If the average similarity between elements in different sets
+#'      should be maximized (i.e., making sets as a whole similar to
+#'      each other), select \code{objective = "distance"}
+#'  \item When the objective is \code{"distance"} and an exact approach
+#'      is infeasible: selecting \code{method = "sampling"} and
+#'      \code{preclustering = TRUE} usually gives the best results.
+#'      Adjust \code{nrep} as needed, more repetitions may improve the
+#'      result. The exchange method is \bold{not recommended} for
+#'      optimizing the anticluster editing (distance) objective.
+#'  \item When the objective is \code{"variance"}: select
+#'      \code{method = "exchange"}. If the exchange method takes too long,
+#'      select \code{preclustering = TRUE} to reduce the
+#'      number of exchange partners per element. The exchange method is
+#'      preferred over random sampling for optimizing the k-means
+#'      (variance) objective.
+#' }
+#'
 #'
 #' \strong{Categorical constraints}
 #'
