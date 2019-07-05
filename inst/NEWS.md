@@ -1,4 +1,20 @@
 
+# anticlust 0.2.8
+
+2019-07-05
+
+A new exported function is available: `fast_anticlustering()`. As the 
+name suggests, it is optimized for speed and particularly useful for large 
+data sets (many thousand elements). It uses the k-means variance 
+objective because computing all pairwise distances for the cluster 
+editing objective becomes computationally infeasible for large data
+sets. Additionally, it employs a speed-optimized exchange method. 
+The number of exchange partners can be adjusted using the argument 
+`k_neighbours`. Fewer exchange partners make it possible to apply the
+`fast_anticlustering()` function to very large data sets. The default
+value for `k_neighbours` is `Inf`, meaning that in the default case, 
+each element is swapped with all other elements.
+
 # anticlust 0.2.7
 
 2019-07-01
