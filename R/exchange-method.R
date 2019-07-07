@@ -95,7 +95,7 @@ exchange_method_ <- function(data, clusters, obj_function, categories, precluste
       tmp_clusters <- clusters
       tmp_clusters[i] <- tmp_clusters[exchange_partners[j]]
       tmp_clusters[exchange_partners[j]] <- group_i
-      comparison_objectives[j] <- variance_objective_(tmp_clusters, data)
+      comparison_objectives[j] <- obj_function(tmp_clusters, data)
     }
     ## Do the swap if an improvement occured
     best_this_round <- max(comparison_objectives)
