@@ -15,7 +15,7 @@
 #' @importFrom parallel detectCores makeCluster clusterSetRNGStream parLapply stopCluster
 #'
 
-parallel_sampling <- function(dat, K, objective, nrep, sampling_plan,
+parallel_sampling <- function(dat, K, nrep, sampling_plan,
                               obj_function, seed, ncores = NULL) {
   if (!argument_exists(ncores)) {
     ncores <- parallel::detectCores() - 1
@@ -51,9 +51,9 @@ parallel_sampling <- function(dat, K, objective, nrep, sampling_plan,
 }
 
 # Make random_sampling usable for lapply (additional argument x)
-lapply_random_samling <- function(x, dat, K, objective, nrep, sampling_plan,
+lapply_random_samling <- function(x, dat, K, nrep, sampling_plan,
                                   obj_function) {
-  random_sampling_(dat, K, objective, nrep, sampling_plan,
+  random_sampling_(dat, K, nrep, sampling_plan,
                   obj_function)
 }
 
