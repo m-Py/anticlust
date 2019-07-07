@@ -9,10 +9,8 @@
 #' @noRd
 #'
 
-exchange_method <- function(features, distances, K, objective,
+exchange_method <- function(features, distances, K, obj_function,
                             categories, preclusters) {
-  categories <- merge_into_one_variable(categories) # may be NULL
-  obj_function <- get_objective_function(features, distances, objective)
   if (argument_exists(features)) {
     data <- features
   } else {
@@ -26,7 +24,7 @@ exchange_method <- function(features, distances, K, objective,
   ## The problem is: An initial assingnment is needed that potentially
   ## satisfies constraints (preclustering and/or categorical).
   if (!is.null(preclusters)) {
-    clusters <- random_sampling(features, K, preclusters, objective,
+    clusters <- random_sampling(features, K, preclusters, obj_function,
                                 1, distances, NULL, FALSE,
                                 NULL, NULL)
   }
@@ -35,7 +33,7 @@ exchange_method <- function(features, distances, K, objective,
     ## preclustering constraints. However, the exchange algorithm
     ## below still tries to adhere to the preclustering constraints as
     ## well as possible
-    clusters <- random_sampling(data, K, NULL, objective,
+    clusters <- random_sampling(data, K, NULL, obj_function,
                                 1, distances, categories, FALSE,
                                 NULL, NULL)
   }

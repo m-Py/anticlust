@@ -293,7 +293,7 @@ anticlustering_ <- function(features = NULL, distances = NULL,
     if (standardize) {
       features <- scale(features)
     }
-    if (objective == "distance") {
+    if (class(objective) != "function" && objective == "distance") {
       distances <- as.matrix(dist(features))
     }
   } else {
@@ -305,24 +305,31 @@ anticlustering_ <- function(features = NULL, distances = NULL,
     return(exact_anticlustering(distances, K, solver_available(),
                                 preclustering))
   }
+  ## Heuristic methods
+  # Determine if "objective" was a function
+  if (class(objective) != "function") {
+    obj_function <- get_objective_function(features, distances, objective)
+  } else {
+    obj_function <- objective
+  }
   preclusters <- NULL
+  categories <- merge_into_one_variable(categories) # may be NULL
   if (method == "sampling" || method == "heuristic") {
     if (!argument_exists(categories) && preclustering == TRUE) {
-      preclusters <- get_preclusters(features, distances, K, objective)
+      preclusters <- get_preclusters(features, distances, K)
     }
     return(random_sampling(features, K, preclusters,
-                           objective, nrep = nrep, distances,
+                           obj_function, nrep = nrep, distances,
                            categories, parallelize, seed,
                            ncores = NULL))
   } else if (method == "exchange") {
     if (preclustering == TRUE) {
-      preclusters <- get_preclusters(features, distances, K, objective)
+      preclusters <- get_preclusters(features, distances, K)
     }
-    return(exchange_method(features, distances, K, objective, categories, preclusters))
+    return(exchange_method(features, distances, K, obj_function, categories, preclusters))
   } else if (method == "fast-exchange") {
-    categories <- merge_into_one_variable(categories) # may be NULL
     neighbours <- get_neighbours(features, k_neighbours, categories)
-    clusters <- random_sampling(features, K, NULL, objective,
+    clusters <- random_sampling(features, K, NULL, obj_function,
                                 1, distances, categories, FALSE,
                                 NULL, NULL)
     fast_exchange_(features, clusters, categories, neighbours)
@@ -330,14 +337,14 @@ anticlustering_ <- function(features = NULL, distances = NULL,
 }
 
 ## Extracted function that computes the preclusters. May return NULL.
-get_preclusters <- function(features, distances, K, objective) {
-  if (objective == "distance" && K == 2) {
+get_preclusters <- function(features, distances, K) {
+  if (argument_exists(features)) {
+    distances <- dist(features)
+  }
+  if (K == 2) {
     preclusters <- greedy_matching(distances)
-  } else if (objective == "distance" && K > 2) {
+  } else if (K > 2) {
     preclusters <- greedy_balanced_k_clustering(distances, K)
-  } else if (objective == "variance") {
-    n_preclusters <- nrow(features) / K
-    preclusters <- equal_sized_kmeans(features, n_preclusters)
   }
   preclusters
 }
@@ -384,8 +391,6 @@ input_handling_anticlustering <- function(features, distances,
                  must_be_integer = TRUE)
   validate_input(method, "method", len = 1,
                  input_set = c("ilp", "sampling", "exchange", "heuristic", "fast-exchange"))
-  validate_input(objective, "objective", len = 1,
-                 input_set = c("variance", "distance"))
 
   validate_input(preclustering, "preclustering", "logical", len = 1,
                  input_set = c(TRUE, FALSE))
@@ -418,7 +423,7 @@ input_handling_anticlustering <- function(features, distances,
     }
   }
 
-  if (objective == "variance" && method == "ilp") {
+  if (class(objective) != "function" && objective == "variance" && method == "ilp") {
     stop("You cannot use integer linear programming method to maximize the variance criterion. ",
          "Use objective = 'distance', method = 'sampling', or method = 'exchange' instead")
   }
@@ -431,7 +436,7 @@ input_handling_anticlustering <- function(features, distances,
     stop("Only pass one of the arguments 'features' or 'distances'.")
   }
 
-  if (argument_exists(distances) && objective == "variance") {
+  if (class(objective) != "function" && argument_exists(distances) && objective == "variance") {
     stop("The argument 'distances' cannot be used if the argument 'objective' is 'variance'.")
   }
 

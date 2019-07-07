@@ -34,13 +34,11 @@
 #' @noRd
 #'
 
-random_sampling <- function(features, K, preclusters, objective,
+random_sampling <- function(features, K, preclusters, obj_function,
                             nrep, distances, categories,
                             parallelize, seed, ncores = NULL) {
 
   ## Determine objective function to be used
-  categories <- merge_into_one_variable(categories) # may be NULL
-  obj_function <- get_objective_function(features, distances, objective)
   sampling_plan <- get_sampling_plan(preclusters, categories)
   dat <- sort_by_group(features, distances, preclusters, categories)
 
@@ -48,7 +46,6 @@ random_sampling <- function(features, K, preclusters, objective,
     best_assignment <- parallel_sampling(
       dat,
       K,
-      objective,
       nrep,
       sampling_plan,
       obj_function,
@@ -62,7 +59,6 @@ random_sampling <- function(features, K, preclusters, objective,
     best_assignment <- random_sampling_(
       dat,
       K,
-      objective,
       nrep,
       sampling_plan,
       obj_function
@@ -168,8 +164,6 @@ sort_by_group <- function(features, distances, preclusters, categories) {
 #'     information on grouping restrictions (as the first
 #'     column, see \code{sort_data}).
 #' @param n_anticlusters How many anticlusters should be created.
-#' @param objective The objective to be maximized, either "distance" or
-#'     "variance".
 #' @param nrep The number of repetitions tried when assigning elements
 #'     to anticlusters when the method is "sampling" or "annealing".
 #' @param sampling_plan A string encoding how the anticlusters should be
@@ -188,7 +182,7 @@ sort_by_group <- function(features, distances, preclusters, categories) {
 #' @noRd
 #'
 
-random_sampling_ <- function(dat, K, objective, nrep, sampling_plan,
+random_sampling_ <- function(dat, K, nrep, sampling_plan,
                             obj_function) {
 
   ## Initialize variables
