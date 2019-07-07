@@ -312,20 +312,24 @@ anticlustering_ <- function(features = NULL, distances = NULL,
   } else {
     obj_function <- objective
   }
-  preclusters <- NULL
+  if (is.logical(preclustering) && preclustering == TRUE) {
+    preclusters <- get_preclusters(features, distances, K)
+  } else if (is.logical(preclustering) && preclustering == FALSE) {
+    preclusters <- NULL
+  } else {
+    preclusters <- preclustering # `preclustering` was already a preclustering vector
+  }
+
   categories <- merge_into_one_variable(categories) # may be NULL
   if (method == "sampling" || method == "heuristic") {
-    if (!argument_exists(categories) && preclustering == TRUE) {
-      preclusters <- get_preclusters(features, distances, K)
+    if (argument_exists(categories)) {
+      preclusters <- NULL
     }
     return(random_sampling(features, K, preclusters,
                            obj_function, nrep = nrep, distances,
                            categories, parallelize, seed,
                            ncores = NULL))
   } else if (method == "exchange") {
-    if (preclustering == TRUE) {
-      preclusters <- get_preclusters(features, distances, K)
-    }
     return(exchange_method(features, distances, K, obj_function, categories, preclusters))
   } else if (method == "fast-exchange") {
     neighbours <- get_neighbours(features, k_neighbours, categories)
@@ -336,7 +340,7 @@ anticlustering_ <- function(features = NULL, distances = NULL,
   }
 }
 
-## Extracted function that computes the preclusters. May return NULL.
+## Extracted function that computes the preclusters.
 get_preclusters <- function(features, distances, K) {
   if (argument_exists(features)) {
     distances <- dist(features)
@@ -381,7 +385,7 @@ input_handling_anticlustering <- function(features, distances,
       if (method == "ilp") {
         stop("K must be a divider of the number of elements with the ILP method. (Try out method = 'exchange' or method = 'sampling'.)")
       }
-      if (preclustering == TRUE) {
+      if (is.logical(preclustering) && preclustering == TRUE) {
         stop("K must be a divider of the number of elements with preclustering. (Try out preclustering = FALSE.)")
       }
     }
@@ -392,8 +396,6 @@ input_handling_anticlustering <- function(features, distances,
   validate_input(method, "method", len = 1,
                  input_set = c("ilp", "sampling", "exchange", "heuristic", "fast-exchange"))
 
-  validate_input(preclustering, "preclustering", "logical", len = 1,
-                 input_set = c(TRUE, FALSE))
   validate_input(standardize, "standardize", "logical", len = 1,
                  input_set = c(TRUE, FALSE))
 
