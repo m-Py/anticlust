@@ -8,7 +8,8 @@
   [243ca64](https://github.com/m-Py/anticlust/commit/243ca642be787e8c59ece4dbbb1b567fdac05656)). 
   Tests show that the exchange method now outperforms random sampling
   both for the k-means variance as well as the cluster editing distance
-  objective. Therefore, the exchange method is now the default method.
+  objective. Therefore, the exchange method is now the default method 
+  (see [b101073](https://github.com/m-Py/anticlust/commit/b101073602906b6b9bbf00c76943668f43407e0e)).
 - The fast exchange method is now used when optimizing the variance 
   criterion when calling `anticlustering()`. This improves run time by 
   a large margin for this important application. See [2f47fea](https://github.com/m-Py/anticlust/commit/2f47feaf05aee1d53b60bf78bb7c02994a4659c9).
