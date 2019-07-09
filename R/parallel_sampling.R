@@ -3,7 +3,7 @@
 #'
 #' A wrapper function that sets up some clusters and sends part of
 #' all required reptitions to each cluster. In the end, the best solution
-#' across the solutions found by each cluster is returned.#'
+#' across the solutions found by each cluster is returned.
 #'
 #' @inheritParams random_sampling
 #' @param seed A seed passed to \code{parallel::clusterSetRNGStream}
@@ -33,7 +33,6 @@ parallel_sampling <- function(dat, K, nrep, sampling_plan,
     cl = cl,
     dat = dat,
     K = K,
-    objective = objective,
     nrep = reps_per_cluster,
     sampling_plan = sampling_plan,
     obj_function = obj_function
