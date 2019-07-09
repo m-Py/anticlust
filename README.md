@@ -245,7 +245,7 @@ method: Building on an initial random assignment, items are swapped
 systematically in such a way that each swap improves set similarity by
 the largest amount that is possible (cf. Späth, 1986). The
 exchange method is generally prefered because it usually results in more
-similar sets (it is also the default value for the `method` argument.
+similar sets (it is also the default value for the `method` argument).
 The following code illustrates how to vary between the heuristic methods:
 
 ``` r
