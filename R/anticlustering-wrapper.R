@@ -253,7 +253,7 @@
 #'   K = 2,
 #'   categories = iris[, 5],
 #'   method = "sampling",
-#'   nrep = 10
+#'   nrep = 1
 #' )
 #' table(iris[, 5], anticlusters)
 #'

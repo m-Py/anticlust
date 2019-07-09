@@ -30,7 +30,7 @@ dissimilarities.}
 option "variance" maximizes the k-means objective function. See
 details.}
 
-\item{method}{One of "sampling" (default), "exchange", or "ilp".  See
+\item{method}{One of "exchange" (default), "sampling", or "ilp".  See
 details.}
 
 \item{preclustering}{Boolean. Should a preclustering be conducted
@@ -255,7 +255,7 @@ anticlusters <- anticlustering(
   K = 2,
   categories = iris[, 5],
   method = "sampling",
-  nrep = 10
+  nrep = 1
 )
 table(iris[, 5], anticlusters)
 
