@@ -279,7 +279,7 @@ anticlustering(
 )
 ```
 
-The "variance" objective cannot by optimized to optimality using integer
+The "variance" objective cannot be optimized to optimality using integer
 linear programming. Check out the help page for the `anticlust` function 
 `generate_partitions` (`?generate_partitions`) to see how k-means 
 anticlustering can nevertheless be solved optimally using complete

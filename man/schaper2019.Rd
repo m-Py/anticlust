@@ -45,9 +45,25 @@ anticlusters <- anticlustering(
 )
 
 # Means are quite similar across sets:
-by(schaper2019[, 3:6], anticlusters, function(x) round(colMeans(x), 2))
+by(features, anticlusters, function(x) round(colMeans(x), 2))
+# Check differences in standard deviations:
+by(features, anticlusters, function(x) round(apply(x, 2, sd), 2))
 # Room is balanced between the three sets:
 table(Room = schaper2019$room, Set = anticlusters)
+
+# Optimize the distance criterion
+# (tends to maximize similarity in feature means)
+ac_dist <- anticlustering(
+  features,
+  K = 3,
+  objective = "distance",
+  categories = schaper2019$room,
+  method = "exchange"
+)
+# With the distance criterion, means tend to be less similar,
+# but standard deviations tend to be more similar:
+by(features, ac_dist, function(x) round(colMeans(x), 2))
+by(features, ac_dist, function(x) round(apply(x, 2, sd), 2))
 
 }
 \references{
