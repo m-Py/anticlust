@@ -2,7 +2,8 @@
 #' Fast anticlustering
 #'
 #' The most efficient way to solve anticlustering optimizing the
-#' k-means variance criterion. Can be used for very large data sets.
+#' k-means variance criterion with an exchange method. Can be used for
+#' very large data sets.
 #'
 #' @param features A numeric vector, matrix or data.frame of data
 #'     points.  Rows correspond to elements and columns correspond to
@@ -16,21 +17,62 @@
 #'
 #' @importFrom RANN nn2
 #'
+#' @seealso
+#'
+#' \code{\link{anticlustering}}
+#'
+#' \code{\link{variance_objective}}
+#'
 #' @export
+#'
+#' @details
+#'
+#' This function was created to make anticlustering applicable
+#' to large data sets (e.g., 100,000 elements). It optimizes the k-means
+#' variance objective because computing all pairwise distances is not
+#' feasible for many elements. Additionally, this function employs a
+#' speed-optimized exchange method. For each element, the potential
+#' exchange partners are generated using a nearest neighbor search with the
+#' function \code{\link[RANN]{nn2}} from the \code{RANN} package. The nearest
+#' neighbors then serve as exchange partners. This approach is inspired by the
+#' preclustering heuristic according to which good solutions are found
+#' when similar elements are in different sets---by swapping nearest
+#' neighbors, this will often be the case. The number of exchange partners
+#' per element has to be set using the argument \code{k_neighbours}; by
+#' default, it is set to \code{Inf}, meaning that all possible swaps are
+#' tested. This default must be changed by the user for large data sets.
+#' More exchange partners generally improve the output, but also increase
+#' run time.
+#'
+#' When setting the \code{categories} argument, exchange partners will
+#' be generated from the same category. Note that when
+#' \code{categories} has multiple columns (i.e., each element is
+#' assigned to multiple columns), each combination of categories is
+#' treated as a distinct category by the exchange method.
 #'
 #' @examples
 #'
-#' start <- Sys.time()
+#'
 #' features <- iris[, - 5]
-#' ac_exchange <- fast_anticlustering(features, K = 3)
-#' Sys.time() - start
-#' by(features, ac_exchange, function(x) round(colMeans(x), 2))
+#'
 #'
 #' start <- Sys.time()
-#' features <- schaper2019[, 3:6]
-#' ac_exchange <- fast_anticlustering(features, K = 3, categories = schaper2019$room)
+#' ac_exchange <- fast_anticlustering(features, K = 3)
 #' Sys.time() - start
+#'
+#' ## The following call is equivalent to the call above:
+#' start <- Sys.time()
+#' ac_exchange <- anticlustering(features, K = 3, objective = "variance", method = "exchange")
+#' Sys.time() - start
+#'
+#'
+#' ## Improve run time by using fewer exchange partners:
+#' start <- Sys.time()
+#' ac_fast <- fast_anticlustering(features, K = 3, k_neighbours = 10)
+#' Sys.time() - start
+#'
 #' by(features, ac_exchange, function(x) round(colMeans(x), 2))
+#' by(features, ac_fast, function(x) round(colMeans(x), 2))
 #'
 
 fast_anticlustering <- function(features, K, k_neighbours = Inf, categories = NULL) {

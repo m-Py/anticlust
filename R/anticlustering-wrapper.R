@@ -134,7 +134,9 @@
 #' will limit the legal exchange partners to very similar elements,
 #' resulting in improved run time while preserving a rather good
 #' solution. This option is recommended for larger N. For very large N,
-#' the random sampling method is the recommended approach.
+#' check out the function \code{\link{fast_anticlustering}} that was
+#' specifically implemented for large data sets, or use the random
+#' sampling method.
 #'
 #' The random sampling approach may also incorporate a preclustering
 #' that prevents grouping very similar elements into the same
@@ -169,19 +171,15 @@
 #'      should be maximized (i.e., making sets as a whole similar to
 #'      each other), select \code{objective = "distance"}
 #'  \item When the objective is \code{"distance"} and an exact approach
-#'      is infeasible: selecting \code{method = "sampling"} and
-#'      \code{preclustering = TRUE} usually gives the best results.
-#'      Adjust \code{nrep} as needed, more repetitions may improve the
-#'      result. The exchange method is \bold{not recommended} for
-#'      optimizing the anticluster editing (distance) objective.
-#'  \item When the objective is \code{"variance"}: select
-#'      \code{method = "exchange"}. If the exchange method takes too long,
-#'      select \code{preclustering = TRUE} to reduce the
-#'      number of exchange partners per element. The exchange method is
-#'      preferred over random sampling for optimizing the k-means
-#'      (variance) objective.
+#'      is infeasible: select \code{method = "exchange"}; it is also
+#'      possible to activate \code{preclustering = TRUE}, which improves
+#'      run time and often does not even impair quality of the solution.
+#'  \item Generally, the exchange method is preferred over random
+#'      sampling. Use random sampling only for large data sets or if
+#'      a fast solution is needed. However, even in that case, using
+#'      the exchange method with preclustering activated or using the function
+#'      \code{\link{fast_anticlustering}} is usually preferred.
 #' }
-#'
 #'
 #' \strong{Categorical constraints}
 #'
@@ -219,28 +217,37 @@
 #' data(iris)
 #' head(iris[, -5]) # these features are made similar across sets
 #'
-#' # Optimize the variance criterion using the exchange method
-#' # and preclustering
+#'
+#' ## Optimize the variance criterion using the exchange method
 #' anticlusters <- anticlustering(
 #'   iris[, -5],
 #'   K = 3,
 #'   objective = "variance",
-#'   method = "exchange",
-#'   preclustering = TRUE
+#'   method = "exchange"
 #' )
 #' # Compare feature means by anticluster
 #' by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
+#' # Compare standard deviations by anticluster
+#' by(iris[, -5], anticlusters, function(x) round(apply(x, 2, sd), 2))
 #'
-#' # Optimize the cluster editing objective using random sampling
+#'
+#' ## Optimize the cluster editing objective while activating preclustering
 #' anticlusters <- anticlustering(
 #'   iris[, -5],
 #'   K = 3,
-#'   method = "sampling",
+#'   method = "exchange",
 #'   objective = "distance",
-#'   nrep = 10000
+#'   preclustering = TRUE
 #' )
+#' by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
+#' # Anticluster editing (method = "distance") tends to make the
+#' # standard deviations more similar, while k-means (method = "variance")
+#' # tends to make the means more similar):
+#' by(iris[, -5], anticlusters, function(x) round(apply(x, 2, sd), 2))
 #'
-#' # Incorporate categorical restrictions:
+#'
+#'
+#' ## Incorporate categorical restrictions:
 #' anticlusters <- anticlustering(
 #'   iris[, -5],
 #'   K = 2,
@@ -269,12 +276,6 @@ anticlustering <- function(features = NULL, distances = NULL,
                             standardize = FALSE, nrep = 10000,
                             categories = NULL, parallelize = FALSE,
                             seed = NULL) {
-  ## direct exchange method for k-means criterion to fast exchange for
-  ## fast computation
-  if (preclustering == FALSE && objective == "variance" && method == "exchange") {
-    method <- "fast-exchange"
-  }
-
   anticlustering_(features, distances, K, objective,
                   method, preclustering, standardize, nrep,
                   categories, parallelize,
@@ -286,7 +287,7 @@ anticlustering_ <- function(features = NULL, distances = NULL,
                             method = "sampling", preclustering = FALSE,
                             standardize = FALSE, nrep = 10000,
                             categories = NULL, parallelize = FALSE,
-                            seed = NULL, k_neighbours = 10) {
+                            seed = NULL, k_neighbours) {
 
   input_handling_anticlustering(features, distances, K, objective,
                                 method, preclustering,

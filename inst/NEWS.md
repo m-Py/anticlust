@@ -1,4 +1,37 @@
 
+# anticlust 0.2.9
+
+2019-07-09
+
+- A bug was fixed that incorrectly computed the objective function 
+  for anticluster editing when employing the exchange method (see 
+  [243ca64](https://github.com/m-Py/anticlust/commit/243ca642be787e8c59ece4dbbb1b567fdac05656)). 
+  Tests show that the exchange method now outperforms random sampling
+  both for the k-means variance as well as the cluster editing distance
+  objective. Therefore, the exchange method is now the default method.
+- The fast exchange method is now used when optimizing the variance 
+  criterion when calling `anticlustering()`. This improves run time by 
+  a large margin for this important application. See [2f47fea](https://github.com/m-Py/anticlust/commit/2f47feaf05aee1d53b60bf78bb7c02994a4659c9).
+- Two changes with regard to the functionality of arguments in `anticlustering()`
+    + It is possible that the argument objective now takes as input a 
+      function. This functionality is however not yet documented but may 
+      be an interesting application. The function has to take two arguments,
+      the first being a cluster assignment vector (such as returned by 
+      `anticlustering()`, the second being the data the objective is 
+      computed on. Larger values must indicate a better objective.
+    + It is possible that the argument `preclustering` now takes as input
+      a preclustering vector and not only `TRUE` or `FALSE` (in the former 
+      case, the preclustering vector is computed within the 
+      `anticlustering()` function. This allows for more flexibility, for 
+      example, it is possible to conduct optimal preclustering using 
+      integer linear programming with the function `balanced_clustering()`
+      and then use a heuristic anticlustering method.
+    + Both of these changes have not yet been added to the function 
+      documentation as they require some more testing.
+- The `fast_anticlustering()` function has been documented more
+  thoroughly and part of the `anticlustering()` docs have been reworked
+  (now advocating the exchange method as the preferable option).
+
 # anticlust 0.2.8
 
 2019-07-05
@@ -34,13 +67,13 @@ A big update:
   The exchange method outperforms the random sampling heuristic for k-means 
   anticlustering. The exchange method may incorporate
   both categorical and preclustering constraints, which is not possible
-  for the random sampling approach. For anticluster editing, 
-  the random sampling approach is better than the exchange method.
-  As there are now two heuristic methods (random sampling and exchange) 
+  for the random sampling approach. As there are now two heuristic 
+  methods (random sampling and exchange) 
   the argument `method` of the function `anticlustering()`
   now has the following three possible values: "sampling", "exchange", 
   "ilp". In earlier versions, the two options were "heuristic" and "ilp"; 
-  hence this change possibly breaks earlier code.
+  this change does not break earlier code because using 
+  `method = "heuristic"` will still refer to the random sampling method.
 - A new function `generate_partitions` can be used to generate all
   partitions, making it possible to solve anticlustering via complete
   enumeration. In particular, it is now possible---for small
