@@ -14,18 +14,17 @@
   criterion when calling `anticlustering()`. This improves run time by 
   a large margin for this important application. See [2f47fea](https://github.com/m-Py/anticlust/commit/2f47feaf05aee1d53b60bf78bb7c02994a4659c9).
 - Two changes with regard to the functionality of arguments in `anticlustering()`
-    + It is possible that the argument objective now takes as input a 
-      function. This functionality is however not yet documented but may 
-      be an interesting application. The function has to take two arguments,
+    + It is possible that the argument `objective` now takes as input a 
+      function. This function has to take two arguments,
       the first being a cluster assignment vector (such as returned by 
-      `anticlustering()`, the second being the data the objective is 
-      computed on. Larger values must indicate a better objective.
+      `anticlustering()`), the second being the data the objective is 
+      computed on. Larger return values are interpreted as a better objective.
     + It is possible that the argument `preclustering` now takes as input
       a preclustering vector and not only `TRUE` or `FALSE` (in the former 
       case, the preclustering vector is computed within the 
-      `anticlustering()` function. This allows for more flexibility, for 
-      example, it is possible to conduct optimal preclustering using 
-      integer linear programming with the function `balanced_clustering()`
+      `anticlustering()` function). This allows for more flexibility. For 
+      example, it is now possible to conduct optimal preclustering using 
+      integer linear programming with the function `balanced_clustering()`,
       and then use a heuristic anticlustering method.
     + Both of these changes have not yet been added to the function 
       documentation as they require some more testing.
