@@ -269,6 +269,12 @@ anticlustering <- function(features = NULL, distances = NULL,
                             standardize = FALSE, nrep = 10000,
                             categories = NULL, parallelize = FALSE,
                             seed = NULL) {
+  ## direct exchange method for k-means criterion to fast exchange for
+  ## fast computation
+  if (preclustering == FALSE && objective == "variance" && method == "exchange") {
+    method <- "fast-exchange"
+  }
+
   anticlustering_(features, distances, K, objective,
                   method, preclustering, standardize, nrep,
                   categories, parallelize,
