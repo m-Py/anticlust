@@ -72,13 +72,14 @@ test_that("heuristic anticlustering produces expected output", {
 
     ## Now anticlustering:
     # Test parallel and non-parallel anticlustering:
+    obj_function <- ifelse(conditions$objective[i] == "distance", obj_value_distance, variance_objective_)
     anticlusters <- random_sampling(
       features = as.matrix(features),
       distances = NULL,
       K = p_anticlusters,
       preclusters = preclusters,
       nrep = 100,
-      objective = conditions$objective[i],
+      obj_function = obj_function,
       categories = NULL,
       parallelize = FALSE,
       seed = NULL
@@ -112,13 +113,14 @@ test_that("parallel heuristic anticlustering produces expected output", {
 
     ## Now anticlustering:
     # Test parallel and non-parallel anticlustering:
+    obj_function <- ifelse(conditions$objective[i] == "distance", obj_value_distance, variance_objective_)
     anticlusters <- random_sampling(
       features = as.matrix(features),
       distances = NULL,
       K = p_anticlusters,
       preclusters = preclusters,
       nrep = 100,
-      objective = conditions$objective[i],
+      obj_function = obj_function,
       categories = NULL,
       parallelize = TRUE,
       seed = NULL,
