@@ -321,33 +321,21 @@ anticlustering(
 
 ### Heuristic anticlustering
 
-In addition to the exact approach---that is only feasible for small N---the `anticlust` package may employ two heuristic approaches. The first option is repeated random sampling: Across a specified number of runs, anticlusters are assigned randomly. In the end, the assignment that maximized set similarity is returned. The second approach is an exchange method: Building on an initial random assignment, items are swapped systematically in such a way that each swap improves set similarity by the largest amount that is possible (cf. Späth, 1986). Random sampling is recommended when the objective is "distance" (cluster editing). The exchange method is recommended when the objective is "variance" (k-means). The following code contains examples of how to use the heuristic methods:
+In addition to the exact approach---that is only feasible for small N---the `anticlust` package may employ two heuristic approaches. The first option is repeated random sampling: Across a specified number of runs, anticlusters are assigned randomly. In the end, the assignment that maximized set similarity is returned. The second approach is an exchange method: Building on an initial random assignment, items are swapped systematically in such a way that each swap improves set similarity by the largest amount that is possible (cf. Späth, 1986).The exchange method is generally prefered because it usually results in more similar sets (it is also the default value for the `method` argument). The following code illustrates how to vary between the heuristic methods:
 
 ```{r, eval = FALSE}
 ## Code example using random sampling
 anticlustering(
   features, 
   K = 2, 
-  method = "sampling",
-  objective = "distance" 
-)
-
-## Random sampling may also use preclustering (this often improves the
-## solution):
-anticlustering(
-  features, 
-  K = 2, 
-  method = "sampling",
-  objective = "distance",
-  preclustering = TRUE
+  method = "sampling"
 )
 
 ## Code example using the exchange method
 anticlustering(
   features, 
   K = 2, 
-  method = "exchange",
-  objective = "variance",
+  method = "exchange"
 )
 ```
 
