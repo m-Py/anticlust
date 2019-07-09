@@ -5,7 +5,7 @@
 \title{Anticlustering}
 \usage{
 anticlustering(features = NULL, distances = NULL, K,
-  objective = "distance", method = "sampling", preclustering = FALSE,
+  objective = "distance", method = "exchange", preclustering = FALSE,
   standardize = FALSE, nrep = 10000, categories = NULL,
   parallelize = FALSE, seed = NULL)
 }

@@ -272,7 +272,7 @@
 
 anticlustering <- function(features = NULL, distances = NULL,
                             K, objective = "distance",
-                            method = "sampling", preclustering = FALSE,
+                            method = "exchange", preclustering = FALSE,
                             standardize = FALSE, nrep = 10000,
                             categories = NULL, parallelize = FALSE,
                             seed = NULL) {
