@@ -3,14 +3,14 @@ context("Categorical constraints")
 library("anticlust")
 
 test_that("categorical constraints are met for one categorie (vector input)", {
-  N <- 120
+  N <- 60
   M <- 2
   features <- matrix(rnorm(N * M), ncol = M)
   ## iterate over number of categories & number of anticlusters
   for (K in 2:4) {
     for (C in 2:4) {
       categories <- sample(rep_len(1:C, N))
-      ac <- anticlustering(features, K = K, categories = categories, nrep = 10)
+      ac <- anticlustering(features, K = K, categories = categories)
       tab <- table(categories, ac)
       ## At most 1 deviation between categories in anticlusters
       expect_equal(all(abs(tab - tab[[1]]) <= 1), TRUE)
@@ -39,7 +39,7 @@ test_that("categorical constraints are met for two categories (data.frame or mat
         ## Random order to cath potential problem in the implementation
         ## that might be due to a reliance on sorted input (We don't
         ## want that)
-        #categories <- categories[sample(nrow(categories)), ]
+        categories <- categories[sample(nrow(categories)), ]
         vectorized_categories <- factor(do.call(paste0, as.list(categories)))
         ## Critical test: did it work to create balanced groups?
         tab <- table(vectorized_categories)
