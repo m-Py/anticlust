@@ -20,7 +20,7 @@
 #'     (default) maximizes the cluster editing objective function; the
 #'     option "variance" maximizes the k-means objective function. See
 #'     details.
-#' @param method One of "sampling" (default), "exchange", or "ilp".  See
+#' @param method One of "exchange" (default), "sampling", or "ilp".  See
 #'     details.
 #' @param preclustering Boolean. Should a preclustering be conducted
 #'     before anticlusters are created? Defaults to \code{FALSE}. See
