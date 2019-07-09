@@ -6,8 +6,8 @@
 #' @param K How many anticlusters should be created.
 #' @param preclusters An optional vector representing the preclustering
 #'     of the elements in \code{features}
-#' @param objective The objective to be maximized, either "distance" or
-#'     "variance".
+#' @param obj_function An objective function where the first argument
+#'     is a cluster assignment and the second argument is the data set.
 #' @param nrep The number of repetitions tried when assigning elements
 #'     to anticlusters when the method is "sampling" or "annealing".
 #' @param distances Alternative data argument that can be used if
