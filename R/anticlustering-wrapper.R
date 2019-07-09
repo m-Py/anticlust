@@ -326,6 +326,15 @@ anticlustering_ <- function(features = NULL, distances = NULL,
     preclusters <- preclustering # `preclustering` was already a preclustering vector
   }
 
+  ## direct exchange method for k-means criterion to fast exchange for
+  ## fast computation
+  if (class(objective) != "function" &&
+      preclustering == FALSE &&
+      objective == "variance" &&
+      method == "exchange") {
+    method <- "fast-exchange"
+  }
+
   categories <- merge_into_one_variable(categories) # may be NULL
   if (method == "sampling" || method == "heuristic") {
     if (argument_exists(categories)) {
