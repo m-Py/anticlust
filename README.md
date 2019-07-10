@@ -7,10 +7,11 @@ developed to assign items to experimental conditions in experimental
 psychology, but it can be applied whenever a user requires that a given
 set of elements has to be partitioned into similar subsets. Currently,
 the `anticlust` package offers the possibility to create subsets of
-equal size. The package is still under active developement; expect 
-changes and improvements before it will be submitted to CRAN. Check out the 
-[NEWS file](https://github.com/m-Py/anticlust/blob/master/inst/NEWS.md) 
-for recent changes.
+equal size. The package is still under active developement; expect
+changes and improvements before it will be submitted to CRAN. Check out
+the [NEWS
+file](https://github.com/m-Py/anticlust/blob/master/inst/NEWS.md) for
+recent changes.
 
 ## Installation
 
@@ -79,21 +80,11 @@ read. More information is available via the following sources:
 
 2.  I created a repository on the [Open Science
     Framework](https://osf.io/cd5sr/) that includes materials for a
-    better understanding of the anticlustering method. Currently, it
-    contains the slides of a talk that I gave a the TeaP conference
-    (Annual meeting of Experimental Psychologists) in London in April,
-    2019. The slides can be retrieved [here](https://osf.io/jbthk/);
-    they contain a visual illustration of the anticlustering method and
-    example code for different applications.
+    better understanding of the anticlustering method. For example, I
+    posted the slides of talks that I gave on the `anticlust` package.
 
 3.  There is a paper in preparation that will explain the theoretical
     background of the `anticlust` package in detail.
-
-4.  If you have any question on the anticlustering method and the
-    `anticlust` package, I encourage you to contact me via email
-    (<martin.papenberg@hhu.de>) or
-    [Twitter](https://twitter.com/MPapenberg) or to open an issue on
-    this Github repository.
 
 ## A quick start
 
@@ -108,9 +99,8 @@ number of groups is specified through the argument `K`.
 
 ### The anticlustering objective
 
-To measure set similarity, `anticlust` may employ one of two measures of
-set similarity that have been developed in the context of cluster
-analysis:
+To quantify set similarity, `anticlust` may employ one of two measures
+that have been developed in the context of cluster analysis:
 
   - the k-means “variance” objective (Späth 1986; Valev 1998)
   - the cluster editing “distance” objective (Böcker and Baumbach 2013;
@@ -119,28 +109,33 @@ analysis:
 The k-means objective is given by the sum of the squared distances
 between cluster centers and individual data points (Jain 2010). The
 cluster editing objective is the sum of pairwise distances within each
-anticluster. The following plot illustrates both objectives for 12 that
-are assigned to three sets; each element is described by two numeric
-features, displayed as the x- and
-y-axis:
+anticluster. The following plot illustrates both objectives for 15 
+elements that have been assigned to three sets. Each element is described by 
+two numeric features, displayed as the x- and y-axis:
 
-<img src="inst/README_files/figure-gfm/unnamed-chunk-2-1.png" style="display: block; margin: auto;" />
+<img src="inst/objectives_updated.png" width="100%" style="display: block; margin: auto;" />
 
 The lines connecting the dots illustrate the distances that enter the
-objective functions. For anticluster editing (“distance” objective),
-lines are drawn between pairs of elements within the same anticluster.
-For k-means anticlustering (“variance” objective), lines are drawn
-between each element and the cluster centroid. Minimization creates two
-distinct clusters of elements, whereas maximization leads to a strong
-overlap of the three sets. When we use the objectives for the
-anticlustering application, the distance objective maximizes the average
-similarity between elements in different sets, whereas the k-means
-objective tends to maximize the similarity of the cluster centers.
+objective functions. For anticluster editing (“distance objective”),
+lines are drawn between pairs of elements within the same anticluster,
+because the objective is the sum of the pairwise distances between
+elements in the same cluster. For k-means anticlustering (“variance
+objective”), lines are drawn between each element and the cluster
+centroid, because the objective is the sum of the squared distances
+between cluster centers and elements.
 
-To vary the objective function in the package `anticlust`, we may change
-the parameter `objective`. To apply anticluster editing, use `objective
-= "distance"` (this is also the default). To maximize the k-means
-variance objective, set `objective = "variance"`.
+Minimizing either the distance or the variance objective creates three
+distinct clusters of elements (as shown in the upper plots), whereas
+maximization leads to a strong overlap of the three sets, i.e., three
+anticlusters (as shown in the lower plots). For anticlustering, the
+distance objective maximizes the average similarity between elements in
+different sets, whereas the variance objective tends to maximize the
+similarity of the cluster centers (i.e., the feature means).
+
+To vary the objective function in the `anticlust` package, we can change
+the parameter `objective`. To use anticluster editing, use `objective =
+"distance"` (this is also the default). To maximize the k-means variance
+objective, set `objective = "variance"`.
 
 ``` r
 
@@ -241,12 +236,13 @@ In addition to the exact approach—that is only feasible for small N—the
 option is repeated random sampling: Across a specified number of runs,
 anticlusters are assigned randomly. In the end, the assignment that
 maximized set similarity is returned. The second approach is an exchange
-method: Building on an initial random assignment, items are swapped
-systematically in such a way that each swap improves set similarity by
-the largest amount that is possible (cf. Späth, 1986). The
-exchange method is generally prefered because it usually results in more
-similar sets (it is also the default value for the `method` argument).
-The following code illustrates how to vary between the heuristic methods:
+method: Building on an initial random assignment of elements to
+clusters, items are swapped between clusters in such a way that each
+swap improves set similarity by the largest amount that is possible
+(cf. Späth, 1986).The exchange method is generally prefered because it
+usually results in more similar sets and it is also the default method
+for the `anticlustering()` function. The following code illustrates how
+to vary between the heuristic methods:
 
 ``` r
 ## Code example using random sampling
@@ -281,7 +277,23 @@ anticlusters <- anticlustering(
   method = "exchange",
   categories = iris[, 5]
 )
+
+## The species are as balanced as possible across anticlusters:
+table(anticlusters, iris[, 5])
+#>             
+#> anticlusters setosa versicolor virginica
+#>            1     17         17        16
+#>            2     17         16        17
+#>            3     16         17        17
 ```
+
+## Questions and suggestions
+
+If you have any question on the `anticlust` package or any suggestions
+(which are greatly appreciated), I encourage you to contact me via email
+(<martin.papenberg@hhu.de>) or
+[Twitter](https://twitter.com/MPapenberg), or to open an issue on this
+Github repository.
 
 ## References
 
@@ -298,7 +310,7 @@ Böcker, Sebastian, and Jan Baumbach. 2013. “Cluster Editing.” In
 
 Böcker, Sebastian, Sebastian Briesemeister, and Gunnar W Klau. 2011.
 “Exact Algorithms for Cluster Editing: Evaluation and Experiments.”
-*Algorithmica* 60 (2): 316–34.
+*Algorithmica* 60 (2). Springer: 316–34.
 
 </div>
 
@@ -306,14 +318,14 @@ Böcker, Sebastian, Sebastian Briesemeister, and Gunnar W Klau. 2011.
 
 Grötschel, Martin, and Yoshiko Wakabayashi. 1989. “A Cutting Plane
 Algorithm for a Clustering Problem.” *Mathematical Programming* 45
-(1-3): 59–96.
+(1-3). Springer: 59–96.
 
 </div>
 
 <div id="ref-jain2010">
 
 Jain, Anil K. 2010. “Data Clustering: 50 Years Beyond K-Means.” *Pattern
-Recognition Letters* 31 (8): 651–66.
+Recognition Letters* 31 (8). Elsevier: 651–66.
 
 </div>
 
@@ -321,7 +333,7 @@ Recognition Letters* 31 (8): 651–66.
 
 Miyauchi, Atsushi, and Noriyoshi Sukegawa. 2015. “Redundant Constraints
 in the Standard Formulation for the Clique Partitioning Problem.”
-*Optimization Letters* 9 (1): 199–207.
+*Optimization Letters* 9 (1). Springer: 199–207.
 
 </div>
 
