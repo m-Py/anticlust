@@ -3,29 +3,36 @@
 
 2019-07-09
 
-- A bug was fixed that incorrectly computed the objective function 
-  for anticluster editing when employing the exchange method (see 
+- A bug was fixed that led to an incorrect computation of the objective 
+  function for anticluster editing when employing the exchange method (see 
   [243ca64](https://github.com/m-Py/anticlust/commit/243ca642be787e8c59ece4dbbb1b567fdac05656)). 
   Tests show that the exchange method now outperforms random sampling
-  both for the k-means variance as well as the cluster editing distance
-  objective. Therefore, the exchange method is now the default method 
+  for anticluster editing (as well as for k-means anticlustering). 
+  Therefore, the exchange method is now the default method 
   (see [b101073](https://github.com/m-Py/anticlust/commit/b101073602906b6b9bbf00c76943668f43407e0e)).
 - The fast exchange method is now used when optimizing the variance 
-  criterion when calling `anticlustering()`. This improves run time by 
+  criterion in a call to `anticlustering()`. This improves run time by 
   a large margin for this important application. See [2f47fea](https://github.com/m-Py/anticlust/commit/2f47feaf05aee1d53b60bf78bb7c02994a4659c9).
 - Two changes with regard to the functionality of arguments in `anticlustering()`
     + It is possible that the argument `objective` now takes as input a 
-      function. This function has to take two arguments,
+      function. The passed function has to take two arguments,
       the first being a cluster assignment vector (such as returned by 
       `anticlustering()`), the second being the data the objective is 
-      computed on. Larger return values are interpreted as a better objective.
+      computed on (e.g. an N x M matrix where rows are elements and 
+      columns are features). Larger return values must indicate a 
+      better objective as the objective is maximized with the existing 
+      methods (exchange method and random sampling). This functionality 
+      makes it possible for users to implement
+      their own operationalization of set similarity.
     + It is possible that the argument `preclustering` now takes as input
       a preclustering vector and not only `TRUE` or `FALSE` (in the former 
-      case, the preclustering vector is computed within the 
-      `anticlustering()` function). This allows for more flexibility. For 
+      case, the preclustering vector has been computed within the 
+      `anticlustering()` function). This allows for more flexibility 
+      in combining preclustering and anticlustering methods. For 
       example, it is now possible to conduct optimal preclustering using 
       integer linear programming with the function `balanced_clustering()`,
-      and then use a heuristic anticlustering method.
+      and then use a heuristic anticlustering method that incorporates this 
+      preclustering.
     + Both of these changes have not yet been added to the function 
       documentation as they require some more testing.
 - The `fast_anticlustering()` function has been documented more
