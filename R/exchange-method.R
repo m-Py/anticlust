@@ -19,25 +19,27 @@ exchange_method <- function(features, distances, K, obj_function,
 
   ## Generate an initial clustering from which the
   ## exchange is conducted. Default case is random initiation:
-  clusters <- sample(rep_len(1:K, length.out = nrow(data)))
-
-  ## The problem is: An initial assingnment is needed that potentially
-  ## satisfies constraints (preclustering and/or categorical).
-  if (argument_exists(preclusters)) {
-    clusters <- random_sampling(features, K, preclusters, obj_function,
-                                1, distances, NULL, FALSE,
-                                NULL, NULL)
+  if (length(K) == 1) {
+    clusters <- sample(rep_len(1:K, length.out = nrow(data)))
+    ## The problem is: An initial assingnment is needed that potentially
+    ## satisfies constraints (preclustering and/or categorical).
+    if (argument_exists(preclusters)) {
+      clusters <- random_sampling(features, K, preclusters, obj_function,
+                                  1, distances, NULL, FALSE,
+                                  NULL, NULL)
+    }
+    if (argument_exists(categories)) {
+      ## Categorical constraints have higher priority and overwrite
+      ## preclustering constraints. However, the exchange algorithm
+      ## below still tries to adhere to the preclustering constraints as
+      ## well as possible
+      clusters <- random_sampling(data, K, NULL, obj_function,
+                                  1, distances, categories, FALSE,
+                                  NULL, NULL)
+    }
+  } else {
+    clusters <- K
   }
-  if (argument_exists(categories)) {
-    ## Categorical constraints have higher priority and overwrite
-    ## preclustering constraints. However, the exchange algorithm
-    ## below still tries to adhere to the preclustering constraints as
-    ## well as possible
-    clusters <- random_sampling(data, K, NULL, obj_function,
-                                1, distances, categories, FALSE,
-                                NULL, NULL)
-  }
-
   exchange_method_(data, clusters, obj_function, categories, preclusters)
 }
 
@@ -82,9 +84,12 @@ exchange_method_ <- function(data, clusters, obj_function, categories, precluste
     # (b) are in the same precluster
     # (c) have the same category
     exchange_partners <- (clusters != group_i) & allowed_category & allowed_precluster
-    ## Ensure there are more than zero exchange partners:
+    ## Allow that items that are not currently in the set are available
+    ## as exchange partners -> NA is converted to TRUE
+    exchange_partners[is.na(exchange_partners)] <- TRUE
+    ## Do not use this item if there are zero exchange partners
     if (sum(exchange_partners) == 0) {
-      exchange_partners <- (clusters != group_i) & allowed_category
+      next
     }
     # items in other clusters
     exchange_partners <- (1:N)[exchange_partners]
