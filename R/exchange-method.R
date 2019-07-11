@@ -86,7 +86,7 @@ exchange_method_ <- function(data, clusters, obj_function, categories, precluste
     exchange_partners <- (clusters != group_i) & allowed_category & allowed_precluster
     ## Allow that items that are not currently in the set are available
     ## as exchange partners -> NA is converted to TRUE
-    exchange_partners[is.na(exchange_partners)] <- TRUE
+    exchange_partners[is.na(exchange_partners) & allowed_precluster] <- TRUE
     ## Do not use this item if there are zero exchange partners
     if (sum(exchange_partners) == 0) {
       next
