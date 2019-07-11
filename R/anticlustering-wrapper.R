@@ -395,9 +395,17 @@ input_handling_anticlustering <- function(features, distances,
     }
     features <- as.matrix(features)
     validate_input(features, "features", objmode = "numeric")
-    validate_input(K, "K", "numeric", len = 1,
-                   greater_than = 1, must_be_integer = TRUE)
-    if (nrow(features) %% K != 0) {
+    # allow that K is an initial assignment of elements to clusters
+    if (length(K) == 1) {
+      validate_input(K, "K", "numeric", len = 1,
+                     greater_than = 1, must_be_integer = TRUE)
+    } else {
+      validate_input(K, "K", "numeric", len = nrow(features))
+      if (method != "exchange") {
+        stop("an initial cluster assignment only works with method = 'exchange'")
+      }
+    }
+    if (length(K) == 1 && nrow(features) %% K != 0) {
       if (method == "ilp") {
         stop("K must be a divider of the number of elements with the ILP method. (Try out method = 'exchange' or method = 'sampling'.)")
       }
