@@ -298,14 +298,11 @@ anticlustering <- function(features = NULL, distances = NULL,
   data <- process_input(features, distances, standardize, objective)
   obj_function <- get_objective_function(features, distances, objective)
   preclusters <- get_preclusters(features, distances, K, preclustering)
-  ## Direct exchange method for k-means criterion to fast exchange for
-  ## fast computation. This will have to be handled differently in the
-  ## future (when merging fast_Exchange and exchange funtions)
-  if (class(objective) != "function" &&
-      is.null(preclusters) &&
-      objective == "variance" &&
-      method == "exchange") {
-    method <- "fast-exchange"
+
+  ## Redirect to fast exchange method for k-means exchange (and no preclustering)
+  if (class(objective) != "function" && is.null(preclusters) &&
+      objective == "variance" &&  method == "exchange") {
+    return(fast_anticlustering(features, K, Inf, categories))
   }
 
   ## Start heuristic optimization:

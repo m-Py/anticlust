@@ -76,14 +76,21 @@
 #'
 
 fast_anticlustering <- function(features, K, k_neighbours = Inf, categories = NULL) {
-  anticlustering_(
-    features,
-    K = K,
-    k_neighbours = k_neighbours,
-    method = "fast-exchange",
-    categories = categories,
-    objective = "variance"
-  )
+  input_handling_anticlustering(features, NULL, K, "variance",
+                                "exchange", FALSE,
+                                FALSE, 1, categories,
+                                FALSE, NULL)
+
+  if (!isTRUE(k_neighbours == Inf)) {
+    validate_input(k_neighbours, "k_neighbours", "numeric", len = 1,
+                   must_be_integer = TRUE, greater_than = 0, not_na = TRUE)
+  }
+  features <- as.matrix(features)
+  neighbours <- get_neighbours(features, k_neighbours, categories)
+  clusters <- random_sampling(features, K, NULL, variance_objective_,
+                              nrep = 1, categories, FALSE,
+                              NULL, NULL)
+  fast_exchange_(features, clusters, categories, neighbours)
 }
 
 #' Solve anticlustering using the fast exchange method

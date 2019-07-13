@@ -56,6 +56,11 @@ input_handling_anticlustering <- function(features, distances,
                    input_set = c(TRUE, FALSE), not_na = TRUE)
   } else if (length(preclustering) != 1) {
     validate_input(preclustering, "preclustering", "numeric", not_na = TRUE)
+    if (method %in% c("ilp", "sampling", "heuristic")) {
+      stop("Currently, it is not possible to pass a custom preclustering vector with ",
+           "the ILP or random sampling method. Set preclustering to `TRUE` or `FALSE`" ,
+           "or use method = 'exchange'.")
+    }
   } else {
     stop("The argument `preclustering` must be either TRUE/FALSE or a ",
          "preclustering vector of length N.")
@@ -87,7 +92,7 @@ input_handling_anticlustering <- function(features, distances,
   validate_input(nrep, "nrep", "numeric", len = 1, greater_than = 0,
                  must_be_integer = TRUE)
   validate_input(method, "method", len = 1,
-                 input_set = c("ilp", "sampling", "exchange", "heuristic", "fast-exchange"))
+                 input_set = c("ilp", "sampling", "exchange", "heuristic"))
 
   validate_input(standardize, "standardize", "logical", len = 1,
                  input_set = c(TRUE, FALSE))
@@ -118,19 +123,20 @@ input_handling_anticlustering <- function(features, distances,
     }
   }
 
-  if (class(objective) != "function" && objective == "variance" && method == "ilp") {
-    stop("You cannot use integer linear programming method to maximize the variance criterion. ",
-         "Use objective = 'distance', method = 'sampling', or method = 'exchange' instead")
-  }
-
-  if (class(objective) != "function" && argument_exists(distances) && objective == "variance") {
-    stop("The argument 'distances' cannot be used if the argument 'objective' is 'variance'.")
+  if (class(objective) != "function") {
+    validate_input(objective, "objective", input_set = c("distance", "variance"), len = 1)
+    if (objective == "variance" && method == "ilp") {
+      stop("You cannot use integer linear programming method to maximize the variance criterion. ",
+           "Use objective = 'distance', method = 'sampling', or method = 'exchange' instead")
+      if (argument_exists(distances) && objective == "variance") {
+        stop("The argument 'distances' cannot be used if the argument 'objective' is 'variance'.")
+      }
+    }
   }
 
   if (argument_exists(categories) && method == "ilp") {
     stop("The ILP method cannot incorporate categorical restrictions.")
   }
-
   return(invisible(NULL))
 }
 
@@ -272,12 +278,6 @@ self_validation <- function(argument_name, class_string, len, greater_than,
   if ((argument_exists(input_set) && !argument_exists(len)) ||
       (argument_exists(input_set) && len != 1))  {
     stop("If an input set is passed, argument len must be 1 ",
-         "(this message should not be seen by users of the package).")
-  }
-
-  if ((not_na == TRUE && !argument_exists(len)) ||
-      (not_na == TRUE && len != 1)) {
-    stop("If not_na is passed, argument len must be 1 ",
          "(this message should not be seen by users of the package).")
   }
 
