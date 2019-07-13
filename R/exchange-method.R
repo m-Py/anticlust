@@ -1,51 +1,12 @@
 
-#' Wrapper for the exchange method algorithm below
-#'
-#' This function takes the input and determines the objective function;
-#' i.e., just some preprocessing for the algorithm.
-#'
-#' For the arguments, see \code{anticlustering}
-#'
-#' @noRd
-#'
-
-exchange_method <- function(data, K, obj_function,
-                            categories, preclusters) {
-
-  ## Generate an initial clustering from which the
-  ## exchange is conducted. Default case is random initiation:
-  if (length(K) == 1) {
-    clusters <- sample(rep_len(1:K, length.out = nrow(data)))
-    ## The problem is: An initial assingnment is needed that potentially
-    ## satisfies constraints (preclustering and/or categorical).
-    if (argument_exists(preclusters)) {
-      clusters <- random_sampling(data, K, preclusters, obj_function,
-                                  nrep = 1, NULL, FALSE,
-                                  NULL, NULL)
-    }
-    if (argument_exists(categories)) {
-      ## Categorical constraints have higher priority and overwrite
-      ## preclustering constraints. However, the exchange algorithm
-      ## below still tries to adhere to the preclustering constraints as
-      ## well as possible
-      clusters <- random_sampling(data, K, NULL, obj_function,
-                                  nrep = 1, categories, FALSE,
-                                  NULL, NULL)
-    }
-  } else {
-    clusters <- K # K was already an anticluster assignment
-  }
-  exchange_method_(data, clusters, obj_function, categories, preclusters)
-}
-
 #' Solve anticlustering using the modified exchange method
 #'
 #' @param data the data -- a N x N dissimilarity matrix or a N x M
 #'     table of item features
-#' @param clusters An initial cluster assignment
-#' @param obj_function the objective function (to compute ACE or
-#'     K-Means criterion). Takes as first argument a cluster assignment
-#'     and as second argument the data set `data`.
+#' @param K The number of cluster or an initial cluster assignment
+#' @param obj_function the objective function. Takes as first argument
+#'     a cluster assignment and as second argument the data set `data`
+#'     (`data` is matrix, no `data.frame`).
 #' @param categories A vector representing categorical constraints
 #' @param preclusters A vector representing preclustering constraints
 #'
@@ -55,39 +16,20 @@ exchange_method <- function(data, K, obj_function,
 #'
 #'
 
-exchange_method_ <- function(data, clusters, obj_function, categories, preclusters) {
+exchange_method <- function(data, K, obj_function,
+                            categories, preclusters) {
+  clusters <- initialize_clusters(data, K, obj_function,
+                                  categories, preclusters)
   N <- nrow(data)
   best_total <- obj_function(clusters, data)
   for (i in 1:N) {
     # cluster of current item
     group_i <- clusters[i]
-    # are there categorical variables?
-    if (!is.null(categories)) {
-      # only exchange within the same group
-      allowed_category <- categories == categories[i]
-    } else {
-      allowed_category <- rep(TRUE, nrow(data)) # no constraint
-    }
-    if (!is.null(preclusters)) {
-      allowed_precluster <- preclusters == preclusters[i]
-    } else {
-      allowed_precluster <- rep(TRUE, nrow(data)) # no constraint
-    }
-
-    ## Feasible exchange partners:
-    # (a) are in different anticluster
-    # (b) are in the same precluster
-    # (c) have the same category
-    exchange_partners <- (clusters != group_i) & allowed_category & allowed_precluster
-    ## Allow that items that are not currently in the set are available
-    ## as exchange partners -> NA is converted to TRUE
-    exchange_partners[is.na(exchange_partners) & allowed_precluster] <- TRUE
+    exchange_partners <- get_exchange_partners(clusters, i, group_i, N, categories, preclusters)
     ## Do not use this item if there are zero exchange partners
-    if (sum(exchange_partners) == 0) {
+    if (length(exchange_partners) == 0) {
       next
     }
-    # items in other clusters
-    exchange_partners <- (1:N)[exchange_partners]
     # container to store objectives associated with each exchange of item i:
     comparison_objectives <- rep(NA, length(exchange_partners))
     for (j in seq_along(exchange_partners)) {
@@ -108,6 +50,57 @@ exchange_method_ <- function(data, clusters, obj_function, categories, precluste
       # update best solution
       best_total <- best_this_round
     }
+  }
+  clusters
+}
+
+get_exchange_partners <- function(clusters, i, group_i, N, categories, preclusters) {
+  # are there categorical variables?
+  if (!is.null(categories)) {
+    # only exchange within the same group
+    allowed_category <- categories == categories[i]
+    print(allowed_category)
+  } else {
+    allowed_category <- rep(TRUE, N) # no constraint
+  }
+  if (!is.null(preclusters)) {
+    allowed_precluster <- preclusters == preclusters[i]
+  } else {
+    allowed_precluster <- rep(TRUE, N) # no constraint
+  }
+  ## Feasible exchange partners:
+  # (a) are in different anticluster
+  # (b) are in the same precluster
+  # (c) have the same category
+  # (d) are NA (but of the same precluster)
+  exchange_partners <- (clusters != group_i) & allowed_category & allowed_precluster
+  print(exchange_partners)
+  ## Allow that items that are not currently in any set are available
+  ## as exchange partners -> NA is converted to TRUE
+  exchange_partners[is.na(exchange_partners)] <- TRUE
+  (1:N)[exchange_partners]
+}
+
+
+initialize_clusters <- function(data, K, obj_function,
+                                categories, preclusters) {
+  if (length(K) > 1) {
+    return(K) # K is already an anticluster assignment
+  }
+
+  ## Random initial assignment
+  clusters <- sample(rep_len(1:K, length.out = nrow(data)))
+  ## Initial assignment based on categorical constraints
+  if (argument_exists(categories)) {
+    return(random_sampling(data, K, NULL, obj_function,
+                           nrep = 1, categories, FALSE,
+                           NULL, NULL))
+  }
+  ## Initial assignment based on preclustering constraints
+  if (argument_exists(preclusters)) {
+    clusters <- random_sampling(data, K, preclusters, obj_function,
+                                nrep = 1, NULL, FALSE,
+                                NULL, NULL)
   }
   clusters
 }
