@@ -9,13 +9,8 @@
 #' @noRd
 #'
 
-exchange_method <- function(features, distances, K, obj_function,
+exchange_method <- function(data, K, obj_function,
                             categories, preclusters) {
-  if (argument_exists(features)) {
-    data <- features
-  } else {
-    data <- distances
-  }
 
   ## Generate an initial clustering from which the
   ## exchange is conducted. Default case is random initiation:
@@ -24,8 +19,8 @@ exchange_method <- function(features, distances, K, obj_function,
     ## The problem is: An initial assingnment is needed that potentially
     ## satisfies constraints (preclustering and/or categorical).
     if (argument_exists(preclusters)) {
-      clusters <- random_sampling(features, K, preclusters, obj_function,
-                                  1, distances, NULL, FALSE,
+      clusters <- random_sampling(data, K, preclusters, obj_function,
+                                  nrep = 1, NULL, FALSE,
                                   NULL, NULL)
     }
     if (argument_exists(categories)) {
@@ -34,11 +29,11 @@ exchange_method <- function(features, distances, K, obj_function,
       ## below still tries to adhere to the preclustering constraints as
       ## well as possible
       clusters <- random_sampling(data, K, NULL, obj_function,
-                                  1, distances, categories, FALSE,
+                                  nrep = 1, categories, FALSE,
                                   NULL, NULL)
     }
   } else {
-    clusters <- K
+    clusters <- K # K was already an anticluster assignment
   }
   exchange_method_(data, clusters, obj_function, categories, preclusters)
 }

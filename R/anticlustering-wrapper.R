@@ -271,64 +271,36 @@
 #'
 
 anticlustering <- function(features = NULL, distances = NULL,
-                            K, objective = "distance",
-                            method = "exchange", preclustering = FALSE,
-                            standardize = FALSE, nrep = 10000,
-                            categories = NULL, parallelize = FALSE,
-                            seed = NULL) {
-  anticlustering_(features, distances, K, objective,
-                  method, preclustering, standardize, nrep,
-                  categories, parallelize,
-                  seed, k_neighbours = Inf)
-}
-
-anticlustering_ <- function(features = NULL, distances = NULL,
-                            K, objective = "distance",
-                            method = "sampling", preclustering = FALSE,
-                            standardize = FALSE, nrep = 10000,
-                            categories = NULL, parallelize = FALSE,
-                            seed = NULL, k_neighbours) {
+                           K, objective = "distance",
+                           method = "exchange", preclustering = FALSE,
+                           standardize = FALSE, nrep = 10000,
+                           categories = NULL, parallelize = FALSE,
+                           seed = NULL) {
 
   input_handling_anticlustering(features, distances, K, objective,
                                 method, preclustering,
                                 standardize, nrep, categories,
                                 parallelize, seed)
 
-  ## Standardize feature values (for each feature, mean = 0, sd = 1)?
-  if (argument_exists(features)) {
-    features <- as.matrix(features)
-    if (standardize) {
-      features <- scale(features)
-    }
-    if (class(objective) != "function" && objective == "distance") {
-      distances <- as.matrix(dist(features))
-    }
-  } else {
-    distances <- as.matrix(as.dist(distances))
-  }
-
   ## Exact method using ILP
   if (method == "ilp") {
-    return(exact_anticlustering(distances, K, solver_available(),
-                                preclustering))
-  }
-  ## Heuristic methods
-  # Determine if "objective" was a function
-  if (class(objective) != "function") {
-    obj_function <- get_objective_function(features, distances, objective)
-  } else {
-    obj_function <- objective
-  }
-  if (is.logical(preclustering) && preclustering == TRUE) {
-    preclusters <- get_preclusters(features, distances, K)
-  } else if (is.logical(preclustering) && preclustering == FALSE) {
-    preclusters <- NULL
-  } else {
-    preclusters <- preclustering # `preclustering` was already a preclustering vector
+    return(exact_anticlustering(
+      features,
+      distances,
+      K,
+      solver_available(),
+      preclustering)
+    )
   }
 
-  ## direct exchange method for k-means criterion to fast exchange for
-  ## fast computation
+  ## Get data into required format and get objective function:
+  categories <- merge_into_one_variable(categories) # may be NULL
+  data <- process_input(features, distances, standardize, objective)
+  obj_function <- get_objective_function(features, distances, objective)
+  preclusters <- get_preclusters(features, distances, K, preclustering)
+  ## Direct exchange method for k-means criterion to fast exchange for
+  ## fast computation. This will have to be handled differently in the
+  ## future (when merging fast_Exchange and exchange funtions)
   if (class(objective) != "function" &&
       is.null(preclusters) &&
       objective == "variance" &&
@@ -336,139 +308,99 @@ anticlustering_ <- function(features = NULL, distances = NULL,
     method <- "fast-exchange"
   }
 
-  categories <- merge_into_one_variable(categories) # may be NULL
-  if (method == "sampling" || method == "heuristic") {
-    if (argument_exists(categories)) {
-      preclusters <- NULL
-    }
-    return(random_sampling(features, K, preclusters,
-                           obj_function, nrep = nrep, distances,
-                           categories, parallelize, seed,
-                           ncores = NULL))
-  } else if (method == "exchange") {
-    return(exchange_method(features, distances, K, obj_function, categories, preclusters))
-  } else if (method == "fast-exchange") {
-    neighbours <- get_neighbours(features, k_neighbours, categories)
-    clusters <- random_sampling(features, K, NULL, obj_function,
-                                1, distances, categories, FALSE,
-                                NULL, NULL)
-    fast_exchange_(features, clusters, categories, neighbours)
-  }
+  ## Start heuristic optimization:
+  heuristic_anticlustering(data, K, obj_function,
+                           method, preclusters, nrep,
+                           categories, parallelize,
+                           seed, k_neighbours = Inf)
 }
 
-## Extracted function that computes the preclusters.
-get_preclusters <- function(features, distances, K) {
+## Function that processes input and returns the data set that the
+## optimization is conducted on (for exchange and sampling methods)
+process_input <- function(features, distances, standardize, objective) {
   if (argument_exists(features)) {
-    distances <- dist(features)
+    data <- as.matrix(features)
+    if (standardize) {
+      data <- scale(data)
+    }
+    if (class(objective) != "function" && objective == "distance") {
+      ## Default case for optimization of distance: Euclidean distance
+      distances <- as.matrix(dist(data))
+    }
+  } else {
+    data <- as.matrix(as.dist(distances))
   }
-  if (K == 2) {
-    preclusters <- greedy_matching(distances)
-  } else if (K > 2) {
-    preclusters <- greedy_balanced_k_clustering(distances, K)
-  }
-  preclusters
+  data
 }
 
-#' Validating the arguments passed to `anticlustering`
-#'
-#' This function ensures that:
-#' (a) All arguments have correct type
-#' (b) Method "ilp" can only be used with objective = "distance"
-#' (c) A solver package has to be installed if method = "ilp"
-#' (d) A legal number of anticlusters was requested
-#'
-#' Takes the same parameters as \code{anticlustering}
-#'
-#' @return NULL
+#' Determine the objective function needed for the input
 #'
 #' @noRd
-input_handling_anticlustering <- function(features, distances,
-                                          K, objective, method,
-                                          preclustering, standardize,
-                                          nrep, categories,
-                                          parallelize, seed) {
+get_objective_function <- function(features, distances, objective) {
+  if (class(objective) == "function") {
+    return(objective)
+  }
 
-  ## Validate feature input
-  if (argument_exists(features)) {
-    if (sum(!complete.cases(features)) >= 1) {
-      warning("There are NAs in your data, take care!")
+  ## What was the input: features or distances
+  use_distances <- FALSE
+  if (argument_exists(distances)) {
+    use_distances <- TRUE
+  }
+  ## Determine how to compute objective, three cases:
+  # 1. Distance objective, distances were passed
+  # 2. Distance objective, features were passed
+  # 3. Variance objective, features were passed
+  if (objective == "distance" && use_distances == TRUE) {
+    obj_function <- distance_objective_
+  } else if (objective == "distance" && use_distances == FALSE) {
+    obj_function <- obj_value_distance
+  } else {
+    obj_function <- variance_objective_
+  }
+  obj_function
+}
+
+
+#' Merge several grouping variable into one
+#'
+#' @param categories A vector, data.frame or matrix that represents
+#'     one or several categorical constraints.
+#'
+#' @return A vector representing the group membership (or the combination
+#'     of group memberships) as one variable
+#'
+#' @noRd
+#'
+
+merge_into_one_variable <- function(categories) {
+  if (is.null(categories)) {
+    return(NULL)
+  }
+  categories <- data.frame(categories)
+  factor(do.call(paste0, as.list(categories)))
+}
+
+
+## function that computes preclusters
+get_preclusters <- function(features, distances, K, preclustering) {
+  ## Get precluster, three cases are possible
+  # (a) Preclusters may be NULL (if preclustering == FALSE)
+  # (b) may need to be computed (if preclustering == TRUE)
+  # (c) it was already passed by the user (preclustering = a vector)
+  if (is.logical(preclustering) && preclustering == FALSE) {
+    return(NULL)
+  }
+  if (is.logical(preclustering) && preclustering == TRUE) {
+    if (argument_exists(features)) {
+      distances <- dist(features)
     }
-    features <- as.matrix(features)
-    validate_input(features, "features", objmode = "numeric")
-    # allow that K is an initial assignment of elements to clusters
-    if (length(K) == 1) {
-      validate_input(K, "K", "numeric", len = 1,
-                     greater_than = 1, must_be_integer = TRUE)
-    } else {
-      validate_input(K, "K", "numeric", len = nrow(features))
-      if (method != "exchange") {
-        stop("an initial cluster assignment only works with method = 'exchange'")
-      }
+    if (K == 2) {
+      preclusters <- greedy_matching(distances)
+    } else if (K > 2) {
+      preclusters <- greedy_balanced_k_clustering(distances, K)
     }
-    if (length(K) == 1 && nrow(features) %% K != 0) {
-      if (method == "ilp") {
-        stop("K must be a divider of the number of elements with the ILP method. (Try out method = 'exchange' or method = 'sampling'.)")
-      }
-      if (is.logical(preclustering) && preclustering == TRUE) {
-        stop("K must be a divider of the number of elements with preclustering. (Try out preclustering = FALSE.)")
-      }
-    }
+  } else {
+    preclusters <- preclustering
   }
-
-  validate_input(nrep, "nrep", "numeric", len = 1, greater_than = 0,
-                 must_be_integer = TRUE)
-  validate_input(method, "method", len = 1,
-                 input_set = c("ilp", "sampling", "exchange", "heuristic", "fast-exchange"))
-
-  validate_input(standardize, "standardize", "logical", len = 1,
-                 input_set = c(TRUE, FALSE))
-
-  validate_input(parallelize, "parallelize", "logical", len = 1,
-                 input_set = c(TRUE, FALSE))
-  if (argument_exists(seed)) {
-    validate_input(seed, "seed", "numeric", len = 1, not_na = TRUE)
-  }
-
-  if (method == "ilp") {
-    solver <- solver_available()
-    if (solver == FALSE) {
-      stop("\n\nAn exact solution was requested, but none of the linear ",
-           "programming \npackages 'Rglpk', 'gurobi', or 'Rcplex' is ",
-           "available. \n\nTry `method = 'sampling'`, `method = 'exchange'` or install ",
-           "a linear programming solver \nto obtain an exact solution. ",
-           "For example, install the GNU linear \nprogramming kit: \n\n",
-           "- On windows, visit ",
-           "http://gnuwin32.sourceforge.net/packages/glpk.htm \n\n",
-           "- Use homebrew to install it on mac, 'brew install glpk' \n\n",
-           "- 'sudo apt install libglpk-dev' on Ubuntu ",
-           "\n\nThen, install the Rglpk package via ",
-           "`install.packages(Rglpk)`. \n\nOtherwise, you may obtain ",
-           "a license for one of ",
-           "the commercial solvers \ngurobi or IBM CPLEX (they are free ",
-           "for academic use).")
-    }
-  }
-
-  if (class(objective) != "function" && objective == "variance" && method == "ilp") {
-    stop("You cannot use integer linear programming method to maximize the variance criterion. ",
-         "Use objective = 'distance', method = 'sampling', or method = 'exchange' instead")
-  }
-
-  if (!argument_exists(features) && !argument_exists(distances)) {
-    stop("One of the arguments 'features' or 'distances' must be given.")
-  }
-
-  if (argument_exists(features) && argument_exists(distances)) {
-    stop("Only pass one of the arguments 'features' or 'distances'.")
-  }
-
-  if (class(objective) != "function" && argument_exists(distances) && objective == "variance") {
-    stop("The argument 'distances' cannot be used if the argument 'objective' is 'variance'.")
-  }
-
-  if (argument_exists(categories) && method == "ilp") {
-    stop("The ILP method cannot incorporate categorical restrictions")
-  }
-
-  return(invisible(NULL))
+  preclusters
 }

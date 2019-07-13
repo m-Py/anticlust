@@ -1,4 +1,112 @@
 
+
+#' Validating the arguments passed to `anticlustering`
+#'
+#' This function ensures that:
+#' (a) All arguments have correct type
+#' (b) Method "ilp" can only be used with objective = "distance"
+#' (c) A solver package has to be installed if method = "ilp"
+#' (d) A legal number of anticlusters was requested
+#'
+#' Takes the same parameters as \code{anticlustering}
+#'
+#' @return NULL
+#'
+#' @noRd
+input_handling_anticlustering <- function(features, distances,
+                                          K, objective, method,
+                                          preclustering, standardize,
+                                          nrep, categories,
+                                          parallelize, seed) {
+
+  ## Validate feature input
+  if (argument_exists(features)) {
+    if (sum(!complete.cases(features)) >= 1) {
+      warning("There are NAs in your data, take care!")
+    }
+    features <- as.matrix(features)
+    validate_input(features, "features", objmode = "numeric")
+    # allow that K is an initial assignment of elements to clusters
+    if (length(K) == 1) {
+      validate_input(K, "K", "numeric", len = 1,
+                     greater_than = 1, must_be_integer = TRUE)
+    } else {
+      validate_input(K, "K", "numeric", len = nrow(features))
+      if (method != "exchange") {
+        stop("an initial cluster assignment only works with method = 'exchange'")
+      }
+    }
+    if (length(K) == 1 && nrow(features) %% K != 0) {
+      if (method == "ilp") {
+        stop("K must be a divider of the number of elements with the ILP method. ",
+             "(Try out method = 'exchange' or method = 'sampling'.)")
+      }
+      if (is.logical(preclustering) && preclustering == TRUE) {
+        stop("K must be a divider of the number of elements with preclustering. ",
+             "(Try out preclustering = FALSE.)")
+      }
+    }
+  }
+
+  validate_input(nrep, "nrep", "numeric", len = 1, greater_than = 0,
+                 must_be_integer = TRUE)
+  validate_input(method, "method", len = 1,
+                 input_set = c("ilp", "sampling", "exchange", "heuristic", "fast-exchange"))
+
+  validate_input(standardize, "standardize", "logical", len = 1,
+                 input_set = c(TRUE, FALSE))
+
+  validate_input(parallelize, "parallelize", "logical", len = 1,
+                 input_set = c(TRUE, FALSE))
+  if (argument_exists(seed)) {
+    validate_input(seed, "seed", "numeric", len = 1, not_na = TRUE)
+  }
+
+  if (method == "ilp") {
+    solver <- solver_available()
+    if (solver == FALSE) {
+      stop("\n\nAn exact solution was requested, but none of the linear ",
+           "programming \npackages 'Rglpk', 'gurobi', or 'Rcplex' is ",
+           "available. \n\nTry `method = 'sampling'`, `method = 'exchange'` or install ",
+           "a linear programming solver \nto obtain an exact solution. ",
+           "For example, install the GNU linear \nprogramming kit: \n\n",
+           "- On windows, visit ",
+           "http://gnuwin32.sourceforge.net/packages/glpk.htm \n\n",
+           "- Use homebrew to install it on mac, 'brew install glpk' \n\n",
+           "- 'sudo apt install libglpk-dev' on Ubuntu ",
+           "\n\nThen, install the Rglpk package via ",
+           "`install.packages('Rglpk')`. \n\nOtherwise, you may obtain ",
+           "a license for one of ",
+           "the commercial solvers \ngurobi or IBM CPLEX (they are free ",
+           "for academic use).")
+    }
+  }
+
+  if (class(objective) != "function" && objective == "variance" && method == "ilp") {
+    stop("You cannot use integer linear programming method to maximize the variance criterion. ",
+         "Use objective = 'distance', method = 'sampling', or method = 'exchange' instead")
+  }
+
+  if (!argument_exists(features) && !argument_exists(distances)) {
+    stop("One of the arguments 'features' or 'distances' must be given.")
+  }
+
+  if (argument_exists(features) && argument_exists(distances)) {
+    stop("Only pass one of the arguments 'features' or 'distances'.")
+  }
+
+  if (class(objective) != "function" && argument_exists(distances) && objective == "variance") {
+    stop("The argument 'distances' cannot be used if the argument 'objective' is 'variance'.")
+  }
+
+  if (argument_exists(categories) && method == "ilp") {
+    stop("The ILP method cannot incorporate categorical restrictions")
+  }
+
+  return(invisible(NULL))
+}
+
+
 #' A function for input validation
 #'
 #' @param obj The object that undergoes validation
