@@ -1,4 +1,26 @@
 
+# anticlust 0.2.9-2
+
+New features: 
+
+- In the `anticlustering()` function, K can now be an anticluster vector that
+  serves as the initiation for the exchange method
+- Subset selection (i.e., not assigning each item to a set, but only a subset)
+  is now possible with the exchange method when `K` contains `NA`. 
+  However, currently this functionality is limited to the case where the user 
+  provides (a) a customized `K` with NAs and (b) a user-defined objective function
+  that deals with the presence of NAs. In future versions, there will be a more
+  user-friendly method for subset selection.
+    + By using the `preclustering` vector input,
+      it is also possible to do subset selection from different item pools such 
+      that in advance, the user defines several populations of items. This will also
+      be implemented more user-friendly in a future release and.
+    + The subset selection functionality has not yet been added to the documentation.
+- Major internal restructuring to improve the expected maintainability in the 
+  future. In the last weeks, a lot of features were added to `anticlust` and
+  a restructuring seemed necessary.
+- Many test cases were added to test the new features (TODO).
+
 # anticlust 0.2.9
 
 2019-07-09
