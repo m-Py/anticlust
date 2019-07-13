@@ -19,32 +19,68 @@ input_handling_anticlustering <- function(features, distances,
                                           nrep, categories,
                                           parallelize, seed) {
 
+  if (!argument_exists(features) && !argument_exists(distances)) {
+    stop("One of the arguments 'features' or 'distances' must be given.")
+  }
+
+  if (argument_exists(features) && argument_exists(distances)) {
+    stop("Only pass one of the arguments 'features' or 'distances'.")
+  }
+
   ## Validate feature input
   if (argument_exists(features)) {
+    features <- as.matrix(features)
+    N <- nrow(features)
+    validate_input(features, "features", objmode = "numeric")
     if (sum(!complete.cases(features)) >= 1) {
       warning("There are NAs in your data, take care!")
     }
-    features <- as.matrix(features)
-    validate_input(features, "features", objmode = "numeric")
-    # allow that K is an initial assignment of elements to clusters
-    if (length(K) == 1) {
-      validate_input(K, "K", "numeric", len = 1,
-                     greater_than = 1, must_be_integer = TRUE)
-    } else {
-      validate_input(K, "K", "numeric", len = nrow(features))
-      if (method != "exchange") {
-        stop("an initial cluster assignment only works with method = 'exchange'")
-      }
+  } else if (argument_exists(distances)) {
+    if (class(distances) == "dist") {
+      distances <- as.matrix(distances)
     }
-    if (length(K) == 1 && nrow(features) %% K != 0) {
-      if (method == "ilp") {
-        stop("K must be a divider of the number of elements with the ILP method. ",
-             "(Try out method = 'exchange' or method = 'sampling'.)")
-      }
-      if (is.logical(preclustering) && preclustering == TRUE) {
-        stop("K must be a divider of the number of elements with preclustering. ",
-             "(Try out preclustering = FALSE.)")
-      }
+    ## Ensure that the input really is a distance matrix:
+    lower <- distances[lower.tri(distances)]
+    distances <- t(distances)
+    upper <- distances[lower.tri(distances)]
+    if (any(lower != upper)) {
+      stop("The input via argument `distance` is not a distance matrix. ",
+           "The upper and lower triangular of your matrix differ.")
+    }
+    N <- nrow(distances)
+  }
+
+
+  if (length(preclustering) == 1)  {
+    validate_input(preclustering, "preclustering", "logical", len = 1,
+                   input_set = c(TRUE, FALSE), not_na = TRUE)
+  } else if (length(preclustering) != 1) {
+    validate_input(preclustering, "preclustering", "numeric", not_na = TRUE)
+  } else {
+    stop("The argument `preclustering` must be either TRUE/FALSE or a ",
+         "preclustering vector of length N.")
+  }
+
+  # Allow that K is an initial assignment of elements to clusters
+  if (length(K) == 1) {
+    validate_input(K, "K", "numeric", len = 1,
+                   greater_than = 1, must_be_integer = TRUE)
+  } else {
+    validate_input(K, "K", "numeric", len = N)
+    if (method != "exchange") {
+      stop("Passing an initial cluster assignment via the argument `K` ",
+           "only works with method = 'exchange'")
+    }
+  }
+
+  if (length(K) == 1 && N %% K != 0) {
+    if (method == "ilp") {
+      stop("K must be a divider of the number of elements when using the ILP method. ",
+           "(Try out method = 'exchange' or method = 'sampling'.)")
+    }
+    if (is.logical(preclustering) && preclustering == TRUE) {
+      stop("K must be a divider of the number of elements when preclustering is `TRUE`. ",
+           "(Try out preclustering = FALSE.)")
     }
   }
 
@@ -87,20 +123,12 @@ input_handling_anticlustering <- function(features, distances,
          "Use objective = 'distance', method = 'sampling', or method = 'exchange' instead")
   }
 
-  if (!argument_exists(features) && !argument_exists(distances)) {
-    stop("One of the arguments 'features' or 'distances' must be given.")
-  }
-
-  if (argument_exists(features) && argument_exists(distances)) {
-    stop("Only pass one of the arguments 'features' or 'distances'.")
-  }
-
   if (class(objective) != "function" && argument_exists(distances) && objective == "variance") {
     stop("The argument 'distances' cannot be used if the argument 'objective' is 'variance'.")
   }
 
   if (argument_exists(categories) && method == "ilp") {
-    stop("The ILP method cannot incorporate categorical restrictions")
+    stop("The ILP method cannot incorporate categorical restrictions.")
   }
 
   return(invisible(NULL))
@@ -202,8 +230,8 @@ validate_input <- function(obj, argument_name, class_string = NULL,
   }
 
   if (not_na == TRUE) {
-    if (is.na(obj)) {
-      stop(argument_name, " cannot must not be NA but is NA")
+    if (sum(is.na(obj) >= 1)) {
+      stop(argument_name, " cannot must not be NA but contains NA")
     }
   }
 

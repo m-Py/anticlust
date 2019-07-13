@@ -20,11 +20,6 @@
 
 exact_anticlustering <- function(features, distances, K, solver, preclustering) {
 
-  if (length(preclustering) > 1) {
-    stop("Currently, it is not possible to pass a custom preclustering vector with ",
-         "the ILP method. If `method` is 'ilp', set preclustering to `TRUE` of `FALSE`.")
-  }
-
   ## If needed, convert features to Euclidean distance
   if (argument_exists(features)) {
     distances <- dist(features)
