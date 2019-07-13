@@ -156,10 +156,10 @@ variance_objective_ <- function(clusters, data) {
 #'
 #'
 #' # Illustrates the cluster editing objective as the sum of distances
-#' # within groups:
+#' # within groups (needs an integer linear programming solver!)
 #' n_elements <- 12
 #' features <- matrix(runif(n_elements * 2), ncol = 2)
-#' n_groups <- 3
+#' n_groups <- 2
 #' clusters <- balanced_clustering(features, K = n_groups, method = "ilp")
 #' anticlusters <- anticlustering(features, K = n_groups, method = "ilp")
 #' par(mfrow = c(1, 2))
