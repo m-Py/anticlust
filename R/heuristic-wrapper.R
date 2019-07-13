@@ -23,12 +23,5 @@ heuristic_anticlustering <- function(data, K, obj_function,
                            ncores = NULL))
   } else if (method == "exchange") {
     return(exchange_method(data, K, obj_function, categories, preclusters))
-  } else if (method == "fast-exchange") {
-    ## fast exchange only
-    neighbours <- get_neighbours(data, k_neighbours, categories)
-    clusters <- random_sampling(data, K, NULL, obj_function,
-                                nrep = 1, categories, FALSE,
-                                NULL, NULL)
-    fast_exchange_(data, clusters, categories, neighbours)
   }
 }
