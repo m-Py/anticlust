@@ -7,19 +7,18 @@ New features:
   serves as the initiation for the exchange method
 - Subset selection (i.e., not assigning each item to a set, but only a subset)
   is now possible with the exchange method when `K` contains `NA`. 
-  However, currently this functionality is limited to the case where the user 
-  provides (a) a customized `K` with NAs and (b) a user-defined objective function
-  that deals with the presence of NAs. In future versions, there will be a more
-  user-friendly method for subset selection.
-    + By using the `preclustering` vector input,
-      it is also possible to do subset selection from different item pools such 
-      that in advance, the user defines several populations of items. This will also
-      be implemented more user-friendly in a future release and.
-    + The subset selection functionality has not yet been added to the documentation.
+    + Check out the function `subset_selection()` for an example how to 
+      do that. The function `subset_selection()` generates an initial 
+      assignment that satisfies grouping restrictions. In the exchange 
+      method, these restriction are enforced all the time by passing 
+      the grouping variable to the argument `categories`.
+- For subset selection, a new objective function was added: `mean_sd_obj()`. 
+  Maximizing this objective will simply make all sets as similar as 
+  possible on the mean and standard deviation of all features.
 - Major internal restructuring to improve the expected maintainability in the 
   future. In the last weeks, a lot of features were added to `anticlust` and
   a restructuring seemed necessary.
-- Many test cases were added to test the new features (TODO).
+- Many test cases were added to test the new features
 
 # anticlust 0.2.9
 
