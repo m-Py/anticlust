@@ -17,20 +17,25 @@
 #'
 #' @examples
 #'
-#' # Example of how to use the function to create two subset of stimuli
-#' # from the schaper2019 data set. Two sets of n = 20 each are created,
-#' # one with kitchen items only and one with bathroom items only. The
-#' # sets are parallelized on two features.
+#' # Example of how to use the function `anticlustering` to create two
+#' # subset of stimuli from the schaper2019 data set. Two sets of n = 20
+#' # each are created, one with kitchen items only and one with bathroom
+#' # items only. The sets are parallelized on the means and standard
+#' # deviations of four features.
 #'
 #' head(schaper2019)
 #' features <- schaper2019[, 3:6]
 #'
+#' K <- subset_selection(groups = schaper2019$room, n = c(20, 20))
 #' groups <- anticlustering(
 #'   features,
-#'   K = subset_selection(groups = schaper2019$room, n = c(20, 20)),
+#'   K = K,
 #'   categories = schaper2019$room,
 #'   objective = mean_sd_obj # this objective function makes most sense for subset selection
 #' )
+#' # Note that this subset selection based on two groups is
+#' # no longer anticlustering that would divide one pool of items
+#' # into subsets
 #'
 #' table(K, schaper2019$room)
 #' # Compare feature means by room
