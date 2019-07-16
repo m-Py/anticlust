@@ -59,7 +59,6 @@ get_exchange_partners <- function(clusters, i, group_i, N, categories, precluste
   if (!is.null(categories)) {
     # only exchange within the same group
     allowed_category <- categories == categories[i]
-    print(allowed_category)
   } else {
     allowed_category <- rep(TRUE, N) # no constraint
   }
@@ -72,11 +71,11 @@ get_exchange_partners <- function(clusters, i, group_i, N, categories, precluste
   # (a) are in different anticluster
   # (b) are in the same precluster
   # (c) have the same category
-  # (d) are NA (but of the same precluster)
+  # (d) are NA (and in the same precluster/category)
   exchange_partners <- (clusters != group_i) & allowed_category & allowed_precluster
-  print(exchange_partners)
-  ## Allow that items that are not currently in any set are available
-  ## as exchange partners -> NA is converted to TRUE
+  ## NA is converted to TRUE. This works because: An item only has NA
+  ## if its cluster is currently NA and has the same category/precluster
+  ## (case (d) from above)
   exchange_partners[is.na(exchange_partners)] <- TRUE
   (1:N)[exchange_partners]
 }
