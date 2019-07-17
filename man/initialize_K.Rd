@@ -2,7 +2,7 @@
 % Please edit documentation in R/init-subset-selection.R
 \name{initialize_K}
 \alias{initialize_K}
-\title{Generates an initial cluster assignment for anticlustering}
+\title{Generate an initial cluster assignment for anticlustering}
 \usage{
 initialize_K(N = NULL, K = NULL, n, groups = NULL)
 }
@@ -54,13 +54,29 @@ groups <- anticlustering(
   objective = mean_sd_obj # this objective function makes most sense for subset selection
 )
 # Note that this subset selection based on two groups is
-# no longer anticlustering that would divide one pool of items
-# into subsets
+# no longer an anticlustering method (that would divide one pool of
+# items into subsets)
 
 table(K, schaper2019$room)
 # Compare feature means by room
 by(features, groups, function(x) round(colMeans(x), 2))
 # Compare standard deviations by room
 by(features, groups, function(x) round(apply(x, 2, sd), 2))
+
+
+# Create sets of different size, optimizing anticluster editing objective:
+K <- initialize_K(n = c(48, 24, 24))
+anticlusters <- anticlustering(
+  features,
+  K = K,
+  objective = "distance"
+)
+
+# Compare feature means by room
+table(anticlusters)
+by(features, anticlusters, function(x) round(colMeans(x), 2))
+# Compare standard deviations by room
+by(features, anticlusters, function(x) round(apply(x, 2, sd), 2))
+
 
 }
