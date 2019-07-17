@@ -301,7 +301,8 @@ anticlustering <- function(features = NULL, distances = NULL,
 
   ## Redirect to fast exchange method for k-means exchange (and no preclustering)
   if (class(objective) != "function" && is.null(preclusters) &&
-      objective == "variance" &&  method == "exchange") {
+      objective == "variance" &&  method == "exchange" &&
+      sum(is.na(K)) == 0) {
     return(fast_anticlustering(features, K, Inf, categories))
   }
 
