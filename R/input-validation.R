@@ -76,6 +76,11 @@ input_handling_anticlustering <- function(features, distances,
       stop("Passing an initial cluster assignment via the argument `K` ",
            "only works with method = 'exchange'")
     }
+    if (argument_exists(categories)) {
+      if (length(categories) != length(K)) {
+        stop("Length of arguments `categories` and `K` differ, but should be of same length (if length of K is not 1)")
+      }
+    }
   }
 
   if (length(K) == 1 && N %% K != 0) {
