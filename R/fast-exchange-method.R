@@ -87,9 +87,13 @@ fast_anticlustering <- function(features, K, k_neighbours = Inf, categories = NU
   }
   features <- as.matrix(features)
   neighbours <- get_neighbours(features, k_neighbours, categories)
-  clusters <- random_sampling(features, K, NULL, variance_objective_,
-                              nrep = 1, categories, FALSE,
-                              NULL, NULL)
+  if (length(K) == 1) {
+    clusters <- random_sampling(features, K, NULL, variance_objective_,
+                                nrep = 1, categories, FALSE,
+                                NULL, NULL)
+  } else {
+    clusters <- K
+  }
   fast_exchange_(features, clusters, categories, neighbours)
 }
 
