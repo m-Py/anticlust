@@ -1,5 +1,5 @@
 
-#' Generates an initial cluster assignment for anticlustering
+#' Generate an initial cluster assignment for anticlustering
 #'
 #' This function returns a vector that can be used as the \code{K} argument
 #' in the function \code{\link{anticlustering}}. Some entries in this
@@ -44,14 +44,30 @@
 #'   objective = mean_sd_obj # this objective function makes most sense for subset selection
 #' )
 #' # Note that this subset selection based on two groups is
-#' # no longer anticlustering that would divide one pool of items
-#' # into subsets
+#' # no longer an anticlustering method (that would divide one pool of
+#' # items into subsets)
 #'
 #' table(K, schaper2019$room)
 #' # Compare feature means by room
 #' by(features, groups, function(x) round(colMeans(x), 2))
 #' # Compare standard deviations by room
 #' by(features, groups, function(x) round(apply(x, 2, sd), 2))
+#'
+#'
+#' # Create sets of different size, optimizing anticluster editing objective:
+#' K <- initialize_K(n = c(48, 24, 24))
+#' anticlusters <- anticlustering(
+#'   features,
+#'   K = K,
+#'   objective = "distance"
+#' )
+#'
+#' # Compare feature means by room
+#' table(anticlusters)
+#' by(features, anticlusters, function(x) round(colMeans(x), 2))
+#' # Compare standard deviations by room
+#' by(features, anticlusters, function(x) round(apply(x, 2, sd), 2))
+#'
 #'
 #' @export
 
