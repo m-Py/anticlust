@@ -1,7 +1,10 @@
 
-#' An objective function measuring similarity via discrepancy features
+#' An objective function measuring similarity of sets
 #'
-#' Uses means and standard deviations
+#' Uses variance in means and standard deviations per feature across sets
+#' as the objective.
+#'
+#' @importFrom stats sd
 #'
 #' @param clusters A clustering vector
 #' @param features The features
