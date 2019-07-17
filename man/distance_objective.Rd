@@ -54,13 +54,13 @@ when creating (anti)clusters and when calling \code{variance_objective}
 \examples{
 
 data(iris)
-distances <- dist(iris[, -5])
+distances <- dist(iris[1:60, -5])
 ## Clustering
 clusters <- balanced_clustering(distances = distances, K = 3)
 # This is low:
 distance_objective(distances = distances, clusters = clusters)
 ## Anticlustering
-anticlusters <- anticlustering(distances = distances, K = 3, nrep = 100)
+anticlusters <- anticlustering(distances = distances, K = 3)
 # This is higher:
 distance_objective(distances = distances, clusters = anticlusters)
 
