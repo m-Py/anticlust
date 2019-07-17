@@ -16,8 +16,6 @@
 #'
 
 mean_sd_obj <- function(clusters, features) {
-   features <- features[!is.na(clusters), , drop = FALSE]
-   clusters <- clusters[!is.na(clusters)]
    K <- length(unique(clusters))
    O_min  <- featurewise_diff(by(features, clusters, colMeans), K)
    SD_min <- featurewise_diff(by(features, clusters, function(x) apply(x, 2, sd)), K)

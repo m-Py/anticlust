@@ -296,7 +296,7 @@ anticlustering <- function(features = NULL, distances = NULL,
   ## Get data into required format and get objective function:
   categories <- merge_into_one_variable(categories) # may be NULL
   data <- process_input(features, distances, standardize, objective)
-  obj_function <- get_objective_function(features, distances, objective)
+  obj_function <- get_objective_function(features, distances, objective, K)
   preclusters <- get_preclusters(features, distances, K, preclustering)
 
   ## Redirect to fast exchange method for k-means exchange (and no preclustering)
@@ -334,28 +334,39 @@ process_input <- function(features, distances, standardize, objective) {
 #' Determine the objective function needed for the input
 #'
 #' @noRd
-get_objective_function <- function(features, distances, objective) {
+get_objective_function <- function(features, distances, objective, K) {
   if (class(objective) == "function") {
-    return(objective)
+    obj_function <- objective
+  } else {
+    ## What was the input: features or distances
+    use_distances <- FALSE
+    if (argument_exists(distances)) {
+      use_distances <- TRUE
+    }
+    ## Determine how to compute objective, three cases:
+    # 1. Distance objective, distances were passed
+    # 2. Distance objective, features were passed
+    # 3. Variance objective, features were passed
+    if (objective == "distance" && use_distances == TRUE) {
+      obj_function <- distance_objective_
+    } else if (objective == "distance" && use_distances == FALSE) {
+      obj_function <- obj_value_distance
+    } else {
+      obj_function <- variance_objective_
+    }
   }
 
-  ## What was the input: features or distances
-  use_distances <- FALSE
-  if (argument_exists(distances)) {
-    use_distances <- TRUE
-  }
-  ## Determine how to compute objective, three cases:
-  # 1. Distance objective, distances were passed
-  # 2. Distance objective, features were passed
-  # 3. Variance objective, features were passed
-  if (objective == "distance" && use_distances == TRUE) {
-    obj_function <- distance_objective_
-  } else if (objective == "distance" && use_distances == FALSE) {
-    obj_function <- obj_value_distance
+  ## Handle NA in initial cluster assignment
+  if (sum(is.na(K)) > 0) {
+    obj <- function(clusters, data) {
+      data <- data[!is.na(clusters), , drop = FALSE]
+      clusters <- clusters[!is.na(clusters)]
+      obj_function(clusters, data)
+    }
   } else {
-    obj_function <- variance_objective_
+    obj <- obj_function
   }
-  obj_function
+  obj
 }
 
 
