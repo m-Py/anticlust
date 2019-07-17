@@ -4,7 +4,7 @@
 #' Uses variance in means and standard deviations per feature across sets
 #' as the objective.
 #'
-#' @importFrom stats sd
+#' @importFrom stats sd var
 #'
 #' @param clusters A clustering vector
 #' @param features The features
@@ -28,6 +28,6 @@ mean_sd_obj <- function(clusters, features) {
 ## for all features
 featurewise_diff <- function(x, K) {
   mat <- matrix(unlist(x), ncol = K)
-  mat <- apply(mat, 1, diff)
-  sum(abs(mat))
+  mat <- apply(mat, 1, var)
+  sum(mat)
 }
