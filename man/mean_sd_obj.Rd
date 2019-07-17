@@ -2,7 +2,7 @@
 % Please edit documentation in R/mean_sd_objective-function.R
 \name{mean_sd_obj}
 \alias{mean_sd_obj}
-\title{An objective function measuring similarity via discrepancy features}
+\title{An objective function measuring similarity of sets}
 \usage{
 mean_sd_obj(clusters, features)
 }
@@ -16,5 +16,6 @@ A value quantifying set similarity as the total absolute deviations
     between sets on all features.
 }
 \description{
-Uses means and standard deviations
+Uses variance in means and standard deviations per feature across sets
+as the objective.
 }
