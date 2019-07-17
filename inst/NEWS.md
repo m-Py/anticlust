@@ -3,22 +3,27 @@
 
 New features: 
 
-- In the `anticlustering()` function, K can now be an anticluster vector that
-  serves as the initiation for the exchange method
-- Subset selection (i.e., not assigning each item to a set, but only a subset)
-  is now possible with the exchange method when `K` contains `NA`. 
-    + Check out the function `subset_selection()` for an example how to 
-      do that. The function `subset_selection()` generates an initial 
-      assignment that satisfies grouping restrictions. In the exchange 
-      method, these restriction are enforced all the time by passing 
-      the grouping variable to the argument `categories`.
+- In the `anticlustering()` function, the argument `K` can now be a vector that
+  serves as the initiation of the anticlusters (Can only be used 
+  when `method = "exchange"`)
+    +  Subset selection (i.e., not assigning each item to a set, but only a subset)
+       is now possible when an initilized vector passed to the argument `K` contains `NAs`. 
+    + The function `initialize_K()` can be used to generate initial 
+      anticluster assignments that may also satisfy categorical 
+      restrictions. 
+    + Check out the documentation of the function `initialize_K()` for examples
+      how to conduct subset selection and anticlustering with different
+      set sizes
 - For subset selection, a new objective function was added: `mean_sd_obj()`. 
   Maximizing this objective will simply make all sets as similar as 
   possible on the mean and standard deviation of all features.
+
+Internal changes:
+
 - Major internal restructuring to improve the expected maintainability in the 
   future. In the last weeks, a lot of features were added to `anticlust` and
   a restructuring seemed necessary.
-- Many test cases were added to test the new features
+- Many test cases were added to test the features that were added in the previous weeks
 
 # anticlust 0.2.9
 
