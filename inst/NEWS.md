@@ -11,10 +11,11 @@ New features:
       a subset is selected that is assigned to the different sets. 
       This functionality is enabled by passing a initial cluster 
       assignment via the argument `K` that contains some `NA` (For example, 
-      if N = 50 and two sets are 20 items should be created, the argument 
-      `K` will contain 10 elements that are `NA`.)
+      if N = 50 and two sets of 20 items should be created, the argument 
+      `K` will contain 10 elements that are `NA`, 20 times 1, and 20 
+      times 2.)
     + By using a customized `K` as input, it is now also possible to 
-      create sets of different size.
+      create sets of different size (e.g. `K = c(1, 1, 1, 1, 2, 2)`)
     + The function `initialize_K()` can be used to generate initial 
       anticluster assignments in a user-friendly way. The 
       documentation of the function `initialize_K()` contains example
