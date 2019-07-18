@@ -4,26 +4,39 @@
 New features: 
 
 - In the `anticlustering()` function, the argument `K` can now be a vector that
-  serves as the initiation of the anticlusters (Can only be used 
-  when `method = "exchange"`)
-    +  Subset selection (i.e., not assigning each item to a set, but only a subset)
-       is now possible when an initilized vector passed to the argument `K` contains `NAs`. 
+  serves as the initiation of the anticlusters (This functionality is only 
+  available when `method = "exchange"`).
+    +  Subset selection is now possible. Subset selection means that 
+      not all input item are assigned to a set, but from the total input
+      a subset is selected that is assigned to the different sets. 
+      This functionality is enabled by passing a initial cluster 
+      assignment via the argument `K` that contains some `NA` (For example, 
+      if N = 50 and two sets are 20 items should be created, the argument 
+      `K` will contain 10 elements that are `NA`.)
+    + By using a customized `K` as input, it is now also possible to 
+      create sets of different size.
     + The function `initialize_K()` can be used to generate initial 
-      anticluster assignments that may also satisfy categorical 
-      restrictions. 
-    + Check out the documentation of the function `initialize_K()` for examples
-      how to conduct subset selection and anticlustering with different
-      set sizes
-- For subset selection, a new objective function was added: `mean_sd_obj()`. 
-  Maximizing this objective will simply make all sets as similar as 
-  possible on the mean and standard deviation of all features.
+      anticluster assignments in a user-friendly way. The 
+      documentation of the function `initialize_K()` contains example
+      code how to conduct subset selection and anticlustering with 
+      different set sizes.
+- A new objective function was added: `mean_sd_obj()`. 
+  Maximizing this objective will simply make all sets similar with regard
+  to the mean and the standard deviation of all input features.
 
 Internal changes:
 
 - Major internal restructuring to improve the expected maintainability in the 
   future. In the last weeks, a lot of features were added to `anticlust` and
-  a restructuring seemed necessary.
-- Many test cases were added to test the features that were added in the previous weeks
+  a restructuring seemed necessary. 
+- Many test cases were added to test the features that were added in the previous weeks.
+- To accommodate the possibility that the argument `K` contains `NA`, 
+  the objective function to be optimized will be restructured internally. 
+  In particular, before the objective is computed, all cases are removed 
+  where the cluster is `NA` (i.e., cases that are currently not assigned 
+  to any set). This also works for user-defined objective functions, so
+  users do not need to deal with the handling of `NA` themselves.
+
 
 # anticlust 0.2.9
 
