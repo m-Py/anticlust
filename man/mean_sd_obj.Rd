@@ -13,9 +13,10 @@ mean_sd_obj(clusters, features)
 }
 \value{
 A value quantifying set similarity as the total absolute deviations
-    between sets on all features.
+    between sets on all features. Higher values indicate that the deviations
+    in mean, median and standard deviations are low.
 }
 \description{
-Uses variance in means and standard deviations per feature across sets
-as the objective.
+Uses variance in means, medians, and standard deviations per feature
+across sets as the objective.
 }

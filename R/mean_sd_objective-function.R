@@ -1,8 +1,8 @@
 
 #' An objective function measuring similarity of sets
 #'
-#' Uses variance in means and standard deviations per feature across sets
-#' as the objective.
+#' Uses variance in means, medians, and standard deviations per feature
+#' across sets as the objective.
 #'
 #' @importFrom stats sd var
 #'
@@ -10,16 +10,18 @@
 #' @param features The features
 #'
 #' @return A value quantifying set similarity as the total absolute deviations
-#'     between sets on all features.
+#'     between sets on all features. Higher values indicate that the deviations
+#'     in mean, median and standard deviations are low.
 #'
 #' @export
 #'
 
 mean_sd_obj <- function(clusters, features) {
    K <- length(unique(clusters))
-   O_min  <- featurewise_diff(by(features, clusters, colMeans), K)
+   mean_min  <- featurewise_diff(by(features, clusters, colMeans), K)
+   median_min  <- featurewise_diff(by(features, clusters, function(x) apply(x, 2, median)), K)
    SD_min <- featurewise_diff(by(features, clusters, function(x) apply(x, 2, sd)), K)
-   (O_min + SD_min) * (-1)
+   (mean_min + SD_min + median_min) * (-1)
 }
 
 ## Convert output from `by` to matrix and compute difference based on means / sds etc
