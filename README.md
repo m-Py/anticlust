@@ -5,9 +5,11 @@ elements to sets in such a way that the sets are as similar as possible
 (Späth 1986; Valev 1998). The package `anticlust` was originally
 developed to assign items to experimental conditions in experimental
 psychology, but it can be applied whenever a user requires that a given
-set of elements has to be partitioned into similar subsets. Currently,
-the `anticlust` package offers the possibility to create subsets of
-equal size. The package is still under active developement; expect
+set of elements has to be partitioned into similar subsets. The 
+`anticlust` package offers the possibility to create sets that are of
+equal size (which is the standard case), but it is also possible to create sets 
+of different size, or to only assign a subset of all elements to a set. 
+The package is still under active developement; expect
 changes and improvements before it will be submitted to CRAN. Check out
 the [NEWS
 file](https://github.com/m-Py/anticlust/blob/master/inst/NEWS.md) for
