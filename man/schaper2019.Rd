@@ -65,6 +65,25 @@ ac_dist <- anticlustering(
 by(features, ac_dist, function(x) round(colMeans(x), 2))
 by(features, ac_dist, function(x) round(apply(x, 2, sd), 2))
 
+
+## Min-max anticlustering
+# To make one variable dissimilar between sets, we use the
+# function argument `iv` (= independent variable)
+
+anticlusters <- anticlustering(
+  schaper2019[, 3:5],
+  K = 2,
+  preclustering = TRUE,
+  iv = schaper2019[, 6]
+)
+# The similarity of the features in the min-max application is usually
+# improved by activating preclustering, but this decreases the dissimilarity
+# between the sets on the independent variable.
+
+# Check out feature means:
+by(schaper2019[, 3:6], anticlusters, function(x) round(colMeans(x), 2))
+
+
 }
 \references{
 Schaper, M. L., Kuhlmann, B. G., & Bayen, U. J. (2019). Metamemory

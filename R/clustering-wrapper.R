@@ -106,7 +106,7 @@ balanced_clustering <- function(features = NULL, distances = NULL,
   input_handling_anticlustering(features, distances, K,
                                 objective, method, TRUE,
                                 standardize, 1,
-                                NULL, FALSE, NULL)
+                                NULL, FALSE, NULL, NULL)
 
   ## Standardize feature values (for each feature, mean = 0, sd = 1)?
   if (argument_exists(features)) {

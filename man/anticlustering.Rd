@@ -7,7 +7,7 @@
 anticlustering(features = NULL, distances = NULL, K,
   objective = "distance", method = "exchange", preclustering = FALSE,
   standardize = FALSE, nrep = 10000, categories = NULL,
-  parallelize = FALSE, seed = NULL)
+  parallelize = FALSE, seed = NULL, iv = NULL)
 }
 \arguments{
 \item{features}{A numeric vector, matrix or data.frame of data
@@ -23,7 +23,9 @@ indicate higher dissimilarity. Can be an object of class
 the upper and lower triangular matrix represent the pairwise
 dissimilarities.}
 
-\item{K}{How many anticlusters should be created.}
+\item{K}{How many anticlusters should be created. Alternatively:
+An initial cluster assignment of length N where each element
+describes the grouping of an element.}
 
 \item{objective}{The objective to be maximized. The option "distance"
 (default) maximizes the cluster editing objective function; the
@@ -58,6 +60,12 @@ should be used for the random sampling method. Defaults to
 \item{seed}{A value to fixate the random seed when using the random
 sampling method. When \code{parallelize} is \code{TRUE}, using
 this argument is the only way to ensure reproducibility.}
+
+\item{iv}{A vector, data.frame or matrix representing features that act
+as "independent variables", i.e., variables whose values
+are made as different as possible between sets (the opposite of
+the \code{features} argument). Cannot be used in conjunction with
+the argument \code{distances}.}
 }
 \value{
 A vector of length \code{nrow(features)} (or
@@ -69,10 +77,13 @@ Create equal-sized groups of elements (anticlusters) that are as
 similar as possible.
 }
 \details{
-This function is used to solve »balanced K anticlustering«. That is,
-K groups of equal size are created in such a way that all groups are
-as similar as possible. Set similarity is assessed using one of two
-objective functions:
+This function is used to solve »K anticlustering«. That is,
+K groups are created in such a way that all groups are
+as similar as possible. In the standard case, groups are of equal
+size. Use a custom \code{K} argument to create groups of different
+size (see \code{\link{initialize_K}}).
+
+Set similarity is assessed using one of two objective functions:
 
 - k-means *variance* objective, setting \code{objective = "variance"}
 
@@ -274,11 +285,9 @@ Control and Cybernetics, 15, 213-218.
 \seealso{
 \code{\link{fast_anticlustering}}
 
+\code{\link{initialize_K}}
+
 \code{\link{variance_objective}}
 
 \code{\link{distance_objective}}
-
-\code{\link{balanced_clustering}}
-
-\code{\link{generate_partitions}}
 }

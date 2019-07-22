@@ -1,4 +1,14 @@
 
+# anticlust 0.2.9-3
+
+New feature:
+
+- There is now an argument `iv` for the function `anticlustering()`. 
+  It can be used for »min-max anticlustering«; `iv` then contains
+  numeric features (vector, matrix or data frame) whose values are made 
+  dissimilar between sets -- as opposed to the usual anticlustering 
+  where all features are made similar. See `?schaper2019` for an example.
+
 # anticlust 0.2.9-2
 
 New features: 

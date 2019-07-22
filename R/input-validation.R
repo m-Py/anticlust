@@ -17,7 +17,7 @@ input_handling_anticlustering <- function(features, distances,
                                           K, objective, method,
                                           preclustering, standardize,
                                           nrep, categories,
-                                          parallelize, seed) {
+                                          parallelize, seed, iv) {
 
   if (!argument_exists(features) && !argument_exists(distances)) {
     stop("One of the arguments 'features' or 'distances' must be given.")
@@ -25,6 +25,10 @@ input_handling_anticlustering <- function(features, distances,
 
   if (argument_exists(features) && argument_exists(distances)) {
     stop("Only pass one of the arguments 'features' or 'distances'.")
+  }
+
+  if (argument_exists(iv) && argument_exists(distances)) {
+    stop("Do not use the `iv` argument together with the `distances` argument.")
   }
 
   ## Validate feature input
@@ -92,6 +96,11 @@ input_handling_anticlustering <- function(features, distances,
       stop("K must be a divider of the number of elements when preclustering is `TRUE`. ",
            "(Try out preclustering = FALSE.)")
     }
+  }
+
+  if (argument_exists(iv)) {
+    iv <- as.matrix(iv)
+    validate_input(iv, "iv", objmode = "numeric")
   }
 
   validate_input(nrep, "nrep", "numeric", len = 1, greater_than = 0,
