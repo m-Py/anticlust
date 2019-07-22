@@ -409,6 +409,9 @@ merge_into_one_variable <- function(categories) {
 
 ## function that computes preclusters
 get_preclusters <- function(features, distances, K, preclustering) {
+  if (length(K) > 1) {
+    K <- length(unique(K))
+  }
   ## Get precluster, three cases are possible
   # (a) Preclusters may be NULL (if preclustering == FALSE)
   # (b) may need to be computed (if preclustering == TRUE)
