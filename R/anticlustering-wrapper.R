@@ -328,10 +328,6 @@ process_input <- function(features, distances, standardize, objective) {
     if (standardize) {
       data <- scale(data)
     }
-    if (class(objective) != "function" && objective == "distance") {
-      ## Default case for optimization of distance: Euclidean distance
-      distances <- as.matrix(dist(data))
-    }
   } else {
     data <- as.matrix(as.dist(distances))
   }
