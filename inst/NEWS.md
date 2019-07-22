@@ -37,7 +37,7 @@ New features:
       different set sizes.
 - A new objective function was added: `mean_sd_obj()`. 
   Maximizing this objective will simply make all sets similar with regard
-  to the mean and the standard deviation of all input features.
+  to the mean, median and the standard deviation of all input features.
 
 Internal changes:
 
