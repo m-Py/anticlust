@@ -4,7 +4,7 @@
 #' Uses variance in means, medians, and standard deviations per feature
 #' across sets as the objective.
 #'
-#' @importFrom stats sd var
+#' @importFrom stats sd var median
 #'
 #' @param clusters A clustering vector
 #' @param features The features
