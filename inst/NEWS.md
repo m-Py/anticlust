@@ -1,6 +1,8 @@
 
 # anticlust 0.2.9-3
 
+2019-07-22
+
 New feature:
 
 - There is now an argument `iv` for the function `anticlustering()`. 
@@ -10,6 +12,8 @@ New feature:
   where all features are made similar. See `?schaper2019` for an example.
 
 # anticlust 0.2.9-2
+
+2019-07-18
 
 New features: 
 
