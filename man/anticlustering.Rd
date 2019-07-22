@@ -68,8 +68,7 @@ the \code{features} argument). Cannot be used in conjunction with
 the argument \code{distances}.}
 }
 \value{
-A vector of length \code{nrow(features)} (or
-    \code{nrow(distances)}) that assigns a group (i.e, a number
+A vector of length N that assigns a group (i.e, a number
     between 1 and K) to each input element.
 }
 \description{
