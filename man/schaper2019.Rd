@@ -70,18 +70,23 @@ by(features, ac_dist, function(x) round(apply(x, 2, sd), 2))
 # To make one variable dissimilar between sets, we use the
 # function argument `iv` (= independent variable)
 
-anticlusters <- anticlustering(
+mix_max_ac <- anticlustering(
   schaper2019[, 3:5],
   K = 2,
   preclustering = TRUE,
   iv = schaper2019[, 6]
 )
-# The similarity of the features in the min-max application is usually
-# improved by activating preclustering, but this decreases the dissimilarity
-# between the sets on the independent variable.
 
 # Check out feature means:
-by(schaper2019[, 3:6], anticlusters, function(x) round(colMeans(x), 2))
+by(schaper2019[, 3:6], mix_max_ac, function(x) round(colMeans(x), 2))
+
+# The similarity of the "covariates" (here: the features argument)
+# in the min-max application is usually improved by activating
+# preclustering, but this decreases the dissimilarity between sets
+# on the independent variable -- there is a tradeoff between similarity
+# and dissimilarity.
+
+
 
 
 }
