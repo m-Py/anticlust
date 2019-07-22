@@ -15,7 +15,9 @@
 #'     \code{\link{as.dist}}) or a \code{matrix} where the entries of
 #'     the upper and lower triangular matrix represent the pairwise
 #'     dissimilarities.
-#' @param K How many anticlusters should be created.
+#' @param K How many anticlusters should be created. Alternatively:
+#'     An initial cluster assignment of length N where each element
+#'     describes the grouping of an element.
 #' @param objective The objective to be maximized. The option "distance"
 #'     (default) maximizes the cluster editing objective function; the
 #'     option "variance" maximizes the k-means objective function. See
@@ -54,10 +56,13 @@
 #'
 #' @details
 #'
-#' This function is used to solve »balanced K anticlustering«. That is,
-#' K groups of equal size are created in such a way that all groups are
-#' as similar as possible. Set similarity is assessed using one of two
-#' objective functions:
+#' This function is used to solve »K anticlustering«. That is,
+#' K groups are created in such a way that all groups are
+#' as similar as possible. In the standard case, groups are of equal
+#' size. Use a custom \code{K} argument to create groups of different
+#' size (see \code{\link{initialize_K}}).
+#'
+#' Set similarity is assessed using one of two objective functions:
 #'
 #' - k-means *variance* objective, setting \code{objective = "variance"}
 #'
@@ -200,13 +205,11 @@
 #'
 #' \code{\link{fast_anticlustering}}
 #'
+#' \code{\link{initialize_K}}
+#'
 #' \code{\link{variance_objective}}
 #'
 #' \code{\link{distance_objective}}
-#'
-#' \code{\link{balanced_clustering}}
-#'
-#' \code{\link{generate_partitions}}
 #'
 #' @examples
 #'
