@@ -44,6 +44,11 @@
 #' @param seed A value to fixate the random seed when using the random
 #'     sampling method. When \code{parallelize} is \code{TRUE}, using
 #'     this argument is the only way to ensure reproducibility.
+#' @param iv A vector, data.frame or matrix representing features that act
+#'     as "independent variables", i.e., variables whose values
+#'     are made as different as possible between sets (the opposite of
+#'     the \code{features} argument). Cannot be used in conjunction with
+#'     the argument \code{distances}.
 #'
 #' @return A vector of length \code{nrow(features)} (or
 #'     \code{nrow(distances)}) that assigns a group (i.e, a number
@@ -278,12 +283,12 @@ anticlustering <- function(features = NULL, distances = NULL,
                            method = "exchange", preclustering = FALSE,
                            standardize = FALSE, nrep = 10000,
                            categories = NULL, parallelize = FALSE,
-                           seed = NULL) {
+                           seed = NULL, iv = NULL) {
 
   input_handling_anticlustering(features, distances, K, objective,
                                 method, preclustering,
                                 standardize, nrep, categories,
-                                parallelize, seed)
+                                parallelize, seed, iv)
 
   ## Exact method using ILP
   if (method == "ilp") {
@@ -299,7 +304,7 @@ anticlustering <- function(features = NULL, distances = NULL,
   ## Get data into required format and get objective function:
   categories <- merge_into_one_variable(categories) # may be NULL
   data <- process_input(features, distances, standardize, objective)
-  obj_function <- get_objective_function(features, distances, objective, K)
+  obj_function <- get_objective_function(features, distances, objective, K, iv)
   preclusters <- get_preclusters(features, distances, K, preclustering)
 
   ## Redirect to fast exchange method for k-means exchange (and no preclustering)
@@ -337,7 +342,7 @@ process_input <- function(features, distances, standardize, objective) {
 #' Determine the objective function needed for the input
 #'
 #' @noRd
-get_objective_function <- function(features, distances, objective, K) {
+get_objective_function <- function(features, distances, objective, K, iv) {
   if (class(objective) == "function") {
     obj_function <- objective
   } else {
@@ -369,7 +374,17 @@ get_objective_function <- function(features, distances, objective, K) {
   } else {
     obj <- obj_function
   }
-  obj
+
+  ## Min-max application: independent variable is present
+  if (argument_exists(iv)) { # make means in independent variable different
+    iv <- as.matrix(iv)
+    obj2 <- function(clusters, data) {
+      obj(clusters, data) + variance_objective_(clusters, iv) * (-1)
+    }
+  } else {
+    obj2 <- obj
+  }
+  obj2
 }
 
 
