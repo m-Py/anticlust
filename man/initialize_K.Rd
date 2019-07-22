@@ -32,8 +32,9 @@ If the sum of `n` per group is lower than `N`, the returned vector
 will include NAs. If this vector is used as the \code{K} argument
 for the \code{\link{anticlustering}}, \code{anticlustering} will
 also output a vector that contains NAs (that is a permutation of the
-input \code{K}. This way, it is possible to select only a subset of
-the input items, or to create sets of different sizes.
+input vector \code{K}). This way, it is possible to select only a
+subset of the input items. It is also possible to create sets of
+different sizes.
 }
 \examples{
 
