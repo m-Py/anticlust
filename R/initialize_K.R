@@ -80,16 +80,21 @@ initialize_K <- function(N = NULL, K = NULL, n, groups = NULL) {
     stop("do not pass both `K` and `groups` argument")
   }
   if (!argument_exists(K) && !argument_exists(groups)) {
-    if (length(n) == 1) {
-      stop("If only the argument `n` is passed, `n` must be of length > 1")
+    if (!argument_exists(N)) {
+      if (length(n) == 1) {
+        stop("If only the argument `n` is passed, `n` must be of length > 1")
+      }
+      return(sample(rep(1:length(n), n)))
+    } else {
+      return(initialize_K(N = N, K = length(n), n))
     }
-    return(sample(rep(1:length(n), n)))
   }
 
   if (argument_exists(N) && argument_exists(K)) {
     groups <- rep_len(1:K, N)
     N <- rep(N / K, K) # N per group
-  } else if (argument_exists(groups)) {
+  }
+  else if (argument_exists(groups)) {
     groups <- as.numeric(as.factor(groups))
     N <- table(groups)
     K <- length(N)

@@ -302,7 +302,7 @@ anticlustering <- function(features = NULL, distances = NULL,
 
   ## Get data into required format and get objective function:
   categories <- merge_into_one_variable(categories) # may be NULL
-  data <- process_input(features, distances, standardize, objective)
+  data <- process_input(features, distances, standardize, objective, iv)
   obj_function <- get_objective_function(features, distances, objective, K, iv)
   preclusters <- get_preclusters(features, distances, K, preclustering)
 
@@ -322,9 +322,12 @@ anticlustering <- function(features = NULL, distances = NULL,
 
 ## Function that processes input and returns the data set that the
 ## optimization is conducted on (for exchange and sampling methods)
-process_input <- function(features, distances, standardize, objective) {
+process_input <- function(features, distances, standardize, objective, iv) {
   if (argument_exists(features)) {
     data <- as.matrix(features)
+    if (argument_exists(iv)) {
+      data <- cbind(data, iv) # if iv exists, the objective function handles the additional columns
+    }
     if (standardize) {
       data <- scale(data)
     }
@@ -373,8 +376,17 @@ get_objective_function <- function(features, distances, objective, K, iv) {
   ## Min-max application: independent variable is present
   if (argument_exists(iv)) { # make means in independent variable different
     iv <- as.matrix(iv)
+    ## In which columns are the independent variables stored when
+    ## the objective is computed? The features (to be made similar)
+    ## and the independent variables (to be made dissimilar) are
+    ## disentangled in the objective function if the argument `iv` exists.
+    n_features <- ncol(features)
+    n_iv <- ncol(iv)
+    columns_for_iv <- (n_features + 1):(n_features + n_iv)
     obj2 <- function(clusters, data) {
-      obj(clusters, data) + variance_objective_(clusters, iv) * (-1)
+      features <- data[, 1:n_features, drop = FALSE]
+      iv <- data[, columns_for_iv, drop = FALSE]
+      obj(clusters, features) + obj(clusters, iv) * (-1)
     }
   } else {
     obj2 <- obj
