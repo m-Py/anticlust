@@ -55,7 +55,7 @@
 #' by(features, groups, function(x) round(apply(x, 2, sd), 2))
 #'
 #'
-#' # Create sets of different size, optimizing anticluster editing objective:
+#' # Create sets of different size:
 #' K <- initialize_K(n = c(48, 24, 24))
 #' anticlusters <- anticlustering(
 #'   features,
@@ -65,9 +65,6 @@
 #'
 #' # Compare feature means by room
 #' table(anticlusters)
-#' by(features, anticlusters, function(x) round(colMeans(x), 2))
-#' # Compare standard deviations by room
-#' by(features, anticlusters, function(x) round(apply(x, 2, sd), 2))
 #'
 #'
 #' @export

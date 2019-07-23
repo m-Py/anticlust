@@ -24,8 +24,9 @@ the upper and lower triangular matrix represent the pairwise
 dissimilarities.}
 
 \item{K}{How many anticlusters should be created. Alternatively:
-An initial cluster assignment of length N where each element
-describes the grouping of an element.}
+A vector of length N. Each entry in this vector
+describes the initial grouping of an input element (as a number
+between 1 and the number of groups).}
 
 \item{objective}{The objective to be maximized. The option "distance"
 (default) maximizes the cluster editing objective function; the
@@ -72,15 +73,14 @@ A vector of length N that assigns a group (i.e, a number
     between 1 and K) to each input element.
 }
 \description{
-Create equal-sized groups of elements (anticlusters) that are as
-similar as possible.
+Create sets of elements (anticlusters) that are as similar as possible.
 }
 \details{
 This function is used to solve »K anticlustering«. That is,
 K groups are created in such a way that all groups are
-as similar as possible. In the standard case, groups are of equal
-size. Use a custom \code{K} argument to create groups of different
-size (see \code{\link{initialize_K}}).
+as similar as possible. In the standard case, groups of equal
+size are returned. Adjust the \code{K} argument to create groups
+of different size (see \code{\link{initialize_K}} for an example).
 
 Set similarity is assessed using one of two objective functions:
 
@@ -89,16 +89,17 @@ Set similarity is assessed using one of two objective functions:
 - cluster editing *distance* objective, setting \code{objective =
   "distance"}
 
-The k-means objective maximizes the variance within
+The k-means objective measures the variance within
 anticlusters---that is, the sum of the squared distances between each
 element and its cluster center (see
 \code{\link{variance_objective}}). The cluster editing objective
-maximizes the sum of pairwise distances within anticlusters (see
-\code{\link{distance_objective}}). Maximizing either clustering
-objective will create create similar groups; minimization of the same
-objectives leads to a clustering, i.e., elements are as similar as
-possible within a set and as different as possible between
-sets. (Such a clustering is also possible with the function
+measures the sum of pairwise distances within anticlusters (see
+\code{\link{distance_objective}}). Maximizing either of these
+objectives will lead to similar groups (and this is what is
+actually done when using this function). Minimization of the same
+objectives would lead to a clustering, i.e., sets where elements are
+similar within a set and different between sets.
+(Such a clustering is also possible with the function
 \code{\link{balanced_clustering}}.)
 
 If the argument \code{features} is passed together with
@@ -142,16 +143,16 @@ small problem instances.
 \strong{Heuristic anticlustering}
 
 In addition to the exact approach---that is only feasible for small
-N---the function employs two heuristic approaches. The first option
+N---the function employs two heuristic approaches. One option
 is repeated random sampling (\code{method = "sampling"}): Across a
 specified number of runs, each element is assigned to an anticluster
 at random and the objective value associated with this assignment is
 computed. In the end, the best assignment---the assignment that
-maximized the objective function---is returned.  The second heuristic
+maximized the objective function---is returned.  The other option
 is the exchange method (\code{method = "exchange"}): Building on an
 initial random assignment, elements are swapped between anticlusters
 in such a way that each swap improves set similarity by the largest
-amount that is possible in each situation (cf. Späth, 1986). The
+amount that is possible in a situation (cf. Späth, 1986). The
 swapping procedure is repeated for each element; because each
 possible swap is investigated for each element, the total number of
 exchanges grows quadratically with input size, rendering the exchange
@@ -160,8 +161,8 @@ will limit the legal exchange partners to very similar elements,
 resulting in improved run time while preserving a rather good
 solution. This option is recommended for larger N. For very large N,
 check out the function \code{\link{fast_anticlustering}} that was
-specifically implemented for large data sets, or use the random
-sampling method.
+specifically implemented for large data sets (or use the random
+sampling method with few repetitions).
 
 The random sampling approach may also incorporate a preclustering
 that prevents grouping very similar elements into the same
@@ -219,6 +220,15 @@ the argument \code{preclustering} will be ignored (that is, there
 will be no preclustering). The exchange method will try to adhere to
 both preclustering and categorical constraints if \code{preclustering
 = TRUE} while giving priority to the categorical constraints.
+
+\strong{Min-max anticlustering}
+
+It is possible to conduct »min-max anticlustering«. That is: For
+some variables, similarity is maximized between sets, whereas for
+other variables, similarity is minimized. Use the argument \code{iv}
+to define variables whose values should be dissimilar between sets;
+\code{iv} is used the same way as \code{features} whose values are
+made similar between sets.
 }
 \examples{
 

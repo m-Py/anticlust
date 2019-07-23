@@ -12,11 +12,30 @@ mean_sd_obj(clusters, features)
 \item{features}{The features}
 }
 \value{
-A value quantifying set similarity as the total absolute deviations
-    between sets on all features. Higher values indicate that the deviations
-    in mean, median and standard deviations are low.
+A value quantifying set similarity. Higher values indicate
+    that the discrepancy in means, medians and standard deviations
+    are low.
 }
 \description{
-Uses variance in means, medians, and standard deviations per feature
-across sets as the objective.
+Defines set similarity as the discrepancy in means, medians, and
+standard deviations.
+}
+\details{
+Use this function as the \code{objective} in the anticlustering
+function to make means, standard deviations and medians as similar
+as possible.
+}
+\examples{
+data(schaper2019)
+features <- schaper2019[1:48, 3:6]
+ac <- anticlustering(
+  features,
+  K = 3,
+  categories = schaper2019$room[1:48],
+  objective = mean_sd_obj
+)
+by(features, ac, function(x) round(colMeans(x), 2))
+by(features, ac, function(x) round(apply(x, 2, sd), 2))
+by(features, ac, function(x) round(apply(x, 2, median), 2))
+
 }
