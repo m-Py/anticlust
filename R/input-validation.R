@@ -19,6 +19,9 @@ input_handling_anticlustering <- function(features, distances,
                                           nrep, categories,
                                           parallelize, seed, iv) {
 
+  ## Merge categories variable so that `length` can be applied:
+  categories <- merge_into_one_variable(categories)
+
   if (!argument_exists(features) && !argument_exists(distances)) {
     stop("One of the arguments 'features' or 'distances' must be given.")
   }
