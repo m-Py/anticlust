@@ -311,7 +311,7 @@ anticlustering <- function(features = NULL, distances = NULL,
 
   ## Get data into required format and get objective function:
   categories <- merge_into_one_variable(categories) # may be NULL
-  data <- process_input(features, distances, standardize, objective, iv)
+  data <- process_input(features, distances, standardize, objective, iv, method)
   obj_function <- get_objective_function(features, distances, objective, K, iv)
   preclusters <- get_preclusters(features, distances, K, preclustering)
 
@@ -320,6 +320,11 @@ anticlustering <- function(features = NULL, distances = NULL,
       objective == "variance" &&  method == "exchange" &&
       sum(is.na(K)) == 0) {
     return(fast_anticlustering(features, K, Inf, categories))
+  }
+
+  ## Redirect to fast exchange method for anticluster editing
+  if (class(objective) != "function" && objective == "distance" && method == "exchange") {
+    return(fast_exchange_dist(data, K, categories, preclusters))
   }
 
   ## Start heuristic optimization:
@@ -331,7 +336,7 @@ anticlustering <- function(features = NULL, distances = NULL,
 
 ## Function that processes input and returns the data set that the
 ## optimization is conducted on (for exchange and sampling methods)
-process_input <- function(features, distances, standardize, objective, iv) {
+process_input <- function(features, distances, standardize, objective, iv, method) {
   if (argument_exists(features)) {
     data <- as.matrix(features)
     if (argument_exists(iv)) {
@@ -339,6 +344,9 @@ process_input <- function(features, distances, standardize, objective, iv) {
     }
     if (standardize) {
       data <- scale(data)
+    }
+    if (class(objective) != "function" && objective == "distance" && method == "exchange") {
+      data <- as.matrix(dist(features))
     }
   } else {
     data <- as.matrix(as.dist(distances))
