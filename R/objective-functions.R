@@ -237,7 +237,7 @@ distance_objective_ <- function(anticlusters, data) {
 ## expand.grid
 unique_combinations <- function(elements) {
   selection <- as.matrix(expand.grid(elements, elements))
-  selection[selection[, 1] < selection[, 2], ]
+  selection[selection[, 1] > selection[, 2], ]
 }
 
 
