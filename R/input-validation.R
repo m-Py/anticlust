@@ -108,6 +108,9 @@ input_handling_anticlustering <- function(features, distances,
   if (argument_exists(iv)) {
     iv <- as.matrix(iv)
     validate_input(iv, "iv", objmode = "numeric")
+    if (nrow(iv) != N) {
+      stop("The argument `iv` and the argument `features` (or `distances`) imply a different N")
+    }
   }
 
   validate_input(nrep, "nrep", "numeric", len = 1, greater_than = 0,
