@@ -1,4 +1,62 @@
 
+# anticlust 0.2.9-4
+
+2019-07-23
+
+Internal change: Optimizing the exchange method with the default 
+distance objective is now much faster. This is accomplished 
+by only updating the sum of distances after each exchange, instead of 
+recomputing all distances (see 
+  [d51e59d](https://github.com/m-Py/anticlust/commit/d51e59d56d2d4b679db6a7969f5a5c71ac0d4438))
+
+This example illustrates the improvement of the run time: 
+
+```R
+# For N = 20 to N = 300, test run time for old and new 
+# optimization of distance criterion:
+
+n <- seq(20, 300, by = 20)
+times <- matrix(nrow = length(n), ncol = 3)
+times[, 1] <- n
+colnames(times) <- c("n", "new_distance", "old_distance")
+
+for (i in seq_along(n)) {
+  start <- Sys.time()
+  anticlusters <- anticlustering(
+    rnorm(n[i]),
+    K = 2,
+    objective = anticlust:::obj_value_distance
+  )
+  times[i, "old_distance"] <- difftime(Sys.time(), start, units = "s")
+
+  start <- Sys.time()
+  anticlusters <- anticlustering(
+    rnorm(n[i]),
+    K = 2,
+    objective = "distance"
+  )
+  times[i, "new_distance"] <- difftime(Sys.time(), start, units = "s")
+}
+
+round(times, 2)
+#         n new_distance old_distance
+#  [1,]  20         0.02         0.10
+#  [2,]  40         0.03         0.27
+#  [3,]  60         0.07         0.75
+#  [4,]  80         0.16         1.11
+#  [5,] 100         0.30         1.93
+#  [6,] 120         0.50         2.70
+#  [7,] 140         0.86         3.77
+#  [8,] 160         1.11         4.97
+#  [9,] 180         1.58         6.58
+# [10,] 200         2.30         8.32
+# [11,] 220         3.10        10.31
+# [12,] 240         4.15        12.96
+# [13,] 260         5.26        15.83
+# [14,] 280         6.94        19.34
+# [15,] 300         8.69        23.19
+```
+
 # anticlust 0.2.9-3
 
 2019-07-22
