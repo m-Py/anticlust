@@ -85,9 +85,13 @@ input_handling_anticlustering <- function(features, distances,
     }
     if (argument_exists(categories)) {
       if (length(categories) != length(K)) {
-        stop("Length of arguments `categories` and `K` differ, but should be of same length (if length of K is not 1)")
+        stop("Length of arguments `categories` and `K` differ, but should be of same length (K can also be of length 1)")
       }
     }
+  }
+
+  if (argument_exists(categories) && length(categories) != N) {
+    stop("The length of the `categories` argument is not equal to the the number of input elements.")
   }
 
   if (length(K) == 1 && N %% K != 0) {
