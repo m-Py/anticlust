@@ -9,53 +9,92 @@ by only updating the sum of distances after each exchange, instead of
 recomputing all distances (see 
   [d51e59d](https://github.com/m-Py/anticlust/commit/d51e59d56d2d4b679db6a7969f5a5c71ac0d4438))
 
-This example illustrates the improvement of the run time: 
+This example illustrates the run time improvement:
 
 ```R
 # For N = 20 to N = 300, test run time for old and new 
 # optimization of distance criterion:
 
 n <- seq(20, 300, by = 20)
-times <- matrix(nrow = length(n), ncol = 3)
+times <- matrix(nrow = length(n), ncol = 4)
 times[, 1] <- n
-colnames(times) <- c("n", "new_distance", "old_distance")
+colnames(times) <- c("n", "old_features_input", "old_distance_input", "new_distance")
 
 for (i in seq_along(n)) {
   start <- Sys.time()
-  anticlusters <- anticlustering(
-    rnorm(n[i]),
-    K = 2,
+
+  # Simulate 2 features as input data
+  data <- matrix(rnorm(n[i] * 2), ncol = 2)
+
+  ## Old version: feature table as input
+  ac1 <- anticlustering(
+    data,
+    K = rep_len(1:2, nrow(data)),
     objective = anticlust:::obj_value_distance
   )
-  times[i, "old_distance"] <- difftime(Sys.time(), start, units = "s")
+  times[i, "old_features_input"] <- difftime(Sys.time(), start, units = "s")
+
+  ## Old version: distance matrix as input
+  ac2 <- anticlustering(
+    dist(data),
+    K = rep_len(1:2, nrow(data)),
+    objective = anticlust:::distance_objective_
+  )
+  times[i, "old_distance_input"] <- difftime(Sys.time(), start, units = "s")
 
   start <- Sys.time()
-  anticlusters <- anticlustering(
-    rnorm(n[i]),
-    K = 2,
+  ac3 <- anticlustering(
+    data,
+    K = rep_len(1:2, nrow(data)),
     objective = "distance"
   )
   times[i, "new_distance"] <- difftime(Sys.time(), start, units = "s")
+
+  ## Ensures that all methods have the same output
+  stopifnot(all(ac1 == ac2))
+  stopifnot(all(ac1 == ac3))
 }
 
 round(times, 2)
-#         n new_distance old_distance
-#  [1,]  20         0.02         0.10
-#  [2,]  40         0.03         0.27
-#  [3,]  60         0.07         0.75
-#  [4,]  80         0.16         1.11
-#  [5,] 100         0.30         1.93
-#  [6,] 120         0.50         2.70
-#  [7,] 140         0.86         3.77
-#  [8,] 160         1.11         4.97
-#  [9,] 180         1.58         6.58
-# [10,] 200         2.30         8.32
-# [11,] 220         3.10        10.31
-# [12,] 240         4.15        12.96
-# [13,] 260         5.26        15.83
-# [14,] 280         6.94        19.34
-# [15,] 300         8.69        23.19
+
+#         n old_features_input old_distance_input new_distance
+#  [1,]  20               0.08               0.12         0.01
+#  [2,]  40               0.26               0.50         0.03
+#  [3,]  60               0.72               1.36         0.10
+#  [4,]  80               1.07               2.62         0.22
+#  [5,] 100               1.81               4.98         0.46
+#  [6,] 120               3.84              11.17         0.82
+#  [7,] 140               3.72              13.17         1.33
+#  [8,] 160               5.20              20.65         2.16
+#  [9,] 180               7.30              31.48         2.44
+# [10,] 200               8.63              37.96         3.38
+# [11,] 220              10.97              53.26         4.80
+# [12,] 240              13.78              74.17         6.66
+# [13,] 260              17.49             106.81         8.43
+# [14,] 280              20.40             149.38        12.23
+# [15,] 300              27.21             178.46        15.20
 ```
+
+As shown in the code and in the output table, two different 
+objective functions could be called when the exchange algorithm was
+employed, depending on the input: When a feature table was passed, 
+the internal function `anticlust:::obj_value_distance` was called
+in each iteration of the exchange algorithm; 
+When a distance matrix was passed, the internal function 
+`anticlust:::distance_objective_` was called
+in each iteration of the exchange algorithm. The former function 
+computes all between-element distances within each set and returns their sum
+(using the `R` functions `by`, `dist`, `sapply` and `sum`). The latter 
+function stores all distances and will index the relevant distances and
+return their sum. Interestingly, this indexing approach was a lot slower
+than recomputing all distances every iteration in the exchange algorithm. 
+
+In the new version, there no longer is a difference between a feature 
+and distance input; in both cases, the sum of distances is updated 
+based on only the relevant columns/rows in a distance matrix (that means, 
+in each iteration of the exchange method, 4 rows/columns need
+to be investigated, independent of N). The new approach is 
+a lot faster and especially benefial when we pass distance as input. 
 
 # anticlust 0.2.9-3
 
