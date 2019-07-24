@@ -87,12 +87,13 @@ swap_items <- function(selected, i, j) {
   selected
 }
 
-# Important: distances has 0 in diagonal and upper triangular
+# (not that) important: distances has 0 in diagonal and upper triangular
 itemwise_distance_sum <- function(distances, selected, i, j) {
+  n <- nrow(distances)
   sum(
-    distances[i, ][selected[i, ]],
-    distances[, i][selected[, i]],
-    distances[j, ][selected[j, ]],
-    distances[, j][selected[, j]]
+    distances[i, 1:(i-1)][selected[i, 1:(i-1)]],
+    distances[i:n, i][selected[i:n, i]],
+    distances[j, 1:(j-1)][selected[j, 1:(j-1)]],
+    distances[j:n, j][selected[j:n, j]]
   )
 }
