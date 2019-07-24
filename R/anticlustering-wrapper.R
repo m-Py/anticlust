@@ -448,10 +448,11 @@ get_preclusters <- function(features, distances, K, preclustering) {
     if (argument_exists(features)) {
       distances <- dist(features)
     }
+    N <- nrow(as.matrix(distances))
     if (K == 2) {
       preclusters <- greedy_matching(distances)
     } else if (K > 2) {
-      preclusters <- greedy_balanced_k_clustering(distances, K)
+      preclusters <- greedy_balanced_k_clustering(distances, N / K)
     }
   } else {
     preclusters <- preclustering
