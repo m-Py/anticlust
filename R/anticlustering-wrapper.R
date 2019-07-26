@@ -318,12 +318,13 @@ anticlustering <- function(features = NULL, distances = NULL,
   ## Redirect to fast exchange method for k-means exchange (and no preclustering)
   if (class(objective) != "function" && is.null(preclusters) &&
       objective == "variance" &&  method == "exchange" &&
-      sum(is.na(K)) == 0) {
+      sum(is.na(K)) == 0 && !argument_exists(iv)) {
     return(fast_anticlustering(features, K, Inf, categories))
   }
 
   ## Redirect to fast exchange method for anticluster editing
-  if (class(objective) != "function" && objective == "distance" && method == "exchange") {
+  if (class(objective) != "function" && objective == "distance"
+      && method == "exchange"  && !argument_exists(iv)) {
     return(fast_exchange_dist(data, K, categories, preclusters))
   }
 
@@ -339,9 +340,6 @@ anticlustering <- function(features = NULL, distances = NULL,
 process_input <- function(features, distances, standardize, objective, iv, method) {
   if (argument_exists(features)) {
     data <- as.matrix(features)
-    if (argument_exists(iv)) {
-      data <- cbind(data, iv) # if iv exists, the objective function handles the additional columns
-    }
     if (standardize) {
       data <- scale(data)
     }
@@ -393,17 +391,8 @@ get_objective_function <- function(features, distances, objective, K, iv) {
   ## Min-max application: independent variable is present
   if (argument_exists(iv)) { # make means in independent variable different
     iv <- as.matrix(iv)
-    ## In which columns are the independent variables stored when
-    ## the objective is computed? The features (to be made similar)
-    ## and the independent variables (to be made dissimilar) are
-    ## disentangled in the objective function if the argument `iv` exists.
-    n_features <- ncol(features)
-    n_iv <- ncol(iv)
-    columns_for_iv <- (n_features + 1):(n_features + n_iv)
     obj2 <- function(clusters, data) {
-      features <- data[, 1:n_features, drop = FALSE]
-      iv <- data[, columns_for_iv, drop = FALSE]
-      obj(clusters, features) + obj(clusters, iv) * (-1)
+      obj(clusters, data) + obj(clusters, iv) * (-1)
     }
   } else {
     obj2 <- obj
