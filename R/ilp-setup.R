@@ -6,13 +6,36 @@
 #' @param K The number of groups to be created
 #' @param solver A string identifing the solver to be used ("Rglpk",
 #'     "gurobi", or "Rcplex")
+#' @param group_restriction If FALSE, there is no restriction on the
+#'     group size, leading to a normal weighted cluster editing formulation
 #'
 #' @return A list representing the ILP formulation of the instance
 #'
 #' @noRd
 #'
+#' @examples
+#'
+#' ## Balanced anticluster editing:
+#' distances <- as.matrix(dist(runif(6)))
+#' K <- 2
+#' solver <- "Rcplex"
+#' ilp <- anticlustering_ilp(distances, K, solver)
+#' solve_ilp(ilp, solver)
+#'
+#' # Cluster editing:
+#' subs <- sample(150, size = 120)
+#' data <- iris[subs, -5]
+#' distances <- dist(data)
+#' # Define agreement as being close enough to each other
+#' agreements <- ifelse(as.matrix(distances) < 2.5, 1, -1)
+#' solver <- "Rcplex"
+#' ilp <- anticlustering_ilp(agreements, K = 0, solver, FALSE) # k is irrelevant
+#' solution <- solve_ilp(ilp, solver, "max")
+#' clusters <- ilp_to_groups(ilp, solution)
+#' plot_clusters(data[, 1:2], clusters)
+#'
 
-anticlustering_ilp <- function(distances, K, solver) {
+anticlustering_ilp <- function(distances, K, solver, group_restriction = TRUE) {
 
   ## Initialize some constant variables:
   equality_signs <- equality_identifiers(solver)
@@ -39,6 +62,13 @@ anticlustering_ilp <- function(distances, K, solver) {
 
   ## Give names to all objects for inspection purposes
   names(obj_function) <- colnames(constraints)
+
+  ## normal cluster editing:
+  if (group_restriction == FALSE) {
+    rhs <- rhs[1:n_tris]
+    equalities <- equalities[1:n_tris]
+    constraints <- constraints[1:n_tris, ]
+  }
 
   ## return instance
   instance              <- list()
