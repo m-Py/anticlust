@@ -1,4 +1,22 @@
 
+# anticlust 0.2.9-5
+
+2019-07-17
+
+- Fix: Random assignment under categorical restrictions failed
+  if a category only had one member because in this case `sample` was called
+  with an vector input of length 1, e.g., `sample(9)` actually returns
+  `sample(1:9)` but should return 9 in this case. This was fixed
+  with f53bf4e[https://github.com/m-Py/anticlust/commit/f53bf4ec19a9cefe44b1639a814bc97c61f4181b].
+- There is no longer any error tolerance with the CPLEX solver;
+  previously there was an optimality gap of 1e-11, but now it is 0.
+- There is a new exported fuction: `wce()`. This corresponds to optimal
+  weighted cluster editing without group size restrictions. Optimality
+  means: an ILP solver is required to use this function. Note that
+  the (only) argument `weights` is a **similarity** matrix, i.e., 
+  larger values indicate stronger agreement between elements. This is 
+  unlike the other functions, but common for cluster editing.
+
 # anticlust 0.2.9-4
 
 2019-07-23
