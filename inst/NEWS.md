@@ -1,7 +1,7 @@
 
 # anticlust 0.2.9-5
 
-2019-07-17
+2019-09-17
 
 - Fix: Random assignment under categorical restrictions failed
   if a category only had one member because in this case `sample` was called
