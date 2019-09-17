@@ -20,6 +20,7 @@
 
 wce <- function(weights) {
   solver <- solver_available()
+  weights <- as.matrix(weights)
   ilp <- anticlustering_ilp(weights, K = 0, solver, FALSE) # k is irrelevant
   solution <- solve_ilp(ilp, solver, "max")
   ilp_to_groups(ilp, solution)
