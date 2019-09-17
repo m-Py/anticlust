@@ -11,6 +11,8 @@
 #' data <- iris[subs, -5]
 #' distances <- dist(data)
 #' # Define agreement as being close enough to each other
+#' # By defining low agreement as -1 and high agreement as +1, we
+#' # solve *unweighted* cluster editing
 #' agreements <- ifelse(as.matrix(distances) < 2.5, 1, -1)
 #' clusters <- wce(agreements)
 #' plot_clusters(data[, 1:2], clusters)
