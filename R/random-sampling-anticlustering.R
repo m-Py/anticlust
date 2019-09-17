@@ -185,8 +185,17 @@ random_sampling_ <- function(dat, K, nrep, sampling_plan,
 #' @noRd
 
 categorical_sampling <- function(categories, K) {
-  init <- by(rep_len(1:K, length(categories)), categories, sample)
+  init <- by(rep_len(1:K, length(categories)), categories, sample_)
   unlist(init)
+}
+
+# sample function must be redefined for categorical sampling just in case
+# there is a category with only 1 member
+sample_ <- function(x) {
+  if (length(x) == 1) {
+    return(x)
+  }
+  sample(x)
 }
 
 #' Replicate a random permutation of \code{1:N} several times
