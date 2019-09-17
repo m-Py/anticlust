@@ -7,7 +7,7 @@
   if a category only had one member because in this case `sample` was called
   with an vector input of length 1, e.g., `sample(9)` actually returns
   `sample(1:9)` but should return 9 in this case. This was fixed
-  with f53bf4e[https://github.com/m-Py/anticlust/commit/f53bf4ec19a9cefe44b1639a814bc97c61f4181b].
+  with [f53bf4e](https://github.com/m-Py/anticlust/commit/f53bf4ec19a9cefe44b1639a814bc97c61f4181b).
 - There is no longer any error tolerance with the CPLEX solver;
   previously there was an optimality gap of 1e-11, but now it is 0.
 - There is a new exported fuction: `wce()`. This corresponds to optimal
