@@ -59,3 +59,17 @@ test_that("categorical constraints are met for two categories (data.frame or mat
     }
   }
 })
+
+
+test_that("argument categories can be used to enforce preclustering constraints correctly", {
+  N <- 60
+  M <- 2
+  features <- matrix(rnorm(N * M), ncol = M)
+  ## iterate over number of categories & number of anticlusters
+  for (K in 2:4) {
+    preclusters <- balanced_clustering(features, K = N / K)
+    ac <- anticlustering(features, K = K, method = "sampling", nrep = 1, categories = preclusters)
+    tab <- table(ac, preclusters)
+    expect_equal(all(tab == 1), TRUE)
+  }
+})
