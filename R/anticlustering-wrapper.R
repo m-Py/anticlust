@@ -38,12 +38,6 @@
 #'     \code{method} is \code{"sampling"}.
 #' @param categories A vector, data.frame or matrix representing one or
 #'     several categorical constraints. See details.
-#' @param parallelize Boolean. Indicates whether multiple processors
-#'     should be used for the random sampling method. Defaults to
-#'     \code{FALSE}.
-#' @param seed A value to fixate the random seed when using the random
-#'     sampling method. When \code{parallelize} is \code{TRUE}, using
-#'     this argument is the only way to ensure reproducibility.
 #' @param iv A vector, data.frame or matrix representing features that act
 #'     as "independent variables", i.e., variables whose values
 #'     are made as different as possible between sets (the opposite of
@@ -160,36 +154,7 @@
 #' are to be created (actually, this is not exactly what happens
 #' internally, but it is equivalent).
 #'
-#' For the random sampling method, the output will vary between function
-#' calls. To make a computation results reproducible, you can use the
-#' argument \code{seed} -- a specific value will produce the same
-#' results when the function is called with the same input
-#' parameters. Note that the same seed will produce different results
-#' when the parameter \code{parallelize} is varied. For the parallel
-#' computation, the random seed is set using the function
-#' \code{\link[parallel]{clusterSetRNGStream}}; otherwise, the function
-#' \code{\link{set.seed}} is called.
 #'
-#' \strong{Recommendations}
-#'
-#' The following recommendations are provided on using this function:
-#'
-#' \enumerate{
-#'  \item If it is desired that the feature means are as similar as possible
-#'      between sets, select \code{objective = "variance"}
-#'  \item If the average similarity between elements in different sets
-#'      should be maximized (i.e., making sets as a whole similar to
-#'      each other), select \code{objective = "distance"}
-#'  \item When the objective is \code{"distance"} and an exact approach
-#'      is infeasible: select \code{method = "exchange"}; it is also
-#'      possible to activate \code{preclustering = TRUE}, which improves
-#'      run time and often does not even impair quality of the solution.
-#'  \item Generally, the exchange method is preferred over random
-#'      sampling. Use random sampling only for large data sets or if
-#'      a fast solution is needed. However, even in that case, using
-#'      the exchange method with preclustering activated or using the function
-#'      \code{\link{fast_anticlustering}} is usually preferred.
-#' }
 #'
 #' \strong{Categorical constraints}
 #'
@@ -213,6 +178,27 @@
 #' to define variables whose values should be dissimilar between sets;
 #' \code{iv} is used the same way as \code{features} whose values are
 #' made similar between sets.
+#'
+#' \strong{Recommendations}
+#'
+#' The following recommendations are provided on using this function:
+#'
+#' \enumerate{
+#'  \item If it is desired that the feature means are as similar as possible
+#'      between sets, select \code{objective = "variance"}
+#'  \item If the average similarity between elements in different sets
+#'      should be maximized (i.e., making sets as a whole similar to
+#'      each other), select \code{objective = "distance"}
+#'  \item When the objective is \code{"distance"} and an exact approach
+#'      is infeasible: select \code{method = "exchange"}; it is also
+#'      possible to activate \code{preclustering = TRUE}, which improves
+#'      run time and often does not even impair quality of the solution.
+#'  \item Generally, the exchange method is preferred over random
+#'      sampling. Use random sampling only for large data sets or if
+#'      a fast solution is needed. However, even in that case, using
+#'      the exchange method with preclustering activated or using the function
+#'      \code{\link{fast_anticlustering}} is usually preferred.
+#' }
 #'
 #' @seealso
 #'
@@ -290,13 +276,11 @@ anticlustering <- function(features = NULL, distances = NULL,
                            K, objective = "distance",
                            method = "exchange", preclustering = FALSE,
                            standardize = FALSE, nrep = 10000,
-                           categories = NULL, parallelize = FALSE,
-                           seed = NULL, iv = NULL) {
+                           categories = NULL, iv = NULL) {
 
   input_handling_anticlustering(features, distances, K, objective,
-                                method, preclustering,
-                                standardize, nrep, categories,
-                                parallelize, seed, iv)
+                                method, preclustering, standardize,
+                                nrep, categories, iv)
 
   ## Exact method using ILP
   if (method == "ilp") {
@@ -331,8 +315,7 @@ anticlustering <- function(features = NULL, distances = NULL,
   ## Start heuristic optimization:
   heuristic_anticlustering(data, K, obj_function,
                            method, preclusters, nrep,
-                           categories, parallelize,
-                           seed, k_neighbours = Inf)
+                           categories, k_neighbours = Inf)
 }
 
 ## Function that processes input and returns the data set that the
