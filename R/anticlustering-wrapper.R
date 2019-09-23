@@ -34,8 +34,8 @@
 #'     works when the input data is given via \code{features}, not via
 #'     \code{distances}.
 #' @param nrep The number of repetitions for the random sampling
-#'     method. Defaults to 10,000. This argument only has an effect if
-#'     \code{method} is \code{"sampling"}.
+#'     method. This argument only has an effect if \code{method} is
+#'     \code{"sampling"}.
 #' @param categories A vector, data.frame or matrix representing one or
 #'     several categorical constraints. See details.
 #' @param iv A vector, data.frame or matrix representing features that act
@@ -273,7 +273,7 @@
 anticlustering <- function(features = NULL, distances = NULL,
                            K, objective = "distance",
                            method = "exchange", preclustering = FALSE,
-                           standardize = FALSE, nrep = 10000,
+                           standardize = FALSE, nrep = 10,
                            categories = NULL, iv = NULL) {
 
   input_handling_anticlustering(features, distances, K, objective,
