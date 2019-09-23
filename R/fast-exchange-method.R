@@ -76,8 +76,7 @@
 
 fast_anticlustering <- function(features, K, k_neighbours = Inf, categories = NULL) {
   input_handling_anticlustering(features, NULL, K, "variance",
-                                "exchange", FALSE,
-                                FALSE, 1, categories,
+                                "exchange", FALSE, 1, categories,
                                 NULL)
 
   if (!isTRUE(k_neighbours == Inf)) {

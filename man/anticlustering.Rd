@@ -6,7 +6,7 @@
 \usage{
 anticlustering(features = NULL, distances = NULL, K,
   objective = "distance", method = "exchange", preclustering = FALSE,
-  standardize = FALSE, nrep = 10000, categories = NULL, iv = NULL)
+  nrep = 10, categories = NULL, iv = NULL)
 }
 \arguments{
 \item{features}{A numeric vector, matrix or data.frame of data
@@ -39,16 +39,9 @@ details.}
 before anticlusters are created? Defaults to \code{FALSE}. See
 details.}
 
-\item{standardize}{Boolean. Should the features be standardized
-before anticlusters are created? Defaults to \code{FALSE}.
-Standardization is done using the function \code{\link{scale}}
-using the default settings (mean = 0, SD = 1). This argument only
-works when the input data is given via \code{features}, not via
-\code{distances}.}
-
 \item{nrep}{The number of repetitions for the random sampling
-method. Defaults to 10,000. This argument only has an effect if
-\code{method} is \code{"sampling"}.}
+method. This argument only has an effect if \code{method} is
+\code{"sampling"}.}
 
 \item{categories}{A vector, data.frame or matrix representing one or
 several categorical constraints. See details.}

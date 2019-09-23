@@ -12,10 +12,10 @@ test_that("distance input works for exact ILP", {
     distances <- dist(features)
 
     ac_feat <- anticlustering(features, K = K, preclustering = FALSE,
-                              method = "ilp", standardize = FALSE)
+                              method = "ilp")
     ac_dist <- anticlustering(distances = distances, K = K,
                               preclustering = FALSE,
-                              method = "ilp", standardize = FALSE)
+                              method = "ilp")
     expect_equal(distance_objective_(ac_feat, dist(features)),
                  distance_objective_(ac_feat, distances))
   }
@@ -31,10 +31,10 @@ test_that("distance input works for precluster ILP", {
     distances <- dist(features)
 
     ac_feat <- anticlustering(features, K = K, preclustering = TRUE,
-                              method = "ilp", standardize = FALSE)
+                              method = "ilp")
     ac_dist <- anticlustering(distances = distances, K = K,
                               preclustering = TRUE,
-                              method = "ilp", standardize = FALSE)
+                              method = "ilp")
     expect_equal(distance_objective_(ac_feat, dist(features)),
                  distance_objective_(ac_feat, distances))
   }
@@ -72,12 +72,10 @@ test_that("distance input works for heuristic without preclustering", {
 
     set.seed(rnd_seed)
     ac_feat <- anticlustering(features, K = K, preclustering = FALSE,
-                              method = "sampling", standardize = FALSE,
-                              nrep = 100)
+                              method = "sampling", nrep = 100)
     set.seed(rnd_seed)
     ac_dist <- anticlustering(distances = distances, K = K, preclustering = FALSE,
-                              method = "sampling", standardize = FALSE,
-                              nrep = 100)
+                              method = "sampling",nrep = 100)
 
     expect_equal(distance_objective_(ac_feat, dist(features)),
                  distance_objective_(ac_feat, distances))
@@ -100,12 +98,10 @@ test_that("distance input works for heuristic with preclustering", {
     set.seed(rnd_seed)
     ## does not work with distance criterion
     ac_feat <- anticlustering(features, K = K, preclustering = TRUE,
-                              method = "sampling", standardize = FALSE,
-                              nrep = 100)
+                              method = "sampling", nrep = 100)
     set.seed(rnd_seed)
     ac_dist <- anticlustering(distances = distances, K = K, preclustering = TRUE,
-                              method = "sampling", standardize = FALSE,
-                              nrep = 100)
+                              method = "sampling", nrep = 100)
 
     expect_equal(distance_objective_(ac_feat, dist(features)),
                  distance_objective_(ac_feat, distances))
@@ -123,8 +119,8 @@ test_that("distance input works for clustering function, heuristic method", {
     distances <- dist(features)
 
     ## does not work with distance criterion
-    ac_feat <- balanced_clustering(features, K = K, method = "sampling", standardize = FALSE)
-    ac_dist <- balanced_clustering(distances = distances, K = K, method = "sampling", standardize = FALSE)
+    ac_feat <- balanced_clustering(features, K = K, method = "sampling")
+    ac_dist <- balanced_clustering(distances = distances, K = K, method = "sampling")
 
     expect_equal(distance_objective_(ac_feat, dist(features)),
                  distance_objective_(ac_feat, distances))

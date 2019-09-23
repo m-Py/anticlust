@@ -9,10 +9,9 @@ test_that("high level equal sized clustering function runs through", {
     n_clusters <- conditions[k, "p"]
     n_elements <- n_clusters * 5 # n must be multiplier of p
     features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
-    clusters_exact <- balanced_clustering(features, K = n_clusters, method = "ilp",
-                                          standardize = FALSE)
+    clusters_exact <- balanced_clustering(features, K = n_clusters, method = "ilp")
     clusters_heuristic <- balanced_clustering(features, K = n_clusters,
-                                              method = "heuristic", standardize = FALSE)
+                                              method = "heuristic")
     ## Check that output is valid
     expect_equal(legal_number_of_clusters(features, clusters_exact), NULL)
     expect_equal(legal_number_of_clusters(features, clusters_heuristic), NULL)
@@ -35,12 +34,10 @@ test_that("high level anticlustering function runs through", {
     features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
     anticlusters_exact <- anticlustering(features, K = n_clusters,
                                          method = "ilp",
-                                         standardize = FALSE,
                                          preclustering = FALSE)
     anticlusters_heuristic <- anticlustering(features,
                                              K = n_clusters,
                                              method = "sampling",
-                                             standardize = FALSE,
                                              nrep = 5)
     ## Check that output is valid
     expect_equal(legal_number_of_clusters(features, anticlusters_exact), NULL)
@@ -73,8 +70,7 @@ test_that("all argument combinations run through", {
     anticlusters <- anticlustering(features, K = n_anticlusters,
                                    objective = criterion,
                                    method = method,
-                                   preclustering = preclustering,
-                                   standardize = FALSE)
+                                   preclustering = preclustering)
     obj <- obj_value_distance(anticlusters, features)
     rowname <- ifelse(preclustering, "preclustering", "no_preclustering")
     storage[rowname, method] <- obj

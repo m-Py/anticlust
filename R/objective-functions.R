@@ -9,10 +9,6 @@
 #' @param clusters A vector representing (anti)clusters (e.g., returned
 #'     by \code{\link{anticlustering}} or
 #'     \code{\link{balanced_clustering}})
-#' @param standardize Boolean - should the features be standardized
-#'     before the objective is computed? Defaults to \code{FALSE}.
-#'     Standardization is done using the function \code{\link{scale}}
-#'     using the default settings (mean = 0, SD = 1).
 #'
 #' @return The total within-cluster variance
 #'
@@ -23,13 +19,6 @@
 #' objective function used in k-means clustering, see
 #' \code{\link{kmeans}}.
 #'
-#' @note
-#'
-#' When using this function to check the results of
-#' \code{\link{anticlustering}} or \code{\link{balanced_clustering}},
-#' make sure that the \code{standardization} argument has the same
-#' value when creating (anti)clusters and when calling
-#' \code{variance_objective}.
 #'
 #' @references
 #'
@@ -48,43 +37,32 @@
 #' clusters <- balanced_clustering(
 #'   iris[, -5],
 #'   K = 3,
-#'   standardize = TRUE,
 #'   objective = "variance"
 #' )
 #' # This is low:
 #' variance_objective(
 #'   iris[, -5],
-#'   clusters,
-#'   standardize = TRUE
+#'   clusters
 #' )
 #' ## Anticlustering
 #' anticlusters <- anticlustering(
 #'   iris[, -5],
 #'   K = 3,
-#'   standardize = TRUE,
 #'   objective = "variance",
 #'   nrep = 100
 #' )
 #' # This is higher:
 #' variance_objective(
 #'   iris[, -5],
-#'   anticlusters,
-#'   standardize = TRUE
+#'   anticlusters
 #' )
 #'
 
-variance_objective <- function(features, clusters,
-                               standardize = FALSE) {
+variance_objective <- function(features, clusters) {
   validate_input(features, "features", c("data.frame", "matrix", "numeric"))
   features <- as.matrix(features)
   validate_input(features, "features", objmode = "numeric")
   validate_input(clusters, "anticlusters", class_string = c("numeric", "factor"))
-  validate_input(standardize, "standardize", input_set = c(TRUE, FALSE),
-                 not_na = TRUE, len = 1)
-
-  if (standardize) {
-    features <- scale(features)
-  }
   variance_objective_(clusters, features)
 }
 
@@ -117,12 +95,6 @@ variance_objective_ <- function(clusters, data) {
 #' @param clusters A vector representing (anti)clusters (e.g.,
 #'     returned by \code{\link{anticlustering}} or
 #'     \code{\link{balanced_clustering}}).
-#' @param standardize Boolean - should the features be standardized
-#'     before anticlusters are created? Defaults to \code{FALSE}.
-#'     Standardization is done using the function \code{\link{scale}}
-#'     using the default settings (mean = 0, SD = 1). This argument
-#'     only works in combination with the \code{features} argument,
-#'     not with \code{distances}.
 #'
 #' @return The cluster editing objective
 #'
@@ -133,13 +105,6 @@ variance_objective_ <- function(clusters, data) {
 #' When the argument \code{features} is passed, the Euclidean distance
 #' is used.
 #'
-#' @note
-#'
-#' When using this function to check the results of
-#' \code{\link{anticlustering}} or \code{\link{balanced_clustering}},
-#' make sure that the \code{standardization} argument has the same value
-#' when creating (anti)clusters and when calling \code{variance_objective}
-#' (at least if \code{features} is used as input).
 #'
 #' @examples
 #'
@@ -181,7 +146,7 @@ variance_objective_ <- function(clusters, data) {
 #'
 
 distance_objective <- function(features = NULL, distances = NULL,
-                               clusters, standardize = FALSE) {
+                               clusters) {
   if (!argument_exists(features) && !argument_exists(distances)) {
     stop("One of the arguments 'features' or 'distances' must be given.")
   }
@@ -190,15 +155,10 @@ distance_objective <- function(features = NULL, distances = NULL,
     stop("Only pass one of the arguments 'features' or 'distances'.")
   }
   validate_input(clusters, "anticlusters", class_string = c("numeric", "factor"))
-  validate_input(standardize, "standardize", input_set = c(TRUE, FALSE),
-                 not_na = TRUE, len = 1)
   if (argument_exists(features)) {
     validate_input(features, "features", c("data.frame", "matrix", "numeric"))
     features <- as.matrix(features)
     validate_input(features, "features", objmode = "numeric")
-    if (standardize) {
-      features <- scale(features)
-    }
     return(obj_value_distance(clusters, features))
   }
   validate_input(distances, "distances", c("matrix", "dist"))
@@ -211,7 +171,7 @@ distance_objective <- function(features = NULL, distances = NULL,
 #' Internal function for distance objective via input through distances
 #'
 #' @param anticlusters A vector of n anticlusters
-#' @param data A n x n matrix of
+#' @param data A n x n matrix of distances
 #'
 #' @details
 #' The second argument is named `data` to have a consistent

@@ -15,8 +15,8 @@
 #' @noRd
 input_handling_anticlustering <- function(features, distances,
                                           K, objective, method,
-                                          preclustering, standardize,
-                                          nrep, categories, iv) {
+                                          preclustering, nrep,
+                                          categories, iv) {
 
   ## Merge categories variable so that `length` can be applied:
   categories <- merge_into_one_variable(categories)
@@ -113,9 +113,6 @@ input_handling_anticlustering <- function(features, distances,
                  must_be_integer = TRUE)
   validate_input(method, "method", len = 1,
                  input_set = c("ilp", "sampling", "exchange", "heuristic"))
-
-  validate_input(standardize, "standardize", "logical", len = 1,
-                 input_set = c(TRUE, FALSE))
 
   if (method == "ilp") {
     solver <- solver_available()

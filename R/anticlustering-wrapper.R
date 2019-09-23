@@ -27,12 +27,6 @@
 #' @param preclustering Boolean. Should a preclustering be conducted
 #'     before anticlusters are created? Defaults to \code{FALSE}. See
 #'     details.
-#' @param standardize Boolean. Should the features be standardized
-#'     before anticlusters are created? Defaults to \code{FALSE}.
-#'     Standardization is done using the function \code{\link{scale}}
-#'     using the default settings (mean = 0, SD = 1). This argument only
-#'     works when the input data is given via \code{features}, not via
-#'     \code{distances}.
 #' @param nrep The number of repetitions for the random sampling
 #'     method. This argument only has an effect if \code{method} is
 #'     \code{"sampling"}.
@@ -271,14 +265,12 @@
 #'
 
 anticlustering <- function(features = NULL, distances = NULL,
-                           K, objective = "distance",
-                           method = "exchange", preclustering = FALSE,
-                           standardize = FALSE, nrep = 10,
+                           K, objective = "distance", method = "exchange",
+                           preclustering = FALSE, nrep = 10,
                            categories = NULL, iv = NULL) {
 
   input_handling_anticlustering(features, distances, K, objective,
-                                method, preclustering, standardize,
-                                nrep, categories, iv)
+                                method, preclustering, nrep, categories, iv)
 
   ## Exact method using ILP
   if (method == "ilp") {
@@ -293,7 +285,7 @@ anticlustering <- function(features = NULL, distances = NULL,
 
   ## Get data into required format and get objective function:
   categories <- merge_into_one_variable(categories) # may be NULL
-  data <- process_input(features, distances, standardize, objective, method)
+  data <- process_input(features, distances, objective, method)
   obj_function <- get_objective_function(features, distances, objective, K, iv)
   preclusters <- get_preclusters(features, distances, K, preclustering)
 
@@ -301,7 +293,7 @@ anticlustering <- function(features = NULL, distances = NULL,
   if (class(objective) != "function" && is.null(preclusters) &&
       objective == "variance" &&  method == "exchange" &&
       sum(is.na(K)) == 0 && !argument_exists(iv)) {
-    return(fast_anticlustering(features, K, Inf, categories))
+    return(fast_anticlustering(data, K, Inf, categories))
   }
 
   ## Redirect to fast exchange method for anticluster editing
@@ -319,12 +311,9 @@ anticlustering <- function(features = NULL, distances = NULL,
 
 ## Function that processes input and returns the data set that the
 ## optimization is conducted on (for exchange and sampling methods)
-process_input <- function(features, distances, standardize, objective, method) {
+process_input <- function(features, distances, objective, method) {
   if (argument_exists(features)) {
     data <- as.matrix(features)
-    if (standardize) {
-      data <- scale(data)
-    }
     ## Why is the data only coverted to distances for exchange method?
     ## -> random sampling uses `obj_value_distance` which uses features
     ## as input. Exchange method operates on distances.

@@ -5,7 +5,7 @@
 \title{Create K balanced clusters}
 \usage{
 balanced_clustering(features = NULL, distances = NULL, K,
-  objective = "distance", method = "heuristic", standardize = FALSE)
+  objective = "distance", method = "heuristic")
 }
 \arguments{
 \item{features}{A vector, matrix or data.frame of data points. Rows
@@ -29,17 +29,9 @@ objective; the option "variance" is used to minimize the
 k-means objective. See details.}
 
 \item{method}{One of "heuristic" or "ilp". See details.}
-
-\item{standardize}{Boolean - should the features be standardized
-before anticlusters are created? Defaults to \code{FALSE}.
-Standardization is done using the function \code{\link{scale}}
-using the default settings (mean = 0, SD = 1). This argument
-only works in combination with the \code{features} argument,
-not with \code{distances}.}
 }
 \value{
 A vector representing the cluster affiliation of all elements.
-    Each cluster has the the same size.
 }
 \description{
 Create K balanced clusters

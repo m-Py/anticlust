@@ -4,8 +4,7 @@
 \alias{distance_objective}
 \title{Objective value for the cluster editing distance objective}
 \usage{
-distance_objective(features = NULL, distances = NULL, clusters,
-  standardize = FALSE)
+distance_objective(features = NULL, distances = NULL, clusters)
 }
 \arguments{
 \item{features}{A vector, matrix or data.frame of data points. Rows
@@ -24,13 +23,6 @@ dissimilarities.}
 \item{clusters}{A vector representing (anti)clusters (e.g.,
 returned by \code{\link{anticlustering}} or
 \code{\link{balanced_clustering}}).}
-
-\item{standardize}{Boolean - should the features be standardized
-before anticlusters are created? Defaults to \code{FALSE}.
-Standardization is done using the function \code{\link{scale}}
-using the default settings (mean = 0, SD = 1). This argument
-only works in combination with the \code{features} argument,
-not with \code{distances}.}
 }
 \value{
 The cluster editing objective
@@ -43,13 +35,6 @@ The cluster editing objective objective is given by the sum of the
 pairwise distances between elements within the same (anti)clusters.
 When the argument \code{features} is passed, the Euclidean distance
 is used.
-}
-\note{
-When using this function to check the results of
-\code{\link{anticlustering}} or \code{\link{balanced_clustering}},
-make sure that the \code{standardization} argument has the same value
-when creating (anti)clusters and when calling \code{variance_objective}
-(at least if \code{features} is used as input).
 }
 \examples{
 

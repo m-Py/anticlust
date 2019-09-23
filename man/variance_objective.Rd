@@ -4,7 +4,7 @@
 \alias{variance_objective}
 \title{Objective value for the variance criterion}
 \usage{
-variance_objective(features, clusters, standardize = FALSE)
+variance_objective(features, clusters)
 }
 \arguments{
 \item{features}{A vector, matrix or data.frame of data points. Rows
@@ -14,11 +14,6 @@ vector represents a single feature.}
 \item{clusters}{A vector representing (anti)clusters (e.g., returned
 by \code{\link{anticlustering}} or
 \code{\link{balanced_clustering}})}
-
-\item{standardize}{Boolean - should the features be standardized
-before the objective is computed? Defaults to \code{FALSE}.
-Standardization is done using the function \code{\link{scale}}
-using the default settings (mean = 0, SD = 1).}
 }
 \value{
 The total within-cluster variance
@@ -32,13 +27,6 @@ errors between cluster centers and individual data points. It is the
 objective function used in k-means clustering, see
 \code{\link{kmeans}}.
 }
-\note{
-When using this function to check the results of
-\code{\link{anticlustering}} or \code{\link{balanced_clustering}},
-make sure that the \code{standardization} argument has the same
-value when creating (anti)clusters and when calling
-\code{variance_objective}.
-}
 \examples{
 
 data(iris)
@@ -46,28 +34,24 @@ data(iris)
 clusters <- balanced_clustering(
   iris[, -5],
   K = 3,
-  standardize = TRUE,
   objective = "variance"
 )
 # This is low:
 variance_objective(
   iris[, -5],
-  clusters,
-  standardize = TRUE
+  clusters
 )
 ## Anticlustering
 anticlusters <- anticlustering(
   iris[, -5],
   K = 3,
-  standardize = TRUE,
   objective = "variance",
   nrep = 100
 )
 # This is higher:
 variance_objective(
   iris[, -5],
-  anticlusters,
-  standardize = TRUE
+  anticlusters
 )
 
 }

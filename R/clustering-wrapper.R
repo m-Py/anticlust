@@ -18,15 +18,8 @@
 #'     objective; the option "variance" is used to minimize the
 #'     k-means objective. See details.
 #' @param method One of "heuristic" or "ilp". See details.
-#' @param standardize Boolean - should the features be standardized
-#'     before anticlusters are created? Defaults to \code{FALSE}.
-#'     Standardization is done using the function \code{\link{scale}}
-#'     using the default settings (mean = 0, SD = 1). This argument
-#'     only works in combination with the \code{features} argument,
-#'     not with \code{distances}.
 #'
 #' @return A vector representing the cluster affiliation of all elements.
-#'     Each cluster has the the same size.
 #'
 #' @details
 #'
@@ -100,20 +93,14 @@
 
 balanced_clustering <- function(features = NULL, distances = NULL,
                                 K, objective = "distance",
-                                method = "heuristic",
-                                standardize = FALSE) {
+                                method = "heuristic") {
 
   input_handling_anticlustering(features, distances, K,
-                                objective, method, TRUE,
-                                standardize, 1,
+                                objective, method, TRUE, 1,
                                 NULL, NULL)
 
-  ## Standardize feature values (for each feature, mean = 0, sd = 1)?
   if (argument_exists(features)) {
     features <- as.matrix(features)
-    if (standardize) {
-      features <- scale(features)
-    }
     distances <- as.matrix(dist(features))
   } else if (argument_exists(distances)) {
     distances <- as.matrix(as.dist(distances))
