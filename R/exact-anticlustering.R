@@ -6,8 +6,8 @@
 #'     pairwise dissimilarities between all N elements. CAN an be an
 #'     object of class \code{dist}.
 #' @param K How many anticlusters should be created.
-#' @param solver A string identifying the solver to be used ("glpk",
-#'     "gurobi", or "cplex")
+#' @param solver A string identifying the solver to be used ("Rglpk",
+#'     "gurobi", or "Rcplex")
 #' @param standardize Boolean - should the feature values be
 #'     standardized before groups are created?
 #' @param preclustering Boolean, should a preclustering be conducted
