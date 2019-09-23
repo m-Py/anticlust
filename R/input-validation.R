@@ -53,21 +53,8 @@ input_handling_anticlustering <- function(features, distances,
     N <- nrow(distances)
   }
 
-
-  if (length(preclustering) == 1)  {
-    validate_input(preclustering, "preclustering", "logical", len = 1,
-                   input_set = c(TRUE, FALSE), not_na = TRUE)
-  } else if (length(preclustering) != 1) {
-    validate_input(preclustering, "preclustering", "numeric", not_na = TRUE)
-    if (method %in% c("ilp", "sampling", "heuristic")) {
-      stop("Currently, it is not possible to pass a custom preclustering vector with ",
-           "the ILP or random sampling method. Set preclustering to `TRUE` or `FALSE`" ,
-           "or use method = 'exchange'.")
-    }
-  } else {
-    stop("The argument `preclustering` must be either TRUE/FALSE or a ",
-         "preclustering vector of length N.")
-  }
+  validate_input(preclustering, "preclustering", "logical", len = 1,
+                 input_set = c(TRUE, FALSE), not_na = TRUE)
 
   # Allow that K is an initial assignment of elements to clusters
   if (length(K) == 1) {
@@ -95,7 +82,7 @@ input_handling_anticlustering <- function(features, distances,
       stop("K must be a divider of the number of elements when using the ILP method. ",
            "(Try out method = 'exchange' or method = 'sampling'.)")
     }
-    if (is.logical(preclustering) && preclustering == TRUE) {
+    if (preclustering == TRUE) {
       stop("K must be a divider of the number of elements when preclustering is `TRUE`. ",
            "(Try out preclustering = FALSE.)")
     }

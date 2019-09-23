@@ -16,7 +16,6 @@ test_that("all levels of heuristicism work and that exact approach has best obje
     anti_list <- list()
     for (i in c(TRUE, FALSE)) {
       anticlusters <- exact_anticlustering(as.matrix(dist(features)),
-                                           NULL,
                                            p_anticlusters,
                                            solver, preclustering = i)
       anti_list[[i + 1]] <- anticlusters

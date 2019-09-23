@@ -269,27 +269,28 @@ anticlustering <- function(features = NULL, distances = NULL,
                            preclustering = FALSE, nrep = 10,
                            categories = NULL, iv = NULL) {
 
+  ## Get data into required format
   input_handling_anticlustering(features, distances, K, objective,
                                 method, preclustering, nrep, categories, iv)
+
+  data <- process_input(features, distances, objective, method)
 
   ## Exact method using ILP
   if (method == "ilp") {
     return(exact_anticlustering(
-      features,
-      distances,
+      data,
       K,
       solver_available(),
       preclustering)
     )
   }
 
-  ## Get data into required format and get objective function:
+  # Some preprocessing; get objective function, preclusters and categories:
   categories <- merge_into_one_variable(categories) # may be NULL
-  data <- process_input(features, distances, objective, method)
   obj_function <- get_objective_function(features, distances, objective, K, iv)
   preclusters <- get_preclusters(features, distances, K, preclustering)
 
-  ## Redirect to fast exchange method for k-means exchange (and no preclustering)
+  ## Redirect to fast exchange method for k-means exchange
   if (class(objective) != "function" && is.null(preclusters) &&
       objective == "variance" &&  method == "exchange" &&
       sum(is.na(K)) == 0 && !argument_exists(iv)) {
@@ -303,7 +304,7 @@ anticlustering <- function(features = NULL, distances = NULL,
     return(fast_exchange_dist(data, K, categories, preclusters))
   }
 
-  ## Start heuristic optimization:
+  ## General heuristic optimization:
   heuristic_anticlustering(data, K, obj_function,
                            method, preclusters, nrep,
                            categories)
@@ -314,10 +315,10 @@ anticlustering <- function(features = NULL, distances = NULL,
 process_input <- function(features, distances, objective, method) {
   if (argument_exists(features)) {
     data <- as.matrix(features)
-    ## Why is the data only coverted to distances for exchange method?
+    ## Why is the data only coverted to distances for exchange method and ILP?
     ## -> random sampling uses `obj_value_distance` which uses features
-    ## as input. Exchange method operates on distances.
-    if (class(objective) != "function" && objective == "distance" && method == "exchange") {
+    ## as input. Exchange method and ILP operate on distances.
+    if (class(objective) != "function" && objective == "distance" && method %in% c("ilp", "exchange")) {
       data <- as.matrix(dist(features))
     }
     return(data)
@@ -399,25 +400,20 @@ get_preclusters <- function(features, distances, K, preclustering) {
   if (length(K) > 1) {
     K <- length(unique(K))
   }
-  ## Get precluster, three cases are possible
+  ## Get precluster, two cases are possible
   # (a) Preclusters may be NULL (if preclustering == FALSE)
   # (b) may need to be computed (if preclustering == TRUE)
-  # (c) it was already passed by the user (preclustering = a vector)
-  if (is.logical(preclustering) && preclustering == FALSE) {
+  if (preclustering == FALSE) {
     return(NULL)
   }
-  if (is.logical(preclustering) && preclustering == TRUE) {
-    if (argument_exists(features)) {
-      distances <- dist(features)
-    }
-    N <- nrow(as.matrix(distances))
-    if (K == 2) {
-      preclusters <- greedy_matching(distances)
-    } else if (K > 2) {
-      preclusters <- greedy_balanced_k_clustering(distances, N / K)
-    }
-  } else {
-    preclusters <- preclustering
+  if (argument_exists(features)) {
+    distances <- dist(features)
+  }
+  N <- nrow(as.matrix(distances))
+  if (K == 2) {
+    preclusters <- greedy_matching(distances)
+  } else if (K > 2) {
+    preclusters <- greedy_balanced_k_clustering(distances, N / K)
   }
   preclusters
 }

@@ -1,7 +1,9 @@
 
 #' Solve balanced K-anticluster editing exactly using ILP
 #'
-#' @param features A N x M matrix of item features
+#' @param features A N x M matrix of item features (Note, this is indeed
+#'     a `matrix`, not of class `dist`. This is ensured when calling this
+#'     function from the anticlustering wrapper function.)
 #' @param distances A N x N matrix representing the
 #'     pairwise dissimilarities between all N elements. CAN an be an
 #'     object of class \code{dist}.
@@ -18,17 +20,12 @@
 #'
 #' @noRd
 
-exact_anticlustering <- function(features, distances, K, solver, preclustering) {
+exact_anticlustering <- function(distances, K, solver, preclustering) {
 
-  ## If needed, convert features to Euclidean distance
-  if (argument_exists(features)) {
-    distances <- dist(features)
-  }
-  distances <- as.matrix(distances)
-  n_items <- nrow(distances)
+  N <- nrow(distances)
 
   if (preclustering == TRUE) {
-    ilp <- anticlustering_ilp(distances, n_items / K,
+    ilp <- anticlustering_ilp(distances, N / K,
                               solver = solver)
     solution <- solve_ilp(ilp, solver, "min")
     preclusters <- ilp_to_groups(ilp, solution)
@@ -37,8 +34,8 @@ exact_anticlustering <- function(features, distances, K, solver, preclustering) 
     distances <- edit_distances(distances, preclusters)
     ## Edit ILP - objective function and group sizes
     ilp$obj_function <- vectorize_weights(distances)$costs
-    ilp$rhs <- c(rep(1, choose(n_items, 3) * 3),
-                 rep((n_items / K) - 1, n_items))
+    ilp$rhs <- c(rep(1, choose(N, 3) * 3),
+                 rep((N / K) - 1, N))
     ## Solve edited ILP
     solution <- solve_ilp(ilp, solver)
     assignment <- ilp_to_groups(ilp, solution)
