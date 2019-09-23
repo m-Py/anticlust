@@ -293,7 +293,7 @@ anticlustering <- function(features = NULL, distances = NULL,
 
   ## Get data into required format and get objective function:
   categories <- merge_into_one_variable(categories) # may be NULL
-  data <- process_input(features, distances, standardize, objective, iv, method)
+  data <- process_input(features, distances, standardize, objective, method)
   obj_function <- get_objective_function(features, distances, objective, K, iv)
   preclusters <- get_preclusters(features, distances, K, preclustering)
 
@@ -318,7 +318,7 @@ anticlustering <- function(features = NULL, distances = NULL,
 
 ## Function that processes input and returns the data set that the
 ## optimization is conducted on (for exchange and sampling methods)
-process_input <- function(features, distances, standardize, objective, iv, method) {
+process_input <- function(features, distances, standardize, objective, method) {
   if (argument_exists(features)) {
     data <- as.matrix(features)
     if (standardize) {
