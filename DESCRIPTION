@@ -5,14 +5,14 @@ Version: 0.2.9-6
 Authors@R: person("Papenberg", "Martin", email = "martin.papenberg@hhu.de",
   role = c("aut", "cre"))
 Description: Anticlustering divides a pool of elements into subsets (i.e., 
-    anticlusters) in such a way that the subsets are as similar as possible
-    to each other. This is accomplished by maximizing instead of minimizing
-    a clustering objective (such as the variance or sum of distances 
-    within clusters). The package includes exact and heuristic approaches 
-    for anticlustering. The exact approach requires that a linear 
-    programming solver is installed. The package also offers methods 
-    to classical clustering problems under size constraints, i.e., 
-    creating balanced clusters of equal size.
+    anticlusters) in such a way that the subsets are as similar as possible. 
+    This is accomplished by maximizing instead of minimizing
+    a clustering objective (such as the intra-cluster variance or the 
+    sum of pairwise distances within clusters). The package includes 
+    exact and heuristic approaches for anticlustering. The exact approach 
+    requires that a linear programming solver is installed. The package 
+    also offers methods to classical clustering problems under size 
+    constraints, i.e., creating balanced clusters of equal size.
 Encoding: UTF-8
 License: MIT + file LICENSE
 LazyData: true
