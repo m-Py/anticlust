@@ -313,7 +313,7 @@ anticlustering <- function(features = NULL, distances = NULL,
   ## Start heuristic optimization:
   heuristic_anticlustering(data, K, obj_function,
                            method, preclusters, nrep,
-                           categories, k_neighbours = Inf)
+                           categories)
 }
 
 ## Function that processes input and returns the data set that the
@@ -428,4 +428,21 @@ get_preclusters <- function(features, distances, K, preclustering) {
     preclusters <- preclustering
   }
   preclusters
+}
+
+# Direct to exchange method or sampling
+heuristic_anticlustering <- function(data, K, obj_function,
+                                     method, preclusters, nrep,
+                                     categories) {
+  if (method == "sampling" || method == "heuristic") {
+    # For random sampling, we cannot apply preclustering and categorical
+    # constraints at the same time
+    if (argument_exists(categories)) {
+      preclusters <- NULL
+    }
+    return(random_sampling(data, K, preclusters,
+                           obj_function, nrep, categories))
+  } else if (method == "exchange") {
+    return(exchange_method(data, K, obj_function, categories, preclusters))
+  }
 }
