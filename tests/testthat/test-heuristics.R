@@ -85,8 +85,10 @@ test_that("heuristic anticlustering produces expected output", {
     expect_equal(legal_number_of_clusters(features, anticlusters), NULL)
     ## Expected number of anticlusters?
     expect_equal(as.numeric(table(anticlusters)[1]), n_elements / p_anticlusters)
-    # Are no preclustered elements together?
-    tab <- table(anticlusters, preclusters)
-    expect_equal(all(tab == 1), TRUE)
+    if (conditions$preclustering[i] == TRUE) {
+      # Are no preclustered elements together?
+      tab <- table(anticlusters, preclusters)
+      expect_equal(all(tab == 1), TRUE)
+    }
   }
 })
