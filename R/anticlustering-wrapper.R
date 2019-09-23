@@ -324,13 +324,15 @@ process_input <- function(features, distances, standardize, objective, method) {
     if (standardize) {
       data <- scale(data)
     }
+    ## Why is the data only coverted to distances for exchange method?
+    ## -> random sampling uses `obj_value_distance` which uses features
+    ## as input. Exchange method operates on distances.
     if (class(objective) != "function" && objective == "distance" && method == "exchange") {
       data <- as.matrix(dist(features))
     }
-  } else {
-    data <- as.matrix(as.dist(distances))
+    return(data)
   }
-  data
+  as.matrix(as.dist(distances))
 }
 
 #' Determine the objective function needed for the input
