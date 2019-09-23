@@ -45,13 +45,10 @@ input_handling_anticlustering <- function(features, distances,
     if (class(distances) == "dist") {
       distances <- as.matrix(distances)
     }
-    ## Ensure that the input really is a distance matrix:
-    lower <- distances[lower.tri(distances)]
-    distances <- t(distances)
-    upper <- distances[lower.tri(distances)]
-    if (any(lower != upper)) {
+
+    if (!is_distance_matrix(distances)) {
       stop("The input via argument `distance` is not a distance matrix. ",
-           "The upper and lower triangular of your matrix differ.")
+           "Most likely, the upper and lower triangulars of your matrix differ.")
     }
     N <- nrow(distances)
   }
@@ -328,4 +325,20 @@ legal_number_of_clusters <- function(features, clusters) {
   if (nrow(features) %% n_anticlusters != 0)
     stop("The number of elements is not a multiplier of the number of anticlusters")
   invisible(NULL)
+}
+
+#' Is a matrix a legal distance matrix
+#'
+#' @param m a Matrix
+#' @return TRUE if `m` is distance matrix, FALSE otherwise
+#' @noRd
+is_distance_matrix <- function(m) {
+  m <- as.matrix(m)
+  if (nrow(m) != ncol(m)) {
+    return(FALSE)
+  }
+  lower <- m[lower.tri(m)]
+  m <- t(m)
+  upper <- m[lower.tri(m)]
+  all(lower == upper)
 }

@@ -21,6 +21,10 @@
 #'
 
 wce <- function(weights) {
+  if (!is_distance_matrix(weights)) {
+    stop("The input via argument `weights` is not a distance matrix. ",
+         "Maybe the upper and lower triangulars of your matrix differ.")
+  }
   solver <- solver_available()
   weights <- as.matrix(weights)
   ilp <- anticlustering_ilp(weights, K = 0, solver, FALSE) # k is irrelevant
