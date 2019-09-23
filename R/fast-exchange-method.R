@@ -55,7 +55,6 @@
 #'
 #' features <- iris[, - 5]
 #'
-#'
 #' start <- Sys.time()
 #' ac_exchange <- fast_anticlustering(features, K = 3)
 #' Sys.time() - start
@@ -79,7 +78,7 @@ fast_anticlustering <- function(features, K, k_neighbours = Inf, categories = NU
   input_handling_anticlustering(features, NULL, K, "variance",
                                 "exchange", FALSE,
                                 FALSE, 1, categories,
-                                FALSE, NULL, NULL)
+                                NULL)
 
   if (!isTRUE(k_neighbours == Inf)) {
     validate_input(k_neighbours, "k_neighbours", "numeric", len = 1,
@@ -87,14 +86,9 @@ fast_anticlustering <- function(features, K, k_neighbours = Inf, categories = NU
   }
   features <- as.matrix(features)
   neighbours <- get_neighbours(features, k_neighbours, categories)
-  if (length(K) == 1) {
-    clusters <- random_sampling(features, K, NULL, variance_objective_,
-                                nrep = 1, categories, FALSE,
-                                NULL, NULL)
-  } else {
-    clusters <- K
-  }
-  fast_exchange_(features, clusters, categories, neighbours)
+  init <- initialize_clusters(features, K, variance_objective_,
+                                  categories, NULL)
+  fast_exchange_(features, init, categories, neighbours)
 }
 
 #' Solve anticlustering using the fast exchange method

@@ -18,9 +18,7 @@ heuristic_anticlustering <- function(data, K, obj_function,
       preclusters <- NULL
     }
     return(random_sampling(data, K, preclusters,
-                           obj_function, nrep, categories,
-                           parallelize, seed,
-                           ncores = NULL))
+                           obj_function, nrep, categories))
   } else if (method == "exchange") {
     return(exchange_method(data, K, obj_function, categories, preclusters))
   }

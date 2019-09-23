@@ -71,7 +71,6 @@ test_that("heuristic anticlustering produces expected output", {
     }
 
     ## Now anticlustering:
-    # Test parallel and non-parallel anticlustering:
     obj_function <- ifelse(conditions$objective[i] == "distance",
                            obj_value_distance, variance_objective_)
     anticlusters <- random_sampling(
@@ -80,50 +79,7 @@ test_that("heuristic anticlustering produces expected output", {
       preclusters = preclusters,
       nrep = 10,
       obj_function = obj_function,
-      categories = NULL,
-      parallelize = FALSE,
-      seed = NULL
-    )
-    ## Legal number of anticlusters?
-    expect_equal(legal_number_of_clusters(features, anticlusters), NULL)
-    ## Expected number of anticlusters?
-    expect_equal(as.numeric(table(anticlusters)[1]), n_elements / p_anticlusters)
-  }
-})
-
-test_that("parallel heuristic anticlustering produces expected output", {
-  conditions <- expand.grid(m = 4, p = 2, objective = c("distance", "variance"),
-                            preclustering = c(TRUE, FALSE))
-  for (i in 1:nrow(conditions)) {
-    m_features <- conditions[i, "m"]
-    p_anticlusters <- conditions[i, "p"]
-    n_elements <- p_anticlusters * 5 # n must be multiplier of p
-    features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
-
-    ## First: heuristic preclustering
-    preclusters <- NULL
-    if (conditions$preclustering[i] == TRUE) {
-      n_preclusters <- n_elements / p_anticlusters
-      preclusters <- equal_sized_kmeans(features, n_preclusters)
-      ## Legal number of preclusters?
-      expect_equal(legal_number_of_clusters(features, preclusters), NULL)
-      ## Expected number of preclusters?
-      expect_equal(as.numeric(table(preclusters)[1]), n_elements / n_preclusters)
-    }
-
-    ## Now anticlustering:
-    # Test parallel and non-parallel anticlustering:
-    obj_function <- ifelse(conditions$objective[i] == "distance", obj_value_distance, variance_objective_)
-    anticlusters <- random_sampling(
-      as.matrix(features),
-      K = p_anticlusters,
-      preclusters = preclusters,
-      nrep = 100,
-      obj_function = obj_function,
-      categories = NULL,
-      parallelize = TRUE,
-      seed = NULL,
-      ncores = 2
+      categories = NULL
     )
     ## Legal number of anticlusters?
     expect_equal(legal_number_of_clusters(features, anticlusters), NULL)

@@ -11,16 +11,6 @@
 #' @param nrep The number of repetitions tried when assigning elements
 #'     to anticlusters when the method is "sampling" or "annealing".
 #' @param categories A vector that represents categorical constraints.
-#' @param parallelize Boolean. Indicates whether multiple processors should
-#'     be used.
-#' @param seed A value to fixate the random seed when using the random
-#'     sampling method. When \code{parallelize} is \code{TRUE}, using
-#'     this argument is the only way to ensure reproducibility.
-#' @param ncores The number of cores to be used when parallelize is TRUE.
-#'     This argument is not
-#'     accessible from the exported function \code{anticlustering} and
-#'     only exists because R CMD check does not allows to use more than
-#'     two cores.
 #'
 #' @return A vector representing the anticlustering.
 #'
@@ -28,36 +18,21 @@
 #'
 
 random_sampling <- function(data, K, preclusters, obj_function,
-                            nrep, categories,
-                            parallelize, seed, ncores = NULL) {
+                            nrep, categories) {
 
   ## Determine objective function to be used
   sampling_plan <- get_sampling_plan(preclusters, categories)
+
   ## Sort data by constraint-inducing variable
   dat <- sort_by_group(data, preclusters, categories)
 
-  if (parallelize) {
-    best_assignment <- parallel_sampling(
-      dat,
-      K,
-      nrep,
-      sampling_plan,
-      obj_function,
-      seed,
-      ncores
-    )
-  } else {
-    if (argument_exists(seed)) {
-      set.seed(seed)
-    }
-    best_assignment <- random_sampling_(
-      dat,
-      K,
-      nrep,
-      sampling_plan,
-      obj_function
-    )
-  }
+  best_assignment <- random_sampling_(
+    dat,
+    K,
+    nrep,
+    sampling_plan,
+    obj_function
+  )
 
   ## Return anticluster assignment in original order
   dat[, 1] <- best_assignment
@@ -136,8 +111,6 @@ sort_by_group <- function(data, preclusters, categories) {
 #'     is balanced out between anticlusters).
 #' @param use_distances A boolean flag indicating whether `dat` contains
 #'     distances or features. (TRUE = distances were passed)
-#' @param parallelize Boolean. Indicates whether multiple processors should
-#'     be used.
 #'
 #' @return A vector representing the anticlustering.
 #'
@@ -145,7 +118,7 @@ sort_by_group <- function(data, preclusters, categories) {
 #'
 
 random_sampling_ <- function(dat, K, nrep, sampling_plan,
-                            obj_function) {
+                             obj_function) {
 
   ## Initialize variables
   N <- nrow(dat)

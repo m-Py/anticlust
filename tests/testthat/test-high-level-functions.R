@@ -12,7 +12,7 @@ test_that("high level equal sized clustering function runs through", {
     clusters_exact <- balanced_clustering(features, K = n_clusters, method = "ilp",
                                           standardize = FALSE)
     clusters_heuristic <- balanced_clustering(features, K = n_clusters,
-                                              method = "sampling", standardize = FALSE)
+                                              method = "heuristic", standardize = FALSE)
     ## Check that output is valid
     expect_equal(legal_number_of_clusters(features, clusters_exact), NULL)
     expect_equal(legal_number_of_clusters(features, clusters_heuristic), NULL)

@@ -17,7 +17,6 @@ LazyData: true
 RoxygenNote: 6.1.1
 Imports: 
     Matrix,
-    parallel,
     RANN
 Suggests:
     gurobi,

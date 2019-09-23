@@ -154,8 +154,6 @@
 #' are to be created (actually, this is not exactly what happens
 #' internally, but it is equivalent).
 #'
-#'
-#'
 #' \strong{Categorical constraints}
 #'
 #' The argument \code{categories} may induce categorical constraints.

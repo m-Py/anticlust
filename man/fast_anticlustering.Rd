@@ -54,7 +54,6 @@ treated as a distinct category by the exchange method.
 
 features <- iris[, - 5]
 
-
 start <- Sys.time()
 ac_exchange <- fast_anticlustering(features, K = 3)
 Sys.time() - start

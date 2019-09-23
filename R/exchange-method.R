@@ -86,20 +86,16 @@ initialize_clusters <- function(data, K, obj_function,
   if (length(K) > 1) {
     return(K) # K is already an anticluster assignment
   }
-
-  ## Random initial assignment
-  clusters <- sample(rep_len(1:K, length.out = nrow(data)))
   ## Initial assignment based on categorical constraints
   if (argument_exists(categories)) {
     return(random_sampling(data, K, NULL, obj_function,
-                           nrep = 1, categories, FALSE,
-                           NULL, NULL))
+                           nrep = 1, categories))
   }
   ## Initial assignment based on preclustering constraints
   if (argument_exists(preclusters)) {
-    clusters <- random_sampling(data, K, preclusters, obj_function,
-                                nrep = 1, NULL, FALSE,
-                                NULL, NULL)
+    return(random_sampling(data, K, preclusters, obj_function,
+                           nrep = 1, categories))
   }
-  clusters
+  ## Initial random assignment unrestricted:
+  sample(rep_len(1:K, length.out = nrow(data)))
 }
