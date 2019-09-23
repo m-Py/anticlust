@@ -4,10 +4,12 @@ Title: Create similar groups using anticlustering
 Version: 0.2.9-6
 Authors@R: person("Papenberg", "Martin", email = "martin.papenberg@hhu.de",
   role = c("aut", "cre"))
-Description: Anticlustering establishes groups of elements (i.e., 
-    anticlusters) that are as similar as possible. The package 
-    includes exact and heuristic approaches 
-    to solve anticlustering. The exact approach requires that a linear 
+Description: Anticlustering divides a pool of elements into subsets (i.e., 
+    anticlusters) in such a way that the subsets are as similar as possible
+    to each other. This is accomplished by maximizing instead of minimizing
+    a clustering objective (such as the variance or sum of distances 
+    within clusters). The package includes exact and heuristic approaches 
+    for anticlustering. The exact approach requires that a linear 
     programming solver is installed. The package also offers methods 
     to classical clustering problems under size constraints, i.e., 
     creating balanced clusters of equal size.
@@ -29,4 +31,4 @@ Suggests:
 VignetteBuilder: knitr
 Depends:
   R (>= 3.00)
-Date: 2019-09-18
+Date: 2019-09-23
