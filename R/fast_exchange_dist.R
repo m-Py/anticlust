@@ -12,11 +12,10 @@
 #'
 #'
 
-fast_exchange_dist <- function(distances, K, categories, preclusters) {
+fast_exchange_dist <- function(distances, K, categories) {
   distances[upper.tri(distances)] <- 0
   diag(distances) <- 0
-  clusters <- initialize_clusters(distances, K, distance_objective_,
-                                  categories, preclusters)
+  clusters <- initialize_clusters(distances, K, distance_objective_, categories)
   ## Matrix for indexing the elements in the distance matrix
   selected <- selection_matrix_from_clusters(clusters)
   N <- nrow(distances)
@@ -24,7 +23,7 @@ fast_exchange_dist <- function(distances, K, categories, preclusters) {
   for (i in 1:N) {
     # cluster of current item
     group_i <- clusters[i]
-    exchange_partners <- get_exchange_partners(clusters, i, group_i, N, categories, preclusters)
+    exchange_partners <- get_exchange_partners(clusters, i, group_i, N, categories)
     ## Do not use this item if there are zero exchange partners
     if (length(exchange_partners) == 0) {
       next

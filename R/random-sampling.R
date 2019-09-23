@@ -4,27 +4,25 @@
 #' @param data The data that is optimized on (N x M feature matrix
 #'     or N x N distance matrix)
 #' @param K How many anticlusters should be created.
-#' @param preclusters An optional vector representing the preclustering
-#'     of the elements in \code{data}
 #' @param obj_function An objective function where the first argument
 #'     is a cluster assignment and the second argument is the data set.
 #' @param nrep The number of repetitions tried when assigning elements
 #'     to anticlusters when the method is "sampling" or "annealing".
-#' @param categories A vector that represents categorical constraints.
+#' @param categories A vector that represents categorical constraints
+#'     (may be preclustering constraints).
 #'
 #' @return A vector representing the anticlustering.
 #'
 #' @noRd
 #'
 
-random_sampling <- function(data, K, preclusters, obj_function,
-                            nrep, categories) {
+random_sampling <- function(data, K, obj_function, nrep, categories) {
 
   ## Determine objective function to be used
-  sampling_plan <- get_sampling_plan(preclusters, categories)
+  sampling_plan <- get_sampling_plan(categories)
 
   ## Sort data by constraint-inducing variable
-  dat <- sort_by_group(data, preclusters, categories)
+  dat <- sort_by_group(data, categories)
 
   best_assignment <- random_sampling_(
     dat,
@@ -43,12 +41,10 @@ random_sampling <- function(data, K, preclusters, obj_function,
 }
 
 # Extracted from the above function for readability
-get_sampling_plan <- function(preclusters, categories) {
+get_sampling_plan <- function(categories) {
   ## Determine plan for random sampling
   sampling_plan <- "unrestricted"
-  if (argument_exists(preclusters)) {
-    sampling_plan <- "preclustering"
-  } else if (argument_exists(categories)) {
+  if (argument_exists(categories)) {
     sampling_plan <- "categorical"
   }
   sampling_plan
@@ -58,10 +54,8 @@ get_sampling_plan <- function(preclusters, categories) {
 #' Sort data by a grouping variable
 #'
 #' @param data A data matrix representing features or distances.
-#' @param preclusters A vector of precluster affiliations. Can be NULL,
-#'     see Details.
-#' @param categories A vector that represents categorical constraints.
-#'     Can be NULL, see Details.
+#' @param group A grouping variable. A vector that represents
+#'     categorical constraints. Can be NULL, see Details.
 #'
 #' @return An extended data matrix. The first column indicates the
 #'     group category of each element (precluster or categorical variable).
@@ -75,20 +69,17 @@ get_sampling_plan <- function(preclusters, categories) {
 #'  @details
 #'
 #'  This function sorts the input table by precluster affiliation
-#'  or by a categorical variable; neither needs to be present, if no
-#'  grouping restrictions are passed (precluster or categories), the data
-#'  is not sorted. It assumes that at most one of the arguments is not
-#'  NULL.
+#'  or by a categorical variable; both restrictions are realized via the
+#'  argument categories. The argument may be NULL. If that is so (i.e., no
+#'  grouping restrictions are passed) the data is not sorted.
 #'
 #' @noRd
 #'
 
-sort_by_group <- function(data, preclusters, categories) {
+sort_by_group <- function(data, group) {
   sort_by <- 1 # default: data does not need to be sorted
-  if (argument_exists(preclusters)) {
-    sort_by <- preclusters
-  } else if (argument_exists(categories)) {
-    sort_by <- categories
+  if (argument_exists(group)) {
+    sort_by <- group
   }
   dat <- cbind(sort_by, 1:nrow(data), data)
   dat <- sort_by_col(dat, 1)
@@ -120,9 +111,7 @@ sort_by_group <- function(data, preclusters, categories) {
 random_sampling_ <- function(dat, K, nrep, sampling_plan,
                              obj_function) {
 
-  ## Initialize variables
   N <- nrow(dat)
-  n_preclusters <- N / K
   ## Start optimizing
   best_obj <- -Inf
 
@@ -133,9 +122,7 @@ random_sampling_ <- function(dat, K, nrep, sampling_plan,
   for (i in 1:nrep) {
     if (sampling_plan == "unrestricted") {
       anticlusters <- sample(anticlusters)
-    } else if (sampling_plan == "preclustering") {
-      anticlusters <- replicate_sample(n_preclusters, K)
-    } else if (sampling_plan == "categorical") {
+    } else {
       anticlusters <- categorical_sampling(categories, K)
     }
     cur_obj <- obj_function(anticlusters, objective_data)
@@ -169,20 +156,4 @@ sample_ <- function(x) {
     return(x)
   }
   sample(x)
-}
-
-#' Replicate a random permutation of \code{1:N} several times
-#'
-#' @param times How many times should the random sample be generated
-#' @param N The function returns several random permutations of
-#'     \code{1:N}
-#'
-#' @return \code{times} random samples of \code{1:N} in a single vector
-#'
-#' @examples
-#' replicate_sample(3, 3)
-#'
-#' @noRd
-replicate_sample <- function(times, N) {
-  c(replicate(times, sample(N)))
 }

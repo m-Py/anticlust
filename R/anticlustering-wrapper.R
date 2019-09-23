@@ -286,14 +286,13 @@ anticlustering <- function(features = NULL, distances = NULL,
   }
 
   # Some preprocessing; get objective function, preclusters and categories:
+  preclusters <- get_preclusters(features, distances, K, preclustering) # may be NULL
   categories <- merge_into_one_variable(categories) # may be NULL
   obj_function <- get_objective_function(features, distances, objective, K, iv)
-  preclusters <- get_preclusters(features, distances, K, preclustering)
 
   ## Redirect to fast exchange method for k-means exchange
-  if (class(objective) != "function" && is.null(preclusters) &&
-      objective == "variance" &&  method == "exchange" &&
-      sum(is.na(K)) == 0 && !argument_exists(iv)) {
+  if (class(objective) != "function" && objective == "variance" &&
+      method == "exchange" && sum(is.na(K)) == 0 && !argument_exists(iv)) {
     return(fast_anticlustering(data, K, Inf, categories))
   }
 
@@ -301,13 +300,12 @@ anticlustering <- function(features = NULL, distances = NULL,
   if (class(objective) != "function" && objective == "distance" &&
       method == "exchange"  && !argument_exists(iv) &&
       sum(is.na(K)) == 0) {
-    return(fast_exchange_dist(data, K, categories, preclusters))
+    return(fast_exchange_dist(data, K, categories))
   }
 
   ## General heuristic optimization:
   heuristic_anticlustering(data, K, obj_function,
-                           method, preclusters, nrep,
-                           categories)
+                           method, nrep, categories)
 }
 
 ## Function that processes input and returns the data set that the
@@ -386,7 +384,7 @@ get_objective_function <- function(features, distances, objective, K, iv) {
 #' @noRd
 #'
 
-merge_into_one_variable <- function(categories) {
+merge_into_one_variable <- function(categories, preclusters) {
   if (is.null(categories)) {
     return(NULL)
   }
@@ -420,17 +418,10 @@ get_preclusters <- function(features, distances, K, preclustering) {
 
 # Direct to exchange method or sampling
 heuristic_anticlustering <- function(data, K, obj_function,
-                                     method, preclusters, nrep,
-                                     categories) {
+                                     method, nrep, categories) {
   if (method == "sampling" || method == "heuristic") {
-    # For random sampling, we cannot apply preclustering and categorical
-    # constraints at the same time
-    if (argument_exists(categories)) {
-      preclusters <- NULL
-    }
-    return(random_sampling(data, K, preclusters,
-                           obj_function, nrep, categories))
+    return(random_sampling(data, K, obj_function, nrep, categories))
   } else if (method == "exchange") {
-    return(exchange_method(data, K, obj_function, categories, preclusters))
+    return(exchange_method(data, K, obj_function, categories))
   }
 }

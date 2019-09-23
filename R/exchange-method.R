@@ -7,8 +7,7 @@
 #' @param obj_function the objective function. Takes as first argument
 #'     a cluster assignment and as second argument the data set `data`
 #'     (`data` is matrix, no `data.frame`).
-#' @param categories A vector representing categorical constraints
-#' @param preclusters A vector representing preclustering constraints
+#' @param categories A vector representing preclustering/categorical constraints
 #'
 #' @return The anticluster assignment
 #'
@@ -17,15 +16,15 @@
 #'
 
 exchange_method <- function(data, K, obj_function,
-                            categories, preclusters) {
-  clusters <- initialize_clusters(data, K, obj_function,
-                                  categories, preclusters)
+                            categories) {
+
+  clusters <- initialize_clusters(data, K, obj_function, categories)
   N <- nrow(data)
   best_total <- obj_function(clusters, data)
   for (i in 1:N) {
     # cluster of current item
     group_i <- clusters[i]
-    exchange_partners <- get_exchange_partners(clusters, i, group_i, N, categories, preclusters)
+    exchange_partners <- get_exchange_partners(clusters, i, group_i, N, categories)
     ## Do not use this item if there are zero exchange partners
     if (length(exchange_partners) == 0) {
       next
@@ -54,7 +53,7 @@ exchange_method <- function(data, K, obj_function,
   clusters
 }
 
-get_exchange_partners <- function(clusters, i, group_i, N, categories, preclusters) {
+get_exchange_partners <- function(clusters, i, group_i, N, categories) {
   # are there categorical variables?
   if (!is.null(categories)) {
     # only exchange within the same group
@@ -62,17 +61,13 @@ get_exchange_partners <- function(clusters, i, group_i, N, categories, precluste
   } else {
     allowed_category <- rep(TRUE, N) # no constraint
   }
-  if (!is.null(preclusters)) {
-    allowed_precluster <- preclusters == preclusters[i]
-  } else {
-    allowed_precluster <- rep(TRUE, N) # no constraint
-  }
+
   ## Feasible exchange partners:
   # (a) are in different anticluster
   # (b) are in the same precluster
   # (c) have the same category
   # (d) are NA (and in the same precluster/category)
-  exchange_partners <- (clusters != group_i) & allowed_category & allowed_precluster
+  exchange_partners <- (clusters != group_i) & allowed_category
   ## NA is converted to TRUE. This works because: An item only has NA
   ## if its cluster is currently NA and has the same category/precluster
   ## (case (d) from above)
@@ -82,18 +77,14 @@ get_exchange_partners <- function(clusters, i, group_i, N, categories, precluste
 
 
 initialize_clusters <- function(data, K, obj_function,
-                                categories, preclusters) {
+                                categories) {
   if (length(K) > 1) {
     return(K) # K is already an anticluster assignment
   }
   ## Initial assignment based on categorical constraints
+  ## (categorical constraints may be preclustering constraints)
   if (argument_exists(categories)) {
     return(random_sampling(data, K, NULL, obj_function,
-                           nrep = 1, categories))
-  }
-  ## Initial assignment based on preclustering constraints
-  if (argument_exists(preclusters)) {
-    return(random_sampling(data, K, preclusters, obj_function,
                            nrep = 1, categories))
   }
   ## Initial random assignment unrestricted:
