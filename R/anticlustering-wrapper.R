@@ -305,8 +305,9 @@ anticlustering <- function(features = NULL, distances = NULL,
   }
 
   ## Redirect to fast exchange method for anticluster editing
-  if (class(objective) != "function" && objective == "distance"
-      && method == "exchange"  && !argument_exists(iv)) {
+  if (class(objective) != "function" && objective == "distance" &&
+      method == "exchange"  && !argument_exists(iv) &&
+      sum(is.na(K)) == 0) {
     return(fast_exchange_dist(data, K, categories, preclusters))
   }
 
