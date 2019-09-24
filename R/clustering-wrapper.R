@@ -98,11 +98,10 @@
 #'
 
 balanced_clustering <- function(features = NULL, distances = NULL,
-                                K, objective = "distance",
-                                method = "heuristic") {
+                                K, method = "heuristic") {
 
   input_handling_anticlustering(features, distances, K,
-                                objective, method, TRUE, 1,
+                                "distance", method, TRUE, 1,
                                 NULL, NULL)
 
   if (argument_exists(features)) {
@@ -112,14 +111,8 @@ balanced_clustering <- function(features = NULL, distances = NULL,
     distances <- as.matrix(as.dist(distances))
   }
 
-  if (objective == "variance") {
-    return(equal_sized_kmeans(features, K))
-  }
   if (method == "ilp") {
     return(balanced_cluster_editing(distances, K, solver_available()))
   }
-  if (K == nrow(distances) / 2) {
-    return(greedy_matching(distances))
-  }
-  greedy_balanced_k_clustering(distances, K)
+  centroid_preclustering(features, distances, K = K)
 }
