@@ -3,9 +3,14 @@
 \name{balanced_clustering}
 \alias{balanced_clustering}
 \title{Create K balanced clusters}
+\source{
+The heuristic method was developed and contributed by m.eik michalke.
+The integer linear programming method was implemented by Martin
+Papenberg.
+}
 \usage{
 balanced_clustering(features = NULL, distances = NULL, K,
-  objective = "distance", method = "heuristic")
+  method = "heuristic")
 }
 \arguments{
 \item{features}{A vector, matrix or data.frame of data points. Rows
@@ -23,11 +28,6 @@ dissimilarities.}
 
 \item{K}{How many clusters should be created.}
 
-\item{objective}{The objective to be minimized. The option
-"distance" (default) is used to minimize the cluster editing
-objective; the option "variance" is used to minimize the
-k-means objective. See details.}
-
 \item{method}{One of "heuristic" or "ilp". See details.}
 }
 \value{
@@ -38,32 +38,31 @@ Create K balanced clusters
 }
 \details{
 This function partitions a set of elements into K equal sized
-clusters. The objective is one of the following:
+clusters. The function offers two methods, a heuristic method and an
+exact method. The heuristic (\code{method = "heuristic"}) computes
+the centroid of all available elements and identifies the element
+farthest to it (if the input is a dissimilarity matrix, the most
+central element acts as the centroid). The farthest element is
+clustered with its (N/K)-1 nearest neighbours. From the remaining
+elements, the element farthest to the centroid is selected and again
+clustered with its (N/K)-1 neighbours; the procedure is repeated
+until all elements are part of a cluster.
 
-- k-means *variance* objective, setting \code{objective = "variance"}
-
-- cluster editing *distance* objective, setting \code{objective = "distance"}
-
-The k-means objective minimizes the variance within clusters. The
-cluster editing objective minimizes the sum of pairwise distances
-within clusters. If the argument \code{features} is passed together
-with \code{objective = "distance"}, the Euclidean distance is
-computed by default. If another distance measure is preferred, pass
-a self-computed dissimiliarity matrix via the argument
-\code{distances}. The optimal cluster editing objective can be
-found via integer linear programming; for the k-means objective,
-there is only a heuristic option. Vary the parameter \code{method}
-to select a "heuristic" or exact (via "ilp") computation.
-
-To obtain an optimal solution for balanced cluster editing, a
-linear programming solver must be installed and usable from R. The
-`anticlust` package supports the open source GNU linear programming
-kit (called from the package \code{Rglpk}) and the commercial
-solvers gurobi (called from the package \code{gurobi}) and IBM
-CPLEX (called from the package \code{Rcplex}). A license is needed
-to use one of the commercial solvers. The optimal solution is
-retrieved by setting \code{objective = "distance"} and \code{method
-= "ilp"}.
+An exact method (\code{method = "ilp"}) can be used to solve cluster
+editing optimally. The cluster editing objective minimizes the sum
+of pairwise distances within clusters. If the argument
+\code{features} is passed, the Euclidean distance is computed by
+default as the basic unit of the cluster editing objective. If
+another distance measure is preferred, users may pass a self-computed
+dissimiliarity matrix via the argument \code{distances}. The optimal
+cluster editing objective can be found via integer linear
+programming. To obtain an optimal solution for balanced cluster
+editing, a linear programming solver must be installed and usable
+from R. The `anticlust` package supports the open source GNU linear
+programming kit (called from the package \code{Rglpk}) and the
+commercial solvers gurobi (called from the package \code{gurobi}) and
+IBM CPLEX (called from the package \code{Rcplex}). A license is
+needed to use one of the commercial solvers.
 }
 \examples{
 
@@ -99,9 +98,6 @@ plot_clusters(features, ac2, within_connection = TRUE,
 \references{
 Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
 for a clustering problem. Mathematical Programming, 45, 59–96.
-
-Späth, H. (1986). Anticlustering: Maximizing the variance criterion.
-Control and Cybernetics, 15, 213–218.
 }
 \author{
 Martin Papenberg \email{martin.papenberg@hhu.de}
