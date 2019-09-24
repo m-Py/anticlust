@@ -69,13 +69,23 @@ test_that("fast exchange and exchange functions yield the same results - anticlu
                             categories = schaper2019$room)
   expect_equal(all(ac == ac_fast), TRUE)
 
-  ## Test categorical AND preclustering restrictions
+  ## Test categorical AND preclustering restrictions [not possible at the moment!]
   features <- schaper2019[, 3:6]
-  ac <- anticlustering(features, K = rep_len(1:2, nrow(schaper2019)),
-                       objective = obj_value_distance, preclustering = TRUE,
-                       categories = schaper2019$room)
-  ac_fast <- anticlustering(features, K = rep_len(1:2, nrow(schaper2019)),
-                            objective = "distance", preclustering = TRUE,
-                            categories = schaper2019$room)
-  expect_equal(all(ac == ac_fast), TRUE)
+  expect_error(
+    anticlustering(
+      features,
+      K = rep_len(1:2, nrow(schaper2019)),
+      objective = obj_value_distance,
+      preclustering = TRUE,
+      categories = schaper2019$room)
+  )
+  expect_error(
+    anticlustering(
+      features,
+      K = rep_len(1:2, nrow(schaper2019)),
+      objective = "distance",
+      preclustering = TRUE,
+      categories = schaper2019$room
+    )
+  )
 })

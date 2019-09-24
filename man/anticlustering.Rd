@@ -166,13 +166,9 @@ The argument \code{categories} may induce categorical constraints.
 The grouping variables indicated by \code{categories} will be
 balanced out across anticlusters. Currently, this functionality is
 only available in combination with the random sampling and exchange
-method, but not with the exact ILP approach. Note that for the random
-sampling method, it is \strong{not} possible to apply preclustering
-constraints and categorical constraints at the same time. Instead,
-the argument \code{preclustering} will be ignored (that is, there
-will be no preclustering). The exchange method will try to adhere to
-both preclustering and categorical constraints if \code{preclustering
-= TRUE} while giving priority to the categorical constraints.
+method, but not with the exact ILP approach. Note that
+it is currently \strong{not} possible to apply preclustering constraints
+and categorical constraints at the same time.
 
 \strong{Min-max anticlustering}
 

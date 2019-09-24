@@ -154,13 +154,9 @@
 #' The grouping variables indicated by \code{categories} will be
 #' balanced out across anticlusters. Currently, this functionality is
 #' only available in combination with the random sampling and exchange
-#' method, but not with the exact ILP approach. Note that for the random
-#' sampling method, it is \strong{not} possible to apply preclustering
-#' constraints and categorical constraints at the same time. Instead,
-#' the argument \code{preclustering} will be ignored (that is, there
-#' will be no preclustering). The exchange method will try to adhere to
-#' both preclustering and categorical constraints if \code{preclustering
-#' = TRUE} while giving priority to the categorical constraints.
+#' method, but not with the exact ILP approach. Note that
+#' it is currently \strong{not} possible to apply preclustering constraints
+#' and categorical constraints at the same time.
 #'
 #' \strong{Min-max anticlustering}
 #'
@@ -289,7 +285,7 @@ anticlustering <- function(features = NULL, distances = NULL,
   # Some preprocessing: get objective function, preclusters and categories:
   obj_function <- get_objective_function(features, distances, objective, K, iv)
   # Preclustering and categorical constraints are both processed in the
-  # variable categories after this step:
+  # variable `categories` after this step:
   categories <- get_categorical_constraints(features, distances, K, preclustering, categories)
 
   ## Redirect to fast exchange method for k-means exchange
@@ -381,27 +377,20 @@ get_objective_function <- function(features, distances, objective, K, iv) {
 
 
 
-# Merge preclustering and categorical constraints into one variable
-#
-# The main difficulty for this function is that either or both variables
-# `preclusters` and `categories` may be NULL. If both are NULL, this
-# function returns NULL. Otherwise, it returns a vector representing all
-# constraints as one vector variable. (It is probably unwise to combine
-# categorical and preclustering constraints.) That is, the returned value
-# may represent preclustering constraints or categorical constraints or
-# a combination of both or no constraints at all.
+# Determines if preclustering constraints or categorical constraints
+# are present. Returns either of them or NULL. The input validation
+# ensures that at most one of the constraints is present when this
+# function is called.
 get_categorical_constraints <- function(features, distances, K, preclustering, categories) {
-  preclusters <- get_preclusters(features, distances, K, preclustering) # may be NULL
-  constraints <- list(preclusters, categories)
-  ## Remove NULL elements
-  constraints <- constraints[!sapply(constraints, is.null)]
-  if (length(constraints) == 0) {
-    constraints <- NULL
-  } else {
-    constraints <- do.call(cbind, constraints)
+  if (preclustering == TRUE) {
+    return(get_preclusters(features, distances, K, preclustering))
   }
-  merge_into_one_variable(constraints) # may be NULL
+  if (argument_exists(categories)) {
+    return(merge_into_one_variable(categories))
+  }
+  NULL
 }
+
 
 #' Merge several grouping variable into one
 #'

@@ -56,6 +56,10 @@ input_handling_anticlustering <- function(features, distances,
   validate_input(preclustering, "preclustering", "logical", len = 1,
                  input_set = c(TRUE, FALSE), not_na = TRUE)
 
+  if (argument_exists(categories) && preclustering == TRUE) {
+    stop("It is currently not possible to apply both preclustering and categorical constraints.")
+  }
+
   # Allow that K is an initial assignment of elements to clusters
   if (length(K) == 1) {
     validate_input(K, "K", "numeric", len = 1,
