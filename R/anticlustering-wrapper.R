@@ -417,7 +417,8 @@ get_preclusters <- function(features, distances, K) {
   if (length(K) > 1) {
     K <- length(unique(K))
   }
-  centroid_preclustering(features, distances, K)
+  N <- max(NROW(features), NROW(distances))
+  centroid_preclustering(features, distances, N / K)
 }
 
 # Direct to exchange method or sampling
