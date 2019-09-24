@@ -421,8 +421,14 @@ get_preclusters <- function(features, distances, K) {
   if (length(K) > 1) {
     K <- length(unique(K))
   }
-  N <- max(NROW(features), NROW(distances))
-  centroid_clustering(features, distances, N / K)
+  if (argument_exists(features)) {
+    features <- as.matrix(features)
+    N <- nrow(features)
+  } else if (argument_exists(distances)) {
+    distances <- as.matrix(distances)
+    N <- nrow(distances)
+  }
+  centroid_clustering(features, distances, N, N / K)
 }
 
 # Direct to exchange method or sampling

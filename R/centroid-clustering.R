@@ -5,19 +5,13 @@
 #'
 #' @param features N x M matrix of features
 #' @param distances N x N distance matrix
-#' @param param K the number of groups
+#' @param param N N
+#' @param param K the number of clusters
 #' @return the cluster assignments as a vector
 #'
 #' @noRd
 
-centroid_clustering <- function(features, distances, K) {
-  if (argument_exists(features)) {
-    features <- as.matrix(features)
-    N <- nrow(features)
-  } else if (argument_exists(distances)) {
-    distances <- as.matrix(distances)
-    N <- nrow(distances)
-  }
+centroid_clustering <- function(features, distances, N, K) {
   K <- N / K
   anticlusters <- centroid_anticlustering(features, distances, k = K, as_vector = FALSE)
   mode(anticlusters) <- "numeric"
