@@ -85,8 +85,7 @@ fast_anticlustering <- function(features, K, k_neighbours = Inf, categories = NU
   }
   features <- as.matrix(features)
   neighbours <- get_neighbours(features, k_neighbours, categories)
-  init <- initialize_clusters(features, K, variance_objective_,
-                                  categories, NULL)
+  init <- initialize_clusters(features, K, variance_objective_, categories)
   fast_exchange_(features, init, categories, neighbours)
 }
 

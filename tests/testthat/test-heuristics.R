@@ -76,10 +76,9 @@ test_that("heuristic anticlustering produces expected output", {
     anticlusters <- random_sampling(
       as.matrix(features),
       K = p_anticlusters,
-      preclusters = preclusters,
       nrep = 10,
       obj_function = obj_function,
-      categories = NULL
+      categories = preclusters
     )
     ## Legal number of anticlusters?
     expect_equal(legal_number_of_clusters(features, anticlusters), NULL)

@@ -273,6 +273,7 @@ anticlustering <- function(features = NULL, distances = NULL,
   input_handling_anticlustering(features, distances, K, objective,
                                 method, preclustering, nrep, categories, iv)
 
+  ## Only deal with 1 data object (either features or distances)
   data <- process_input(features, distances, objective, method)
 
   ## Exact method using ILP
@@ -285,10 +286,11 @@ anticlustering <- function(features = NULL, distances = NULL,
     )
   }
 
-  # Some preprocessing; get objective function, preclusters and categories:
-  preclusters <- get_preclusters(features, distances, K, preclustering) # may be NULL
-  categories <- merge_into_one_variable(categories) # may be NULL
+  # Some preprocessing: get objective function, preclusters and categories:
   obj_function <- get_objective_function(features, distances, objective, K, iv)
+  # Preclustering and categorical constraints are both processed in the
+  # variable categories after this step:
+  categories <- get_categorical_constraints(features, distances, K, preclustering, categories)
 
   ## Redirect to fast exchange method for k-means exchange
   if (class(objective) != "function" && objective == "variance" &&
@@ -308,8 +310,9 @@ anticlustering <- function(features = NULL, distances = NULL,
                            method, nrep, categories)
 }
 
-## Function that processes input and returns the data set that the
-## optimization is conducted on (for exchange and sampling methods)
+# Function that processes input and returns the data set that the
+# optimization is conducted on as matrix (for exchange and sampling methods)
+# Returned matrix either represents distances or features.
 process_input <- function(features, distances, objective, method) {
   if (argument_exists(features)) {
     data <- as.matrix(features)
@@ -324,9 +327,13 @@ process_input <- function(features, distances, objective, method) {
   as.matrix(as.dist(distances))
 }
 
-#' Determine the objective function needed for the input
-#'
-#' @noRd
+# Determine the objective function needed for the input
+# The function returns a function. It is ensured that the function
+# removes missing values before computing the objective. Missing values
+# mean that there are NAs in the clustering vector. If an independent
+# variable was passed via `iv`, the objective function will incorporate
+# a reversed anticlustering term (i.e., cluster term) ensuring that
+# sets with higher dissimilarity in the IV are favored.
 get_objective_function <- function(features, distances, objective, K, iv) {
   if (class(objective) == "function") {
     obj_function <- objective
@@ -373,6 +380,29 @@ get_objective_function <- function(features, distances, objective, K, iv) {
 }
 
 
+
+# Merge preclustering and categorical constraints into one variable
+#
+# The main difficulty for this function is that either or both variables
+# `preclusters` and `categories` may be NULL. If both are NULL, this
+# function returns NULL. Otherwise, it returns a vector representing all
+# constraints as one vector variable. (It is probably unwise to combine
+# categorical and preclustering constraints.) That is, the returned value
+# may represent preclustering constraints or categorical constraints or
+# a combination of both or no constraints at all.
+get_categorical_constraints <- function(features, distances, K, preclustering, categories) {
+  preclusters <- get_preclusters(features, distances, K, preclustering) # may be NULL
+  constraints <- list(preclusters, categories)
+  ## Remove NULL elements
+  constraints <- constraints[!sapply(constraints, is.null)]
+  if (length(constraints) == 0) {
+    constraints <- NULL
+  } else {
+    constraints <- do.call(cbind, constraints)
+  }
+  merge_into_one_variable(constraints) # may be NULL
+}
+
 #' Merge several grouping variable into one
 #'
 #' @param categories A vector, data.frame or matrix that represents
@@ -384,7 +414,7 @@ get_objective_function <- function(features, distances, objective, K, iv) {
 #' @noRd
 #'
 
-merge_into_one_variable <- function(categories, preclusters) {
+merge_into_one_variable <- function(categories) {
   if (is.null(categories)) {
     return(NULL)
   }

@@ -32,7 +32,7 @@ test_that("fast exchange and exchange functions yield the same results - anticlu
   clusters <- rep(1:K, 5)
   features <- matrix(rnorm(K * 10), ncol = 2)
   ac <- anticlustering(features, K = clusters, objective = obj_value_distance)
-  ac_fast <- fast_exchange_dist(as.matrix(dist(features)), clusters, NULL, NULL)
+  ac_fast <- fast_exchange_dist(as.matrix(dist(features)), clusters, NULL)
   expect_equal(all(ac == ac_fast), TRUE)
 
   # for K = 3
@@ -40,7 +40,7 @@ test_that("fast exchange and exchange functions yield the same results - anticlu
   clusters <- rep(1:K, 5)
   features <- matrix(rnorm(K * 10), ncol = 2)
   ac <- anticlustering(features, K = clusters, objective = obj_value_distance)
-  ac_fast <- fast_exchange_dist(as.matrix(dist(features)), clusters, NULL, NULL)
+  ac_fast <- fast_exchange_dist(as.matrix(dist(features)), clusters, NULL)
   expect_equal(all(ac == ac_fast), TRUE)
 
   # for K = 4
@@ -48,7 +48,7 @@ test_that("fast exchange and exchange functions yield the same results - anticlu
   clusters <- rep(1:K, 5)
   features <- matrix(rnorm(K * 10), ncol = 2)
   ac <- anticlustering(features, K = clusters, objective = obj_value_distance)
-  ac_fast <- fast_exchange_dist(as.matrix(dist(features)), clusters, NULL, NULL)
+  ac_fast <- fast_exchange_dist(as.matrix(dist(features)), clusters, NULL)
   expect_equal(all(ac == ac_fast), TRUE)
 
   ## Test preclustering restrictions

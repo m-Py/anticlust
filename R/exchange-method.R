@@ -76,16 +76,14 @@ get_exchange_partners <- function(clusters, i, group_i, N, categories) {
 }
 
 
-initialize_clusters <- function(data, K, obj_function,
-                                categories) {
+initialize_clusters <- function(data, K, obj_function, categories) {
   if (length(K) > 1) {
     return(K) # K is already an anticluster assignment
   }
   ## Initial assignment based on categorical constraints
   ## (categorical constraints may be preclustering constraints)
   if (argument_exists(categories)) {
-    return(random_sampling(data, K, NULL, obj_function,
-                           nrep = 1, categories))
+    return(random_sampling(data, K, obj_function, nrep = 1, categories))
   }
   ## Initial random assignment unrestricted:
   sample(rep_len(1:K, length.out = nrow(data)))
