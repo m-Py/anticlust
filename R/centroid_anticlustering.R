@@ -39,28 +39,34 @@
 #   colMeans(ac_data[x_fw[,3],])
 # )
 centroid_anticlustering <- function(
-  data,
+  data = NULL,
+  distances = NULL,
   k=2,
   method="euclidean",
   as_vector=TRUE,
   forward=FALSE
 ){
-  cases <- nrow(data)
-  if(cases %% k > 0){
-    stop(simpleError(
-      paste0("sorry, the variables can't be split even into ", k, " sets!")
-    ))
-  } else {}
-  # append column means, coordinates of controid for all dimensions
-  data_plus <- rbind(data, colMeans(data))
-  # calculate distance matrix including the controid
-  # make it a matrix object for easier indexing
-  dm <- as.matrix(dist(data_plus, method=method))
+  if (argument_exists(data)) {
+    # append column means, coordinates of controid for all dimensions
+    data_plus <- rbind(data, colMeans(data))
+    # calculate distance matrix including
+    # make it a true matrix for easier indexing
+    dm <- as.matrix(dist(data_plus, method=method))
+  } else if (argument_exists(distances)) {
+    # determine a centroid item if the input was a distance matrix
+    distances <- as.matrix(distances)
+    maxima <- apply(distances, 1, max)
+    center_item <- which.min(maxima)
+    centroid <- distances[center_item, ]
+    dm <- rbind(distances, centroid)
+    dm <- cbind(dm, c(centroid, 0))
+  }
+  cases <- nrow(dm) - 1
   # cases + 1 is now the index number for the centroid variable
-  c_idx <- cases + 1 
+  c_idx <- cases + 1
   # get the last row which now holds the distances of all other rows to the centroid
   dist_centroid <- dm[c_idx,]
-  
+
   # results are stored in a vector; results_k stores the category number for each
   # item, whereas results stores the items ordered by categories
   results <- c()
