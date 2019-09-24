@@ -72,3 +72,6 @@ for cluster editing: Evaluation and experiments. Algorithmica, 60,
 Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
 for a clustering problem. Mathematical Programming, 45, 59–96.
 }
+\author{
+Martin Papenberg \email{martin.papenberg@hhu.de}
+}

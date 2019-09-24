@@ -78,3 +78,6 @@ by(features, ac_fast, function(x) round(colMeans(x), 2))
 
 \code{\link{variance_objective}}
 }
+\author{
+Martin Papenberg \email{martin.papenberg@hhu.de}
+}

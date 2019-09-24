@@ -30,6 +30,9 @@
 #'
 #' @export
 #'
+#' @author
+#' Martin Papenberg \email{martin.papenberg@@hhu.de}
+#'
 #' @examples
 #'
 #' data(iris)
@@ -134,6 +137,9 @@ variance_objective_ <- function(clusters, data) {
 #'               main = "Maximum within-group distances")
 #'
 #' @export
+#'
+#' @author
+#' Martin Papenberg \email{martin.papenberg@@hhu.de}
 #'
 #' @references
 #'

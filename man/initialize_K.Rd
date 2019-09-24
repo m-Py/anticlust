@@ -78,3 +78,6 @@ table(anticlusters)
 
 
 }
+\author{
+Martin Papenberg \email{martin.papenberg@hhu.de}
+}

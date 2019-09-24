@@ -39,3 +39,6 @@ by(features, ac, function(x) round(apply(x, 2, sd), 2))
 by(features, ac, function(x) round(apply(x, 2, median), 2))
 
 }
+\author{
+Martin Papenberg \email{martin.papenberg@hhu.de}
+}

@@ -53,6 +53,11 @@
 #'
 #' @export
 #'
+#' @author
+#' Martin Papenberg \email{martin.papenberg@@hhu.de}
+#'
+#' m.eik michalke \email{meik.michalke@@hhu.de}
+#'
 #' @examples
 #'
 #' data(iris)
@@ -81,6 +86,7 @@
 #'               main = "optimal cluster editing", xlab = "", ylab = "")
 #' plot_clusters(features, ac2, within_connection = TRUE,
 #'               main = "heuristic cluster editing", xlab = "", ylab = "")
+#'
 #'
 #' @references
 #'

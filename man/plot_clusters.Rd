@@ -90,3 +90,6 @@ plot_clusters(features, clusters, pch = c(15, 16, 17), main = "Cluster editing")
 plot_clusters(features, anticlusters, pch = c(15, 16, 17), main = "Anticluster editing")
 
 }
+\author{
+Martin Papenberg \email{martin.papenberg@hhu.de}
+}

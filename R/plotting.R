@@ -40,6 +40,9 @@
 #'
 #' @export
 #'
+#' @author
+#' Martin Papenberg \email{martin.papenberg@@hhu.de}
+#'
 #' @importFrom grDevices rainbow
 #' @importFrom graphics lines par plot points
 #'

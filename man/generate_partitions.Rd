@@ -97,3 +97,6 @@ par(mfrow = c(1, 1))
 
 
 }
+\author{
+Martin Papenberg \email{martin.papenberg@hhu.de}
+}

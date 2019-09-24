@@ -35,6 +35,10 @@
 #'
 #' @export
 #'
+#' @author
+#' Martin Papenberg \email{martin.papenberg@@hhu.de}
+#'
+#'
 
 mean_sd_obj <- function(clusters, features) {
    K <- length(unique(clusters))

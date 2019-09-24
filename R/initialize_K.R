@@ -68,6 +68,10 @@
 #'
 #'
 #' @export
+#'
+#' @author
+#' Martin Papenberg \email{martin.papenberg@@hhu.de}
+#'
 
 initialize_K <- function(N = NULL, K = NULL, n, groups = NULL) {
   if (argument_exists(N) && argument_exists(groups)) {

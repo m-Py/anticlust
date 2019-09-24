@@ -25,6 +25,9 @@
 #'
 #' @export
 #'
+#' @author
+#' Martin Papenberg \email{martin.papenberg@@hhu.de}
+#'
 #' @details
 #'
 #' This function was created to make anticlustering applicable

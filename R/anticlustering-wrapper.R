@@ -46,6 +46,9 @@
 #'
 #' @export
 #'
+#' @author
+#' Martin Papenberg \email{martin.papenberg@@hhu.de}
+#'
 #' @details
 #'
 #' This function is used to solve »K anticlustering«. That is,
@@ -197,6 +200,7 @@
 #' \code{\link{variance_objective}}
 #'
 #' \code{\link{distance_objective}}
+#'
 #'
 #' @examples
 #'

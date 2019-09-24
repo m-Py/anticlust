@@ -62,3 +62,6 @@ Pattern Recognition Letters, 31, 651–666.
 Späth, H. (1986). Anticlustering: Maximizing the variance criterion.
 Control and Cybernetics, 15, 213–218.
 }
+\author{
+Martin Papenberg \email{martin.papenberg@hhu.de}
+}

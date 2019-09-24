@@ -19,6 +19,9 @@
 #'
 #' @export
 #'
+#' @author
+#' Martin Papenberg \email{martin.papenberg@@hhu.de}
+#'
 
 wce <- function(weights) {
   if (!is_distance_matrix(weights)) {

@@ -270,3 +270,6 @@ Control and Cybernetics, 15, 213-218.
 
 \code{\link{distance_objective}}
 }
+\author{
+Martin Papenberg \email{martin.papenberg@hhu.de}
+}

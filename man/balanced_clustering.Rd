@@ -94,6 +94,7 @@ plot_clusters(features, ac1, within_connection = TRUE,
 plot_clusters(features, ac2, within_connection = TRUE,
               main = "heuristic cluster editing", xlab = "", ylab = "")
 
+
 }
 \references{
 Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
@@ -101,4 +102,9 @@ for a clustering problem. Mathematical Programming, 45, 59–96.
 
 Späth, H. (1986). Anticlustering: Maximizing the variance criterion.
 Control and Cybernetics, 15, 213–218.
+}
+\author{
+Martin Papenberg \email{martin.papenberg@hhu.de}
+
+m.eik michalke \email{meik.michalke@hhu.de}
 }

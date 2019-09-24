@@ -89,6 +89,9 @@
 #'
 #' @export
 #'
+#' @author
+#' Martin Papenberg \email{martin.papenberg@@hhu.de}
+#'
 
 generate_partitions <- function(K, N, generate_permutations = FALSE) {
   if (N %% K != 0) {

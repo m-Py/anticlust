@@ -28,3 +28,6 @@ clusters <- wce(agreements)
 plot(swiss, col = clusters, pch = 19)
 
 }
+\author{
+Martin Papenberg \email{martin.papenberg@hhu.de}
+}
