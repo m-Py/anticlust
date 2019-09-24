@@ -383,7 +383,7 @@ get_objective_function <- function(features, distances, objective, K, iv) {
 # function is called.
 get_categorical_constraints <- function(features, distances, K, preclustering, categories) {
   if (preclustering == TRUE) {
-    return(get_preclusters(features, distances, K, preclustering))
+    return(get_preclusters(features, distances, K))
   }
   if (argument_exists(categories)) {
     return(merge_into_one_variable(categories))
@@ -413,26 +413,11 @@ merge_into_one_variable <- function(categories) {
 
 
 ## function that computes preclusters
-get_preclusters <- function(features, distances, K, preclustering) {
+get_preclusters <- function(features, distances, K) {
   if (length(K) > 1) {
     K <- length(unique(K))
   }
-  ## Get precluster, two cases are possible
-  # (a) Preclusters may be NULL (if preclustering == FALSE)
-  # (b) may need to be computed (if preclustering == TRUE)
-  if (preclustering == FALSE) {
-    return(NULL)
-  }
-  if (argument_exists(features)) {
-    distances <- dist(features)
-  }
-  N <- nrow(as.matrix(distances))
-  if (K == 2) {
-    preclusters <- greedy_matching(distances)
-  } else if (K > 2) {
-    preclusters <- greedy_balanced_k_clustering(distances, N / K)
-  }
-  preclusters
+  centroid_preclustering(features, distances, K)
 }
 
 # Direct to exchange method or sampling

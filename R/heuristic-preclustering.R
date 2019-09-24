@@ -1,16 +1,16 @@
 #' Heuristic preclustering
 #'
 #' Computes equal-sized clusters based on the function
-#' `centroid_anticlustering` by m.meik
+#' `centroid_anticlustering` by m.eik
 #'
 #' @param features N x M matrix of features
 #' @param distances N x N distance matrix
 #' @param param K the number of groups
-#' @return: the cluster assignments as a vector
+#' @return the cluster assignments as a vector
 #'
 #' @noRd
 
-centroid_preclustering <- function(data = NULL, distances = NULL, K) {
+centroid_preclustering <- function(data, distances, K) {
   if (argument_exists(data)) {
     N <- nrow(data)
   } else if (argument_exists(distances)) {
