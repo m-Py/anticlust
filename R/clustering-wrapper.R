@@ -113,5 +113,5 @@ balanced_clustering <- function(features = NULL, distances = NULL,
   if (method == "ilp") {
     return(balanced_cluster_editing(distances, K, solver_available()))
   }
-  centroid_preclustering(features, distances, K = K)
+  centroid_clustering(features, distances, K = K)
 }

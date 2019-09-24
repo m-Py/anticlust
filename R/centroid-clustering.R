@@ -10,7 +10,7 @@
 #'
 #' @noRd
 
-centroid_preclustering <- function(features, distances, K) {
+centroid_clustering <- function(features, distances, K) {
   if (argument_exists(features)) {
     features <- as.matrix(features)
     N <- nrow(features)
