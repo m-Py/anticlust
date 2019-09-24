@@ -10,15 +10,16 @@
 #'
 #' @noRd
 
-centroid_preclustering <- function(data, distances, K) {
-  if (argument_exists(data)) {
-    N <- nrow(data)
+centroid_preclustering <- function(features, distances, K) {
+  if (argument_exists(features)) {
+    features <- as.matrix(features)
+    N <- nrow(features)
   } else if (argument_exists(distances)) {
     distances <- as.matrix(distances)
     N <- nrow(distances)
   }
   K <- N / K
-  anticlusters <- centroid_anticlustering(data, distances, k = K, as_vector = FALSE)
+  anticlusters <- centroid_anticlustering(features, distances, k = K, as_vector = FALSE)
   mode(anticlusters) <- "numeric"
   ## sometimes the last item is not assigned, fix this:
   anticlusters[is.na(anticlusters)] <- which(!(1:N %in% anticlusters))
