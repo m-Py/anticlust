@@ -1,8 +1,7 @@
 
 #' Solve exact equal-sized cluster editing
 #'
-#' @param features A vector, matrix or data.frame of data points.  Rows
-#'     correspond to items and columns correspond to features.
+#' @param distances A N x N distance matrix (a «matrix», not of type dist)
 #' @param K How many clusters are to be created.
 #' @param solver A string identifing the solver to be used ("Rglpk",
 #'     "gurobi", or "Rcplex")
