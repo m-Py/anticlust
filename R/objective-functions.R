@@ -39,8 +39,7 @@
 #' ## Clustering
 #' clusters <- balanced_clustering(
 #'   iris[, -5],
-#'   K = 3,
-#'   objective = "variance"
+#'   K = 3
 #' )
 #' # This is low:
 #' variance_objective(
