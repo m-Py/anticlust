@@ -26,6 +26,10 @@
 #' subset of the input items. It is also possible to create sets of
 #' different sizes.
 #'
+#' Note that when a custom `K` is passed, it is not guaranteed that
+#' any preclustering or categorical restrictions are enforced---only
+#' if the initial assignment itself adheres to the restrictions!
+#'
 #' @examples
 #'
 #' # Example of how to use the function `anticlustering` to create two
