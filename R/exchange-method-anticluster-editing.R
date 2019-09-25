@@ -23,7 +23,7 @@ fast_exchange_dist <- function(distances, K, categories) {
   for (i in 1:N) {
     # cluster of current item
     group_i <- clusters[i]
-    exchange_partners <- get_exchange_partners(clusters, i, group_i, N, categories)
+    exchange_partners <- get_exchange_partners(clusters, i, categories)
     ## Do not use this item if there are zero exchange partners
     if (length(exchange_partners) == 0) {
       next
@@ -31,11 +31,14 @@ fast_exchange_dist <- function(distances, K, categories) {
     # container to store objectives associated with each exchange of item i:
     comparison_objectives <- rep(NA, length(exchange_partners))
     for (j in seq_along(exchange_partners)) {
-      # update boolean index matrix as well
-      tmp_selection <- swap_items(selected, i, exchange_partners[j])
-      old_distances <- itemwise_distance_sum(distances, selected, i, exchange_partners[j])
-      new_distances <- itemwise_distance_sum(distances, tmp_selection, i, exchange_partners[j])
-      comparison_objectives[j] <- best_total - old_distances + new_distances
+      ## Swap item i with all legal exchange partners and check out objective
+      comparison_objectives[j] <- update_objective_distance(
+        distances = distances,
+        selection_matrix = selected,
+        i = i,
+        j = exchange_partners[j],
+        current_objective = best_total
+      )
     }
     ## Do the swap if an improvement occured
     best_this_round <- max(comparison_objectives)
@@ -54,6 +57,21 @@ fast_exchange_dist <- function(distances, K, categories) {
   clusters
 }
 
+# Update objective value after swapping two items
+#
+# param distances: The N x N distance matrix
+# param selection_matrix: An N x N matrix encoding the currently selected items
+#                (generated via `selection_matrix_from_clusters`)
+# param i, j: The items to be swapped
+# param current_objective: The best found objective
+# return: the objective value after swapping
+update_objective_distance <- function(distances, selection_matrix, i, j, current_objective) {
+  tmp_selection <- swap_items(selection_matrix, i, j)
+  old_distances <- itemwise_distance_sum(distances, selection_matrix, i, j)
+  new_distances <- itemwise_distance_sum(distances, tmp_selection, i, j)
+  current_objective - old_distances + new_distances
+}
+
 ## Initialize a boolean matrix for indexing in a distance matrix
 selection_matrix_from_clusters <- function(clusters) {
   n <- length(clusters)
@@ -69,7 +87,7 @@ selection_matrix_from_clusters <- function(clusters) {
 }
 
 
-## Swap items in a boolean matrix for indexing
+## Swap items in a boolean matrix for indexing.
 swap_items <- function(selected, i, j) {
   tmp1 <- selected[i, ]
   tmp2 <- selected[, i]
