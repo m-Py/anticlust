@@ -31,10 +31,6 @@ fast_exchange_dist <- function(distances, K, categories) {
     # container to store objectives associated with each exchange of item i:
     comparison_objectives <- rep(NA, length(exchange_partners))
     for (j in seq_along(exchange_partners)) {
-      ## Swap item i with all legal exchange partners and check out objective
-      tmp_clusters <- clusters
-      tmp_clusters[i] <- tmp_clusters[exchange_partners[j]]
-      tmp_clusters[exchange_partners[j]] <- group_i
       # update boolean index matrix as well
       tmp_selection <- swap_items(selected, i, exchange_partners[j])
       old_distances <- itemwise_distance_sum(distances, selected, i, exchange_partners[j])
