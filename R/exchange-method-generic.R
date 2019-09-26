@@ -1,4 +1,25 @@
 
+
+# What data structures are needed for the exchange method:
+#
+# *Generic*
+# (a) data = distance matrix/feature matrix
+# (b) clusters = A vector of clusters (i.e., elements in 1, ..., K)
+# (c) obj_function = A function object computing the objective.
+#     The first argument is `clusters`, the second argument is `data`
+#
+#
+# *Anticluster editing*
+# (a) distances = A distance matrix. The upper triangle is 0 and the diagonal is 0.
+# (b) clusters = A vector of clusters (i.e., elements in 1, ..., K)
+# (c) selected = A boolean N x N matrix where TRUE in cell [i,j]
+#     indicates that elements i and j are in the same (anti)cluster
+#
+#
+# *K-means anticlustering*
+# TODO
+
+
 #' Solve anticlustering using the modified exchange method
 #'
 #' @param data the data -- a N x N dissimilarity matrix or a N x M
@@ -31,7 +52,13 @@ exchange_method <- function(data, K, obj_function, categories) {
     comparison_objectives <- rep(NA, length(exchange_partners))
     for (j in seq_along(exchange_partners)) {
       ## Swap item i with all legal exchange partners and check out objective
-      comparison_objectives[j] <- update_objective_generic(data, clusters, i, exchange_partners[j], obj_function)
+      comparison_objectives[j] <- update_objective_generic(
+        data,
+        clusters,
+        i,
+        exchange_partners[j],
+        obj_function
+      )
     }
     ## Do the swap if an improvement occured
     best_this_round <- max(comparison_objectives)
@@ -61,7 +88,7 @@ update_objective_generic <- function(data, clusters, i, j, obj_function) {
 # Swap two items and return new arranged clusters
 #
 # param clusters: a vector of clusters
-# param i, j: the to be swapped items (indexes)
+# param i, j: the to be swapped items (indexes of the items)
 # return: the cluster vector after swapping items i and j
 cluster_swap <- function(clusters, i, j) {
   group_i <- clusters[i]
@@ -70,6 +97,13 @@ cluster_swap <- function(clusters, i, j) {
   clusters
 }
 
+# For a given item i, get all feasible exchange partners
+#
+# param clusters: a vector of clusters
+# param i: the to be swapped item (index of the item)
+# param categories: A vector of categories inducing constraints wrt
+#                   which items are feasible exchange partners
+# return: The indexes of the feasible exchange partners
 get_exchange_partners <- function(clusters, i, categories) {
   N <- length(clusters)
   # are there categorical variables?
@@ -93,6 +127,18 @@ get_exchange_partners <- function(clusters, i, categories) {
 }
 
 
+# Initialize a cluster assignment.
+# The initial assignment is either:
+# (a) already passed via the K argument
+# (b) a completely random assignment
+# (c) a random assignment that balances the categories across anticlusters
+#     (if categories are preclusters: each preclustered item is assigned
+#      to a different anticlusters)
+# param data: The data the optimization is conducted on (distance matrix/ feature matrix)
+# param K: The number of clusters or an initial clustering assignment
+# param obj_function: A function object computing the objective value
+# param categories: A vector of categories
+# return: The initialized clusters
 initialize_clusters <- function(data, K, obj_function, categories) {
   if (length(K) > 1) {
     return(K) # K is already an anticluster assignment
