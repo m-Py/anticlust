@@ -31,7 +31,7 @@ exact_anticlustering <- function(distances, K, solver, preclustering) {
     preclusters <- ilp_to_groups(solution, N)
     ## Fix distances - ensures that the most similar items are assigned
     ## to different groups
-    distances <- edit_distances(distances, preclusters)
+    distances <- edit_distances(distances, preclusters, value = (sum(distances) + 1) * (-1))
     ## Edit ILP - objective function and group sizes
     ilp$obj_function <- vectorize_weights(distances)$costs
     ilp$rhs <- c(rep(1, choose(N, 3) * 3),
