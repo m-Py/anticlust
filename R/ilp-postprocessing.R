@@ -11,7 +11,6 @@ ilp_to_groups <- function(solution, N) {
   selection_matrix[upper.tri(selection_matrix)] <- solution$x
   selection_matrix <- as.matrix(as.dist(t(selection_matrix)))
   diag(selection_matrix) <- 0
-  selection_matrix <- selection_matrix
   clusters_from_selection_matrix(selection_matrix)
 }
 
