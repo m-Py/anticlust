@@ -72,7 +72,12 @@ update_objective_distance <- function(distances, selection_matrix, i, j, current
   current_objective - old_distances + new_distances
 }
 
-## Initialize a boolean matrix for indexing in a distance matrix
+# Create a boolean matrix for indexing in a distance matrix
+# Inverse function for `clusters_from_selection_matrix`
+#
+# param clusters: A clustering vector with elements 1, ..., K indicating cluster membership
+# return: A N x N matrix where TRUE in cell [i,j] indicates that elements
+#     i and j are in the same (anti)cluster
 selection_matrix_from_clusters <- function(clusters) {
   n <- length(clusters)
   K <- length(unique(clusters))
@@ -86,6 +91,44 @@ selection_matrix_from_clusters <- function(clusters) {
   selected
 }
 
+# Convert a selection matrix to clustering vector
+# Inverse function for `selection_matrix_from_clusters`
+#
+# param selection_matrix: A N x N matrix where TRUE in cell [i,j]
+#     indicates that elements i and j are in the same (anti)cluster
+# return: A clustering vector with elements 1, ..., K indicating cluster membership
+clusters_from_selection_matrix <- function(selection_matrix) {
+  N <- nrow(selection_matrix)
+  clusters <- rep(NA, )
+  # assign first cluster to set and all its connections
+  clusters[1] <- 1
+  clusters[which(selection_matrix[1, ] == TRUE)] <- 1
+  # Now iterate over the remaining elements
+  for (i in 2:N) {
+    # test if item i is already in a cluster
+    if (!is.na(clusters[i])) {
+      next
+    }
+    next_cluster_index <- max(clusters, na.rm = TRUE) + 1
+    clusters[i] <- next_cluster_index
+    clusters[which(selection_matrix[i, ] == TRUE)] <- next_cluster_index
+  }
+  clusters
+}
+
+# Order a clustering vector
+
+# For a clustering vector, ensure that the first cluster that occurs
+# in the vector is 1, the next 2, etc ... until K
+
+# param clusters: A clustering vector with elements 1, ..., K indicating cluster membership
+# return: A clustering vector in order
+order_cluster_vector <- function(clusters) {
+  unique_clusters <- unique(clusters)
+  K <- length(unique_clusters)
+  clusters <- factor(clusters, levels = unique_clusters, labels = 1:K)
+  as.numeric(clusters)
+}
 
 ## Swap items in a boolean matrix for indexing.
 swap_items <- function(selected, i, j) {
