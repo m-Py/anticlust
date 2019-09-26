@@ -10,7 +10,6 @@
 #'
 #' @noRd
 #'
-#'
 
 fast_exchange_dist <- function(distances, K, categories) {
   distances[upper.tri(distances)] <- 0
@@ -21,17 +20,15 @@ fast_exchange_dist <- function(distances, K, categories) {
   N <- nrow(distances)
   best_total <- distance_objective_(clusters, distances)
   for (i in 1:N) {
-    # cluster of current item
-    group_i <- clusters[i]
     exchange_partners <- get_exchange_partners(clusters, i, categories)
-    ## Do not use this item if there are zero exchange partners
+    ## Skip if there are zero exchange partners
     if (length(exchange_partners) == 0) {
       next
     }
     # container to store objectives associated with each exchange of item i:
     comparison_objectives <- rep(NA, length(exchange_partners))
+    ## Swap item i with all legal exchange partners and store objectives
     for (j in seq_along(exchange_partners)) {
-      ## Swap item i with all legal exchange partners and check out objective
       comparison_objectives[j] <- update_objective_distance(
         distances = distances,
         selection_matrix = selected,
@@ -40,17 +37,16 @@ fast_exchange_dist <- function(distances, K, categories) {
         current_objective = best_total
       )
     }
-    ## Do the swap if an improvement occured
+    # Do the swap if an improvement occured
     best_this_round <- max(comparison_objectives)
     if (best_this_round > best_total) {
-      # which element has to be swapped
+      # Which element has to be swapped
       swap <- exchange_partners[comparison_objectives == best_this_round][1]
-      # swap the elements
-      clusters[i] <- clusters[swap]
-      clusters[swap] <- group_i
-      ## also adjust the boolean selection matrix
+      # Swap the elements in clustering vector
+      clusters <- cluster_swap(clusters, i, swap)
+      # Swap the elements in selection matrix
       selected <- swap_items(selected, i, swap)
-      # update best solution
+      # Update best solution
       best_total <- best_this_round
     }
   }
