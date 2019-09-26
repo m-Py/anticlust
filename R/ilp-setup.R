@@ -15,24 +15,6 @@
 #'
 #' @examples
 #'
-#' ## Balanced anticluster editing:
-#' distances <- as.matrix(dist(runif(6)))
-#' K <- 2
-#' solver <- "Rcplex"
-#' ilp <- anticlustering_ilp(distances, K, solver)
-#' solve_ilp(ilp, solver)
-#'
-#' # Cluster editing:
-#' subs <- sample(150, size = 120)
-#' data <- iris[subs, -5]
-#' distances <- dist(data)
-#' # Define agreement as being close enough to each other
-#' agreements <- ifelse(as.matrix(distances) < 2.5, 1, -1)
-#' solver <- "Rcplex"
-#' ilp <- anticlustering_ilp(agreements, K = 0, solver, FALSE) # k is irrelevant
-#' solution <- solve_ilp(ilp, solver, "max")
-#' clusters <- ilp_to_groups(ilp, solution)
-#' plot_clusters(data[, 1:2], clusters)
 #'
 
 anticlustering_ilp <- function(distances, K, solver, group_restriction = TRUE) {

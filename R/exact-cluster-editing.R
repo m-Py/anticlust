@@ -13,5 +13,5 @@
 balanced_cluster_editing <- function(distances, K, solver) {
   ilp <- anticlustering_ilp(distances, K, solver = solver)
   solution <- solve_ilp(ilp, solver, "min")
-  ilp_to_groups(ilp, solution)
+  ilp_to_groups(solution, nrow(distances))
 }
