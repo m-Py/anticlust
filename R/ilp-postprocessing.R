@@ -7,10 +7,13 @@
 # @return A clustering vector
 #
 ilp_to_groups <- function(solution, N) {
+  # These steps are taken:
+  # 1. Create matrix of inter-item connections from vector of inter-item connections
+  # 2. Create clustering vector from matrix; this is returned
   selection_matrix <- matrix(ncol = N, nrow = N)
   selection_matrix[upper.tri(selection_matrix)] <- solution$x
+  # the following line copies the upper triangular into the lower; diagonal = 0
   selection_matrix <- as.matrix(as.dist(t(selection_matrix)))
-  diag(selection_matrix) <- 0
   clusters_from_selection_matrix(selection_matrix)
 }
 
