@@ -10,8 +10,6 @@
 #' @return A list of all partitions (or permutations if
 #' \code{generate_permutations} is \code{TRUE}).
 #'
-#' @importFrom stats complete.cases
-#'
 #' @details
 #'
 #' In principle, anticlustering can be solved to optimality by
@@ -20,12 +18,12 @@
 #' However, this approach only works for small N because the
 #' number of partitions grows exponentially with N.
 #'
-#' The partition c(1, 1, 2, 2)
-#' is the same as the partition c(2, 2, 1, 1) but they correspond
-#' to different permutations. If the argument
+#' The partition c(1, 2, 2, 1)
+#' is the same as the partition c(2, 1, 1, 2) but they correspond
+#' to different permutations of the elements [1, 1, 2, 2]. If the argument
 #' \code{generate_permutations} is \code{TRUE}, all permutations are
-#' returned. To solve balanced anticlustering, we only need to
-#' look at all partitions, not at all permutations.
+#' returned. To solve balanced anticlustering exactly, it is sufficient
+#' to inspect all partitions while ignoring duplicated permutations.
 #'
 #' @examples
 #'

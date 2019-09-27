@@ -190,7 +190,6 @@ update_centers <- function(centers, features, i, j, cluster_i, cluster_j, tab) {
 }
 
 #' Get neigbours for fast preclustering (by category)
-#' @noRd
 #'
 #' @details
 #'
@@ -203,6 +202,10 @@ update_centers <- function(centers, features, i, j, cluster_i, cluster_j, tab) {
 #' across categories because this function is only used as preprocessing
 #' for the exchange algorithm)
 #'
+#' @importFrom stats complete.cases
+#'
+#' @noRd
+
 
 get_neighbours <- function(features, k_neighbours, categories) {
 

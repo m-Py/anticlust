@@ -1,17 +1,13 @@
 
 #' Solve balanced K-anticluster editing exactly using ILP
 #'
-#' @param features A N x M matrix of item features (Note, this is indeed
-#'     a `matrix`, not of class `dist`. This is ensured when calling this
-#'     function from the anticlustering wrapper function.)
 #' @param distances A N x N matrix representing the
-#'     pairwise dissimilarities between all N elements. CAN an be an
-#'     object of class \code{dist}.
+#'     pairwise dissimilarities between all N elements. Cannot an be an
+#'     object of class \code{dist} (i.e., has been converted to matrix
+#'     before this function is called)
 #' @param K How many anticlusters should be created.
 #' @param solver A string identifying the solver to be used ("Rglpk",
 #'     "gurobi", or "Rcplex")
-#' @param standardize Boolean - should the feature values be
-#'     standardized before groups are created?
 #' @param preclustering Boolean, should a preclustering be conducted
 #'     before anticlusters are created.
 #'

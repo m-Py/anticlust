@@ -13,9 +13,6 @@
 #'
 #' @noRd
 #'
-#' @examples
-#'
-#'
 
 anticlustering_ilp <- function(distances, K, solver, group_restriction = TRUE) {
 

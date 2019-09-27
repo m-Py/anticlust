@@ -5,7 +5,7 @@
 #'
 #' @param features N x M matrix of features
 #' @param distances N x N distance matrix
-#' @param param N N
+#' @param param N The sample size
 #' @param param K the number of clusters
 #' @return the cluster assignments as a vector
 #'
