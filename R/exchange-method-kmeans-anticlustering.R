@@ -67,7 +67,6 @@
 #' ac_exchange <- anticlustering(features, K = 3, objective = "variance", method = "exchange")
 #' Sys.time() - start
 #'
-#'
 #' ## Improve run time by using fewer exchange partners:
 #' start <- Sys.time()
 #' ac_fast <- fast_anticlustering(features, K = 3, k_neighbours = 10)
@@ -113,13 +112,7 @@ fast_exchange_ <- function(data, clusters, categories, nearest_neighbors) {
   for (i in 1:N) {
     # cluster of current item
     cluster_i <- clusters[i]
-    # are there categorical variables?
-    exchange_partners <- nearest_neighbors[i, -1]
-    if (!is.null(categories)) {
-      exchange_partners <- exchange_partners[categories[exchange_partners] == categories[i]]
-    }
-    ## Do not change with other elements that are in the same cluster
-    exchange_partners <- exchange_partners[clusters[exchange_partners] != cluster_i]
+    exchange_partners <- get_exchange_partners_kmeans(clusters, i, nearest_neighbors, categories)
     ## Sometimes an exchange cannot take place
     if (length(exchange_partners) == 0) {
       next
@@ -161,8 +154,14 @@ fast_exchange_ <- function(data, clusters, categories, nearest_neighbors) {
   clusters
 }
 
-
-
+get_exchange_partners_kmeans <- function(clusters, i, nearest_neighbors, categories) {
+  exchange_partners <- nearest_neighbors[i, -1]
+  if (!is.null(categories)) {
+    exchange_partners <- exchange_partners[categories[exchange_partners] == categories[i]]
+  }
+  ## Do not change with other elements that are in the same cluster
+  exchange_partners[clusters[exchange_partners] != clusters[i]]
+}
 #' Update a cluster center after swapping two elements
 #'
 #' @param centers The current cluster centers
