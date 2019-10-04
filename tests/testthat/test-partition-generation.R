@@ -18,3 +18,30 @@ test_that("generate_partitions function correctly removes redundant partitions",
     }
   }
 })
+
+test_that("analytical solution and generative functions result in same number of partitions", {
+  K <- 2
+  for (N in seq(4, 18, 2)) {
+    partitions <- generate_partitions(K, N, FALSE)
+    analytical_n <- n_partitions(N, K)
+    expect_equal(analytical_n, length(partitions))
+  }
+  K <- 3
+  for (N in seq(6, 12, 3)) {
+    partitions <- generate_partitions(K, N, FALSE)
+    analytical_n <- n_partitions(N, K)
+    expect_equal(analytical_n, length(partitions))
+  }
+  K <- 4
+  for (N in c(8, 12)) {
+    partitions <- generate_partitions(K, N, FALSE)
+    analytical_n <- n_partitions(N, K)
+    expect_equal(analytical_n, length(partitions))
+  }
+  K <- 5
+  for (N in c(5, 10)) {
+    partitions <- generate_partitions(K, N, FALSE)
+    analytical_n <- n_partitions(N, K)
+    expect_equal(analytical_n, length(partitions))
+  }
+})
