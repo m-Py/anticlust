@@ -1,5 +1,4 @@
 
-<<<<<<< HEAD
 # anticlust 0.2.9-6
 
 - Fewer arguments: `parallelize`, `seed`, `standardize` were removed from 
@@ -11,8 +10,6 @@
 - new function: `n_partitions()` computes the number of balanced partitions for
   given *N* and *K*
 
-=======
->>>>>>> 834d2d6fb3740c7a6e5cde0338f63f204cd54911
 # anticlust 0.2.9-5
 
 2019-09-17
