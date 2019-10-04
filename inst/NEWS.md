@@ -1,4 +1,18 @@
 
+<<<<<<< HEAD
+# anticlust 0.2.9-6
+
+- Fewer arguments: `parallelize`, `seed`, `standardize` were removed from 
+  function `anticlustering()`
+- `preclustering` only accepts `TRUE`/`FALSE` again, see discussion in #19 
+  (`categories` can still take a vector, fulfilling the same goal)
+- balanced clustering heuristic was replaced by a new algorithm that is better 
+  and faster
+- new function: `n_partitions()` computes the number of balanced partitions for
+  given *N* and *K*
+
+=======
+>>>>>>> 834d2d6fb3740c7a6e5cde0338f63f204cd54911
 # anticlust 0.2.9-5
 
 2019-09-17
