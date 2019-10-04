@@ -3,21 +3,24 @@
 # What data structures are needed for the exchange method:
 #
 # *Generic*
-# (a) data = distance matrix/feature matrix
-# (b) clusters = A vector of clusters (i.e., elements in 1, ..., K)
-# (c) obj_function = A function object computing the objective.
-#     The first argument is `clusters`, the second argument is `data`
+# (a) A distance matrix/feature matrix
+# (b) A vector of clusters (i.e., elements in 1, ..., K)
+# (c) A function object computing the objective. The first argument
+#     is `clusters`, the second argument is `data`
 #
 #
 # *Anticluster editing*
-# (a) distances = A distance matrix. The upper triangle is 0 and the diagonal is 0.
-# (b) clusters = A vector of clusters (i.e., elements in 1, ..., K)
-# (c) selected = A boolean N x N matrix where TRUE in cell [i,j]
+# (a) A distance matrix. The upper triangle is 0 and the diagonal is 0.
+# (b) A vector of clusters (i.e., elements in 1, ..., K)
+# (c) A boolean N x N matrix where TRUE in cell [i,j]
 #     indicates that elements i and j are in the same (anti)cluster
 #
 #
 # *K-means anticlustering*
-# TODO
+# (a) A matrix of cluster centers. Each row corresponds to a
+#     cluster and each column corresponds to a feature
+# (b) A vector where each entry is the number of elements in each cluster
+# (c)
 
 
 #' Solve anticlustering using the modified exchange method
