@@ -1,5 +1,5 @@
 
-# anticlust 0.2.9-6
+# anticlust 0.3.0
 
 - Fewer arguments: `parallelize`, `seed`, `standardize` were removed from 
   function `anticlustering()`
