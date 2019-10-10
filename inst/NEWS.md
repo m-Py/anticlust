@@ -9,6 +9,9 @@
   and faster
 - new function: `n_partitions()` computes the number of balanced partitions for
   given *N* and *K*
+- preclustering with categorical restrictions is possible for well-balanced data
+  (if preclusters can be computed per category and everything still fits into K 
+  anticlusters)
 
 # anticlust 0.2.9-5
 
