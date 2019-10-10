@@ -13,6 +13,12 @@
 
 centroid_clustering <- function(features, distances, N, K) {
   K <- N / K
+  if (argument_exists(features)) {
+    rownames(features) <- NULL
+  }
+  if (argument_exists(distances)) {
+    rownames(distances) <- NULL
+  }
   anticlusters <- centroid_anticlustering(features, distances, k = K, as_vector = FALSE)
   mode(anticlusters) <- "numeric"
   ## sometimes the last item is not assigned, fix this:
