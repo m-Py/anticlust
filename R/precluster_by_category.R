@@ -3,7 +3,7 @@
 precluster_per_category <- function(features, categories, K) {
   if (preclustering_possible(categories, K)) {
     N <- nrow(features)
-    unique_categories <- unique(categories)
+    unique_categories <- sort(unique(categories))
     n_categories <- length(unique_categories)
     # save original order to restore before returning
     data <- cbind(categories, 1:N, features)
@@ -20,7 +20,8 @@ precluster_per_category <- function(features, categories, K) {
     cl <- lapply(seq_along(cl), function(i) cl[[i]] + to_be_added[i])
     # return data sorted in original order
     data$clusters <- unlist(cl)
-    return(sort_by_col(data, 2)$clusters)
+    cl <- sort_by_col(data, 2)$clusters
+    return(merge_into_one_variable(cbind(cl, categories)))
   }
   stop("Not today.")
 }
