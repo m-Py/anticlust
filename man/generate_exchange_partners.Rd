@@ -50,10 +50,19 @@ cannot be split into equal-sized parts of size \code{p + 1}).
 Therefore, the function may return more than \code{p} exchange
 partners for some elements. When \code{similar = TRUE}, such impossible
 imbalances will lead to an error message.
+
+If the argument \code{similar} is \code{TRUE}, the exchange partners
+are chosen in such a way that similar items are exchange partners
+for each other (following the general preclustering logic, see
+\code{\link{anticlustering}}) Similar items are grouped using a call
+to the function \code{\link{balanced_clustering}}. When combining the
+arguments \code{similar = TRUE} and \code{categories}, within each
+category a cluster analysis is conducted to group similar items.
 }
 \examples{
 
-generate_exchange_partners(N = 6, p = 3)
+generate_exchange_partners(N = 6, p = 1)
+# impossible requirement: each of 19 elements has exactly 3 partners:
 table(generate_exchange_partners(N = 19, p = 3))
 
 ## On the schaper2019 data set
@@ -75,6 +84,9 @@ anticlustering(
   categories = schaper2019$room
 )
 Sys.time() - start
+
+## Pass a data set and p:
+table(generate_exchange_partners(features = iris, p = 2))
 
 }
 \author{

@@ -40,6 +40,14 @@
 #' partners for some elements. When \code{similar = TRUE}, such impossible
 #' imbalances will lead to an error message.
 #'
+#' If the argument \code{similar} is \code{TRUE}, the exchange partners
+#' are chosen in such a way that similar items are exchange partners
+#' for each other (following the general preclustering logic, see
+#' \code{\link{anticlustering}}) Similar items are grouped using a call
+#' to the function \code{\link{balanced_clustering}}. When combining the
+#' arguments \code{similar = TRUE} and \code{categories}, within each
+#' category a cluster analysis is conducted to group similar items.
+#'
 #' @export
 #'
 #' @author
@@ -47,12 +55,13 @@
 #'
 #' @examples
 #'
-#' generate_exchange_partners(N = 6, p = 3)
+#' generate_exchange_partners(N = 6, p = 1)
+#' # impossible requirement: each of 19 elements has exactly 3 partners:
 #' table(generate_exchange_partners(N = 19, p = 3))
 #'
 #' ## On the schaper2019 data set
 #' data(schaper2019)
-#' # Enforce 3 exchange partners per element - faster
+#' # Enforce 3 exchange partners per element - faster than using each item
 #' start <- Sys.time()
 #' anticlustering(
 #'   schaper2019[, 3:6],
@@ -69,6 +78,9 @@
 #'   categories = schaper2019$room
 #' )
 #' Sys.time() - start
+#'
+#' ## Pass a data set and p:
+#' table(generate_exchange_partners(features = rnorm(999), p = 2))
 #'
 
 generate_exchange_partners <- function(
