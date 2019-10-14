@@ -33,6 +33,9 @@
 #'
 #' @export
 #'
+#' @author
+#' Martin Papenberg \email{martin.papenberg@@hhu.de}
+#'
 
 generate_exchange_partners <- function(
   N = NULL,

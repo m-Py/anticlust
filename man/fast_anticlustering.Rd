@@ -63,7 +63,6 @@ start <- Sys.time()
 ac_exchange <- anticlustering(features, K = 3, objective = "variance", method = "exchange")
 Sys.time() - start
 
-
 ## Improve run time by using fewer exchange partners:
 start <- Sys.time()
 ac_fast <- fast_anticlustering(features, K = 3, k_neighbours = 10)
