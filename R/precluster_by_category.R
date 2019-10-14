@@ -12,6 +12,7 @@ precluster_per_category <- function(features, categories, K) {
     cl <- list()
     for (i in 1:n_categories) {
       tmp_data <- data[data[, 1] == unique_categories[i], -c(1, 2)]
+      rownames(tmp_data) <- NULL
       cl[[i]] <- balanced_clustering(tmp_data, K = nrow(tmp_data) / K)
     }
     # ensure that clusters in different categories have different cluster numbers
