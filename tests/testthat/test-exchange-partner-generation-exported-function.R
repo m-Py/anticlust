@@ -9,10 +9,10 @@ test_that("function returns correct results for input argument N", {
   expect_true(all(table(partners) == p + 1))
 
   # try imbalanced data
-  N <- 10
+  N <- 11
   p <- 3
   partners <- generate_exchange_partners(N, p)
-  expect_true(all(table(partners) %in% c(p + 1, p)))
+  expect_true(all(table(partners) >= p))
 })
 
 test_that("function returns correct results for input argument N", {
