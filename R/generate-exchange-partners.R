@@ -18,23 +18,59 @@
 #' \code{similar = TRUE}), data is needed describing the elements.
 #'
 #' @details
-#' This function will be particularly interesting when generating exchange
-#' partners within categories. For imbalanced data (that is, within each
-#' category, the elements cannot be split into equal-sized parts of
-#' size \code{p}, the function may return some elements with \code{p + 1}
-#' exchange partners.
 #'
-#' In general, the function will try to balance out everything as well as
-#' possible (this is also true for clustering and especially clustering
-#' within categories), but it cannot always succeed. That is, sometimes
-#' the function will throw an error if the argument \code{p} does not
-#' fit with the arguments \code{similar = TRUE} (which request a cluster
-#' analysis with clusters of equal size) or \code{categories}.
+#' This function is used to define which elements serve as exchange
+#' partners when calling the anticlustering exchange method. Its output
+#' is passed to the function \code{\link{anticlustering}} as the argument
+#' \code{categories}.
+#'
+#' This function is usually used to reduce the number of exchange
+#' partners to speed up the exchange method. By default, the exchange
+#' method swaps each element with each other element (unless the other
+#' element is already part of the same cluster). When passing a
+#' categorical vector, only the member of the same category serve as
+#' exchange partner. This function is particularly useful to ensure
+#' that not even all elements from the same category are used as exchange
+#' partners, but only a subset.
+#'
+#' Note that this function may sometimes run into problems when dealing
+#' with imbalanced data (that is, within each category, the elements
+#' cannot be split into equal-sized parts of size \code{p}). Sometimes,
+#' the function may return some elements with more than \code{p} exchange
+#' partners.
+#'
+#' When \code{similar = TRUE}, impossible requirements via argument \code{p}
+#' will lead to an error.
 #'
 #' @export
 #'
 #' @author
 #' Martin Papenberg \email{martin.papenberg@@hhu.de}
+#'
+#' @examples
+#'
+#' generate_exchange_partners(N = 6, p = 3)
+#' table(generate_exchange_partners(N = 19, p = 3))
+#'
+#' ## On the schaper2019 data set
+#' data(schaper2019)
+#' # Enforce 3 exchange partners per element - faster
+#' start <- Sys.time()
+#' anticlustering(
+#'   schaper2019[, 3:6],
+#'   K = 3,
+#'   categories = generate_exchange_partners(categories = schaper2019$room, p = 3)
+#' )
+#' Sys.time() - start
+#'
+#' # Without these restrictions:
+#' start <- Sys.time()
+#' anticlustering(
+#'   schaper2019[, 3:6],
+#'   K = 3,
+#'   categories = schaper2019$room
+#' )
+#' Sys.time() - start
 #'
 
 generate_exchange_partners <- function(
