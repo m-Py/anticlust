@@ -105,6 +105,9 @@ generate_exchange_partners <- function(
     }
     return(to_numeric(precluster_per_category(features, categories, K)))
   }
+  if (argument_exists(features)) {
+    return(sample_partners(NROW(features), p))
+  }
   stop("Pass one of the arguments N, categories, features to get a result")
 }
 
