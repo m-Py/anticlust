@@ -9,9 +9,12 @@
   and faster
 - new function: `n_partitions()` computes the number of balanced partitions for
   given *N* and *K*
-- preclustering with categorical restrictions is possible for well-balanced data
+- new function: `generate_exchange_partners()`
+- preclustering with categorical restrictions is possible 
+  for well-balanced data using the function `generate_exchange_partners()`
   (if preclusters can be computed per category and everything still fits into K 
   anticlusters)
+
 
 # anticlust 0.2.9-5
 
