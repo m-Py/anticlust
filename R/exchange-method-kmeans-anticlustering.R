@@ -230,7 +230,7 @@ get_neighbours <- function(features, k_neighbours, categories) {
   if (!argument_exists(categories)) {
     idx <- RANN::nn2(features, k = k_neighbours)$nn.idx
   } else {
-    categories <- as.numeric(as.factor(categories))
+    categories <- to_numeric(categories)
     ncategories <- length(unique(categories))
     nns <- by(features, categories, RANN::nn2, k = k_neighbours)
     nns <- lapply(nns, function(x) x$nn.idx)
@@ -262,4 +262,9 @@ get_neighbours <- function(features, k_neighbours, categories) {
     colnames(idx) <- NULL
   }
   sort_by_col(idx, 1)
+}
+
+# A convenience function converting any categorical input to numeric
+to_numeric <- function(x) {
+  as.numeric(as.factor(x))
 }
