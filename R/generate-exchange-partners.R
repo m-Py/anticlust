@@ -45,7 +45,7 @@ generate_exchange_partners <- function(
   features = NULL
 ) {
   if (argument_exists(N)) {
-    return(sample(rep_len(1:p, N)))
+    return(sample_partners(N, p))
   }
   if (argument_exists(categories) && similar == FALSE) {
     # some sorting etc
@@ -54,8 +54,7 @@ generate_exchange_partners <- function(
     categories <- sort_by_col(categories, 2)
     partners <- lapply(unique(categories[, 2]), function(x) {
       n <- sum(categories[, 2] == x)
-      k <- p + 1
-      sample(rep_len(1:(n/k), n))
+      sample_partners(n, p)
     })
     categories$partners <- to_numeric(paste0(unlist(partners), categories[, 2]))
     return(sort_by_col(categories, 1)$partners)
@@ -73,4 +72,9 @@ generate_exchange_partners <- function(
     return(to_numeric(precluster_per_category(features, categories, K)))
   }
   stop("Pass one of the arguments N, categories, features to get a result")
+}
+
+sample_partners <- function(N, p) {
+  k <- p + 1
+  sample(rep_len(1:(N/k), N))
 }
