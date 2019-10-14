@@ -35,12 +35,10 @@
 #'
 #' Note that this function may sometimes run into problems when dealing
 #' with imbalanced data (that is, within each category, the elements
-#' cannot be split into equal-sized parts of size \code{p}). Sometimes,
-#' the function may return some elements with more than \code{p} exchange
-#' partners.
-#'
-#' When \code{similar = TRUE}, impossible requirements via argument \code{p}
-#' will lead to an error.
+#' cannot be split into equal-sized parts of size \code{p + 1}).
+#' Therefore, the function may return more than \code{p} exchange
+#' partners for some elements. When \code{similar = TRUE}, such impossible
+#' imbalances will lead to an error message.
 #'
 #' @export
 #'
