@@ -67,7 +67,7 @@ table(generate_exchange_partners(N = 19, p = 3))
 
 ## On the schaper2019 data set
 data(schaper2019)
-# Enforce 3 exchange partners per element - faster
+# Enforce 3 exchange partners per element - faster than using each item
 start <- Sys.time()
 anticlustering(
   schaper2019[, 3:6],
@@ -86,7 +86,7 @@ anticlustering(
 Sys.time() - start
 
 ## Pass a data set and p:
-table(generate_exchange_partners(features = iris, p = 2))
+table(generate_exchange_partners(features = rnorm(999), p = 2))
 
 }
 \author{
