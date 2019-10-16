@@ -9,9 +9,9 @@ test_that("heuristic clustering works for different inputs", {
     for (p in 2:5) {
       n_elements <- p * 3 # n-elements must be multiplier of p
       features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
-      clusters <- centroid_clustering(features, N = n_elements, K = p)
+      clusters <- balanced_clustering(features, K = p)
       expect_equal(legal_number_of_clusters(features, clusters), NULL)
-      clusters <- centroid_clustering(features = NULL, distances = dist(features), N = n_elements, K = p)
+      clusters <- balanced_clustering(distances = dist(features), K = p)
       expect_equal(legal_number_of_clusters(features, clusters), NULL)
     }
   }
@@ -30,7 +30,7 @@ test_that("heuristic anticlustering produces expected output", {
     preclusters <- NULL
     if (conditions$preclustering[i] == TRUE) {
       n_preclusters <- n_elements / p_anticlusters
-      preclusters <- centroid_clustering(features, N = n_elements, K = n_preclusters)
+      preclusters <- balanced_clustering(features, K = n_preclusters)
       ## Legal number of preclusters?
       expect_equal(legal_number_of_clusters(features, preclusters), NULL)
       ## Expected number of preclusters?

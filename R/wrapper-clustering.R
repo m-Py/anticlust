@@ -64,7 +64,7 @@
 #'
 #' data(iris)
 #' # Only use numeric attributes
-#' clusters <- balanced_clustering(iris[, -5], K = 3)
+#' clusters <- balanced_clustering(distances = dist(iris[, -5]), K = 3)
 #' # Compare feature means by anticluster
 #' by(iris[, -5], clusters, function(x) round(colMeans(x), 2))
 #' # Plot the anticlustering
@@ -103,16 +103,14 @@ balanced_clustering <- function(features = NULL, distances = NULL,
                                 "distance", method, TRUE, 1,
                                 NULL, NULL)
 
-  if (argument_exists(features)) {
-    features <- as.matrix(features)
-    distances <- as.matrix(dist(features))
-  } else if (argument_exists(distances)) {
-    distances <- as.matrix(as.dist(distances))
-  }
-  N <- nrow(distances)
+  data <- process_input(features, distances, "distance", method)
 
   if (method == "ilp") {
+    if ("features" %in% class(data)) {
+      distances <- as.matrix(dist(data))
+    }
     return(balanced_cluster_editing(distances, K, solver_available()))
   }
-  centroid_clustering(features, distances, N = N, K = K)
+
+  centroid_clustering(data, K = K)
 }

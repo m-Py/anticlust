@@ -68,7 +68,7 @@ needed to use one of the commercial solvers.
 
 data(iris)
 # Only use numeric attributes
-clusters <- balanced_clustering(iris[, -5], K = 3)
+clusters <- balanced_clustering(distances = dist(iris[, -5]), K = 3)
 # Compare feature means by anticluster
 by(iris[, -5], clusters, function(x) round(colMeans(x), 2))
 # Plot the anticlustering

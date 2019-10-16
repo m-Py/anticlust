@@ -290,7 +290,7 @@ anticlustering <- function(features = NULL, distances = NULL,
   obj_function <- get_objective_function(features, distances, objective, K, iv)
   # Preclustering and categorical constraints are both processed in the
   # variable `categories` after this step:
-  categories <- get_categorical_constraints(features, distances, K, preclustering, categories)
+  categories <- get_categorical_constraints(data, K, preclustering, categories)
 
   ## Redirect to fast exchange method for k-means exchange
   if (class(objective) != "function" && objective == "variance" &&
@@ -302,6 +302,9 @@ anticlustering <- function(features = NULL, distances = NULL,
   if (class(objective) != "function" && objective == "distance" &&
       method == "exchange"  && !argument_exists(iv) &&
       sum(is.na(K)) == 0) {
+    if ("features" %in% class(data)) {
+      data <- as.matrix(dist(data))
+    }
     return(fast_exchange_dist(data, K, categories))
   }
 
@@ -316,15 +319,12 @@ anticlustering <- function(features = NULL, distances = NULL,
 process_input <- function(features, distances, objective, method) {
   if (argument_exists(features)) {
     data <- as.matrix(features)
-    ## Why is the data only coverted to distances for exchange method and ILP?
-    ## -> random sampling uses `obj_value_distance` which uses features
-    ## as input. Exchange method and ILP operate on distances.
-    if (class(objective) != "function" && objective == "distance" && method %in% c("ilp", "exchange")) {
-      data <- as.matrix(dist(features))
-    }
+    class(data) <- c("features", class(data))
     return(data)
   }
-  as.matrix(as.dist(distances))
+  data <- as.matrix(as.dist(distances))
+  class(data) <- c("distances", class(data))
+  data
 }
 
 # Determine the objective function needed for the input
@@ -385,9 +385,9 @@ get_objective_function <- function(features, distances, objective, K, iv) {
 # are present. Returns either of them or NULL. The input validation
 # ensures that at most one of the constraints is present when this
 # function is called.
-get_categorical_constraints <- function(features, distances, K, preclustering, categories) {
+get_categorical_constraints <- function(data, K, preclustering, categories) {
   if (preclustering == TRUE) {
-    return(get_preclusters(features, distances, K))
+    return(get_preclusters(data, K))
   }
   if (argument_exists(categories)) {
     return(merge_into_one_variable(categories))
@@ -417,20 +417,13 @@ merge_into_one_variable <- function(categories) {
   order_cluster_vector(to_numeric(categories))
 }
 
-
 ## function that computes preclusters
-get_preclusters <- function(features, distances, K) {
+get_preclusters <- function(data, K) {
   if (length(K) > 1) {
     K <- length(unique(K))
   }
-  if (argument_exists(features)) {
-    features <- as.matrix(features)
-    N <- nrow(features)
-  } else if (argument_exists(distances)) {
-    distances <- as.matrix(distances)
-    N <- nrow(distances)
-  }
-  centroid_clustering(features, distances, N, N / K)
+  N <- nrow(data)
+  centroid_clustering(data, N / K)
 }
 
 # Direct to exchange method or sampling

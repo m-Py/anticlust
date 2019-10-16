@@ -38,26 +38,12 @@
 #   colMeans(ac_data[x_fw[,3],])
 # )
 centroid_anticlustering <- function(
-  data = NULL,
-  distances = NULL,
+  data,
   k=2,
   as_vector=TRUE,
   forward=FALSE
 ){
-  if (argument_exists(data)) {
-    # append column means, coordinates of controid for all dimensions
-    data_plus <- rbind(data, colMeans(data))
-    # calculate distance matrix including
-    # make it a true matrix for easier indexing
-  } else if (argument_exists(distances)) {
-    # determine a centroid item if the input was a distance matrix
-    distances <- as.matrix(distances)
-    maxima <- apply(distances, 1, max)
-    center_item <- which.min(maxima)
-    centroid <- distances[center_item, ]
-    dm <- rbind(distances, centroid)
-    dm <- cbind(dm, c(centroid, 0))
-  }
+  dm <- extended_distance_matrix(data)
   cases <- nrow(dm) - 1
   # cases + 1 is now the index number for the centroid variable
   c_idx <- cases + 1
@@ -156,4 +142,25 @@ shift <- function(
     return(1:k)
   }
 } ## end function shift()
+
+
+extended_distance_matrix <- function(x) UseMethod("extended_distance_matrix")
+
+extended_distance_matrix.features <- function(x) {
+  # append column means, coordinates of controid for all dimensions
+  data_plus <- rbind(x, colMeans(x))
+  # calculate distance matrix including
+  # make it a true matrix for easier indexing
   as.matrix(dist(data_plus))
+}
+
+extended_distance_matrix.distances <- function(x) {
+  # use the most central element as centroid
+  distances <- as.matrix(x)
+  maxima <- apply(distances, 1, max)
+  center_item <- which.min(maxima)
+  centroid <- distances[center_item, ]
+  dm <- rbind(distances, centroid)
+  dm <- cbind(dm, c(centroid, 0))
+  dm
+}
