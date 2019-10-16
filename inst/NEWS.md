@@ -12,7 +12,7 @@ code used with earlier versions. In particular:
   much better -- I do not intend to extend code for the random sampling
   method -- having options for parallelization is an unnecessary burden
   in my code base. Therefore, the option `seed` is also no longer needed
-  as it was only used to ensure reproducibility when using the parralel
+  as it was only used to ensure reproducibility when using the parallel
   option. The argument `standardize` has also been removed. To
   standardize the input, users now have to call the function `scale()`
   before calling the `anticlustering()` function. The philosophy behind
