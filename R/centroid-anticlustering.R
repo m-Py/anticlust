@@ -1,5 +1,5 @@
 ## function centroid_anticlustering()
-# 
+#
 # computes the centroid of all available items and iterates over either
 # the items farthest or closest to it, to assign it with the k-1
 # items next to the desired number of categories.
@@ -21,7 +21,7 @@
 # x <- centroid_anticlustering(ac_data, k=3, as_vector=FALSE)
 # plot(ac_data[x[,1],], pch=19, col="green")
 # points(ac_data[x[,2],], pch=3, col="red")
-# points(ac_data[x[,3],], pch=4, col="blue") 
+# points(ac_data[x[,3],], pch=4, col="blue")
 # cbind(
 #   colMeans(ac_data[x[,1],]),
 #   colMeans(ac_data[x[,2],]),
@@ -86,7 +86,7 @@ centroid_anticlustering <- function(
       ),
       max=!forward
     )
-  
+
     append_to_results <- c(
       farthest,
       next_points(
@@ -100,7 +100,7 @@ centroid_anticlustering <- function(
         max=FALSE
       )
     )
-    
+
     if(length(results) > k){
       append_to_results <- append_to_results[shift(k=k, start=offset)]
     } else {}
@@ -120,7 +120,7 @@ centroid_anticlustering <- function(
       offset <- 1
     }
   }
-  
+
   if(isTRUE(as_vector)){
     return(results_k)
   } else {
