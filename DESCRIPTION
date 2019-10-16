@@ -1,6 +1,6 @@
 Package: anticlust
 Type: Package
-Title: Subset partitioning via anticlustering
+Title: Subset Partitioning via Anticlustering
 Version: 0.3.0
 Authors@R: c(person(given = "Martin", family = "Papenberg", email = "martin.papenberg@hhu.de", role = c("aut", "cre", "cph")),
   person(given="Meik", family="Michalke", role = c("ctb"), comment = "centroid based clustering algorithm"))
