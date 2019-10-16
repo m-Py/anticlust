@@ -20,8 +20,8 @@
   instead of just using the class `dist` for distance input: usually,
   I want a complete matrix (having upper and lower triangular). Also,
   it is not really more effort.
-  
-  TODO
+- package title is now changed: anticlust: Subset partitioning via anticlustering 
+  (more general) 
 
 # anticlust 0.2.9-5
 

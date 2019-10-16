@@ -1,9 +1,9 @@
 Package: anticlust
 Type: Package
-Title: Create similar groups using anticlustering
+Title: Subset partitioning via anticlustering
 Version: 0.3.0
-Authors@R: person("Papenberg", "Martin", email = "martin.papenberg@hhu.de",
-  role = c("aut", "cre"))
+Authors@R: c(person(given = "Martin", family = "Papenberg", email = "martin.papenberg@hhu.de", role = c("aut", "cre", "cph")),
+  person(given="Meik", family="Michalke", role = c("ctb"), comment = "centroid based clustering algorithm"))
 Description: Anticlustering partitions a pool of elements into subsets (i.e., 
     anticlusters) in such a way that the subsets are as similar as possible. 
     This is accomplished by maximizing instead of minimizing
@@ -31,4 +31,6 @@ Suggests:
 VignetteBuilder: knitr
 Depends:
   R (>= 3.00)
-Date: 2019-09-23
+Date: 2019-10-16
+URL: https://github.com/m-Py/anticlust
+BugReports: https://github.com/m-Py/anticlust/issues
