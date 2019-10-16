@@ -287,7 +287,7 @@ anticlustering <- function(features = NULL, distances = NULL,
   }
 
   # Some preprocessing: get objective function, preclusters and categories:
-  obj_function <- get_objective_function(features, distances, objective, K, iv)
+  obj_function <- get_objective_function(data, objective, K, iv)
   # Preclustering and categorical constraints are both processed in the
   # variable `categories` after this step:
   categories <- get_categorical_constraints(data, K, preclustering, categories)
@@ -340,22 +340,17 @@ convert_to_distances <- function(data) {
 # variable was passed via `iv`, the objective function will incorporate
 # a reversed anticlustering term (i.e., cluster term) ensuring that
 # sets with higher dissimilarity in the IV are favored.
-get_objective_function <- function(features, distances, objective, K, iv) {
+get_objective_function <- function(data, objective, K, iv) {
   if (class(objective) == "function") {
     obj_function <- objective
   } else {
-    ## What was the input: features or distances
-    use_distances <- FALSE
-    if (argument_exists(distances)) {
-      use_distances <- TRUE
-    }
     ## Determine how to compute objective, three cases:
     # 1. Distance objective, distances were passed
     # 2. Distance objective, features were passed
     # 3. Variance objective, features were passed
-    if (objective == "distance" && use_distances == TRUE) {
+    if (objective == "distance" && "distances" %in% class(data)) {
       obj_function <- distance_objective_
-    } else if (objective == "distance" && use_distances == FALSE) {
+    } else if (objective == "distance" && "features" %in% class(data)) {
       obj_function <- obj_value_distance
     } else {
       obj_function <- variance_objective_
