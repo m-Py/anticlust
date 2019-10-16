@@ -14,7 +14,14 @@
   for well-balanced data using the function `generate_exchange_partners()`
   (if preclusters can be computed per category and everything still fits into K 
   anticlusters)
-
+- more internal changes to enhance maintainability (using S3 classes to 
+  internaly differentiate between distance and feature input; for anyone 
+  inspecting the source code and wondering why I use customized classes 
+  instead of just using the class `dist` for distance input: usually,
+  I want a complete matrix (having upper and lower triangular). Also,
+  it is not really more effort.
+  
+  TODO
 
 # anticlust 0.2.9-5
 
