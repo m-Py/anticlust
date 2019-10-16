@@ -8,7 +8,6 @@
 #
 # data: matrix or data frame to calculate the distance matrix from
 # k: number of target categories
-# method: see ?dist
 # as_vector: if TRUE, returns a vector with category numbers for each item,
 #   otherwise a matrix mit k columns listing the item numbers per category
 # forward: if TRUE, always starts with the item closest to the centroid,
@@ -42,7 +41,6 @@ centroid_anticlustering <- function(
   data = NULL,
   distances = NULL,
   k=2,
-  method="euclidean",
   as_vector=TRUE,
   forward=FALSE
 ){
@@ -51,7 +49,6 @@ centroid_anticlustering <- function(
     data_plus <- rbind(data, colMeans(data))
     # calculate distance matrix including
     # make it a true matrix for easier indexing
-    dm <- as.matrix(dist(data_plus, method=method))
   } else if (argument_exists(distances)) {
     # determine a centroid item if the input was a distance matrix
     distances <- as.matrix(distances)
@@ -159,3 +156,4 @@ shift <- function(
     return(1:k)
   }
 } ## end function shift()
+  as.matrix(dist(data_plus))
