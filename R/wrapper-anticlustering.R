@@ -412,7 +412,9 @@ merge_into_one_variable <- function(categories) {
     return(NULL)
   }
   categories <- data.frame(categories)
-  factor(do.call(paste0, as.list(categories)))
+  categories <- factor(do.call(paste0, as.list(categories)))
+  # sort as numeric to get consistent return value
+  order_cluster_vector(to_numeric(categories))
 }
 
 

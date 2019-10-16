@@ -20,5 +20,6 @@ centroid_clustering <- function(features, distances, N, K) {
   preclusters <- cbind(c(anticlusters), rep(1:nrow(anticlusters), K))
   # return preclusters in correct order
   preclusters[, 2][order(preclusters[, 1])]
+  order_cluster_vector(preclusters[, 2][order(preclusters[, 1])])
 }
 
