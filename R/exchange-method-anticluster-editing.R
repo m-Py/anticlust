@@ -1,7 +1,7 @@
 
 #' Solve anticluster editing using a fast exchange method
 #'
-#' @param distances An N x N dissimilarity matrix.
+#' @param data An N x N dissimilarity matrix or N x M features matrix.
 #' @param K The number of cluster or an initial cluster assignment
 #' @param categories A vector representing categorical constraints
 #' @param preclusters A vector representing preclustering constraints
@@ -11,7 +11,8 @@
 #' @noRd
 #'
 
-fast_exchange_dist <- function(distances, K, categories) {
+fast_exchange_dist <- function(data, K, categories) {
+  distances <- convert_to_distances(data)
   distances[upper.tri(distances)] <- 0
   diag(distances) <- 0
   clusters <- initialize_clusters(distances, K, distance_objective_, categories)

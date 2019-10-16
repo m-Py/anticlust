@@ -302,9 +302,6 @@ anticlustering <- function(features = NULL, distances = NULL,
   if (class(objective) != "function" && objective == "distance" &&
       method == "exchange"  && !argument_exists(iv) &&
       sum(is.na(K)) == 0) {
-    if ("features" %in% class(data)) {
-      data <- as.matrix(dist(data))
-    }
     return(fast_exchange_dist(data, K, categories))
   }
 
@@ -326,6 +323,15 @@ process_input <- function(features, distances, objective, method) {
   class(data) <- c("distances", class(data))
   data
 }
+
+# Sometimes it is necessary to check that distance input is available
+convert_to_distances <- function(data) {
+  if ("features" %in% class(data)) {
+    return(as.matrix(dist(data)))
+  }
+  data
+}
+
 
 # Determine the objective function needed for the input
 # The function returns a function. It is ensured that the function

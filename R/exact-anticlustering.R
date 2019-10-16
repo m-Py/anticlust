@@ -16,13 +16,9 @@
 #'
 #' @noRd
 
-exact_anticlustering <- function(distances, K, solver, preclustering) {
+exact_anticlustering <- function(data, K, solver, preclustering) {
 
-  # compute distance matrix if it was not passed
-  if ("features" %in% class(distances)) {
-    distances <- as.matrix(dist(distances))
-  }
-
+  distances <- convert_to_distances(data)
   N <- nrow(distances)
 
   if (preclustering == TRUE) {

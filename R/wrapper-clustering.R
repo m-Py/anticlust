@@ -106,10 +106,7 @@ balanced_clustering <- function(features = NULL, distances = NULL,
   data <- process_input(features, distances, "distance", method)
 
   if (method == "ilp") {
-    if ("features" %in% class(data)) {
-      distances <- as.matrix(dist(data))
-    }
-    return(balanced_cluster_editing(distances, K, solver_available()))
+    return(balanced_cluster_editing(data, K, solver_available()))
   }
 
   centroid_clustering(data, K = K)
