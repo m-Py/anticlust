@@ -6,57 +6,59 @@
 This is a rather big update including several changes that may break
 code used with earlier versions. In particular:
 
-The arguments `parallelize`, `seed` and `standardize` were removed from 
-the function `anticlustering()`. Parallelization was used to speed
-up the random sampling method, but as the exchange algorithm is much
-better -- I do not intend to work on the random sampling method any 
-longer -- having options for parallelization is an unnecessary burden
-in my code base. Therefore, the option `seed` is no longer needed as
-it was only used to ensure reproducibility when using the parralel 
-option. As the argument `standardize` has been removed, users now 
-have to call the function `scale()` on their input if the input features
-should be standardized. The philosophy behind these changes is that the
-main function should not have too many arguments, making it easier usable.
-I also expect that it this makes it easier to adapt the code base in the
-future.
+- The arguments `parallelize`, `seed` and `standardize` were removed
+  from the function `anticlustering()`. Parallelization was used to
+  speed up the random sampling method, but as the exchange algorithm is
+  much better -- I do not intend to extend code for the random sampling
+  method -- having options for parallelization is an unnecessary burden
+  in my code base. Therefore, the option `seed` is also no longer needed
+  as it was only used to ensure reproducibility when using the parralel
+  option. The argument `standardize` has also been removed. To
+  standardize the input, users now have to call the function `scale()`
+  before calling the `anticlustering()` function. The philosophy behind
+  these changes is that the main function of the `anticlust` package
+  should not have too many arguments, making it easier usable. I also
+  expect that it this makes it easier to adapt the code base in the
+  future.
 
-A minor change: The argument `preclustering` now only accepts 
-`TRUE`/`FALSE` as it used to before (see the discussion
-[here](https://github.com/m-Py/anticlust/issues/19). To induce customized
-clustering constraints, we can still use the argument `categories`, so
-nothing is lost.
+- Minor change: The argument `preclustering` now only accepts
+  `TRUE`/`FALSE` as it used to before (see the discussion
+  [here](https://github.com/m-Py/anticlust/issues/19). To induce
+  customized clustering constraints, we can still use the argument
+  `categories`, so nothing is lost.
 
-An enhancement is was added to the `balanced_clustering()` function:
-The heuristic algorithm to create equal-sized clusters was replaced by
-one that is much faster and better (courteously contributed by Meik 
-Michalke). This method is also called when the argument `preclustering`
-is `TRUE` in a function call of the `anticlustering()` function (unless
-the argument `method` is "ilp", in which case an exact clustering 
-algorithm is called).
+- An enhancement was added to the `balanced_clustering()` function: The
+  heuristic algorithm to create equal-sized clusters was replaced by one
+  that is much faster and better (courteously contributed by Meik
+  Michalke). This method is also called when the argument
+  `preclustering` is `TRUE` in a function call of the `anticlustering()`
+  function (unless the argument `method` is "ilp", in which case an
+  exact clustering algorithm is called).
 
-A new function is available: `n_partitions()` computes the number of 
-balanced partitions for given *N* and *K*.
+- A new function is available: `n_partitions()` computes the number of 
+  balanced partitions for given *N* and *K*.
 
-A new function is available: `generate_exchange_partners()` can be used
-to group elements that serve as exchange partners when using one
-of the functions `anticlustering()` or `fast_anticlustering()`. 
-This is good because users can now easily speed
-up anticlustering computations by reducing the number of exchange partners. 
-This function also enables the possibility to combine categorical and preclustering restrictions, 
-see `?generate_exchange_partners()` (it is still not possible to combine
-`preclustering = TRUE` and the `categories` argument).
+- A new function is available: `generate_exchange_partners()` can be
+  used to group elements that serve as exchange partners when using one
+  of the functions `anticlustering()` or `fast_anticlustering()`. This
+  is good because users can now easily speed up anticlustering
+  computations by reducing the number of exchange partners. The
+  function also enables the possibility to combine categorical and
+  preclustering restrictions, see `?generate_exchange_partners()` (it
+  is still not possible to combine `preclustering = TRUE` and the
+  `categories` argument).
 
-The package title was changed: It is now "`anticlust`: Subset 
-partitioning via anticlustering"
+- The package title was changed: "`anticlust`: Subset partitioning via
+  anticlustering"
 
-Several internal changes were implemented to the code base to enhance
-future maintainability. For example, to differentiate between
+Moreover, several internal changes were implemented to the code base to
+enhance future maintainability. For example, to differentiate between
 distance and features input, custom S3 classes are added to the data
-matrices. For anyone inspecting the source code and wondering why I
-use customized classes instead of just using the class `dist` for 
-distance input: usually, I want a complete matrix (having upper and 
-lower triangular) and not a reduced matrix of class `dist`. Also, it is
-not really more effort to add a custom S3 class.
+matrices. For anyone inspecting the source code and wondering why I use
+customized classes instead of just using the class `dist` for distance
+input: usually, I want a complete matrix (having upper and lower
+triangular) and not a reduced matrix of class `dist`. Also, it is not
+really more effort to add a custom S3 class.
 
 # anticlust 0.2.9-5
 
