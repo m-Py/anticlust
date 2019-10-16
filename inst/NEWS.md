@@ -23,9 +23,18 @@ code used with earlier versions. In particular:
 
 - Minor change: The argument `preclustering` now only accepts
   `TRUE`/`FALSE` as it used to before (see the discussion
-  [here](https://github.com/m-Py/anticlust/issues/19). To induce
+  [here](https://github.com/m-Py/anticlust/issues/19)). To induce
   customized clustering constraints, we can still use the argument
-  `categories`, so nothing is lost.
+  `categories`. In the following example, we restrict the exchange 
+  partners for each element to four similar elements:
+
+```R
+anticlustering(
+  iris[, -5],
+  K = 3,
+  categories = balanced_clustering(iris[, -5], K = 5)
+)
+```
 
 - An enhancement was added to the `balanced_clustering()` function: The
   heuristic algorithm to create equal-sized clusters was replaced by one
@@ -42,11 +51,39 @@ code used with earlier versions. In particular:
   used to group elements that serve as exchange partners when using one
   of the functions `anticlustering()` or `fast_anticlustering()`. This
   is good because users can now easily speed up anticlustering
-  computations by reducing the number of exchange partners. The
-  function also enables the possibility to combine categorical and
-  preclustering restrictions, see `?generate_exchange_partners()` (it
-  is still not possible to combine `preclustering = TRUE` and the
-  `categories` argument).
+  computations by reducing the number of exchange partners. The function
+  also enables the possibility to combine categorical and preclustering
+  restrictions, see `?generate_exchange_partners()` (it is still not
+  possible to combine `preclustering = TRUE` and the `categories`
+  argument). In the following example, we restrict the exchange
+  partners to four random elements within the same species:
+
+```R
+anticlustering(
+  iris[, -5],
+  K = 3,
+  categories = generate_exchange_partners(
+    categories = iris[, 5], 
+    p = 4
+  )
+)
+```
+
+- In another example, we restrict the exchange partners to four similar
+  elements within the same species:
+
+```R
+anticlustering(
+  iris[, -5],
+  K = 3,
+  categories = generate_exchange_partners(
+    features = iris[, -5], 
+    categories = iris[, 5], 
+    p = 4, 
+    similar = TRUE
+  )
+)
+```
 
 - The package title was changed: "`anticlust`: Subset partitioning via
   anticlustering"
