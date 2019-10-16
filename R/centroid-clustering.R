@@ -18,10 +18,33 @@ centroid_clustering <- function(data, K) {
   N <- nrow(data)
   K <- N / K
   anticlusters <- centroid_anticlustering(data, k = K, as_vector = FALSE)
-  mode(anticlusters) <- "numeric"
-  ## sometimes the last item is not assigned, fix this:
-  anticlusters[is.na(anticlusters)] <- which(!(1:N %in% anticlusters))
-  preclusters <- cbind(c(anticlusters), rep(1:nrow(anticlusters), K))
+  anticlusters <- as_numeric_anticlusters(data, anticlusters)
+  # for each element, determine the cluster (anticlusters is a vector
+  # with a meaningful order, caused by the matrix that is returned
+  # by `centroid_anticlustering`
+  preclusters  <- cbind(anticlusters, rep(1:(N / K), K))
   # return preclusters in correct order
   order_cluster_vector(preclusters[, 2][order(preclusters[, 1])])
+}
+
+
+# Sometimes the last element is not assigned to a cluster, fix this
+# through a postprocessing. Returns a numeric vector of indexes of
+# elements. The order of the elements can corresponds to the clusters
+# each element has been assigned to.
+as_numeric_anticlusters <- function(data, anticlusters) {
+  # centroid_anticlustering returns a matrix of row names (if the input
+  # had rownames) or a character matrix of numeric indices. each row
+  # in the matrix corresponds to a cluster.
+  id_numeric <- 1:nrow(data)
+  if (is.null(rownames(data))) {
+    idx <- as.character(id_numeric)
+  }
+  else {
+    idx <- rownames(data)
+  }
+  names(id_numeric) <- idx
+  anticlusters[anticlusters == ""] <- idx[!(idx %in% anticlusters)]
+  ## return numeric indices of anticlusters
+  unname(id_numeric[c(anticlusters)])
 }

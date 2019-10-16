@@ -144,6 +144,7 @@ shift <- function(
 } ## end function shift()
 
 
+# Compute the cluster centroid
 extended_distance_matrix <- function(x) UseMethod("extended_distance_matrix")
 
 extended_distance_matrix.features <- function(x) {
@@ -154,8 +155,8 @@ extended_distance_matrix.features <- function(x) {
   as.matrix(dist(data_plus))
 }
 
+# If distances are given as input, use the most central element as centroid
 extended_distance_matrix.distances <- function(x) {
-  # use the most central element as centroid
   distances <- as.matrix(x)
   maxima <- apply(distances, 1, max)
   center_item <- which.min(maxima)
