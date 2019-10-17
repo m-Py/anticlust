@@ -11,8 +11,7 @@ equal size (which is the standard case), but it is also possible to create sets
 of different size, or to only assign a subset of all elements to a set. 
 The package is still under active developement; expect
 changes and improvements before it will be submitted to CRAN. Check out
-the [NEWS
-file](https://github.com/m-Py/anticlust/blob/master/inst/NEWS.md) for
+the [NEWS file](https://m-py.github.io/anticlust/NEWS.html) for
 recent changes.
 
 ## Installation
