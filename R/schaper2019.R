@@ -85,13 +85,14 @@
 #'
 #' @references
 #'
-#' Schaper, M. L., Kuhlmann, B. G., & Bayen, U. J. (2019). Metamemory
-#' expectancy illusion and schema-consistent guessing in source monitoring.
-#' Journal of Experimental Psychology: Learning, Memory, and Cognition,
-#' 45, 470-496. http://dx.doi.org/10.1037/xlm0000602
+#' Schaper, M. L., Kuhlmann, B. G., & Bayen, U. J. (2019a). Metacognitive expectancy
+#' effects in source monitoring: Beliefs, in-the-moment experiences, or both? Journal
+#' of Memory and Language, 107, 95–110. https://doi.org/10.1016/j.jml.2019.03.009
 #'
-#' Schaper, M. L., Kuhlmann, B. G., & Bayen, U. J. (in press).
-#' Metacognitive expectancy effects in source monitoring: Beliefs,
-#' in-the-moment experiences, or both? Journal of Memory and Language.
+#' Schaper, M. L., Kuhlmann, B. G., & Bayen, U. J. (2019b). Metamemory expectancy illusion
+#' and schema-consistent guessing in source monitoring. Journal of Experimental
+#' Psychology: Learning, Memory, and Cognition, 45, 470.
+#' https://doi.org/10.1037/xlm0000602
+#'
 #'
 "schaper2019"
