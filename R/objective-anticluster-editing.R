@@ -62,12 +62,9 @@
 #'
 #' @references
 #'
-#' Böcker, S., Briesemeister, S., & Klau, G. W. (2011). Exact algorithms
-#' for cluster editing: Evaluation and experiments. Algorithmica, 60,
-#' 316-334.
-#'
-#' Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
-#' for a clustering problem. Mathematical Programming, 45, 59–96.
+#' Papenberg, M., & Klau, G. W. (2019, October 30). Using anticlustering
+#' to partition a stimulus pool into equivalent parts.
+#' https://doi.org/10.31234/osf.io/3razc
 #'
 
 distance_objective <- function(features = NULL, distances = NULL,

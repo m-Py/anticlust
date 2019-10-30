@@ -76,6 +76,12 @@
 #' @author
 #' Martin Papenberg \email{martin.papenberg@@hhu.de}
 #'
+#' @references
+#'
+#' Papenberg, M., & Klau, G. W. (2019, October 30). Using anticlustering
+#' to partition a stimulus pool into equivalent parts.
+#' https://doi.org/10.31234/osf.io/3razc
+#'
 
 initialize_K <- function(N = NULL, K = NULL, n, groups = NULL) {
   if (argument_exists(N) && argument_exists(groups)) {

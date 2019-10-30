@@ -83,7 +83,11 @@
 #' )
 #' par(mfrow = c(1, 1))
 #'
+#' @references
 #'
+#' Papenberg, M., & Klau, G. W. (2019, October 30). Using anticlustering
+#' to partition a stimulus pool into equivalent parts.
+#' https://doi.org/10.31234/osf.io/3razc
 #'
 #' @export
 #'
