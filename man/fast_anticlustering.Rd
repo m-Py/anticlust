@@ -60,7 +60,7 @@ Sys.time() - start
 
 ## The following call is equivalent to the call above:
 start <- Sys.time()
-ac_exchange <- anticlustering(features, K = 3, objective = "variance", method = "exchange")
+ac_exchange <- anticlustering(features, K = 3, objective = "variance")
 Sys.time() - start
 
 ## Improve run time by using fewer exchange partners:
