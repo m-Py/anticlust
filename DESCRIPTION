@@ -1,36 +1,29 @@
 Package: anticlust
 Type: Package
 Title: Subset Partitioning via Anticlustering
-Version: 0.3.0
-Authors@R: c(person(given = "Martin", family = "Papenberg", email = "martin.papenberg@hhu.de", role = c("aut", "cre", "cph")),
-  person(given="Meik", family="Michalke", role = c("ctb"), comment = "centroid based clustering algorithm"))
-Description: Anticlustering partitions a pool of elements into subsets (i.e., 
-    anticlusters) in such a way that the subsets are as similar as possible. 
-    This is accomplished by maximizing instead of minimizing
-    a clustering objective (such as the intra-cluster variance or the 
-    sum of pairwise distances within clusters). The package includes 
-    exact and heuristic approaches for anticlustering. The exact approach 
-    requires that a linear programming solver is installed. The package 
-    also offers methods for classical clustering problems under size 
-    constraints, i.e., creating balanced clusters of equal size.
-Encoding: UTF-8
+Description: Anticlustering partitions a pool of elements into subsets
+        (i.e., anticlusters) in such a way that the subsets are as
+        similar as possible. This is accomplished by maximizing instead
+        of minimizing a clustering objective (such as the intra-cluster
+        variance or the sum of pairwise distances within clusters). The
+        package includes exact and heuristic approaches for
+        anticlustering. The exact approach requires that a linear
+        programming solver is installed. The package also offers
+        methods for classical clustering problems under size
+        constraints, i.e., creating balanced clusters of equal size.
 License: MIT + file LICENSE
+Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.1.1
-Imports: 
-    Matrix,
-    RANN
-Suggests:
-    gurobi,
-    Rglpk,
-    Rcplex,
-    testthat,
-    knitr,
-    rmarkdown,
-    dplyr
-VignetteBuilder: knitr
-Depends:
-  R (>= 3.00)
-Date: 2019-10-16
 URL: https://github.com/m-Py/anticlust
+Suggests: gurobi, Rglpk, Rcplex, testthat, knitr, rmarkdown, dplyr
+VignetteBuilder: knitr
+Imports: Matrix, RANN
+Depends: R (>= 3.0.0)
 BugReports: https://github.com/m-Py/anticlust/issues
+Author@R: c(person(given='Martin', family='Papenberg',
+        email='martin.papenberg@hhu.de', role=c('aut', 'cre', 'cph')),
+        person(given='Meik', family='Michalke', role=c('ctb'),
+        comment='centroid based preclustering algorithm') )
+Version: 0.3.0-1
+Date: 2019-11-05
+RoxygenNote: 6.1.1
