@@ -1,7 +1,8 @@
 
 #' Anticlustering
 #'
-#' Create sets of elements (anticlusters) that are as similar as possible.
+#' Create sets of elements (anticlusters) that are as similar as 
+#' possible by maximizing the heterogeneity within anticlusters.
 #'
 #' @param features A numeric vector, matrix or data.frame of data
 #'     points.  Rows correspond to elements and columns correspond to

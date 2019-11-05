@@ -57,7 +57,8 @@ A vector of length N that assigns a group (i.e, a number
     between 1 and K) to each input element.
 }
 \description{
-Create sets of elements (anticlusters) that are as similar as possible.
+Create sets of elements (anticlusters) that are as similar as 
+possible by maximizing the heterogeneity within anticlusters.
 }
 \details{
 This function is used to solve »K anticlustering«. That is,
