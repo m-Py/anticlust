@@ -20,7 +20,7 @@ VignetteBuilder: knitr
 Imports: Matrix, RANN
 Depends: R (>= 3.0.0)
 BugReports: https://github.com/m-Py/anticlust/issues
-Author@R: c(person(given='Martin', family='Papenberg',
+Authors@R: c(person(given='Martin', family='Papenberg',
         email='martin.papenberg@hhu.de', role=c('aut', 'cre', 'cph')),
         person(given='Meik', family='Michalke', role=c('ctb'),
         comment='centroid based preclustering algorithm') )
