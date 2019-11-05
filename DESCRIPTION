@@ -17,14 +17,13 @@ Encoding: UTF-8
 LazyData: true
 URL: https://github.com/m-Py/anticlust
 Suggests: gurobi, Rglpk, Rcplex, testthat, knitr, rmarkdown, dplyr
-VignetteBuilder: knitr
 Imports: Matrix, RANN
 Depends: R (>= 3.4.0)
 BugReports: https://github.com/m-Py/anticlust/issues
 Authors@R: c(person(given='Martin', family='Papenberg',
         email='martin.papenberg@hhu.de', role=c('aut', 'cre', 'cph')),
         person(given='Meik', family='Michalke', role=c('ctb'),
-        comment='centroid based preclustering algorithm') )
+        comment='centroid based clustering algorithm') )
 Version: 0.3.0-1
 Date: 2019-11-05
 RoxygenNote: 6.1.1
