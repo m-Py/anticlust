@@ -1,20 +1,23 @@
  
-#' Divide and Select 
+#' Select stimuli for experiments
 #' 
-#' Stimulus selection through the divide and select approach. 
-#' Makes some variables dissimilar between sets, other variables
-#' similar between sets. 
-#'
-#' @param split_by The features by which the data is split
-#' @param select The features that should be similar across sets
-#' @param design Specifies the number of levels per \code{split_by} 
+#' Stimulus selection through the divide and select or anticlustering
+#' approach. Can makes some variables dissimilar between sets, 
+#' other variables similar between sets. 
+#' 
+#' @param data A N x M data frame of features describing stimuli
+#' @param split_by Character vector, the names of the variables that 
+#      should be different between sets
+#' @param equalize Character vector, the names of the variables that 
+#      should be similar across sets
+#' @param design Specifies the number of groups per \code{split_by} 
 #'     feature. Is a vector of length \code{ncol(split_by)} (or of length
 #'     1 if only one \code{split_by} feature is passed.
 #' @param n The number of elements per set.
 #' @param p The number of exchange partners; higher values increase
 #'     the precision of the results but also increase run time.
 #'
-#' @return The anticluster affiliation
+#' @return The grouping of each item
 #'
 #' @author Martin Papenberg \email{martin.papenberg@@hhu.de}
 #' 
@@ -29,10 +32,10 @@
 #'   - thresholds on divide parameter
  
 
-divide_and_select <- function(split_by, equalize, design, n, p) {
-  if (argument_exists(split_by)) {
-    split_by <- split_data(split_by, design)
-  }
+select_stimuli <- function(data, split_by, equalize, design, n, p) {
+  equalize <- data[, equalize]
+  split_by <- data[, split_by]
+  split_by <- split_data(split_by, design)
   categories <- merge_into_one_variable(split_by)
   init_groups <- initialize_K(groups = categories, n = rep(n, length(unique(categories))))
   exchange_partners <- generate_exchange_partners(categories = categories, p = p)
