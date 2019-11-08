@@ -43,9 +43,8 @@
 mean_sd_obj <- function(clusters, features) {
    K <- length(unique(clusters))
    mean_min  <- featurewise_diff(by(features, clusters, colMeans, na.rm = TRUE), K)
-   median_min  <- featurewise_diff(by(features, clusters, function(x) apply(x, 2, median, na.rm = TRUE)), K)
-   SD_min <- featurewise_diff(by(features, clusters, function(x) apply(x, 2, sd, na.rm = TRUE)), K)
-   (mean_min + SD_min + median_min) * (-1)
+   SD_min <- featurewise_diff(by(features, clusters, function(x) apply(x, 2, var, na.rm = TRUE)), K)
+   (mean_min + SD_min) * (-1)
 }
 
 ## Convert output from `by` to matrix and compute difference based
