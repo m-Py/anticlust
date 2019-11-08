@@ -122,10 +122,15 @@ get_exchange_partners <- function(clusters, i, categories) {
   # (b) are in the same category/precluster
   # (c) are NA (and in the same precluster/category)
   exchange_partners <- (clusters != clusters[i]) & allowed_category
-  ## NA is converted to TRUE. This works because: An item only has NA
-  ## if its cluster is currently NA and has the same category/precluster
-  ## (case (d) from above)
-  exchange_partners[is.na(exchange_partners)] <- TRUE
+  ## NA is converted to TRUE/FALSE. TRUE if: the current item is not NA.
+  ## FALSE if: the current item is NA (then swapping NA with NA does nothing)
+  ## This works because: An item only has NA if its cluster is currently 
+  ## NA and has the same category/precluster
+  if (is.na(clusters[i])) {
+    exchange_partners[is.na(exchange_partners)] <- FALSE
+  } else {
+    exchange_partners[is.na(exchange_partners)] <- TRUE
+  }
   (1:N)[exchange_partners]
 }
 
