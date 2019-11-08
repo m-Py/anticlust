@@ -10,7 +10,7 @@
 #'     \code{data} that should be similar across sets
 #' @param design Specifies the number of groups per \code{split_by} 
 #'     feature. Is a vector of length \code{ncol(split_by)} (or of length
-#'     1 if only one \code{split_by} feature is passed.
+#'     1 if only one - or no - \code{split_by} feature is passed).
 #' @param n The number of elements per set.
 #' @param p The number of exchange partners per stimulus used by the
 #'     exchange method that optimizes similarity with regard to the 
@@ -30,13 +30,124 @@
 #'   - number of elements per group (as matrix?)
 #'   - p can be control parameter
 #'   - thresholds on divide parameter
+#'   - objective for anticlustering (anticluster editing / k-means)
  
 
 select_stimuli <- function(data, split_by = NULL, equalize, design, n = NULL, p = 15) {
   if (argument_exists(split_by) && argument_exists(n)) {
     groups <- divide_and_select(data, split_by, equalize, design, n, p)
+  } else if (argument_exists(split_by) && !argument_exists(n)) {
+    groups <- min_max_anticlustering(data, split_by, equalize, design, p)
+  } else if (!argument_exists(split_by) && argument_exists(n)) {
+    groups <- subset_anticlustering(data, equalize, design, n, p)
+  } else if (!argument_exists(split_by) && !argument_exists(n)) {
+    groups <- wrap_anticlustering(data, equalize, design, p)
   }
   groups
+}
+
+# Internal function for subset selection based on preclustering - then anticlustering
+subset_anticlustering <- function(data, equalize, design, n, p) {
+  N <- nrow(data)
+  message("Starting stimulus selection using `preclustering and anticlustering`.")
+  message("Selecting ", design, " groups, each having ", 
+          n, " elements from a pool of ", N, " stimuli.")
+
+  # create vector that keeps track which item is in the selection
+  preclusters <- rep(NA, N)
+  mode(preclusters) <- "numeric"
+  gets_precluster <- rep(TRUE, N)
+  # randomly discard some items so that a balanced selection is possible
+  preselection <- sample(1:N, size = N - (N %% design))
+  not_selected <- (1:N)[!(1:N) %in% preselection]
+  gets_precluster[not_selected] <- FALSE
+  
+  # compute preclusters
+  subsetted <- data[preselection, ]
+  N <- nrow(subsetted)
+  preclusters[gets_precluster] <- balanced_clustering(scale(subsetted[, equalize]), K = N / design)
+  # compute sum of within-cluster distances per cluster
+  distances <- by(subsetted[, equalize], preclusters[!is.na(preclusters)], dist)
+  objective <- sapply(distances, sum)
+  # how many elements remain?
+  needed_n <- design * n
+  # how many clusters are needed:
+  needed_clusters <- needed_n / table(preclusters)[1]
+  # select the best clusters
+  most_similar_clusters <- as.numeric(names(sort(objective))[1:needed_clusters])
+  is_not_in_output <- which(!preclusters %in% most_similar_clusters)
+  is_in_output <- which(preclusters %in% most_similar_clusters)
+  preclusters[is_not_in_output] <- NA
+  
+  # now do anticlustering
+  anticlusters <- rep(NA, nrow(data))
+  subsetted <- data[is_in_output, ]
+  preclusters <- preclusters[is_in_output]
+  
+  # First assignment: balance preclusters across anticlusters!
+  K <- anticlustering(
+    subsetted[, equalize], 
+    K = design, 
+    method = "sampling", 
+    nrep = 1,
+    categories = preclusters
+  )
+  
+  # now optimize assignment using exchange method
+  anticlusters[is_in_output] <- anticlustering(
+    scale(subsetted[, equalize]),
+    K = K, 
+    categories = generate_exchange_partners(nrow(subsetted), p = p)
+  )
+  anticlusters
+}
+
+# Internal function for min-max anticlustering
+min_max_anticlustering <- function(data, split_by, equalize, design, p) {
+  K <- prod(design)
+  N <- nrow(data)
+  message("Starting stimulus selection using `min-max anticlustering`.")
+  message("Selecting ", K, " groups, each having approximately ", 
+          N / K, " elements from a pool of ", N, " stimuli.")
+  # Get preclusters based on p argument. 
+  k <- p + 1
+  preclusters <- imbalanced_preclustering(data, N, k, equalize)
+  anticlustering(
+    features = scale(data[, equalize]),
+    K = K,
+    categories = preclusters,
+    iv = data[, split_by]
+  )
+}
+
+# Deal with it that it may not be possible to generate perfectly 
+# balanced clusters
+imbalanced_preclustering <- function(data, N, k, equalize) {
+  preclusters <- rep(NA, N)
+  # only select as many data as can be clustered into balanced clusters
+  subsetted <- data[1:(N - (N %% k)), ]
+  preclusters[1:nrow(subsetted)] <- balanced_clustering(
+    scale(subsetted[, equalize]), 
+    K = nrow(subsetted) / k
+  )
+  # full some clusters at random
+  if (sum(is.na(preclusters)) > 0) {
+    preclusters[is.na(preclusters)] <- sample(1:max(preclusters, na.rm = TRUE), size = sum(is.na(preclusters)))
+  }
+  preclusters
+}
+
+# Internal function for anticlustering
+wrap_anticlustering <- function(data, equalize, design, p) {
+  message("Starting stimulus selection using `anticlustering`.")
+  message("Selecting ", design, " groups, each having approximately ", 
+          round(nrow(data) / design), " elements from a pool of ", 
+          nrow(data), " stimuli.")
+  anticlustering(
+    features = scale(data[, equalize]),
+    K = design,
+    categories = generate_exchange_partners(nrow(data), p = p)
+  )
 }
 
 # Internal function for divide and select approach
