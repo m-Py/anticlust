@@ -49,8 +49,8 @@ select_stimuli <- function(data, split_by, equalize, design, n, p) {
 
 # Split data / Turn numeric values into categories
 # 
-# param: split_by Inherited from divide_and_select
-# param: design Inherited from divide_and_select
+# param: split_by A matrix with variables to be different between sets
+# param: design Inherited from `select_stimuli`
 # return: a matrix of same dimensions as `split_by` encoding the split per variable
 #
 split_data <- function(split_by, design) {
