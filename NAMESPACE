@@ -3,6 +3,7 @@
 export(anticlustering)
 export(balanced_clustering)
 export(distance_objective)
+export(divide_and_select)
 export(fast_anticlustering)
 export(generate_exchange_partners)
 export(generate_partitions)
