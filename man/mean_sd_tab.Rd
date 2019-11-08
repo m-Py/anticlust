@@ -4,7 +4,7 @@
 \alias{mean_sd_tab}
 \title{Means and standard deviations by group variable formatted in table}
 \usage{
-mean_sd_tab(features, groups, decimals = 2)
+mean_sd_tab(features, groups, decimals = 2, na.rm = FALSE)
 }
 \arguments{
 \item{features}{A data frame of features}
