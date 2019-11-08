@@ -13,16 +13,15 @@ mean_sd_obj(clusters, features)
 }
 \value{
 A value quantifying set similarity. Higher values indicate
-    that the discrepancy in means, medians and standard deviations
+    that the discrepancy in means and standard deviations
     are low.
 }
 \description{
-Defines set similarity as the discrepancy in means, medians, and
-standard deviations.
+Defines set similarity as the discrepancy in means and standard deviations
 }
 \details{
 Use this function as the \code{objective} in the anticlustering
-function to make means, standard deviations and medians as similar
+function to make means and standard deviations as similar
 as possible.
 }
 \examples{

@@ -4,31 +4,34 @@
 \alias{select_stimuli}
 \title{Select stimuli for experiments}
 \usage{
-select_stimuli(data, split_by, equalize, design, n, p)
+select_stimuli(data, split_by = NULL, equalize, design, n = NULL,
+  p = 15)
 }
 \arguments{
 \item{data}{A N x M data frame of features describing stimuli}
 
-\item{split_by}{Character vector, the names of the variables that}
+\item{split_by}{Character vector, the names of the variables in 
+\code{data} that should be different between sets}
 
-\item{equalize}{Character vector, the names of the variables that}
+\item{equalize}{Character vector, the names of the variables in 
+\code{data} that should be similar across sets}
 
 \item{design}{Specifies the number of groups per \code{split_by} 
 feature. Is a vector of length \code{ncol(split_by)} (or of length
-1 if only one \code{split_by} feature is passed.}
+1 if only one - or no - \code{split_by} feature is passed).}
 
 \item{n}{The number of elements per set.}
 
-\item{p}{The number of exchange partners; higher values increase
+\item{p}{The number of exchange partners per stimulus used by the
+exchange method that optimizes similarity with regard to the 
+\code{equalize} variables. Higher values increase
 the precision of the results but also increase run time.}
 }
 \value{
 The grouping of each item
 }
 \description{
-Stimulus selection through the divide and select or anticlustering
-approach. Can makes some variables dissimilar between sets, 
-other variables similar between sets.
+Stimulus selection via `Divide and Select` or `anticlustering`.
 }
 \examples{
 # TODO
@@ -37,6 +40,7 @@ TODO control parameters:
   - number of elements per group (as matrix?)
   - p can be control parameter
   - thresholds on divide parameter
+  - objective for anticlustering (anticluster editing / k-means)
 }
 \author{
 Martin Papenberg \email{martin.papenberg@hhu.de}
