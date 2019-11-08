@@ -1,20 +1,20 @@
  
 #' Select stimuli for experiments
 #' 
-#' Stimulus selection through the divide and select or anticlustering
-#' approach. Can makes some variables dissimilar between sets, 
-#' other variables similar between sets. 
+#' Stimulus selection via `Divide and Select` or `anticlustering`.
 #' 
 #' @param data A N x M data frame of features describing stimuli
-#' @param split_by Character vector, the names of the variables that 
-#      should be different between sets
-#' @param equalize Character vector, the names of the variables that 
-#      should be similar across sets
+#' @param split_by Character vector, the names of the variables in 
+#'     \code{data} that should be different between sets
+#' @param equalize Character vector, the names of the variables in 
+#'     \code{data} that should be similar across sets
 #' @param design Specifies the number of groups per \code{split_by} 
 #'     feature. Is a vector of length \code{ncol(split_by)} (or of length
 #'     1 if only one \code{split_by} feature is passed.
 #' @param n The number of elements per set.
-#' @param p The number of exchange partners; higher values increase
+#' @param p The number of exchange partners per stimulus used by the
+#'     exchange method that optimizes similarity with regard to the 
+#'     \code{equalize} variables. Higher values increase
 #'     the precision of the results but also increase run time.
 #'
 #' @return The grouping of each item
@@ -32,7 +32,18 @@
 #'   - thresholds on divide parameter
  
 
-select_stimuli <- function(data, split_by, equalize, design, n, p) {
+select_stimuli <- function(data, split_by = NULL, equalize, design, n = NULL, p = 15) {
+  if (argument_exists(split_by) && argument_exists(n)) {
+    groups <- divide_and_select(data, split_by, equalize, design, n, p)
+  }
+  groups
+}
+
+# Internal function for divide and select approach
+divide_and_select <- function(data, split_by, equalize, design, n, p) {
+  message("Starting stimulus selection using the `Divide and Select` approach.")
+  message("Selecting ", prod(design), " groups, each having ", n, 
+          " elements from a pool of ", nrow(data), " stimuli.")
   equalize <- data[, equalize]
   split_by <- data[, split_by]
   split_by <- split_data(split_by, design)
