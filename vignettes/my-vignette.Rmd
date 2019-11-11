@@ -1,0 +1,230 @@
+---
+title: "Using the R package anticlust for stimulus selection"
+output: 
+  rmarkdown::html_vignette:
+    number_sections: true
+vignette: >
+  %\VignetteIndexEntry{my-vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(anticlust)
+library(knitr)
+```
+
+The OASIS data set contains norming data for 900 photos on arousal 
+and valence. First, I load the data from the csv file:
+
+```{r}
+oasis <- read.csv("OASIS.csv")
+```
+
+Then, I plot valence by arousal:
+
+```{r}
+plot(
+  oasis[, c("Valence_mean" , "Arousal_mean")], 
+  cex = 0.3, 
+  col = "darkgrey",
+  xlim = c(1, 7),
+  ylim = c(1, 7)
+)
+# add a quadratic regression line:
+quad_reg <- lm(Arousal_mean ~ poly(Valence_mean, 2), data = oasis)
+predicted_arousal <- predict(quad_reg)
+points(
+  oasis$Valence_mean[order(oasis$Valence_mean)],
+  predicted_arousal[order(oasis$Valence_mean)], 
+  col = "red", 
+  type = "l",
+  lwd = 3,
+  lty = 2
+)
+
+```
+
+There seems to be a U-shaped relationship between valence and arousal. 
+We can explain `r round(summary(quad_reg)$r.squared * 100)`% of the 
+variance in arousal ratings based on valence ratings using the quadratic 
+relationship depicted in the scatter plot. High arousal is usually 
+accompanied with very high or very low values of valence. We should 
+remember this because it has some implications when extracting groups of 
+stimuli; the two attributes are not independent.
+
+In the following, we look at four different kinds of stimulus selection.
+This are given by crossing the following two properties of the stimulus
+selection procedure:
+
+- The experimental manipulation is realized via the properties of the stimuli / is independent of the stimuli
+- The pool of stimuli that is part of the experiment is selected by the researcher / should be selected by the computer program
+
+# Entirely algorithmic stimulus assignment
+
+## Divide and Select
+
+In the Divide and Select approach, we select stimuli that differ with 
+regard to one (or more) independent variable, but are as similar as 
+possible with regard to other covariates. The independent variable can 
+be a categorical variable or a numeric variable that is artificially 
+categorized for the purpose of stimulus selection.
+
+### Divide by categorical variable
+
+Each of the images in the data base belongs to one of four 
+categories. The frequency of each category is given as follows:
+
+```{r}
+table(oasis$Category)
+```
+
+Imagine I want to select 30 images from each category and the four
+sets should be as similar as possible with regard to arousal and
+valence. We can use the function `select_stimuli` for this purpose:
+
+```{r}
+
+sets <- select_stimuli(
+  oasis,
+  split_by = "Category",
+  equalize = c("Arousal_mean", "Valence_mean"),
+  design = 4, # specifies the number of groups
+  n = 30 # Number of stimuli per set
+)
+
+table(sets, oasis$Category)
+```
+
+As shown by our call to the `table()` function, our new variable `sets`
+contains a subset of each of the four categories. Using the function
+`mean_sd_tab()`, we can test how well the four subsets are matched
+with regard to arousal and valence:
+
+```{r}
+kable(
+  mean_sd_tab(
+    oasis[!is.na(sets), c("Arousal_mean", "Valence_mean")], 
+    sets[!is.na(sets)],
+    na.rm = TRUE
+  )
+)
+
+```
+
+Apparently, this worked quite well.
+
+### Divide by numeric variable
+
+I may also split the data pool on a numeric variable, thus establishing
+sets that are dissimilar with regard to one attribute, but similar to 
+others. Here, I divide the item pool by valence (into 3 sets) and make
+sure that the sets are similar with regard to arousal:
+
+```{r}
+
+sets <- select_stimuli(
+  oasis,
+  split_by = "Valence_mean",
+  equalize = c("Arousal_mean"),
+  design = 3, # specifies the number of groups
+  n = 40 # Number of stimuli per set
+)
+```
+
+Inspecting means and standard deviations of the variables by set shows
+that the stimulus assignment was successful:
+
+```{r}
+kable(
+  mean_sd_tab(
+    oasis[!is.na(sets), c("Arousal_mean", "Valence_mean")], 
+    sets[!is.na(sets)],
+    na.rm = TRUE
+  )
+)
+
+```
+
+This approach is generalizable: Both the arguments `split_by` and 
+`equalize` may take more than one variable. Note that variables are
+passed as character vectors that refer to the names of the columns in
+the data frame that has been passed as the first argument (here: oasis).
+
+### Control parameters
+
+- Introduce `control` parameters (TODO)
+- tradeoff similarity wrt covariates and dissimilarity wrt independent 
+  variable
+
+## Subset anticlustering
+
+Imagine I want to select 3 sets of stimuli that are similar with regard
+to all numeric variables. In this case, I just leave out the argument 
+`split_by`: 
+
+```{r}
+sets <- select_stimuli(
+  oasis,
+  equalize = c("Arousal_mean", "Valence_mean"),
+  design = 3, # specifies the number of groups
+  n = 40 # Number of stimuli per set
+)
+```
+
+Inspecting means and standard deviations of the variables by set shows
+that the stimulus assignment was successful:
+
+```{r}
+kable(
+  mean_sd_tab(
+    oasis[!is.na(sets), c("Arousal_mean", "Valence_mean")], 
+    sets[!is.na(sets)],
+    na.rm = TRUE
+  )
+)
+
+```
+
+
+## Manual preselection
+
+### Anticlustering
+
+- preselection on desired range in values / specific category etc.
+- just leave out `n` argument.
+
+
+### Min-Max Anticlustering
+
+Select all Animal images, create two sets from the 134 images, maximize
+dissimilarity wrt valence, minimize dissimilarity wrt arousal. Leaves out
+the `n` argument as all images from the pool are assigned to a set:
+
+```{r}
+
+animals <- oasis[oasis$Category == "Animal", ]
+sets <- select_stimuli(
+  animals,
+  split_by = "Valence_mean",
+  equalize = c("Arousal_mean"),
+  design = 2 # specifies the number of groups
+)
+
+kable(
+  mean_sd_tab(
+    animals[, c("Arousal_mean", "Valence_mean")], 
+    sets,
+    na.rm = TRUE
+  )
+)
+
+```
+

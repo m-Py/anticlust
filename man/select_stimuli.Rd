@@ -2,7 +2,8 @@
 % Please edit documentation in R/divide_select.R
 \name{select_stimuli}
 \alias{select_stimuli}
-\title{Select stimuli for experiments}
+\title{Select stimuli for experiments
+#' Stimulus selection via `Divide and Select` or `anticlustering`.}
 \usage{
 select_stimuli(data, split_by = NULL, equalize, design, n = NULL,
   p = 15)
@@ -31,7 +32,8 @@ the precision of the results but also increase run time.}
 The grouping of each item
 }
 \description{
-Stimulus selection via `Divide and Select` or `anticlustering`.
+Select stimuli for experiments
+#' Stimulus selection via `Divide and Select` or `anticlustering`.
 }
 \details{
 The argument \code{split_by} will convert a numeric variable into 
