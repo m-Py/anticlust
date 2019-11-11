@@ -14,6 +14,8 @@
 #   partners. divide and select: 15 exchange partners
 # - generate_exchange_partners should call the clustering function defined
 #   below that can deal with data that cannot be split in N/K parts
+# - control parameter for weights of `equalize` variables
+# - maybe: argument pca: should a pca be conducted on the features?
  
 #' Select stimuli for experiments
 #' 
