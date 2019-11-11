@@ -33,14 +33,15 @@ The grouping of each item
 \description{
 Stimulus selection via `Divide and Select` or `anticlustering`.
 }
+\details{
+The argument \code{split_by} will convert a numeric variable into 
+a categorical variable, and will recognize if a variable is already
+categorical by testing if \code{length(unique(split_by)) == design}
+is \code{TRUE}.
+}
 \examples{
 # TODO
 
-TODO control parameters: 
-  - number of elements per group (as matrix?)
-  - p can be control parameter
-  - thresholds on divide parameter
-  - objective for anticlustering (anticluster editing / k-means)
 }
 \author{
 Martin Papenberg \email{martin.papenberg@hhu.de}

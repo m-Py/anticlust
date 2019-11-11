@@ -44,6 +44,12 @@
 #' @examples
 #' # TODO
 #' 
+#' @details
+#' The argument \code{split_by} will convert a numeric variable into 
+#' a categorical variable, and will recognize if a variable is already
+#' categorical by testing if \code{length(unique(split_by)) == design}
+#' is \code{TRUE}.
+#' 
 
 select_stimuli <- function(data, split_by = NULL, equalize, design, n = NULL, p = 15) {
   if (argument_exists(split_by) && argument_exists(n)) {
@@ -200,10 +206,13 @@ split_data <- function(split_by, design) {
 # param k: The number of categories
 # return: the categorized vector
 categorize_vector <- function(x, k) {
+  # test if this is already a categorical vector
+  if (length(unique(x)) == k) {
+    return(x)
+  }
   x <- matrix(c(1:length(x), x), ncol = 2)
   x <- sort_by_col(x, 2)
   x <- cbind(x, sort(rep_len(1:k, nrow(x))))
   # return categorized data in original order
   sort_by_col(x, 1)[, 3]
 }
-
