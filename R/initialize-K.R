@@ -106,7 +106,7 @@ initialize_K <- function(N = NULL, K = NULL, n, groups = NULL) {
     N <- rep(N / K, K) # N per group
   }
   else if (argument_exists(groups)) {
-    groups <- as.numeric(as.factor(groups))
+    groups <- to_numeric(groups)
     N <- table(groups)
     K <- length(N)
   }
