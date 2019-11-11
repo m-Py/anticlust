@@ -44,7 +44,7 @@ set.seed(123)
 ## Installation
 
 ```R
-library("devtools") # if not available: install.packages("devtools")
+library("remotes") # if not available: install.packages("remotes")
 install_github("m-Py/anticlust")
 ```
 
