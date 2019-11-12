@@ -28,6 +28,8 @@
 #'     \code{data} that should be different between sets
 #' @param equalize Character vector, the names of the variables in 
 #'     \code{data} that should be similar across sets
+#' @param balance One or more categorical variables. The frequency of
+#'     the categories is balanced between sets.
 #' @param design Specifies the number of groups per \code{split_by} 
 #'     feature. Is a vector of length \code{ncol(split_by)} (or of length
 #'     1 if only one - or no - \code{split_by} feature is passed).
@@ -57,7 +59,7 @@ select_stimuli <- function(
   data, 
   split_by = NULL, 
   equalize, 
-  balance,
+  balance = NULL,
   design, 
   n = NULL
 ) {
@@ -66,7 +68,7 @@ select_stimuli <- function(
   } else if (argument_exists(split_by) && !argument_exists(n)) {
     groups <- min_max_anticlustering(data, split_by, equalize, design)
   } else if (!argument_exists(split_by) && argument_exists(n)) {
-    groups <- subset_anticlustering(data, equalize, design, n)
+    groups <- subset_anticlustering(data, equalize, balance, design, n)
   } else if (!argument_exists(split_by) && !argument_exists(n)) {
     groups <- wrap_anticlustering(data, equalize, design)
   }
@@ -74,7 +76,7 @@ select_stimuli <- function(
 }
 
 # Internal function for subset selection based on preclustering - then anticlustering
-subset_anticlustering <- function(data, equalize, design, n) {
+subset_anticlustering <- function(data, equalize, balance, design, n) {
   N <- nrow(data)
   message("Starting stimulus selection using `preclustering and anticlustering`.")
   message("Selecting ", design, " groups, each having ", 
@@ -103,6 +105,14 @@ subset_anticlustering <- function(data, equalize, design, n) {
   is_in_output <- preclusters %in% most_similar_clusters
   preselection <- preselection[is_in_output, ]
   preclusters  <- preclusters[is_in_output]
+
+  # if a categorical variable is passed, use this for the initial assignment
+  if (argument_exists(balance)) {
+    categories  <- merge_into_one_variable(preselection[, balance])
+    preclusters <- categories
+  } else {
+    categories <- NULL
+  }
   
   # First assignment: balance preclusters across anticlusters!
   K <- anticlustering(
@@ -116,7 +126,8 @@ subset_anticlustering <- function(data, equalize, design, n) {
   # now optimize assignment using exchange method
   anticlusters <- anticlustering(
     scale(preselection[, equalize]),
-    K = K
+    K = K,
+    categories = categories
   )
   
   # prepare output: Needs to incorporate NA for non-selected items
