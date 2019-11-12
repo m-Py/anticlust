@@ -31,7 +31,8 @@ clusters of equal size.",
   Suggests = "gurobi, Rglpk, Rcplex, testthat, knitr, rmarkdown, dplyr",
   Imports = "Matrix, RANN",
   Depends = "R (>= 3.4.0)",
-  BugReports = "https://github.com/m-Py/anticlust/issues"
+  BugReports = "https://github.com/m-Py/anticlust/issues",
+  VignetteBuilder = "knitr, rmarkdown"
 )
 
 roxy.package(
@@ -40,5 +41,5 @@ roxy.package(
    R.libs = myRlib,
    repo.root = "~/R/repo/anticlust",
    pck.description = pckg.dscrptn,
-   actions = c("roxy", "package", "cite", "html", "doc", "cleanRd") # "check"
+   actions = c("roxy", "package", "cite", "html", "doc", "cleanRd", "buildVignettes") # "check"
 ) 
