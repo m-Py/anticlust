@@ -20,10 +20,11 @@ Suggests: gurobi, Rglpk, Rcplex, testthat, knitr, rmarkdown, dplyr
 Imports: Matrix, RANN
 Depends: R (>= 3.4.0)
 BugReports: https://github.com/m-Py/anticlust/issues
+VignetteBuilder: knitr, rmarkdown
 Authors@R: c(person(given='Martin', family='Papenberg',
         email='martin.papenberg@hhu.de', role=c('aut', 'cre', 'cph')),
         person(given='Meik', family='Michalke', role=c('ctb'),
         comment='centroid based clustering algorithm') )
 Version: 0.3.0-1
-Date: 2019-11-11
+Date: 2019-11-12
 RoxygenNote: 6.1.1
