@@ -132,11 +132,10 @@ min_max_anticlustering <- function(data, split_by, equalize, design) {
   message("Starting stimulus selection using `min-max anticlustering`.")
   message("Selecting ", K, " groups, each having approximately ", 
           N / K, " elements from a pool of ", N, " stimuli.")
-  # Get preclusters based on p argument. 
   anticlustering(
     features = scale(data[, equalize]),
     K = K,
-    iv = data[, split_by]
+    iv = scale(data[, split_by])
   )
 }
 
