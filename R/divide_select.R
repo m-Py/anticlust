@@ -139,23 +139,6 @@ min_max_anticlustering <- function(data, split_by, equalize, design) {
   )
 }
 
-# Deal with it that it may not be possible to generate perfectly 
-# balanced clusters
-imbalanced_preclustering <- function(data, N, k, equalize) {
-  preclusters <- rep(NA, N)
-  # only select as many data as can be clustered into balanced clusters
-  subsetted <- data[1:(N - (N %% k)), ]
-  preclusters[1:nrow(subsetted)] <- balanced_clustering(
-    scale(subsetted[, equalize]), 
-    K = nrow(subsetted) / k
-  )
-  # full some clusters at random
-  if (sum(is.na(preclusters)) > 0) {
-    preclusters[is.na(preclusters)] <- sample(1:max(preclusters, na.rm = TRUE), size = sum(is.na(preclusters)))
-  }
-  preclusters
-}
-
 # Internal function for anticlustering
 wrap_anticlustering <- function(data, equalize, design) {
   message("Starting stimulus selection using `anticlustering`.")
