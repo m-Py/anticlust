@@ -83,7 +83,7 @@ plot_clusters <- function(features, clustering, within_connection = FALSE,
 
   ## Just in case anybody passes something weird (i.e., cluster numbers
   ## do not start at 1):
-  clustering <- as.numeric(factor(clustering))
+  clustering <- to_numeric(clustering)
 
   ## More input handling:
   K <- length(unique(clustering))
