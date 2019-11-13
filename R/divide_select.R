@@ -39,7 +39,8 @@
 #'     \code{equalize} variables. Higher values increase
 #'     the precision of the results but also increase run time.
 #'
-#' @return The grouping of each item
+#' @return A data frame that has the same columns as the original input 
+#'    (the data frame \code{data}), but has an additional called \code{SET}.
 #'
 #' @author Martin Papenberg \email{martin.papenberg@@hhu.de}
 #' 
@@ -72,7 +73,10 @@ select_stimuli <- function(
   } else if (!argument_exists(split_by) && !argument_exists(n)) {
     groups <- wrap_anticlustering(data, equalize, design)
   }
-  groups
+  # return the original data with column describing the stimulus set.
+  # remove non-selected stimuli
+  data$SET <- groups
+  data[!is.na(groups), ]
 }
 
 # Internal function for subset selection based on preclustering - then anticlustering
