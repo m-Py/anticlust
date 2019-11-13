@@ -83,7 +83,7 @@ select_stimuli <- function(
 # Internal function for subset selection based on preclustering - then anticlustering
 subset_anticlustering <- function(data, equalize, balance, design, n) {
   N <- nrow(data)
-  message("Starting stimulus selection using `preclustering and anticlustering`.")
+  message("Starting stimulus selection using `Subset Anticlustering`.")
   message("Selecting ", design, " groups, each having ", 
           n, " elements from a pool of ", N, " stimuli.")
 
@@ -146,7 +146,7 @@ subset_anticlustering <- function(data, equalize, balance, design, n) {
 min_max_anticlustering <- function(data, split_by, equalize, design) {
   K <- prod(design)
   N <- nrow(data)
-  message("Starting stimulus selection using `min-max anticlustering`.")
+  message("Starting stimulus selection using `Min-Max Anticlustering`.")
   message("Selecting ", K, " groups, each having approximately ", 
           N / K, " elements from a pool of ", N, " stimuli.")
   anticlustering(
@@ -158,7 +158,7 @@ min_max_anticlustering <- function(data, split_by, equalize, design) {
 
 # Internal function for anticlustering
 wrap_anticlustering <- function(data, equalize, design) {
-  message("Starting stimulus selection using `anticlustering`.")
+  message("Starting stimulus selection using `Anticlustering`.")
   message("Selecting ", design, " groups, each having approximately ", 
           round(nrow(data) / design), " elements from a pool of ", 
           nrow(data), " stimuli.")
@@ -170,7 +170,7 @@ wrap_anticlustering <- function(data, equalize, design) {
 
 # Internal function for divide and select approach
 divide_and_select <- function(data, split_by, equalize, design, n) {
-  message("Starting stimulus selection using the `Divide and Select` approach.")
+  message("Starting stimulus selection using `Divide and Select`.")
   message("Selecting ", prod(design), " groups, each having ", n, 
           " elements from a pool of ", nrow(data), " stimuli.")
   equalize <- data[, equalize]
