@@ -4,10 +4,11 @@
 # @param K the Number of anticlusters (! -> the number of clusters returned is ~ nrow(features) / K)
 
 imbalanced_preclustering <- function(features, K) {
+  features <- as.matrix(features)
   N <- nrow(features)
   preclusters <- rep(NA, N)
   # only select as many data as can be clustered into balanced clusters
-  subsetted <- features[1:(N - (N %% K)), ]
+  subsetted <- features[1:(N - (N %% K)), , drop = FALSE]
   preclusters[1:nrow(subsetted)] <- balanced_clustering(
     features,
     K = nrow(subsetted) / K
