@@ -120,19 +120,10 @@ subset_anticlustering <- function(data, equalize, balance, design, n) {
     preclusters  <- merge_into_one_variable(preselection[, balance])
   }
   
-  # First assignment: balance preclusters across anticlusters!
-  K <- anticlustering(
-    preselection[, equalize], 
-    K = design, 
-    method = "sampling", 
-    nrep = 1,
-    categories = preclusters
-  )
-  
   # now optimize assignment using exchange method
   anticlusters <- anticlustering(
     scale(preselection[, equalize]),
-    K = K,
+    K = design,
     categories = preclusters
   )
   
@@ -149,10 +140,14 @@ min_max_anticlustering <- function(data, split_by, equalize, design) {
   message("Starting stimulus selection using `Min-Max Anticlustering`.")
   message("Selecting ", K, " groups, each having approximately ", 
           N / K, " elements from a pool of ", N, " stimuli.")
+  
+  preclusters <- imbalanced_preclustering(features, K)
+  
   anticlustering(
     features = scale(data[, equalize]),
     K = K,
-    iv = scale(data[, split_by])
+    iv = scale(data[, split_by]),
+    categories = preclusters
   )
 }
 
