@@ -64,12 +64,108 @@ In the following, we look at four different kinds of stimulus selection.
 This are given by crossing the following two properties of the stimulus
 selection procedure:
 
-- The experimental manipulation is realized via the properties of the stimuli / is independent of the stimuli
-- The pool of stimuli that is part of the experiment is selected by the researcher / should be selected by the computer program
+- The experimental manipulation is realized via the properties of the 
+stimuli / is independent of the stimuli
+- The pool of stimuli that is part of the experiment is selected by the 
+researcher / should be selected by the computer program
+
+# Manual preselection
+
+First, I discuss experimental designs where all stimuli have been 
+selected by the researcher and now have to be divided into experimental
+sets. For examples of this approach, see ...
+
+## Experimental manipulation independent of stimuli: Anticlustering
+
+Anticlustering partitions a stimulus pool into equal-sized parts that
+are as similar as possible. In particular, we employ anticluster editing,
+introduced by Papenberg and Klau (2019). 
+
+Select all object images, create 4 sets from the 200 images, minimize 
+dissimilarity wrt arousal and valence:
+
+```{r}
+objects <- oasis[oasis$Category == "Object", ]
+stimuli <- select_stimuli(
+  objects,
+  equalize = c("Arousal_mean", "Valence_mean"),
+  design = 4 # specifies the number of groups
+)
+```
+
+The output variable `stimuli` is a data frame that has the same columns
+as the original input (the data frame `objects`), but has an additional
+column called `SET` containing the stimulus set each item was assigned 
+to.
+
+We can use the `anticlust` function `mean_sd_tab()` to check out the 
+results. It prints the means and standard deviations of the variables of 
+interest for each of the sets that were created using the 
+`select_stimuli()` function:
+
+```{r}
+kable(
+  mean_sd_tab(stimuli[, c("Arousal_mean", "Valence_mean")], stimuli$SET)
+)
+```
+
+## Experimental manipulation realized via stimuli: Min-Max Anticlustering
+
+Select all Animal images, create two sets from the 134 images, maximize
+dissimilarity wrt valence, minimize dissimilarity wrt arousal. Leaves out
+the `n` argument as all images from the pool are assigned to a set:
+
+```{r}
+
+animals <- oasis[oasis$Category == "Animal", ]
+stimuli <- select_stimuli(
+  animals,
+  split_by = "Valence_mean",
+  equalize = c("Arousal_mean"),
+  design = 2 # specifies the number of groups
+)
+
+kable(
+  mean_sd_tab(stimuli[, c("Arousal_mean", "Valence_mean")], stimuli$SET)
+)
+
+```
+
+Even though the results look promising, the task of selecting stimulus
+sets that differ on one variable but are similar on other is usually 
+better accomplished by selecting stimuli from a larger item pool, as 
+detailed below.
 
 # Entirely algorithmic stimulus assignment
 
-## Divide and Select
+In this section I treat the case where a large stimulus pool is present
+from which stimulus sets are deduced in an entirely automated manner
+
+## Experimental manipulation independent of stimuli: Subset anticlustering
+
+Imagine I want to select 3 sets of stimuli that are similar with regard
+to all numeric variables. In this case, I just leave out the argument 
+`split_by`: 
+
+```{r}
+stimuli <- select_stimuli(
+  oasis,
+  equalize = c("Arousal_mean", "Valence_mean"),
+  design = 3, # specifies the number of groups
+  n = 100 # Number of stimuli per set
+)
+```
+
+Inspecting means and standard deviations of the variables by set shows
+that the stimulus assignment was successful:
+
+```{r}
+kable(
+  mean_sd_tab(stimuli[, c("Arousal_mean", "Valence_mean")], stimuli$SET)
+)
+```
+
+## Experimental manipulation independent of stimuli: Divide and Select
 
 In the Divide and Select approach, we select stimuli that differ with 
 regard to one (or more) independent variable, but are as similar as 
@@ -92,7 +188,7 @@ valence. We can use the function `select_stimuli` for this purpose:
 
 ```{r}
 
-sets <- select_stimuli(
+stimuli <- select_stimuli(
   oasis,
   split_by = "Category",
   equalize = c("Arousal_mean", "Valence_mean"),
@@ -100,23 +196,18 @@ sets <- select_stimuli(
   n = 30 # Number of stimuli per set
 )
 
-table(sets, oasis$Category)
+table(stimuli$SET, stimuli$Category)
 ```
 
-As shown by our call to the `table()` function, our new variable `sets`
-contains a subset of each of the four categories. Using the function
-`mean_sd_tab()`, we can test how well the four subsets are matched
-with regard to arousal and valence:
+As shown by our call to the `table()` function, the new variable `SET` 
+contains a subset of each of the four categories. Using the function 
+`mean_sd_tab()`, we can test how well the four subsets are matched with 
+regard to arousal and valence:
 
 ```{r}
 kable(
-  mean_sd_tab(
-    oasis[!is.na(sets), c("Arousal_mean", "Valence_mean")], 
-    sets[!is.na(sets)],
-    na.rm = TRUE
-  )
+  mean_sd_tab(stimuli[, c("Arousal_mean", "Valence_mean")], stimuli$SET)
 )
-
 ```
 
 Apparently, this worked quite well.
@@ -130,7 +221,7 @@ sure that the sets are similar with regard to arousal:
 
 ```{r}
 
-sets <- select_stimuli(
+stimuli <- select_stimuli(
   oasis,
   split_by = "Valence_mean",
   equalize = c("Arousal_mean"),
@@ -144,87 +235,11 @@ that the stimulus assignment was successful:
 
 ```{r}
 kable(
-  mean_sd_tab(
-    oasis[!is.na(sets), c("Arousal_mean", "Valence_mean")], 
-    sets[!is.na(sets)],
-    na.rm = TRUE
-  )
+  mean_sd_tab(stimuli[, c("Arousal_mean", "Valence_mean")], stimuli$SET)
 )
-
 ```
 
 This approach is generalizable: Both the arguments `split_by` and 
 `equalize` may take more than one variable. Note that variables are
 passed as character vectors that refer to the names of the columns in
 the data frame that has been passed as the first argument (here: oasis).
-
-### Control parameters
-
-- Introduce `control` parameters (TODO)
-- tradeoff similarity wrt covariates and dissimilarity wrt independent 
-  variable
-
-## Subset anticlustering
-
-Imagine I want to select 3 sets of stimuli that are similar with regard
-to all numeric variables. In this case, I just leave out the argument 
-`split_by`: 
-
-```{r}
-sets <- select_stimuli(
-  oasis,
-  equalize = c("Arousal_mean", "Valence_mean"),
-  design = 3, # specifies the number of groups
-  n = 40 # Number of stimuli per set
-)
-```
-
-Inspecting means and standard deviations of the variables by set shows
-that the stimulus assignment was successful:
-
-```{r}
-kable(
-  mean_sd_tab(
-    oasis[!is.na(sets), c("Arousal_mean", "Valence_mean")], 
-    sets[!is.na(sets)],
-    na.rm = TRUE
-  )
-)
-
-```
-
-
-## Manual preselection
-
-### Anticlustering
-
-- preselection on desired range in values / specific category etc.
-- just leave out `n` argument.
-
-
-### Min-Max Anticlustering
-
-Select all Animal images, create two sets from the 134 images, maximize
-dissimilarity wrt valence, minimize dissimilarity wrt arousal. Leaves out
-the `n` argument as all images from the pool are assigned to a set:
-
-```{r}
-
-animals <- oasis[oasis$Category == "Animal", ]
-sets <- select_stimuli(
-  animals,
-  split_by = "Valence_mean",
-  equalize = c("Arousal_mean"),
-  design = 2 # specifies the number of groups
-)
-
-kable(
-  mean_sd_tab(
-    animals[, c("Arousal_mean", "Valence_mean")], 
-    sets,
-    na.rm = TRUE
-  )
-)
-
-```
-
