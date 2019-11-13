@@ -110,12 +110,13 @@ subset_anticlustering <- function(data, equalize, balance, design, n) {
   preselection <- preselection[is_in_output, ]
   preclusters  <- preclusters[is_in_output]
 
-  # if a categorical variable is passed, use this for the initial assignment
+  # if a categorical variable is passed, use this for the initial 
+  # assignment and exchange method; can't use both categorical and
+  # preclustering restrictions (only in very specific cases - I should
+  # implement the test `preclustering_possible()` and 
+  # `precluster_per_category()` for this case
   if (argument_exists(balance)) {
-    categories  <- merge_into_one_variable(preselection[, balance])
-    preclusters <- categories
-  } else {
-    categories <- NULL
+    preclusters  <- merge_into_one_variable(preselection[, balance])
   }
   
   # First assignment: balance preclusters across anticlusters!
@@ -131,7 +132,7 @@ subset_anticlustering <- function(data, equalize, balance, design, n) {
   anticlusters <- anticlustering(
     scale(preselection[, equalize]),
     K = K,
-    categories = categories
+    categories = preclusters
   )
   
   # prepare output: Needs to incorporate NA for non-selected items
