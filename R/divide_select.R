@@ -141,7 +141,7 @@ min_max_anticlustering <- function(data, split_by, equalize, design) {
   message("Selecting ", K, " groups, each having approximately ", 
           N / K, " elements from a pool of ", N, " stimuli.")
   
-  preclusters <- imbalanced_preclustering(features, K)
+  preclusters <- imbalanced_preclustering(scale(data[, equalize]), K)
   
   anticlustering(
     features = scale(data[, equalize]),
