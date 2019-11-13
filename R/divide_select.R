@@ -17,7 +17,8 @@
 # - control parameter for weights of `equalize` variables
 # - maybe: argument pca: should a pca be conducted on the features?
 # - use categories argument (as argument `balance`)
-# - 
+# - control parameter: add some randomness to increase diversity of 
+#   output (this may be important for subset anticlustering)
  
 #' Select stimuli for experiments
 #' 
