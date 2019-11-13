@@ -31,7 +31,8 @@ exchange method that optimizes similarity with regard to the
 the precision of the results but also increase run time.}
 }
 \value{
-The grouping of each item
+A data frame that has the same columns as the original input 
+   (the data frame \code{data}), but has an additional called \code{SET}.
 }
 \description{
 Stimulus selection via `Divide and Select` or `anticlustering`.
