@@ -4,7 +4,7 @@
 R -e "source('build-package.R')"
 
 # copy vignette to my website
-cp ./inst/doc/my-vignette.html ../m-Py.github.io/anticlust/stimulus-selection.html
+cp ./inst/doc/stimulus-selection.html ../m-Py.github.io/anticlust/stimulus-selection.html
 
 cd ../m-Py.github.io/anticlust
 
