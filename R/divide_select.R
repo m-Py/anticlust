@@ -1,4 +1,37 @@
 
+#' Select stimuli for experiments
+#' 
+#' Stimulus selection via `Divide and Select`
+#' 
+#' @param data A N x M data frame of features describing stimuli
+#' @param split_by Character vector, the names of the variables in 
+#'     \code{data} that should be different between sets
+#' @param equalize Character vector, the names of the variables in 
+#'     \code{data} that should be similar across sets
+#' @param balance One or more categorical variables. The frequency of
+#'     the categories is balanced between sets.
+#' @param design Specifies the number of groups per \code{split_by} 
+#'     feature. Is a vector of length \code{ncol(split_by)} (or of length
+#'     1 if only one - or no - \code{split_by} feature is passed).
+#' @param n The number of elements per set.
+#'
+#' @return A data frame that has the same columns as the original input 
+#'    (the data frame \code{data}), but has an additional called \code{SET}.
+#'
+#' @author Martin Papenberg \email{martin.papenberg@@hhu.de}
+#' 
+#' @export
+#' 
+#' @examples
+#' # TODO
+#' 
+#' @details
+#' The argument \code{split_by} will convert a numeric variable into 
+#' a categorical variable, and will recognize if a variable is already
+#' categorical by testing if \code{length(unique(split_by)) == design}
+#' is \code{TRUE}.
+#' 
+
 # Internal function for divide and select approach
 divide_and_select <- function(data, split_by, equalize, design, n) {
   message("Starting stimulus selection using `Divide and Select`.")
@@ -10,12 +43,14 @@ divide_and_select <- function(data, split_by, equalize, design, n) {
   categories <- merge_into_one_variable(split_by)
   init_groups <- initialize_K(groups = categories, n = rep(n, length(unique(categories))))
   exchange_partners <- generate_exchange_partners(categories = categories, p = 15)
-  anticlustering(
+  groups <- anticlustering(
     scale(equalize),
     K = init_groups,
     categories = exchange_partners,
     objective = mean_sd_obj
   )
+  data$SET <- groups
+  data[!is.na(groups), ]
 }
 
 # Split data / Turn numeric values into categories
