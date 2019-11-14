@@ -21,6 +21,8 @@ library(anticlust)
 library(knitr)
 ```
 
+Last update: `r Sys.time()`
+
 The OASIS data set contains norming data for 900 photos on arousal 
 and valence. First, I load the data from the csv file:
 
@@ -186,7 +188,7 @@ Imagine I want to select 30 images from each category and the four
 sets should be as similar as possible with regard to arousal and
 valence. We can use the function `select_stimuli` for this purpose:
 
-```{r}
+```{r, eval = FALSE}
 
 stimuli <- select_stimuli(
   oasis,
