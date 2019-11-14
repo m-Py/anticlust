@@ -30,38 +30,6 @@ and valence. First, I load the data from the csv file:
 oasis <- read.csv("OASIS.csv")
 ```
 
-Then, I plot valence by arousal:
-
-```{r}
-plot(
-  oasis[, c("Valence_mean" , "Arousal_mean")], 
-  cex = 0.3, 
-  col = "darkgrey",
-  xlim = c(1, 7),
-  ylim = c(1, 7)
-)
-# add a quadratic regression line:
-quad_reg <- lm(Arousal_mean ~ poly(Valence_mean, 2), data = oasis)
-predicted_arousal <- predict(quad_reg)
-points(
-  oasis$Valence_mean[order(oasis$Valence_mean)],
-  predicted_arousal[order(oasis$Valence_mean)], 
-  col = "red", 
-  type = "l",
-  lwd = 3,
-  lty = 2
-)
-
-```
-
-There seems to be a U-shaped relationship between valence and arousal. 
-We can explain `r round(summary(quad_reg)$r.squared * 100)`% of the 
-variance in arousal ratings based on valence ratings using the quadratic 
-relationship depicted in the scatter plot. High arousal is usually 
-accompanied with very high or very low values of valence. We should 
-remember this because it has some implications when extracting groups of 
-stimuli; the two attributes are not independent.
-
 In the following, we look at four different kinds of stimulus selection.
 This are given by crossing the following two properties of the stimulus
 selection procedure:
