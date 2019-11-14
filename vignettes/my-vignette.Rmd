@@ -167,54 +167,15 @@ kable(
 )
 ```
 
-## Experimental manipulation independent of stimuli: Divide and Select
+## Experimental manipulation independent of stimuli
+
+### Subset Min-Max-Anticlustering
 
 In the Divide and Select approach, we select stimuli that differ with 
 regard to one (or more) independent variable, but are as similar as 
 possible with regard to other covariates. The independent variable can 
 be a categorical variable or a numeric variable that is artificially 
 categorized for the purpose of stimulus selection.
-
-### Divide by categorical variable
-
-Each of the images in the data base belongs to one of four 
-categories. The frequency of each category is given as follows:
-
-```{r}
-table(oasis$Category)
-```
-
-Imagine I want to select 30 images from each category and the four
-sets should be as similar as possible with regard to arousal and
-valence. We can use the function `select_stimuli` for this purpose:
-
-```{r, eval = FALSE}
-
-stimuli <- select_stimuli(
-  oasis,
-  split_by = "Category",
-  equalize = c("Arousal_mean", "Valence_mean"),
-  design = 4, # specifies the number of groups
-  n = 30 # Number of stimuli per set
-)
-
-table(stimuli$SET, stimuli$Category)
-```
-
-As shown by our call to the `table()` function, the new variable `SET` 
-contains a subset of each of the four categories. Using the function 
-`mean_sd_tab()`, we can test how well the four subsets are matched with 
-regard to arousal and valence:
-
-```{r}
-kable(
-  mean_sd_tab(stimuli[, c("Arousal_mean", "Valence_mean")], stimuli$SET)
-)
-```
-
-Apparently, this worked quite well.
-
-### Divide by numeric variable
 
 I may also split the data pool on a numeric variable, thus establishing
 sets that are dissimilar with regard to one attribute, but similar to 
@@ -245,3 +206,55 @@ This approach is generalizable: Both the arguments `split_by` and
 `equalize` may take more than one variable. Note that variables are
 passed as character vectors that refer to the names of the columns in
 the data frame that has been passed as the first argument (here: oasis).
+
+
+### Divide by categorical variable
+
+Each of the images in the data base belongs to one of four 
+categories. The frequency of each category is given as follows:
+
+```{r}
+table(oasis$Category)
+```
+
+Imagine I want to select 30 images from each category and the four
+sets should be as similar as possible with regard to arousal and
+valence. We can use the function `select_stimuli` for this purpose:
+
+```{r}
+
+stimuli <- divide_and_select(
+  oasis,
+  split_by = "Category",
+  equalize = c("Arousal_mean", "Valence_mean"),
+  design = 4, # specifies the number of groups
+  n = 30 # Number of stimuli per set
+)
+
+table(stimuli$SET, stimuli$Category)
+```
+
+As shown by our call to the `table()` function, the new variable `SET` 
+contains a subset of each of the four categories. Using the function 
+`mean_sd_tab()`, we can test how well the four subsets are matched with 
+regard to arousal and valence:
+
+```{r}
+kable(
+  mean_sd_tab(stimuli[, c("Arousal_mean", "Valence_mean")], stimuli$SET)
+)
+```
+
+Apparently, this worked quite well. Let's also confirm that the 
+`Category` variable is cleanly split between the four sets:
+
+```{r}
+table(stimuli$Category, stimuli$SET)
+```
+
+Note that the `divide_and_select()` function can also be used to create 
+groups based on a continuous variable; in this case, the continuous 
+variable is artificially categorized. However, I would suggest to try 
+out the Min-Max-Anticlustering approach first as it tends to better 
+maximize differences between the `split` variable while ensuring that
+the covariates are balanced.
