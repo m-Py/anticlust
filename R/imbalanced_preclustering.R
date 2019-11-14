@@ -10,7 +10,7 @@ imbalanced_preclustering <- function(features, K) {
   # only select as many data as can be clustered into balanced clusters
   subsetted <- features[1:(N - (N %% K)), , drop = FALSE]
   preclusters[1:nrow(subsetted)] <- balanced_clustering(
-    features,
+    subsetted,
     K = nrow(subsetted) / K
   )
   # full some clusters at random
