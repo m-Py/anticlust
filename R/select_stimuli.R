@@ -22,7 +22,7 @@
  
 #' Select stimuli for experiments
 #' 
-#' Stimulus selection via `Divide and Select` or `anticlustering`.
+#' Stimulus selection via Anticlustering or Min-Max-Anticlustering
 #' 
 #' @param data A N x M data frame of features describing stimuli
 #' @param split_by Character vector, the names of the variables in 
@@ -35,10 +35,6 @@
 #'     feature. Is a vector of length \code{ncol(split_by)} (or of length
 #'     1 if only one - or no - \code{split_by} feature is passed).
 #' @param n The number of elements per set.
-#' @param p The number of exchange partners per stimulus used by the
-#'     exchange method that optimizes similarity with regard to the 
-#'     \code{equalize} variables. Higher values increase
-#'     the precision of the results but also increase run time.
 #'
 #' @return A data frame that has the same columns as the original input 
 #'    (the data frame \code{data}), but has an additional called \code{SET}.
@@ -49,12 +45,6 @@
 #' 
 #' @examples
 #' # TODO
-#' 
-#' @details
-#' The argument \code{split_by} will convert a numeric variable into 
-#' a categorical variable, and will recognize if a variable is already
-#' categorical by testing if \code{length(unique(split_by)) == design}
-#' is \code{TRUE}.
 #' 
 
 select_stimuli <- function(
