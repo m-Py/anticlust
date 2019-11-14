@@ -23,8 +23,10 @@ library(knitr)
 
 Last update: `r Sys.time()`
 
-The OASIS data set contains norming data for 900 photos on arousal 
-and valence. First, I load the data from the csv file:
+This vignette teaches you how to use the `R` package `anticlust` for 
+stimulus selection. We make use of the open stimulus pool OASIS for this
+purpose. The OASIS data set contains norming data for 900 photos on 
+arousal and valence. First, I load the data from the csv file:
 
 ```{r}
 oasis <- read.csv("OASIS.csv")
