@@ -4,6 +4,8 @@
 #' @param features A data frame of features
 #' @param groups A grouping vector
 #' @param decimals The number of decimals
+#' @param return_diff Boolean. Should an additional row be printed that 
+#'    contains the difference between minimum and maximum
 #' 
 #' @return A table that illustrates means and standard deviations (in brackets)
 #' 
@@ -15,24 +17,34 @@
 #' @author: Martin Papenberg
 #' @export
 
-mean_sd_tab <- function(features, groups, decimals = 2, na.rm  = FALSE) {
+mean_sd_tab <- function(features, groups, decimals = 2, na.rm  = FALSE, 
+                        return_diff = FALSE) {
   K <- length(unique(groups))
   # Means
   means <- by(features, groups, colMeans, na.rm = na.rm)
+  rows <- names(means)
   means <- t(matrix(unlist(means), ncol = K))
   mode(means) <- "numeric"
-  means <- rbind(means, apply(means, 2, range_diff, na.rm = na.rm))
-  means <- apply(means, 2, prmisc::force_decimals, decimals = decimals)
+  ncols <- K
+  if (return_diff) {
+    rows <- c(rows, "Diff")
+    ncols <- K + 1
+    means <- rbind(means, apply(means, 2, range_diff, na.rm = na.rm))
+  }
+  means <- apply(means, 2, force_decimals, decimals = decimals)
   # SDS
   sds <- by(features, groups, function(x) apply(x, 2, sd, na.rm = na.rm))
   sds <- t(matrix(unlist(sds), ncol = K))
   mode(sds) <- "numeric"
-  sds <- rbind(sds, apply(sds, 2, range_diff, na.rm = na.rm))
-  sds <- apply(sds, 2, prmisc::force_decimals, decimals = decimals)
+  if (return_diff) {
+    sds <- rbind(sds, apply(sds, 2, range_diff, na.rm = na.rm))
+  }
+  sds <- apply(sds, 2, force_decimals, decimals = decimals)
   # Merge Means and SDS
   values <- paste0(paste(means, sds, sep = " ("), ")")
-  dim(values) <- c(K + 1, length(means) / (K + 1))
+  dim(values) <- c(ncols, length(means) / (ncols))
   colnames(values) <- colnames(features)
+  rownames(values) <- rows
   values
 }
 
@@ -40,4 +52,36 @@ mean_sd_tab <- function(features, groups, decimals = 2, na.rm  = FALSE) {
 range_diff <- function(x, na.rm) {
   x <- round(x, 2) # so that it is consistent in the table
   diff(range(x, na.rm = na.rm))
+}
+
+#' Force printing a specified number of decimals for a number
+#'
+#' @param x the numeric values to be printed
+#' @param decimals how many decimals are to be printed. Defaults to 2.
+#'
+#' @return The number in the required format
+#'
+#' @examples
+#' 
+#' force_decimals(c(1.23456, 0.873, 2.3456))
+#' force_decimals(c(1.23456, 0.873, 2.3456), 3)
+#' 
+#' @author Martin Papenberg \email{martin.papenberg@@hhu.de}
+#'
+#' @noRd
+force_decimals <- function(x, decimals = 2) {
+  return(vectorize_print(x, decimals, force_decimals_))
+}
+
+force_decimals_ <- function(x, decimals) {
+  if (is.na(x)) {
+    return(NA_character_)
+  }
+  return(format(round(x, decimals), nsmall = decimals, scientific = FALSE))
+}
+
+vectorize_print <- function(x, decimals, FUN, ...) {
+  x <- as.numeric(x)
+  x_ <- vapply(x, FUN, FUN.VALUE = "character", decimals, ...)
+  return(x_)
 }
