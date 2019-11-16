@@ -4,7 +4,8 @@
 \alias{mean_sd_tab}
 \title{Means and standard deviations by group variable formatted in table}
 \usage{
-mean_sd_tab(features, groups, decimals = 2, na.rm = FALSE)
+mean_sd_tab(features, groups, decimals = 2, na.rm = FALSE,
+  return_diff = FALSE)
 }
 \arguments{
 \item{features}{A data frame of features}
@@ -12,6 +13,9 @@ mean_sd_tab(features, groups, decimals = 2, na.rm = FALSE)
 \item{groups}{A grouping vector}
 
 \item{decimals}{The number of decimals}
+
+\item{return_diff}{Boolean. Should an additional row be printed that 
+contains the difference between minimum and maximum}
 }
 \value{
 A table that illustrates means and standard deviations (in brackets)

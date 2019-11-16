@@ -17,7 +17,7 @@ opts_chunk$set(
 )
 # define a method for objects of the class data.frame
 knit_print.matrix = function(x, ...) {
-    res = paste(c("", "", kable(x)), collapse = "\n")
+    res = paste(c("", "", kable(x, row.names = TRUE)), collapse = "\n")
     asis_output(res)
 }
 # register the method
@@ -29,11 +29,9 @@ This document was last updated on `r Sys.Date()`. **It is still under
 active construction.**
 
 This vignette uses functionality that is currently only available in the 
-development version of the `anticlust` package, that is still under 
-construction. The internal implementation will probably change, but the 
-basic functionality will remain. If you would like to check out the 
-latest features to follow this tutorial, install the development version 
-by executing the following code:
+development version of the `anticlust` package. If you would 
+like to check out the latest features to follow this tutorial, install 
+the development version by executing the following code:
 
 ```{r, eval = FALSE}
 if (!"remotes" %in% rownames(installed.packages())) {
@@ -77,8 +75,8 @@ procedures result by crossing two properties that characterize the
 selection of stimuli:
 
 - The final pool of stimuli that is part of the experiment is... 
-    + ... manually selected by the researcher; this selection has to be 
-      partitioned into experimental sets
+    + ... manually selected by the researcher; this selection is then
+      automatically partitioned into subsets using anticlustering
     + ... selected by a computer -- the computer does all of the work
 - The experimental manipulation is ...
     + ... realized via the intrinsic properties of the stimuli 
@@ -111,10 +109,11 @@ identified as "objects" in the data base.
 objects <- oasis[oasis$Category == "Object", ]
 ```
 
-Now I create four sets from the pool of 200 stimuli. The four sets
-sets should be as similar as possible with regard to the three variables
-arousal, valence, and beauty. I use the function `select_stimuli()` that
-internally calls the anticlustering method (also see `?anticlustering`).
+Now I create four sets from the pool of 200 stimuli. The four sets sets 
+should be as similar as possible with regard to the three variables 
+arousal, valence, and beauty. I use the function `select_stimuli()` that 
+internally calls the `anticlustering()` function (also see 
+`?anticlustering`).
 
 ```{r}
 # Create character vector with the relevant covariates:
@@ -133,13 +132,14 @@ assigned to.
 
 We can use the `anticlust` function `mean_sd_tab()` to check out the 
 quality of the results. This function prints the means and standard 
-deviations of the variables of interest for each of the stimulus sets:
+deviations (in brackets) of the variables of interest for each of the 
+four stimulus sets:
 
 ```{r}
 mean_sd_tab(stimuli[, covariates], stimuli$SET)
 ```
 
-Apparently, this worked quite well.
+Apparently, the stimulus assignment worked quite well.
 
 ## Experimental manipulation realized via stimuli: Min-Max Anticlustering
 
@@ -181,23 +181,24 @@ mean_sd_tab(
 
 ```
 
-Here, the sets are not as dissimilar with regard to valence as before.
-What went wrong? The problem is that valence is strongly correlated 
-with beauty, as shown in the following scatter plot: 
+Here, the sets are not as dissimilar with regard to valence as in the 
+previous example. What is the problem? The problem is that valence is 
+strongly correlated with beauty, as shown in the following scatter 
+plot: 
 
 ```{r, fig.width = 4.5, fig.height = 4.5}
 plot(animals[, c("Valence_mean", "beauty_mean")], pch = 4, cex = 0.4, col = "#a9a9a9")
 cor(animals$Valence_mean, animals$beauty_mean)
 ```
 
-In this case, it is pretty much impossible to create sets that differ 
-strongly on valence but are similar with regard to beauty. 
-Algorithmically selecting item sets from the entire item pool -- rather 
-than from a manual preselection -- helps to ensure that the sets are 
-more dissimilar with regard to the independent variable. This is 
-discussed in the next section.
+As we can see, it is pretty much impossible to create sets that differ 
+strongly on valence but are similar with regard to beauty -- these 
+variable covary too much. Selecting item sets from a larger item pool -- 
+rather than just partitioning a preselected pool into parts -- helps to 
+ensure that the sets are more dissimilar with regard to the independent 
+variable. This application is discussed in the next section.
 
-# The computer decides
+# The computer does all the work
 
 In this section we discuss the case when item sets are extracted 
 from the entire stimulus pool in an entirely automated manner -- no 
@@ -230,7 +231,10 @@ Inspecting means and standard deviations of the variables by set shows
 that the stimulus assignment was successful:
 
 ```{r}
-mean_sd_tab(stimuli[, c("Valence_mean", "Arousal_mean", "beauty_mean")], stimuli$SET)
+mean_sd_tab(
+  stimuli[, c("Valence_mean", "Arousal_mean", "beauty_mean")], 
+  stimuli$SET
+)
 ```
 
 Hard to beat those results.
@@ -284,10 +288,11 @@ following properties of our selection:
 
 - Even thought it is very difficult to obtain sets that differ on 
 valence but are similar on beauty -- the two variables are strongly 
-correlated -- the program did it
+correlated -- the program did it (see the scatter plot of beauty and
+valence in the lower left or upper right)
 - There is actually overlap in valence between the sets. The neutral 
 condition also contains some very positive and very negative images. 
-Using a classical Divide and Select approach (see below), there would 
+Using a Divide and Select approach (see below), there would 
 not have been any overlap on valence
 - The three sets overlap strongly on the variables beauty and arousal,
 as they should
