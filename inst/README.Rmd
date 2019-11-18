@@ -4,26 +4,20 @@ author: "Martin Papenberg"
 date: "`r Sys.Date()`"
 output:
   md_document:
-    variant: gfm
-  #html_document
-bibliography: lit.bib
+  variant: gfm
 ---
 
 # anticlust
 
-`anticlust` is an `R` package for »anticlustering«, a method to assign
-elements to sets in such a way that the sets are as similar as possible.
-The package `anticlust` was originally
-developed to assign items to experimental conditions in experimental
-psychology, but it can be applied whenever a user requires that a given
-set of elements has to be partitioned into similar subsets. The 
-`anticlust` package offers the possibility to create sets that are of
-equal size (which is the standard case), but it is also possible to create sets 
-of different size, or to only assign a subset of all elements to a set.
-The package is still under active developement; expect
-changes and improvements before it will be submitted to CRAN. Check out
-the [NEWS file](https://m-py.github.io/anticlust/NEWS.html) 
-for recent changes.
+`anticlust` is an `R` package for »anticlustering«, a method to 
+partition a set of elements into subsets in such a way that the subsets 
+are as similar as possible. The package `anticlust` was originally 
+developed to assign items to experimental conditions in experimental 
+psychology, but it can be applied whenever a user requires that a given 
+set of elements has to be partitioned into similar subsets. The package 
+is still under active developement; expect changes and improvements 
+before it will be submitted to CRAN. Check out the [NEWS 
+file](https://m-py.github.io/anticlust/NEWS.html) for recent changes.
 
 ```{r setup, include = FALSE}
 library("anticlust")
@@ -44,11 +38,32 @@ set.seed(123)
 ## Installation
 
 ```R
-library("devtools") # if not available: install.packages("devtools")
+library("remotes") # if not available: install.packages("remotes")
 install_github("m-Py/anticlust")
 ```
 
-## Example
+## How do I learn about anticlustering
+
+This page contains some basic information on anticlustering. More 
+information is available via the following sources:
+
+1. There is a preprint available (»Using anticlustering to partition a 
+   stimulus pool into equivalent parts«) describing the theoretical 
+   background of anticlustering and the `anticlust` package in detail. 
+   It can be retrieved from [https://psyarxiv.com/3razc/](https://psyarxiv.com/3razc/)
+
+2. I am working on some vignettes on typical usages of the 
+  `anticlust` for stimulus selection in psychological research. 
+  A work-in-progress can be found 
+  [here](https://m-py.github.io/anticlust/stimulus-selection.html). 
+
+3. Use the R help. The main function of the package is `anticlustering()`
+  and the help page of the function (`?anticlustering`) is useful to learn
+  more about anticlustering. It provides explanations of all function
+  parameters and how they relate to the theoretical background of
+  anticlustering.
+  
+## A quick start
 
 In this initial example, I use the main function `anticlustering()` to
 create three similar sets of plants using the classical iris data set:
@@ -75,35 +90,13 @@ table(anticlusters)
 by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
 ```
 
-## How do I learn about anticlustering
-
-This page contains some basic information on anticlustering. 
-So, you might start by simply continuing to read. More information 
-is available via the following sources:
-
-1. There is a preprint available (»Using anticlustering to partition a 
-   stimulus pool into equivalent parts«) describing the theoretical 
-   background of anticlustering and the `anticlust` package in detail. 
-   It can be retrieved from [https://psyarxiv.com/3razc/](https://psyarxiv.com/3razc/)
-
-2. Use the R help. The main function of the package is `anticlustering()`
-  and the help page of the function (`?anticlustering`) is useful to learn
-  more about anticlustering. It provides explanations of all function
-  parameters and how they relate to the theoretical background of
-  anticlustering.
-
-3. I intend to write some vignettes on typical usages of the 
-  `anticlust` package in the near future. Stay tuned.
-
-## A quick start
-
-As illustrated in the example above, we can use the function
-`anticlustering()` to create similar sets of elements. The function
-takes as input a data table describing the elements that should be
-assigned to sets. In the data table, each row represents an element, for
-example a person, word or a photo. Each column is a numeric variable
-describing one of the elements' features. The table may be an R `matrix`
-or `data.frame`; a single feature can also be passed as a `vector`. The
+As illustrated in the example, we can use the function 
+`anticlustering()` to create similar sets of elements. The function 
+takes as input a data table describing the elements that should be 
+assigned to sets. In the data table, each row represents an element, for 
+example a person, word or a photo. Each column is a numeric variable 
+describing one of the elements' features. The table may be an R `matrix` 
+or `data.frame`; a single feature can also be passed as a `vector`. The 
 number of groups is specified through the argument `K`.
 
 To quantify set similarity, `anticlust` may employ one of two measures
@@ -224,23 +217,7 @@ the parameter `objective`. To use anticluster editing, use
 `objective = "distance"` (this is also the default). To maximize the
 k-means variance objective, set `objective = "variance"`.
 
-```{r, eval = FALSE}
-
-## Example code for varying the objective:
-anticlustering(
-  features, 
-  K = 3, 
-  objective = "distance"
-)
-
-anticlustering(
-  features, 
-  K = 3, 
-  objective = "variance"
-)
-```
-
-### Categorical constraints
+## Categorical constraints
 
 Sometimes, it is required that sets are not only similar with regard to
 some numeric variables, but we also want to ensure that each set

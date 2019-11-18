@@ -1,94 +1,90 @@
-# anticlust
+anticlust
+=========
 
-`anticlust` is an `R` package for »anticlustering«, a method to assign
-elements to sets in such a way that the sets are as similar as possible.
-The package `anticlust` was originally developed to assign items to
-experimental conditions in experimental psychology, but it can be
-applied whenever a user requires that a given set of elements has to be
-partitioned into similar subsets. The `anticlust` package offers the
-possibility to create sets that are of equal size (which is the standard
-case), but it is also possible to create sets of different size, or to
-only assign a subset of all elements to a set. The package is still
-under active developement; expect changes and improvements before it
-will be submitted to CRAN. Check out the [NEWS
+`anticlust` is an `R` package for »anticlustering«, a method to
+partition a set of elements into subsets in such a way that the subsets
+are as similar as possible. The package `anticlust` was originally
+developed to assign items to experimental conditions in experimental
+psychology, but it can be applied whenever a user requires that a given
+set of elements has to be partitioned into similar subsets. The package
+is still under active developement; expect changes and improvements
+before it will be submitted to CRAN. Check out the [NEWS
 file](https://m-py.github.io/anticlust/NEWS.html) for recent changes.
 
-## Installation
+Installation
+------------
 
-``` r
-library("devtools") # if not available: install.packages("devtools")
-install_github("m-Py/anticlust")
-```
+    library("remotes") # if not available: install.packages("remotes")
+    install_github("m-Py/anticlust")
 
-## Example
+How do I learn about anticlustering
+-----------------------------------
 
-In this initial example, I use the main function `anticlustering()` to
-create three similar sets of plants using the classical iris data set:
-
-``` r
-# load the package via
-library("anticlust")
-
-anticlusters <- anticlustering(
-  iris[, -5],
-  K = 3,
-  objective = "variance",
-  method = "exchange"
-)
-
-## The output is a vector that assigns a group (i.e, a number 
-## between 1 and K) to each input element:
-anticlusters
-#>   [1] 1 1 1 1 2 2 2 3 2 3 3 3 2 1 3 2 1 2 3 2 3 2 1 2 3 2 2 1 3 3 2 2 3 1 1
-#>  [36] 1 3 1 1 3 1 1 1 2 3 2 3 1 3 3 2 3 2 3 2 3 1 2 2 2 3 3 1 3 3 3 3 1 3 2
-#>  [71] 1 2 2 1 1 1 3 2 2 2 1 2 3 2 1 2 1 3 1 2 2 1 2 2 1 2 1 1 2 3 3 3 2 1 2
-#> [106] 2 3 3 3 2 3 3 3 3 3 1 2 2 1 1 1 1 2 1 3 1 1 2 1 3 1 1 2 3 3 1 2 1 1 1
-#> [141] 1 3 3 2 3 3 3 2 1 2
-
-## Each group has the same number of items:
-table(anticlusters)
-#> anticlusters
-#>  1  2  3 
-#> 50 50 50
-
-## Compare the feature means by anticluster:
-by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
-#> anticlusters: 1
-#> Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
-#>         5.84         3.06         3.76         1.20 
-#> -------------------------------------------------------- 
-#> anticlusters: 2
-#> Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
-#>         5.84         3.06         3.76         1.20 
-#> -------------------------------------------------------- 
-#> anticlusters: 3
-#> Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
-#>         5.84         3.06         3.76         1.20
-```
-
-## How do I learn about anticlustering
-
-This page contains some basic information on anticlustering. So, you
-might start by simply continuing to read. More information is available
-via the following sources:
+This page contains some basic information on anticlustering. More
+information is available via the following sources:
 
 1.  There is a preprint available (»Using anticlustering to partition a
     stimulus pool into equivalent parts«) describing the theoretical
     background of anticlustering and the `anticlust` package in detail.
     It can be retrieved from <https://psyarxiv.com/3razc/>
 
-2.  Use the R help. The main function of the package is
+2.  I am working on some vignettes on typical usages of the `anticlust`
+    for stimulus selection in psychological research. A work-in-progress
+    can be found
+    [here](https://m-py.github.io/anticlust/stimulus-selection.html).
+
+3.  Use the R help. The main function of the package is
     `anticlustering()` and the help page of the function
     (`?anticlustering`) is useful to learn more about anticlustering. It
     provides explanations of all function parameters and how they relate
     to the theoretical background of anticlustering.
 
-3.  I intend to write some vignettes on typical usages of the
-    `anticlust` package in the near future. Stay tuned.
+A quick start
+-------------
 
-## A quick start
+In this initial example, I use the main function `anticlustering()` to
+create three similar sets of plants using the classical iris data set:
 
-As illustrated in the example above, we can use the function
+    # load the package via
+    library("anticlust")
+
+    anticlusters <- anticlustering(
+      iris[, -5],
+      K = 3,
+      objective = "variance",
+      method = "exchange"
+    )
+
+    ## The output is a vector that assigns a group (i.e, a number 
+    ## between 1 and K) to each input element:
+    anticlusters
+    #>   [1] 1 1 2 3 2 2 1 3 1 3 1 2 3 2 1 3 1 3 3 1 2 3 1 3 3 2 2 2 2 2 3 2 3 2 1
+    #>  [36] 3 2 2 1 2 1 3 2 1 1 1 3 1 3 3 3 1 1 2 3 3 1 3 1 2 3 3 1 2 2 1 1 2 2 3
+    #>  [71] 1 1 3 3 2 1 3 3 1 3 1 2 1 2 1 2 3 1 1 3 2 1 2 1 1 2 1 2 3 3 3 2 2 3 3
+    #> [106] 2 1 1 2 1 3 2 2 3 2 2 1 3 1 1 1 2 1 3 2 3 1 3 3 2 1 2 3 2 3 3 1 2 2 1
+    #> [141] 2 2 1 3 3 3 2 2 1 3
+
+    ## Each group has the same number of items:
+    table(anticlusters)
+    #> anticlusters
+    #>  1  2  3 
+    #> 50 50 50
+
+    ## Compare the feature means by anticluster:
+    by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
+    #> anticlusters: 1
+    #> Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
+    #>         5.84         3.06         3.76         1.20 
+    #> -------------------------------------------------------- 
+    #> anticlusters: 2
+    #> Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
+    #>         5.84         3.06         3.76         1.20 
+    #> -------------------------------------------------------- 
+    #> anticlusters: 3
+    #> Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
+    #>         5.84         3.06         3.76         1.20
+
+As illustrated in the example, we can use the function
 `anticlustering()` to create similar sets of elements. The function
 takes as input a data table describing the elements that should be
 assigned to sets. In the data table, each row represents an element, for
@@ -100,16 +96,15 @@ number of groups is specified through the argument `K`.
 To quantify set similarity, `anticlust` may employ one of two measures
 that have been developed in the context of cluster analysis:
 
-  - the k-means “variance” objective
-  - the cluster editing “distance” objective
+-   the k-means “variance” objective
+-   the cluster editing “distance” objective
 
 The k-means objective is given by the sum of the squared distances
 between cluster centers and individual data points. The cluster editing
 objective is the sum of pairwise distances within each anticluster. The
 following plot illustrates both objectives for 15 elements that have
 been assigned to three sets. Each element is described by two numeric
-features, displayed as the *x* and *y*
-axis:
+features, displayed as the *x* and *y* axis:
 
 <img src="inst/objectives_updated.png" width="100%" style="display: block; margin: auto;" />
 
@@ -131,27 +126,12 @@ different sets, whereas the variance objective tends to maximize the
 similarity of the cluster centers (i.e., the feature means).
 
 To vary the objective function in the `anticlust` package, we can change
-the parameter `objective`. To use anticluster editing, use `objective =
-"distance"` (this is also the default). To maximize the k-means variance
-objective, set `objective = "variance"`.
+the parameter `objective`. To use anticluster editing, use
+`objective = "distance"` (this is also the default). To maximize the
+k-means variance objective, set `objective = "variance"`.
 
-``` r
-
-## Example code for varying the objective:
-anticlustering(
-  features, 
-  K = 3, 
-  objective = "distance"
-)
-
-anticlustering(
-  features, 
-  K = 3, 
-  objective = "variance"
-)
-```
-
-### Categorical constraints
+Categorical constraints
+-----------------------
 
 Sometimes, it is required that sets are not only similar with regard to
 some numeric variables, but we also want to ensure that each set
@@ -160,33 +140,33 @@ to the initial iris data set, we may want to require that each set has a
 balanced number of plants of the three iris species. To this end, we can
 use the argument `categories` as follows:
 
-``` r
-anticlusters <- anticlustering(
-  iris[, -5],
-  K = 3,
-  objective = "variance",
-  method = "exchange",
-  categories = iris[, 5]
-)
+    anticlusters <- anticlustering(
+      iris[, -5],
+      K = 3,
+      objective = "variance",
+      method = "exchange",
+      categories = iris[, 5]
+    )
 
-## The species are as balanced as possible across anticlusters:
-table(anticlusters, iris[, 5])
-#>             
-#> anticlusters setosa versicolor virginica
-#>            1     17         17        16
-#>            2     17         16        17
-#>            3     16         17        17
-```
+    ## The species are as balanced as possible across anticlusters:
+    table(anticlusters, iris[, 5])
+    #>             
+    #> anticlusters setosa versicolor virginica
+    #>            1     17         17        16
+    #>            2     17         16        17
+    #>            3     16         17        17
 
-## Questions and suggestions
+Questions and suggestions
+-------------------------
 
 If you have any question on the `anticlust` package or any suggestions
 (which are greatly appreciated), I encourage you to contact me via email
-(<martin.papenberg@hhu.de>) or
-[Twitter](https://twitter.com/MPapenberg), or to open an issue on this
-Github repository.
+(<a href="mailto:martin.papenberg@hhu.de" class="email">martin.papenberg@hhu.de</a>)
+or [Twitter](https://twitter.com/MPapenberg), or to open an issue on
+this Github repository.
 
-## Reference
+Reference
+---------
 
 Papenberg, M., & Klau, G. W. (2019, October 30). Using anticlustering to
 partition a stimulus pool into equivalent parts.
