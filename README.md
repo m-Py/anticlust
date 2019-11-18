@@ -16,7 +16,7 @@ file](https://m-py.github.io/anticlust/NEWS.html) for recent changes.
 ## Installation
 
 ``` r
-library("remotes") # if not available: install.packages("remotes")
+library("devtools") # if not available: install.packages("devtools")
 install_github("m-Py/anticlust")
 ```
 
