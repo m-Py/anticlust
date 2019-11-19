@@ -181,21 +181,25 @@ mean_sd_tab(
 
 ```
 
-Here, the sets are not as dissimilar with regard to valence as in the 
-previous example. What is the problem? The problem is that valence is 
-strongly correlated with beauty, as shown in the following scatter 
-plot: 
+The sets are no longer very dissimilar with regard to valence. The 
+problem is that valence is strongly correlated with beauty, as shown in 
+the following scatter plot: 
 
 ```{r, fig.width = 4.5, fig.height = 4.5}
-plot(animals[, c("Valence_mean", "beauty_mean")], pch = 4, cex = 0.4, col = "#a9a9a9")
+plot(
+  animals[, c("Valence_mean", "beauty_mean")], 
+  pch = 4, 
+  cex = 0.7, 
+  col = c("#a9a9a9", "orange")[stimuli$SET]
+)
 cor(animals$Valence_mean, animals$beauty_mean)
 ```
 
-As we can see, it is pretty much impossible to create sets that differ 
-strongly on valence but are similar with regard to beauty -- these 
-variable covary too much. Selecting item sets from a larger item pool -- 
-rather than just partitioning a preselected pool into parts -- helps to 
-ensure that the sets are more dissimilar with regard to the independent 
+It is more or less impossible to create sets that differ strongly on 
+valence but are similar with regard to beauty, because these variables 
+covary too much. Selecting item sets from a larger item pool -- rather 
+than just partitioning a preselected pool into parts -- helps to ensure 
+that the sets are more dissimilar with regard to the independent 
 variable. This application is discussed in the next section.
 
 # The computer does all the work
@@ -204,7 +208,7 @@ In this section we discuss the case when item sets are extracted
 from the entire stimulus pool in an entirely automated manner -- no 
 human input required.
 
-## Experimental manipulation indenpendent of stimuli: Subset anticlustering
+## Experimental manipulation independent of stimuli: Subset anticlustering
 
 Imagine I want to select 3 sets of stimuli that are similar with regard 
 to all numeric variables. 
@@ -381,6 +385,70 @@ Apparently, this worked quite well. Let's also confirm that the
 table(stimuli$Category, stimuli$SET)
 ```
 
+## Divide and Select Reloaded
+
+Using the functionality to pass categorical variables to the 
+`divide_and_select()` function, we can try to select item sets that
+differ more strongly with regard to an independent variable. To this
+end, I apply customized cutoffs above (and below) which the valence
+levels are defined. I use the function `case_when()` from the package
+`dplyr`:
+
+```{r}
+
+library(dplyr)
+
+oasis$category_valence <- case_when(
+  oasis$Valence_mean < 3 ~ "low",
+  oasis$Valence_mean > 3.5 & oasis$Valence_mean < 4.5 ~ "neutral",
+  oasis$Valence_mean > 5 ~ "high",
+  TRUE ~ "" # default case: exclude those
+)
+
+# exclude cases that are not within one of the ranges
+oasis_subset <- oasis[oasis$category_valence != "", ]
+
+# Check out number of preselected items:
+nrow(oasis_subset)
+
+# Do Divide and Select
+stimuli <- divide_and_select(
+  oasis_subset,
+  split_by = "category_valence",
+  equalize = c("Arousal_mean", "beauty_mean"),
+  design = 3, # specifies the number of groups
+  n = 40 # Number of stimuli per set
+)
+
+mean_sd_tab(
+  stimuli[, c("Valence_mean", "Arousal_mean", "beauty_mean")], 
+  stimuli$SET
+)
+```
+
+Let's also visualize this selection:
+
+```{r, fig.width = 7, fig.height = 7}
+was_selected <- oasis$item %in% stimuli$item
+group <- rep(1, nrow(oasis))
+group[was_selected] <- stimuli$SET + 1
+
+plot(
+  oasis[, c("Valence_mean", "Arousal_mean", "beauty_mean")],
+  col = colors[group],
+  cex = cex[group],
+  pch = pch[group]
+)
+```
+
+Using this strategy, you can decide for yourself which level of 
+deviation between the covariates is still acceptable, while increasing
+the difference between sets with regard to the independent variable. 
+
+The function `select_stimuli()` tends to favor the similarity with regard
+to the covariates, and tries to maximize differences with regard to the 
+independent variable as long as the covariates remain similar.
+
 ## References
 
 Brielmann, A. A., & Pelli, D. (2019). Intense beauty requires intense 
@@ -392,5 +460,5 @@ Affective Standardized Image Set (OASIS). *Behavior Research Methods,
 
 Papenberg, M., & Klau, G. W. (2019, October 30). Using anticlustering 
 to partition a stimulus pool into equivalent parts. 
-https://doi.org/10.31234/osf.io/3razc. Prepring submitted for 
+https://doi.org/10.31234/osf.io/3razc. Preprint submitted for 
 publication.
