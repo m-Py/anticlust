@@ -13,12 +13,9 @@ imbalanced_preclustering <- function(features, K) {
     subsetted,
     K = nrow(subsetted) / K
   )
-  # full some clusters at random
+  # the remainders get into the last cluster
   if (sum(is.na(preclusters)) > 0) {
-    preclusters[is.na(preclusters)] <- sample(
-      1:max(preclusters, na.rm = TRUE), 
-      size = sum(is.na(preclusters))
-    )
+    preclusters[is.na(preclusters)] <- max(preclusters, na.rm = TRUE) + 1
   }
   preclusters
 }
