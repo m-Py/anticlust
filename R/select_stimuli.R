@@ -1,7 +1,8 @@
  
 # TODO
-# - use preclustering in anticlustering applications 
-#   (generate_exchange_partners with `similar = TRUE`)
+# - add categorical constrains (using an argument `balance`)
+#     + should be able to include preclustering retrictions
+#   (generate_exchange_partners with `similar = TRUE` is a start)
 # - add control parameters fro the function select_stimuli (number 
 #   of elements per group (as matrix?); p can be control parameter;
 #   thresholds on divide parameter; objective for anticlustering 
@@ -9,9 +10,6 @@
 #   of maximizing dissimilarity wrt independent variable and minimize
 #   similarity wrt covariates)
 # - examples in code (need new data set!)
-# - argument p by default should behave differently for divide and select
-#   and anticlustering; anticlustering: no restriction on exchange 
-#   partners. divide and select: 15 exchange partners
 # - generate_exchange_partners should call the clustering function defined
 #   below that can deal with data that cannot be split in N/K parts
 # - control parameter for weights of `equalize` variables

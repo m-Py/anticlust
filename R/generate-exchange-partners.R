@@ -106,15 +106,11 @@ generate_exchange_partners <- function(
     return(sort_by_col(categories, 1)$partners)
   }
   if (!argument_exists(categories) && similar == TRUE) {
-    K <- nrow(features) / (p + 1)
-    print(K)
-    return(balanced_clustering(features, K = K))
+    K <- p + 1
+    return(imbalanced_preclustering(features, K = K))
   }
   if (argument_exists(categories) && similar == TRUE) {
     K <- p + 1
-    if (!preclustering_possible(categories, K)) {
-      stop("Given your categories, the data cannot be split into clusters of size p + 1")
-    }
     return(to_numeric(precluster_per_category(features, categories, K)))
   }
   if (argument_exists(features)) {

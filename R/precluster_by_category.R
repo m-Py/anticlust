@@ -1,30 +1,28 @@
 
 # Compute preclusters within categories
+# argument K is the number of anticlusters, not the number of clusters!
 precluster_per_category <- function(features, categories, K) {
-  if (preclustering_possible(categories, K)) {
-    N <- nrow(features)
-    unique_categories <- sort(unique(categories))
-    n_categories <- length(unique_categories)
-    # save original order to restore before returning
-    data <- cbind(categories, 1:N, features)
-    data <- sort_by_col(data, 1)
-    # precluster within each category:
-    cl <- list()
-    for (i in 1:n_categories) {
-      tmp_data <- data[data[, 1] == unique_categories[i], -c(1, 2)]
-      rownames(tmp_data) <- NULL
-      cl[[i]] <- balanced_clustering(tmp_data, K = nrow(tmp_data) / K)
-    }
-    # ensure that clusters in different categories have different cluster numbers
-    to_be_added <- sapply(cl, length) / K
-    to_be_added <- cumsum(to_be_added) - to_be_added[1]
-    cl <- lapply(seq_along(cl), function(i) cl[[i]] + to_be_added[i])
-    # return data sorted in original order
-    data$clusters <- unlist(cl)
-    cl <- sort_by_col(data, 2)$clusters
-    return(merge_into_one_variable(cbind(cl, categories)))
+  N <- nrow(features)
+  unique_categories <- sort(unique(categories))
+  n_categories <- length(unique_categories)
+  # save original order to restore before returning
+  data <- cbind(categories, 1:N, features)
+  data <- sort_by_col(data, 1)
+  # precluster within each category:
+  cl <- list()
+  for (i in 1:n_categories) {
+    tmp_data <- data[data[, 1] == unique_categories[i], -c(1, 2)]
+    rownames(tmp_data) <- NULL
+    cl[[i]] <- imbalanced_preclustering(tmp_data, K = K)
   }
-  stop("Not today.")
+  # ensure that clusters in different categories have different cluster numbers
+  to_be_added <- sapply(cl, length) / K
+  to_be_added <- cumsum(to_be_added) - to_be_added[1]
+  cl <- lapply(seq_along(cl), function(i) cl[[i]] + to_be_added[i])
+  # return data sorted in original order
+  data$clusters <- unlist(cl)
+  cl <- sort_by_col(data, 2)$clusters
+  merge_into_one_variable(cbind(cl, categories))
 }
 
 # Combining preclustering restrictions and categorical restrictions
