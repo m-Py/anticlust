@@ -145,7 +145,7 @@ remove_outliers <- function(data, equalize, K) {
   minima <- minima[1:(N - (N %% K)), , drop = FALSE]
   # obtain original order
   minima <- sort_by_col(minima, 2)
-  data[minima[, 2], ]
+  data[minima[, 2], , drop = FALSE]
 }
 
 # Internal function for min-max anticlustering
