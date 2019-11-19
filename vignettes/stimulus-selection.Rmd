@@ -38,7 +38,7 @@ if (!"remotes" %in% rownames(installed.packages())) {
   install.packages("remotes")
 }
 library(remotes)
-remotes::install_github("m-Py/anticlust@devel")
+install_github("m-Py/anticlust@devel")
 ```
 
 Now, load the package to reproduce the code in this tutorial:
