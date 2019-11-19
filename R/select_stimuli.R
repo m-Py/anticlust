@@ -75,7 +75,7 @@ subset_anticlustering <- function(data, split_by, equalize, design, n) {
   # keep track which items are selected; use ID for this
   data$id_anticlustering <- 1:N
   # Select a number of elements that can evenly be split into preclusters
-  preselection <- data[sample(1:N, size = N - (N %% design)), ]
+  preselection <- remove_outliers(data, equalize, prod(design))
 
   # Compute preclusters
   preclusters <- balanced_clustering(
@@ -95,7 +95,7 @@ subset_anticlustering <- function(data, split_by, equalize, design, n) {
     objectives2 <- sapply(distances2, sum)
     objectives <- objectives - objectives2
   }
-    
+
   needed_n <- design * n
   needed_clusters <- needed_n / table(preclusters)[1]
   # Best preclusters - (TODO: insert stochastic component)
@@ -111,7 +111,7 @@ subset_anticlustering <- function(data, split_by, equalize, design, n) {
     iv <- scale(preselection[, split_by])
   }
 
-  message("Starting stimulus selection using `Subset ", min_max, " Anticlustering`.")
+  message("Starting stimulus selection using `Subset-", min_max, "Anticlustering`.")
   message("Selecting ", design, " groups, each having ", 
           n, " elements from a pool of ", N, " stimuli.")
   # now optimize assignment using exchange method
@@ -128,6 +128,22 @@ subset_anticlustering <- function(data, split_by, equalize, design, n) {
   output
 }
 
+# Function to remove elements such that the remaining elements can fit 
+# into clusters of size K. Removes the data points that are furthest 
+# apart from any other data points
+remove_outliers <- function(data, equalize, K) {
+  N <- nrow(data)
+  distances <- as.matrix(dist(data[, equalize]))
+  diag(distances) <- Inf
+  minima <- apply(distances, 1, min)
+  minima <- cbind(minima, 1:N)
+  minima <- sort_by_col(minima, 1)
+  # discard elements whose nearest neighbor is farthest away
+  minima <- minima[1:(N - (N %% K)), ]
+  # obtain original order
+  minima <- sort_by_col(minima, 2)
+  data[minima[, 2], ]
+}
 
 # Internal function for min-max anticlustering
 min_max_anticlustering <- function(data, split_by, equalize, design) {
