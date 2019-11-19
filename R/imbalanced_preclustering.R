@@ -8,7 +8,7 @@ imbalanced_preclustering <- function(features, K) {
   N <- nrow(features)
   preclusters <- rep(NA, N)
   # only select as many data as can be clustered into balanced clusters
-  subsetted <- features[1:(N - (N %% K)), , drop = FALSE]
+  subsetted <- remove_outliers(features, 1:ncol(features), K)
   preclusters[1:nrow(subsetted)] <- balanced_clustering(
     subsetted,
     K = nrow(subsetted) / K
