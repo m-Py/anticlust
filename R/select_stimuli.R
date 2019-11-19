@@ -33,6 +33,10 @@
 #'     feature. Is a vector of length \code{ncol(split_by)} (or of length
 #'     1 if only one - or no - \code{split_by} feature is passed).
 #' @param n The number of elements per set.
+#' @param randomness An integer in `1:3`. Used for subset anticlustering.
+#'    1 = the same stimuli are returned each call; 2 = there is some 
+#'    randomness in which stimuli are returned. 3 = there is more 
+#'    randomness in which stimuli are returned. 
 #'
 #' @return A data frame that has the same columns as the original input 
 #'    (the data frame \code{data}), but has an additional called \code{SET}.
