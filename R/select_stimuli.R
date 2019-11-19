@@ -50,14 +50,15 @@ select_stimuli <- function(
   split_by = NULL, 
   equalize, 
   design, 
-  n = NULL
+  n = NULL,
+  randomness = 1
 ) {
   if (argument_exists(split_by) && argument_exists(n)) {
-    groups <- subset_anticlustering(data, split_by, equalize, design, n)
+    groups <- subset_anticlustering(data, split_by, equalize, design, n, randomness)
   } else if (argument_exists(split_by) && !argument_exists(n)) {
     groups <- min_max_anticlustering(data, split_by, equalize, design)
   } else if (!argument_exists(split_by) && argument_exists(n)) {
-    groups <- subset_anticlustering(data, split_by, equalize, design, n)
+    groups <- subset_anticlustering(data, split_by, equalize, design, n, randomness)
   } else if (!argument_exists(split_by) && !argument_exists(n)) {
     groups <- wrap_anticlustering(data, equalize, design)
   }
@@ -69,7 +70,7 @@ select_stimuli <- function(
 
 # Internal function for subset selection based on preclustering - then 
 # anticlustering. if `split_by` exists, min-max anticlustering is conducted
-subset_anticlustering <- function(data, split_by, equalize, design, n) {
+subset_anticlustering <- function(data, split_by, equalize, design, n, randomness) {
   N <- nrow(data)
 
   # keep track which items are selected; use ID for this
@@ -98,8 +99,21 @@ subset_anticlustering <- function(data, split_by, equalize, design, n) {
 
   needed_n <- design * n
   needed_clusters <- needed_n / table(preclusters)[1]
-  # Best preclusters - (TODO: insert stochastic component)
-  most_similar_clusters <- as.numeric(names(sort(objectives))[1:needed_clusters])
+  # Best preclusters
+  if (randomness == 1) {
+    cluster_ids <- 1:needed_clusters
+  } else if (randomness == 2) {
+    # some randomness: better chance to be selected for better objectives
+    tmp <- objectives + min(objectives) + 1
+    cluster_ids <- sample(length(objectives), size = needed_clusters, prob = sort(tmp / sum(tmp)))
+  } else if (randomness == 3) {
+    # much randomness: select ANY clusters
+    cluster_ids <- sample(length(objectives), size = needed_clusters)
+  } else {
+    stop("Argument `randomness` must be one of 1, 2, or 3")
+  }
+  
+  most_similar_clusters <- as.numeric(names(sort(objectives))[cluster_ids])
   
   # encode items that are selected (all that are in the best preclusters)
   is_in_output <- preclusters %in% most_similar_clusters
