@@ -14,6 +14,9 @@ mean_sd_tab(features, groups, decimals = 2, na.rm = FALSE,
 
 \item{decimals}{The number of decimals}
 
+\item{na.rm}{Should NAs be removed prior to computing stats 
+(Default = FALSE)}
+
 \item{return_diff}{Boolean. Should an additional row be printed that 
 contains the difference between minimum and maximum}
 }

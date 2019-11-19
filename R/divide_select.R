@@ -8,8 +8,6 @@
 #'     \code{data} that should be different between sets
 #' @param equalize Character vector, the names of the variables in 
 #'     \code{data} that should be similar across sets
-#' @param balance One or more categorical variables. The frequency of
-#'     the categories is balanced between sets.
 #' @param design Specifies the number of groups per \code{split_by} 
 #'     feature. Is a vector of length \code{ncol(split_by)} (or of length
 #'     1 if only one - or no - \code{split_by} feature is passed).

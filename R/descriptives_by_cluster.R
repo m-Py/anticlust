@@ -4,8 +4,10 @@
 #' @param features A data frame of features
 #' @param groups A grouping vector
 #' @param decimals The number of decimals
+#' @param na.rm Should NAs be removed prior to computing stats 
+#'     (Default = FALSE)
 #' @param return_diff Boolean. Should an additional row be printed that 
-#'    contains the difference between minimum and maximum
+#'     contains the difference between minimum and maximum
 #' 
 #' @return A table that illustrates means and standard deviations (in brackets)
 #' 

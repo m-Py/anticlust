@@ -20,9 +20,6 @@ feature. Is a vector of length \code{ncol(split_by)} (or of length
 1 if only one - or no - \code{split_by} feature is passed).}
 
 \item{n}{The number of elements per set.}
-
-\item{balance}{One or more categorical variables. The frequency of
-the categories is balanced between sets.}
 }
 \value{
 A data frame that has the same columns as the original input 
