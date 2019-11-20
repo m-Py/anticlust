@@ -14,7 +14,11 @@ precluster_per_category <- function(features, categories, K) {
   for (i in 1:n_categories) {
     tmp_data <- data[data[, 1] == unique_categories[i], -c(1, 2)]
     rownames(tmp_data) <- NULL
-    cl[[i]] <- imbalanced_preclustering(tmp_data, K = K)
+    if (nrow(tmp_data) <= K) {
+      cl[[i]] <- 1 # all members have the same category and cluster
+    } else {
+      cl[[i]] <- imbalanced_preclustering(tmp_data, K = K)
+    }
   }
   # ensure that clusters in different categories have different cluster numbers
   to_be_added <- sapply(cl, length) / K

@@ -51,16 +51,15 @@ select_stimuli <- function(
   data, 
   split_by = NULL, 
   equalize, 
+  balance = NULL,
   design, 
   n = NULL,
   randomness = 1
 ) {
-  if (argument_exists(split_by) && argument_exists(n)) {
-    groups <- subset_anticlustering(data, split_by, equalize, design, n, randomness)
+  if (argument_exists(n)) {
+    groups <- subset_anticlustering(data, split_by, equalize, balance, design, n, randomness)
   } else if (argument_exists(split_by) && !argument_exists(n)) {
     groups <- min_max_anticlustering(data, split_by, equalize, design)
-  } else if (!argument_exists(split_by) && argument_exists(n)) {
-    groups <- subset_anticlustering(data, split_by, equalize, design, n, randomness)
   } else if (!argument_exists(split_by) && !argument_exists(n)) {
     groups <- wrap_anticlustering(data, equalize, design)
   }
@@ -72,7 +71,7 @@ select_stimuli <- function(
 
 # Internal function for subset selection based on preclustering - then 
 # anticlustering. if `split_by` exists, min-max anticlustering is conducted
-subset_anticlustering <- function(data, split_by, equalize, design, n, randomness) {
+subset_anticlustering <- function(data, split_by, equalize, balance, design, n, randomness) {
   N <- nrow(data)
 
   # keep track which items are selected; use ID for this
@@ -125,6 +124,16 @@ subset_anticlustering <- function(data, split_by, equalize, design, n, randomnes
   iv <- NULL
   if (argument_exists(split_by)) {
     iv <- scale(preselection[, split_by])
+  }
+  
+  if (argument_exists(balance)) {
+    categories <- merge_into_one_variable(preselection[, balance])
+    preclusters <- generate_exchange_partners(
+      p = prod(design) - 1,
+      categories = categories,
+      similar = TRUE,
+      features = scale(preselection[, equalize])
+    )
   }
 
   message("Starting stimulus selection using `Subset-", min_max, "Anticlustering`.")
