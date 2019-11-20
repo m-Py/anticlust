@@ -2,7 +2,9 @@
 # TODO
 # - add categorical constrains (using an argument `balance`)
 #     + should be able to include preclustering retrictions
-#   (generate_exchange_partners with `similar = TRUE` is a start)
+# - for subset anticlustering: do categorical preclustering at the
+#   beginnung; then, select only preclusters having the correct size;
+#   the select the best preclusters
 # - add control parameters fro the function select_stimuli (number 
 #   of elements per group (as matrix?); p can be control parameter;
 #   thresholds on divide parameter; objective for anticlustering 
@@ -73,18 +75,18 @@ select_stimuli <- function(
 # anticlustering. if `split_by` exists, min-max anticlustering is conducted
 subset_anticlustering <- function(data, split_by, equalize, balance, design, n, randomness) {
   N <- nrow(data)
-
-  # keep track which items are selected; use ID for this
+  # track which items are selected via ID:
   data$id_anticlustering <- 1:N
-  # Select a number of elements that can evenly be split into preclusters
-  preselection <- remove_outliers(data, equalize, prod(design))
 
-  # Compute preclusters
-  preclusters <- balanced_clustering(
-    scale(preselection[, equalize]), 
-    K = nrow(preselection) / design
-  )
+  # get most similar items, possibly under categorical restrictions
+  preclusters <- categorical_restrictions(data, equalize, balance, design)
   
+  # only select clusters of size `design` (aka `K`)
+  filled <- which(table(preclusters) == design)
+  is_selected <- preclusters %in% filled
+  preselection <- data[is_selected, ]
+  preclusters <- preclusters[is_selected]
+
   # Get best clusters - similar wrt `equalize`; dissimilar wrt `split_by`
   distances <- by(preselection[, equalize], preclusters, dist)
   objectives <- sapply(distances, sum)
@@ -126,31 +128,43 @@ subset_anticlustering <- function(data, split_by, equalize, balance, design, n, 
     iv <- scale(preselection[, split_by])
   }
   
-  if (argument_exists(balance)) {
-    categories <- merge_into_one_variable(preselection[, balance])
-    preclusters <- generate_exchange_partners(
-      p = prod(design) - 1,
-      categories = categories,
-      similar = TRUE,
-      features = scale(preselection[, equalize])
-    )
-  }
-
   message("Starting stimulus selection using `Subset-", min_max, "Anticlustering`.")
   message("Selecting ", design, " groups, each having ", 
           n, " elements from a pool of ", N, " stimuli.")
   # now optimize assignment using exchange method
   anticlusters <- anticlustering(
     features = scale(preselection[, equalize]),
-    K = prod(design),
+    K = design,
     iv = iv,
     categories = preclusters
   )
+  print(anticlusters)
   
   # prepare output: Needs to incorporate NA for non-selected items
   output <- rep(NA, N)
   output[preselection$id_anticlustering] <- anticlusters
   output
+}
+
+# A wrapper to obtain preclusters 
+# (a) for imbalanced data
+# (b) if categorical restrictions are passed
+categorical_restrictions <- function(data, equalize, balance, design) {
+  if (argument_exists(balance)) {
+    categories <- merge_into_one_variable(data[, balance])
+    preclusters <- generate_exchange_partners(
+      p = design - 1,
+      categories = categories,
+      similar = TRUE,
+      features = scale(data[, equalize])
+    )
+  } else {
+    preclusters <- imbalanced_preclustering(
+      scale(data[, equalize]), 
+      K = design
+    )
+  }
+  preclusters
 }
 
 # Function to remove elements such that the remaining elements can fit 
