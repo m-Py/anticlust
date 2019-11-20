@@ -4,8 +4,8 @@
 \alias{select_stimuli}
 \title{Select stimuli for experiments}
 \usage{
-select_stimuli(data, split_by = NULL, equalize, design, n = NULL,
-  randomness = 1)
+select_stimuli(data, split_by = NULL, equalize, balance = NULL, design,
+  n = NULL, randomness = 1)
 }
 \arguments{
 \item{data}{A N x M data frame of features describing stimuli}
@@ -15,6 +15,10 @@ select_stimuli(data, split_by = NULL, equalize, design, n = NULL,
 
 \item{equalize}{Character vector, the names of the variables in 
 \code{data} that should be similar across sets}
+
+\item{balance}{Character vector, the names of the variables in 
+\code{data} that constitute categorical variables whose frequency
+should be balanced across sets}
 
 \item{design}{Specifies the number of groups per \code{split_by} 
 feature. Is a vector of length \code{ncol(split_by)} (or of length

@@ -29,6 +29,9 @@
 #'     \code{data} that should be different between sets
 #' @param equalize Character vector, the names of the variables in 
 #'     \code{data} that should be similar across sets
+#' @param balance Character vector, the names of the variables in 
+#'     \code{data} that constitute categorical variables whose frequency
+#'     should be balanced across sets
 #' @param design Specifies the number of groups per \code{split_by} 
 #'     feature. Is a vector of length \code{ncol(split_by)} (or of length
 #'     1 if only one - or no - \code{split_by} feature is passed).
@@ -61,9 +64,9 @@ select_stimuli <- function(
   if (argument_exists(n)) {
     groups <- subset_anticlustering(data, split_by, equalize, balance, design, n, randomness)
   } else if (argument_exists(split_by) && !argument_exists(n)) {
-    groups <- min_max_anticlustering(data, split_by, equalize, design)
+    groups <- min_max_anticlustering(data, split_by, equalize, balance, design)
   } else if (!argument_exists(split_by) && !argument_exists(n)) {
-    groups <- wrap_anticlustering(data, equalize, design)
+    groups <- wrap_anticlustering(data, equalize, balance, design)
   }
   # return the original data with column describing the stimulus set.
   # remove non-selected stimuli
@@ -138,7 +141,6 @@ subset_anticlustering <- function(data, split_by, equalize, balance, design, n, 
     iv = iv,
     categories = preclusters
   )
-  print(anticlusters)
   
   # prepare output: Needs to incorporate NA for non-selected items
   output <- rep(NA, N)
@@ -168,14 +170,14 @@ categorical_restrictions <- function(data, equalize, balance, design) {
 }
 
 # Internal function for min-max anticlustering
-min_max_anticlustering <- function(data, split_by, equalize, design) {
+min_max_anticlustering <- function(data, split_by, equalize, balance, design) {
   K <- prod(design)
   N <- nrow(data)
   message("Starting stimulus selection using `Min-Max Anticlustering`.")
   message("Selecting ", K, " groups, each having approximately ", 
           N / K, " elements from a pool of ", N, " stimuli.")
   
-  preclusters <- imbalanced_preclustering(scale(data[, equalize]), K)
+  preclusters <- categorical_restrictions(data, equalize, balance, design)
   
   anticlustering(
     features = scale(data[, equalize]),
@@ -186,21 +188,29 @@ min_max_anticlustering <- function(data, split_by, equalize, design) {
 }
 
 # Internal function for anticlustering
-wrap_anticlustering <- function(data, equalize, design) {
+wrap_anticlustering <- function(data, equalize, balance, design) {
   message("Starting stimulus selection using `Anticlustering`.")
   message("Selecting ", design, " groups, each having approximately ", 
           round(nrow(data) / design), " elements from a pool of ", 
           nrow(data), " stimuli.")
   
+  preclusters <- categorical_restrictions(data, equalize, balance, design)
+  
   # initial assignment based on preclustering
   K <- anticlustering(
     data[, equalize],
     K = design,
-    categories = imbalanced_preclustering(scale(data[, equalize]), design)
+    categories = preclusters
   )
+  
+  categories <- NULL
+  if (argument_exists(balance)) {
+    categories <- merge_into_one_variable(data[, balance])
+  }
   
   anticlustering(
     features = scale(data[, equalize]),
-    K = K
+    K = K,
+    categories = categories
   )
 }
