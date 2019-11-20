@@ -301,7 +301,7 @@ not have been any overlap on valence
 - The three sets overlap strongly on the variables beauty and arousal,
 as they should
 
-### Divide and Select
+## Divide and Select
 
 The `divide_and_select()` function can also be used to create groups 
 that differ on an independent variable. It works by actually dividing
@@ -385,7 +385,7 @@ Apparently, this worked quite well. Let's also confirm that the
 table(stimuli$Category, stimuli$SET)
 ```
 
-## Divide and Select Reloaded
+### Divide and Select Reloaded
 
 Using the functionality to pass categorical variables to the 
 `divide_and_select()` function, we can try to select item sets that
@@ -448,6 +448,112 @@ the difference between sets with regard to the independent variable.
 The function `select_stimuli()` tends to favor the similarity with regard
 to the covariates, and tries to maximize differences with regard to the 
 independent variable as long as the covariates remain similar.
+
+## Balancing a categorical variable
+
+The function `select_stimuli()` also allows to balance the frequency of 
+a categorical variable between stimulus sets via the argument `balance`.
+This argument takes as input the names of the columns that should be 
+balanced across sets. 
+
+In the following examples, I repeat the four cases from above and use
+balance the image category across sets each time.
+
+### Anticlustering
+
+Create sets that are maximally similar with regard to valence, arousal
+and beauty from a random preselection (i.e., classical anticlustering),
+and the category is balanced between sets:
+
+```{r}
+# Preselect 200 random stimuli
+preselection <- oasis[sample(nrow(oasis), size = 200), ]
+# Create character vector with the relevant covariates:
+stimuli <- select_stimuli(
+  preselection,
+  equalize = c("Valence_mean", "Arousal_mean", "beauty_mean"),
+  design = 3,
+  balance = "Category"
+)
+# Check out that the category is balanced:
+table(stimuli$SET, stimuli$Category)
+# Check M/SD by set
+mean_sd_tab(stimuli[, c("Valence_mean", "Arousal_mean", "beauty_mean")], stimuli$SET)
+```
+
+Note that by including an additional restriction (i.e., balancing out a 
+variable between sets), we make it harder for `anticlust` to find sets 
+that are balanced on the covariates. The results are expected to be 
+better if no such restriction is included. However, the results in this
+case are still pretty good. 
+
+This is a general rule: More restrictions are less easy to satisfy.
+If we additionally require that one variable differs between sets, it 
+becomes even harder to balance the covariates between sets. However, 
+`anticlust` will give its best!
+
+### Min-Max Anticlustering
+
+Create sets that differ on valence, are similar with regard to arousal,
+and the category is balanced between sets:
+
+```{r}
+# Preselect 200 random stimuli
+preselection <- oasis[sample(nrow(oasis), size = 200), ]
+stimuli <- select_stimuli(
+  preselection,
+  split_by = "Valence_mean", 
+  equalize = "Arousal_mean",
+  design = 3,
+  balance = "Category"
+)
+# Check out that the category is balanced:
+table(stimuli$SET, stimuli$Category)
+# Check M/SD by set
+mean_sd_tab(stimuli[, c("Valence_mean", "Arousal_mean")], stimuli$SET)
+```
+
+### Subset Anticlustering
+
+Create sets that are maximally similar with regard to valence, arousal
+and beauty. Extract three sets with 50 items each from the entire pool
+of 900 items; the category is balanced between sets:
+
+```{r}
+stimuli <- select_stimuli(
+  oasis,
+  equalize = c("Valence_mean", "Arousal_mean", "beauty_mean"),
+  design = 3,
+  balance = "Category",
+  n = 50
+)
+# Check out that the category is balanced:
+table(stimuli$SET, stimuli$Category)
+# Check M/SD by set
+mean_sd_tab(stimuli[, c("Valence_mean", "Arousal_mean", "beauty_mean")], stimuli$SET)
+```
+
+### Subset Min-Max Anticlustering
+
+Create sets that are maximally similar with regard to arousal and 
+beauty, maximize difference with regard to valence. Extract three sets 
+with 50 items each from the entire pool of 900 items; the category is 
+balanced between sets:
+
+```{r}
+stimuli <- select_stimuli(
+  oasis,
+  split_by = "Valence_mean",
+  equalize = c("Arousal_mean", "beauty_mean"),
+  design = 3,
+  balance = "Category",
+  n = 50
+)
+# Check out that the category is balanced:
+table(stimuli$SET, stimuli$Category)
+# Check M/SD by set
+mean_sd_tab(stimuli[, c("Valence_mean", "Arousal_mean", "beauty_mean")], stimuli$SET)
+```
 
 ## References
 
