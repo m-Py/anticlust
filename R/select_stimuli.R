@@ -61,6 +61,8 @@ select_stimuli <- function(
   n = NULL,
   randomness = 1
 ) {
+  message_method(data, split_by, n, design)
+  
   if (argument_exists(n)) {
     groups <- subset_anticlustering(data, split_by, equalize, balance, design, n, randomness)
   } else if (argument_exists(split_by) && !argument_exists(n)) {
@@ -77,6 +79,7 @@ select_stimuli <- function(
 # Internal function for subset selection based on preclustering - then 
 # anticlustering. if `split_by` exists, min-max anticlustering is conducted
 subset_anticlustering <- function(data, split_by, equalize, balance, design, n, randomness) {
+  
   N <- nrow(data)
   # track which items are selected via ID:
   data$id_anticlustering <- 1:N
@@ -95,9 +98,7 @@ subset_anticlustering <- function(data, split_by, equalize, balance, design, n, 
   objectives <- sapply(distances, sum)
     
   # Some additional work needs to be done if min-max anticlustering is required
-  min_max <- ""
   if (argument_exists(split_by)) {
-    min_max <- "Min-Max-"
     distances2 <- by(preselection[, split_by], preclusters, dist)
     objectives2 <- sapply(distances2, sum)
     objectives <- objectives - objectives2
@@ -131,9 +132,6 @@ subset_anticlustering <- function(data, split_by, equalize, balance, design, n, 
     iv <- scale(preselection[, split_by])
   }
   
-  message("Starting stimulus selection using `Subset-", min_max, "Anticlustering`.")
-  message("Selecting ", design, " groups, each having ", 
-          n, " elements from a pool of ", N, " stimuli.")
   # now optimize assignment using exchange method
   anticlusters <- anticlustering(
     features = scale(preselection[, equalize]),
@@ -173,12 +171,7 @@ categorical_restrictions <- function(data, equalize, balance, design) {
 min_max_anticlustering <- function(data, split_by, equalize, balance, design) {
   K <- prod(design)
   N <- nrow(data)
-  message("Starting stimulus selection using `Min-Max Anticlustering`.")
-  message("Selecting ", K, " groups, each having approximately ", 
-          N / K, " elements from a pool of ", N, " stimuli.")
-  
   preclusters <- categorical_restrictions(data, equalize, balance, design)
-  
   anticlustering(
     features = scale(data[, equalize]),
     K = K,
@@ -189,11 +182,6 @@ min_max_anticlustering <- function(data, split_by, equalize, balance, design) {
 
 # Internal function for anticlustering
 wrap_anticlustering <- function(data, equalize, balance, design) {
-  message("Starting stimulus selection using `Anticlustering`.")
-  message("Selecting ", design, " groups, each having approximately ", 
-          round(nrow(data) / design), " elements from a pool of ", 
-          nrow(data), " stimuli.")
-  
   preclusters <- categorical_restrictions(data, equalize, balance, design)
   
   # initial assignment based on preclustering
@@ -214,3 +202,32 @@ wrap_anticlustering <- function(data, equalize, balance, design) {
     categories = categories
   )
 }
+
+message_method <- function(data, split_by, n, design) {
+  if (argument_exists(split_by)) {
+    min_max <- "Min-Max-"
+  } else {
+    min_max <- ""
+  }
+  if (argument_exists(n)) {
+    sub <- "Subset-"
+  } else {
+    sub <- ""
+  }
+  N <- nrow(data)
+  
+  if (argument_exists(n)) {
+    n <- n
+  } else {
+    n <- N / design
+  }
+  if (floor(n) != ceiling(n)) {
+    n <- paste(floor(n), "or", ceiling(n))
+  }
+
+  message("Starting stimulus selection using `", 
+          sub, min_max, "Anticlustering`.")
+  message("Selecting ", design, " groups, each having ", 
+          n, " elements from a pool of ", N, " stimuli.")
+}
+
