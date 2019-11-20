@@ -26,3 +26,24 @@ imbalanced_preclustering <- function(features, K) {
   }
   preclusters
 }
+
+
+# Function to remove elements such that the remaining elements can fit 
+# into clusters of size K. Removes the data points that are furthest 
+# apart from any other data points
+remove_outliers <- function(data, equalize, K) {
+  N <- nrow(data)
+  if (N %% K == 0) {
+    return(data)
+  }
+  distances <- as.matrix(dist(data[, equalize]))
+  diag(distances) <- Inf
+  minima <- apply(distances, 1, min)
+  minima <- cbind(minima, 1:N)
+  minima <- sort_by_col(minima, 1)
+  # discard elements whose nearest neighbor is farthest away
+  minima <- minima[1:(N - (N %% K)), , drop = FALSE]
+  # obtain original order
+  minima <- sort_by_col(minima, 2)
+  data[minima[, 2], , drop = FALSE]
+}
