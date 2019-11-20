@@ -12,7 +12,7 @@ precluster_per_category <- function(features, categories, K) {
   # precluster within each category:
   cl <- list()
   for (i in 1:n_categories) {
-    tmp_data <- data[data[, 1] == unique_categories[i], -c(1, 2)]
+    tmp_data <- data[data[, 1] == unique_categories[i], -c(1, 2), drop = FALSE]
     rownames(tmp_data) <- NULL
     if (nrow(tmp_data) <= K) {
       cl[[i]] <- 1 # all members have the same category and cluster
