@@ -8,6 +8,7 @@ precluster_per_category <- function(features, categories, K) {
   # save original order to restore before returning
   data <- cbind(categories, 1:N, features)
   data <- sort_by_col(data, 1)
+  data <- data.frame(data)
   # precluster within each category:
   cl <- list()
   for (i in 1:n_categories) {
