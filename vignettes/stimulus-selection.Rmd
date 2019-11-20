@@ -50,10 +50,20 @@ library(anticlust)
 ---
 
 This tutorial teaches you how to use the `R` package `anticlust` for 
-stimulus selection. We use norming data for the open stimulus 
-pool OASIS for this purpose (Brielmann & Pelli, 2019; Kurdi, Lozano, & 
-Banaji, 2017). We load the data provided by Brielmann and Pelli (2019)
-from the internet and save the data as an `R` data frame: 
+stimulus selection. All code can easily be reproduced via Copy & Paste 
+if the development version of the `anticlust` package is installed. The 
+tutorial discusses the following functionalities:
+
+- Minimize differences between sets with regard to some variables
+- Maximize differences between sets with regard to some variables
+- Balance the occurrence of a categorical variable between sets
+- Select a subset of the total stimulus pool -- or assign each stimulus 
+  to a set
+
+We use norming data for the open stimulus pool OASIS for this purpose 
+(Brielmann & Pelli, 2019; Kurdi, Lozano, & Banaji, 2017). We load the 
+data provided by Brielmann and Pelli (2019) from the internet and save 
+the data as an `R` data frame: 
 
 ```{r}
 oasis <- read.csv("https://raw.githubusercontent.com/aenneb/OASIS-beauty/master/means_per_image.csv")
