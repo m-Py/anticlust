@@ -14,10 +14,11 @@ imbalanced_preclustering <- function(features, K) {
   if (nrow(subsetted) == K)  {
     preclusters[subsetted$preclusters_id] <- 1
   } else {
-    preclusters[subsetted$preclusters_id] <- balanced_clustering(
-      subsetted,
+    cl <- balanced_clustering(
+      subsetted[, -ncol(subsetted)],
       K = nrow(subsetted) / K
     )
+    preclusters[subsetted$preclusters_id] <- cl
   }
   # the remainders get into the last cluster
   if (sum(is.na(preclusters)) > 0) {
