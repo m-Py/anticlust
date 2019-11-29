@@ -26,5 +26,5 @@ Authors@R: c(person(given='Martin', family='Papenberg',
         person(given='Meik', family='Michalke', role=c('ctb'),
         comment='centroid based clustering algorithm') )
 Version: 0.3.0-1
-Date: 2019-11-20
+Date: 2019-11-29
 RoxygenNote: 6.1.1

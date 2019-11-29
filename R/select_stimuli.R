@@ -62,8 +62,15 @@ select_stimuli <- function(
   randomness = 1
 ) {
   message_method(data, split_by, n, design)
-  
   if (argument_exists(n)) {
+    if ((design * n) > 10000) {
+      stop("sorry, cannot select more than 10,000 stimuli (that is a large experiment, by the way...)")
+    }
+    N <- nrow(data)
+    if (N > 10000) {
+      data <- data[sample(N, size = 10000), , drop = FALSE]
+      N <- nrow(data)
+    }
     groups <- subset_anticlustering(data, split_by, equalize, balance, design, n, randomness)
   } else if (argument_exists(split_by) && !argument_exists(n)) {
     groups <- min_max_anticlustering(data, split_by, equalize, balance, design)
@@ -79,8 +86,9 @@ select_stimuli <- function(
 # Internal function for subset selection based on preclustering - then 
 # anticlustering. if `split_by` exists, min-max anticlustering is conducted
 subset_anticlustering <- function(data, split_by, equalize, balance, design, n, randomness) {
-  
+    
   N <- nrow(data)
+  
   # track which items are selected via ID:
   data$id_anticlustering <- 1:N
 

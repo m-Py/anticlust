@@ -41,5 +41,5 @@ roxy.package(
    R.libs = myRlib,
    repo.root = "~/R/repo/anticlust",
    pck.description = pckg.dscrptn,
-   actions = c("roxy", "package", "cite", "html", "cleanRd", "buildVignettes", "doc") # "check" , "buildVignettes", "doc"
+   actions = c("roxy", "package", "cite", "html", "cleanRd") # "check" , "buildVignettes", "doc"
 ) 
