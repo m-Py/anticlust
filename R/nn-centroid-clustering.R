@@ -4,6 +4,7 @@
 # data = feature data frame
 # K = size of the small groups
 nn_centroid_clustering <- function(data, K) {
+  data <- as.matrix(data)
   # compute the distances between all elements and overall cluster center
   centroid <- t(as.matrix(colMeans(data)))
   distances <- c(dist_from_centers(data, centroid, squared = FALSE))
@@ -15,9 +16,9 @@ nn_centroid_clustering <- function(data, K) {
     # get element with maximum distance to centroid
     max_away <- which.max(distances)[1]
     # compute nearest neighbors for element that is furthest away
-    clustered <- nn2(data, data[max_away, ], K)$nn.idx
+    clustered <- nn2(data, data[max_away, , drop = FALSE], K)$nn.idx
     clusters[idx[clustered]] <- counter
-    data <- data[-clustered, ]
+    data <- data[-clustered, , drop = FALSE]
     distances <- distances[-clustered]
     idx  <- idx[-clustered]
     counter <- counter + 1
