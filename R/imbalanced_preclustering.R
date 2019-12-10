@@ -14,9 +14,9 @@ imbalanced_preclustering <- function(features, K) {
   if (nrow(subsetted) == K)  {
     preclusters[subsetted$preclusters_id] <- 1
   } else {
-    cl <- balanced_clustering(
+    cl <- nn_centroid_clustering(
       subsetted[, -ncol(subsetted)],
-      K = nrow(subsetted) / K
+      K = K
     )
     preclusters[subsetted$preclusters_id] <- cl
   }
