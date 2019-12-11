@@ -17,9 +17,8 @@
 # - control parameter for weights of `equalize` variables
 # - maybe: argument pca: should a pca be conducted on the features?
 # - use categories argument (as argument `balance`)
-# - control parameter: add some randomness to increase diversity of 
-#   output (this may be important for subset anticlustering)
- 
+
+
 #' Select stimuli for experiments
 #' 
 #' Stimulus selection via Anticlustering or Min-Max-Anticlustering
@@ -36,10 +35,6 @@
 #'     feature. Is a vector of length \code{ncol(split_by)} (or of length
 #'     1 if only one - or no - \code{split_by} feature is passed).
 #' @param n The number of elements per set.
-#' @param randomness An integer in `1:3`. Used for subset anticlustering.
-#'    1 = the same stimuli are returned each call; 2 = there is some 
-#'    randomness in which stimuli are returned. 3 = there is more 
-#'    randomness in which stimuli are returned. 
 #'
 #' @return A data frame that has the same columns as the original input 
 #'    (the data frame \code{data}), but has an additional called \code{SET}.
@@ -58,12 +53,11 @@ select_stimuli <- function(
   equalize, 
   balance = NULL,
   design, 
-  n = NULL,
-  randomness = 1
+  n = NULL
 ) {
   message_method(data, split_by, n, design)
   if (argument_exists(n)) {
-    groups <- subset_anticlustering(data, split_by, equalize, balance, design, n, randomness)
+    groups <- subset_anticlustering(data, split_by, equalize, balance, design, n)
   } else if (argument_exists(split_by) && !argument_exists(n)) {
     groups <- min_max_anticlustering(data, split_by, equalize, balance, design)
   } else if (!argument_exists(split_by) && !argument_exists(n)) {
@@ -77,7 +71,7 @@ select_stimuli <- function(
 
 # Internal function for subset selection based on preclustering - then 
 # anticlustering. if `split_by` exists, min-max anticlustering is conducted
-subset_anticlustering <- function(data, split_by, equalize, balance, design, n, randomness) {
+subset_anticlustering <- function(data, split_by, equalize, balance, design, n) {
     
   N <- nrow(data)
   
@@ -110,19 +104,7 @@ subset_anticlustering <- function(data, split_by, equalize, balance, design, n, 
   needed_n <- design * n
   needed_clusters <- needed_n / table(preclusters)[1]
   # Best preclusters
-  if (randomness == 1) {
-    cluster_ids <- 1:needed_clusters
-  } else if (randomness == 2) {
-    # some randomness: better chance to be selected for better objectives
-    tmp <- objectives + min(objectives) + 1
-    cluster_ids <- sample(length(objectives), size = needed_clusters, prob = sort(tmp / sum(tmp)))
-  } else if (randomness == 3) {
-    # much randomness: select ANY clusters
-    cluster_ids <- sample(length(objectives), size = needed_clusters)
-  } else {
-    stop("Argument `randomness` must be one of 1, 2, or 3")
-  }
-  
+  cluster_ids <- 1:needed_clusters
   most_similar_clusters <- as.numeric(names(sort(objectives))[cluster_ids])
   
   # encode items that are selected (all that are in the best preclusters)
