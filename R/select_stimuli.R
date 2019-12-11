@@ -83,14 +83,17 @@ subset_anticlustering <- function(data, split_by, equalize, balance, design, n, 
   
   # track which items are selected via ID:
   data$id_anticlustering <- 1:N
+  
+  # test if I can safely remove all entries with NA values
+  preselection <- safely_exclude_na(data, split_by, equalize, balance, design, n)
 
   # get most similar items, possibly under categorical restrictions
-  preclusters <- categorical_restrictions(data, equalize, balance, design)
+  preclusters <- categorical_restrictions(preselection, equalize, balance, design)
   
   # only select clusters of size `design` (aka `K`)
   filled <- which(table(preclusters) == design)
   is_selected <- preclusters %in% filled
-  preselection <- data[is_selected, ]
+  preselection <- preselection[is_selected, , drop = FALSE]
   preclusters <- preclusters[is_selected]
 
   # Get best clusters - similar wrt `equalize`; dissimilar wrt `split_by`
@@ -144,6 +147,23 @@ subset_anticlustering <- function(data, split_by, equalize, balance, design, n, 
   output <- rep(NA, N)
   output[preselection$id_anticlustering] <- anticlusters
   output
+}
+
+safely_exclude_na <- function(data, split_by, equalize, balance, design, n) {
+  has_no_na <- complete.cases(data[, equalize, drop = FALSE])
+  if (argument_exists(split_by)) {
+    has_no_na <- has_no_na & complete.cases(data[, split_by, drop = FALSE])
+  }
+  if (argument_exists(balance)) {
+    has_no_na <- has_no_na & complete.cases(data[, balance, drop = FALSE])
+  }
+  # can remove data if enough entries remain after NA exclusion
+  if ((design * n) <= sum(has_no_na)) {
+    data <- data[has_no_na, , drop = FALSE]
+    message("\n", sum(!has_no_na), " records could be excluded due to missing values.\n",
+            "Selecting stimuli from the remaining ", nrow(data), " records.")
+  }
+  data
 }
 
 # A wrapper to obtain preclusters 
