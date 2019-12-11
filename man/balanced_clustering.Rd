@@ -28,7 +28,7 @@ dissimilarities.}
 
 \item{K}{How many clusters should be created.}
 
-\item{method}{One of "heuristic" or "ilp". See details.}
+\item{method}{One of "heuristic", "nn", or "ilp". See details.}
 }
 \value{
 A vector representing the cluster affiliation of all elements.

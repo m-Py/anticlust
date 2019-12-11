@@ -13,7 +13,7 @@
 #'     the upper and lower triangular matrix represent the pairwise
 #'     dissimilarities.
 #' @param K How many clusters should be created.
-#' @param method One of "heuristic" or "ilp". See details.
+#' @param method One of "heuristic", "nn", or "ilp". See details.
 #'
 #' @return A vector representing the cluster affiliation of all elements.
 #'
