@@ -149,17 +149,6 @@ check out the function \code{\link{fast_anticlustering}} that was
 specifically implemented for large data sets (or use the random
 sampling method with few repetitions).
 
-The random sampling approach may also incorporate a preclustering
-that prevents grouping very similar elements into the same
-anticluster (setting \code{preclustering = TRUE}). For large N (N >
-100), the preclustering tends to improve the quality of the solution
-because the random sampling is conducted on a restricted solution
-space that consists of rather good solutions.  Preclustering (for the
-exact and heuristic approaches) is performed by a call to
-\code{\link{balanced_clustering}} where the argument \code{K} is set
-to the number of elements divided by the number of anticlusters that
-are to be created (actually, this is not exactly what happens
-internally, but it is equivalent).
 
 \strong{Categorical constraints}
 

@@ -28,7 +28,13 @@
 #' clustered with its (N/K)-1 nearest neighbours. From the remaining
 #' elements, the element farthest to the centroid is selected and again
 #' clustered with its (N/K)-1 neighbours; the procedure is repeated
-#' until all elements are part of a cluster.
+#' until all elements are part of a cluster. The same algorithm is 
+#' computed when you use \code{method = "nn"}. However, the \code{"nn"}
+#' implementation is faster and applicable to larger data sets because 
+#' it does not compute a distance matrix, but instead relies on nearest 
+#' neighbour search as implemented via \code{\link[RANN]{nn2}}. Currently,
+#' \code{method = "nn"} is only applicable when data is passed via the 
+#' \code{features} argument.
 #'
 #' An exact method (\code{method = "ilp"}) can be used to solve cluster
 #' editing optimally. The cluster editing objective minimizes the sum
@@ -89,6 +95,11 @@
 #' plot_clusters(features, ac2, within_connection = TRUE,
 #'               main = "heuristic cluster editing", xlab = "", ylab = "")
 #'
+#' # Method `nn`
+#'
+#' lds <- data.frame(f1 = rnorm(10000), f2 = rnorm(10000))
+#' cl <- balanced_clustering(lds, K = 10, method = "nn")
+#' plot_clusters(lds, clustering = cl)
 #'
 #' @references
 #'
@@ -107,6 +118,12 @@ balanced_clustering <- function(features = NULL, distances = NULL,
 
   if (method == "ilp") {
     return(balanced_cluster_editing(data, K, solver_available()))
+  }
+  if (method == "nn") {
+    if (argument_exists(distances)) {
+      stop("Can use method `nn` only with argument `features` as input.")
+    }
+    return(nn_centroid_clustering(data, nrow(data) / K))
   }
 
   centroid_clustering(data, K = K)

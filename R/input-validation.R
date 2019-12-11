@@ -87,7 +87,7 @@ input_handling_anticlustering <- function(features, distances,
            "(Try out method = 'exchange' or method = 'sampling'.)")
     }
     if (preclustering == TRUE) {
-      stop("K must be a divider of the number of elements when preclustering is `TRUE`. ",
+      stop("K must be a divider of the number of elements. ",
            "(Try out preclustering = FALSE.)")
     }
   }
@@ -103,7 +103,7 @@ input_handling_anticlustering <- function(features, distances,
   validate_input(nrep, "nrep", "numeric", len = 1, greater_than = 0,
                  must_be_integer = TRUE)
   validate_input(method, "method", len = 1,
-                 input_set = c("ilp", "sampling", "exchange", "heuristic"))
+                 input_set = c("ilp", "sampling", "exchange", "heuristic", "nn"))
 
   if (method == "ilp") {
     solver <- solver_available()
