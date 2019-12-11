@@ -5,7 +5,7 @@
 \title{Select stimuli for experiments}
 \usage{
 select_stimuli(data, split_by = NULL, equalize, balance = NULL, design,
-  n = NULL, randomness = 1)
+  n = NULL)
 }
 \arguments{
 \item{data}{A N x M data frame of features describing stimuli}
