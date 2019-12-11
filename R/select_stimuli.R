@@ -72,20 +72,23 @@ select_stimuli <- function(
 # Internal function for subset selection based on preclustering - then 
 # anticlustering. if `split_by` exists, min-max anticlustering is conducted
 subset_anticlustering <- function(data, split_by, equalize, balance, design, n) {
-    
+  
+  # total N of input data:
   N <- nrow(data)
+  # number of groups that are needed:
+  K <- prod(design)
   
   # track which items are selected via ID:
   data$id_anticlustering <- 1:N
   
   # test if I can safely remove all entries with NA values
-  preselection <- safely_exclude_na(data, split_by, equalize, balance, design, n)
+  preselection <- safely_exclude_na(data, split_by, equalize, balance, K, n)
 
   # get most similar items, possibly under categorical restrictions
-  preclusters <- categorical_restrictions(preselection, equalize, balance, design)
+  preclusters <- categorical_restrictions(preselection, equalize, balance, K)
   
-  # only select clusters of size `design` (aka `K`)
-  filled <- which(table(preclusters) == design)
+  # only select clusters of size `K`
+  filled <- which(table(preclusters) == K)
   is_selected <- preclusters %in% filled
   preselection <- preselection[is_selected, , drop = FALSE]
   preclusters <- preclusters[is_selected]
@@ -101,7 +104,7 @@ subset_anticlustering <- function(data, split_by, equalize, balance, design, n) 
     objectives <- objectives - objectives2
   }
 
-  needed_n <- design * n
+  needed_n <- K * n
   needed_clusters <- needed_n / table(preclusters)[1]
   # Best preclusters
   cluster_ids <- 1:needed_clusters
@@ -120,7 +123,7 @@ subset_anticlustering <- function(data, split_by, equalize, balance, design, n) 
   # now optimize assignment using exchange method
   anticlusters <- anticlustering(
     features = scale(preselection[, equalize]),
-    K = design,
+    K = K,
     iv = iv,
     categories = preclusters
   )
@@ -131,7 +134,7 @@ subset_anticlustering <- function(data, split_by, equalize, balance, design, n) 
   output
 }
 
-safely_exclude_na <- function(data, split_by, equalize, balance, design, n) {
+safely_exclude_na <- function(data, split_by, equalize, balance, K, n) {
   has_no_na <- complete.cases(data[, equalize, drop = FALSE])
   if (argument_exists(split_by)) {
     has_no_na <- has_no_na & complete.cases(data[, split_by, drop = FALSE])
@@ -140,7 +143,7 @@ safely_exclude_na <- function(data, split_by, equalize, balance, design, n) {
     has_no_na <- has_no_na & complete.cases(data[, balance, drop = FALSE])
   }
   # can remove data if enough entries remain after NA exclusion
-  if ((design * n) <= sum(has_no_na)) {
+  if ((K * n) <= sum(has_no_na)) {
     data <- data[has_no_na, , drop = FALSE]
     message("\n", sum(!has_no_na), " records could be excluded due to missing values.\n",
             "Selecting stimuli from the remaining ", nrow(data), " records.")
@@ -151,11 +154,11 @@ safely_exclude_na <- function(data, split_by, equalize, balance, design, n) {
 # A wrapper to obtain preclusters 
 # (a) for imbalanced data
 # (b) if categorical restrictions are passed
-categorical_restrictions <- function(data, equalize, balance, design) {
+categorical_restrictions <- function(data, equalize, balance, K) {
   if (argument_exists(balance)) {
     categories <- merge_into_one_variable(data[, balance])
     preclusters <- generate_exchange_partners(
-      p = design - 1,
+      p = K - 1,
       categories = categories,
       similar = TRUE,
       features = scale(data[, equalize])
@@ -163,7 +166,7 @@ categorical_restrictions <- function(data, equalize, balance, design) {
   } else {
     preclusters <- imbalanced_preclustering(
       scale(data[, equalize]), 
-      K = design
+      K = K
     )
   }
   preclusters
@@ -173,7 +176,7 @@ categorical_restrictions <- function(data, equalize, balance, design) {
 min_max_anticlustering <- function(data, split_by, equalize, balance, design) {
   K <- prod(design)
   N <- nrow(data)
-  preclusters <- categorical_restrictions(data, equalize, balance, design)
+  preclusters <- categorical_restrictions(data, equalize, balance, K)
   anticlustering(
     features = scale(data[, equalize]),
     K = K,
@@ -183,13 +186,13 @@ min_max_anticlustering <- function(data, split_by, equalize, balance, design) {
 }
 
 # Internal function for anticlustering
-wrap_anticlustering <- function(data, equalize, balance, design) {
-  preclusters <- categorical_restrictions(data, equalize, balance, design)
+wrap_anticlustering <- function(data, equalize, balance, K) {
+  preclusters <- categorical_restrictions(data, equalize, balance, K)
   
   # initial assignment based on preclustering
   K <- anticlustering(
     data[, equalize],
-    K = design,
+    K = K,
     categories = preclusters
   )
   
@@ -206,6 +209,7 @@ wrap_anticlustering <- function(data, equalize, balance, design) {
 }
 
 message_method <- function(data, split_by, n, design) {
+  K <- prod(design)
   if (argument_exists(split_by)) {
     min_max <- "Min-Max-"
   } else {
@@ -221,7 +225,7 @@ message_method <- function(data, split_by, n, design) {
   if (argument_exists(n)) {
     n <- n
   } else {
-    n <- N / design
+    n <- N / K
   }
   if (floor(n) != ceiling(n)) {
     n <- paste(floor(n), "or", ceiling(n))
@@ -229,7 +233,7 @@ message_method <- function(data, split_by, n, design) {
 
   message("Starting stimulus selection using `", 
           sub, min_max, "Anticlustering`.")
-  message("Selecting ", design, " groups, each having ", 
+  message("Selecting ", K, " groups, each having ", 
           n, " elements from a pool of ", N, " stimuli.")
 }
 
