@@ -9,7 +9,7 @@ imbalanced_preclustering <- function(features, K) {
   features$preclusters_id <- 1:N
   preclusters <- rep(NA, N)
   # only select as many data as can be clustered into balanced clusters
-  subsetted <- remove_outliers(features, 1:ncol(features), K)
+  subsetted <- remove_outliers(features, K)
   # test if only one cluster can be filled:
   if (nrow(subsetted) == K)  {
     preclusters[subsetted$preclusters_id] <- 1
@@ -30,20 +30,16 @@ imbalanced_preclustering <- function(features, K) {
 
 # Function to remove elements such that the remaining elements can fit 
 # into clusters of size K. Removes the data points that are furthest 
-# apart from any other data points
-remove_outliers <- function(data, equalize, K) {
+# apart from the data centroid
+remove_outliers <- function(data, K) {
   N <- nrow(data)
   if (N %% K == 0) {
     return(data)
   }
-  distances <- as.matrix(dist(data[, equalize]))
-  diag(distances) <- Inf
-  minima <- apply(distances, 1, min)
-  minima <- cbind(minima, 1:N)
-  minima <- sort_by_col(minima, 1)
-  # discard elements whose nearest neighbor is farthest away
-  minima <- minima[1:(N - (N %% K)), , drop = FALSE]
-  # obtain original order
-  minima <- sort_by_col(minima, 2)
-  data[minima[, 2], , drop = FALSE]
+  # define outliers as being furthest away from data centroid
+  distances <- distances_from_centroid(data)
+  # get indices of elements that are no outliers
+  idx <- order(distances)[1:(N - (N %% K))]
+  # return these elements
+  data[idx, , drop = FALSE]
 }

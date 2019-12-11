@@ -5,9 +5,7 @@
 # K = size of the small groups
 nn_centroid_clustering <- function(data, K) {
   data <- as.matrix(data)
-  # compute the distances between all elements and overall cluster center
-  centroid <- t(as.matrix(colMeans(data)))
-  distances <- c(dist_from_centers(data, centroid, squared = FALSE))
+  distances <- distances_from_centroid(data)
   counter <- 1
   idx <- 1:nrow(data)
   clusters <- rep(NA, nrow(data))
@@ -27,4 +25,10 @@ nn_centroid_clustering <- function(data, K) {
     stop("something is wrong")
   }
   clusters
+}
+
+# Compute the distances from centroid of a data set
+distances_from_centroid <- function(data) {
+  centroid <- t(as.matrix(colMeans(data)))
+  c(dist_from_centers(data, centroid, squared = FALSE))
 }
