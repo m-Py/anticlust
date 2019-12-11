@@ -99,6 +99,9 @@ subset_anticlustering <- function(data, split_by, equalize, balance, design, n) 
     
   # Some additional work needs to be done if min-max anticlustering is required
   if (argument_exists(split_by)) {
+    if (length(design) != length(split_by)) {
+      stop("NO!")
+    }
     distances2 <- by(preselection[, split_by], preclusters, dist)
     objectives2 <- sapply(distances2, sum)
     objectives <- objectives - objectives2
@@ -116,16 +119,18 @@ subset_anticlustering <- function(data, split_by, equalize, balance, design, n) 
   preclusters  <- preclusters[is_in_output]
 
   iv <- NULL
+  obj_fun <- "distance"
   if (argument_exists(split_by)) {
     iv <- scale(preselection[, split_by])
+    obj_fun <- make_obj_function(data, equalize, split_by, design) 
   }
   
   # now optimize assignment using exchange method
   anticlusters <- anticlustering(
-    features = scale(preselection[, equalize]),
+    features = scale(preselection[, c(equalize, split_by)]),
     K = K,
-    iv = iv,
-    categories = preclusters
+    categories = preclusters,
+    objective = obj_fun
   )
   
   # prepare output: Needs to incorporate NA for non-selected items
@@ -174,6 +179,9 @@ categorical_restrictions <- function(data, equalize, balance, K) {
 
 # Internal function for min-max anticlustering
 min_max_anticlustering <- function(data, split_by, equalize, balance, design) {
+  if (length(design) != length(split_by)) {
+    stop("NO!")
+  }
   K <- prod(design)
   N <- nrow(data)
   preclusters <- categorical_restrictions(data, equalize, balance, K)
