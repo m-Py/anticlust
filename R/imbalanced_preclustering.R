@@ -41,5 +41,5 @@ remove_outliers <- function(data, K) {
   # get indices of elements that are no outliers
   idx <- order(distances)[1:(N - (N %% K))]
   # return these elements
-  data[idx, , drop = FALSE]
+  data[sort(idx), , drop = FALSE]
 }
