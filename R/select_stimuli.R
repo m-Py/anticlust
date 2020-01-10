@@ -1,10 +1,4 @@
  
-# TODO
-# - generate_exchange_partners should call the clustering function defined
-#   below that can deal with data that cannot be split in N/K parts
-# - control parameter for weights of `equalize` / `split_by` variables
-
-
 #' Select stimuli for experiments
 #' 
 #' Stimulus selection via Anticlustering or Min-Max-Anticlustering
