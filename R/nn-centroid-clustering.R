@@ -15,10 +15,8 @@ nn_centroid_clustering <- function(data, K) {
   clusters <- rep(NA, nrow(data))
   
   while (nrow(data) > 0) {
-    # get element with maximum distance to centroid
-    max_away <- which.max(distances)[1]
     # compute nearest neighbors for element that is furthest away
-    clustered <- nn2(data, data[max_away, , drop = FALSE], K)$nn.idx
+    clustered <- get_nearest_neighbours(data, which.max(distances), K)
     clusters[idx[clustered]] <- counter
     data <- data[-clustered, , drop = FALSE]
     distances <- distances[-clustered]
@@ -29,6 +27,17 @@ nn_centroid_clustering <- function(data, K) {
     stop("something is wrong")
   }
   clusters
+}
+
+# Get nearest neighbours for a current element
+# param data: the data
+# param may_away: the index of the element that is furthest away from 
+#   the cluster centroid and for which nearest neighbors are sought
+# param K: The number of clusters / Nearest neighbours 
+# return: The indices of the current element as vector. !! The first
+#   index is the element itself !!
+get_nearest_neighbours <- function(data, max_away, K) {
+  nn2(data, data[max_away, , drop = FALSE], K)$nn.idx
 }
 
 # Compute the distances from centroid of a data set
