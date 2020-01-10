@@ -148,27 +148,6 @@ safely_exclude_na <- function(data, split_by, equalize, balance, K, n) {
   data
 }
 
-# A wrapper to obtain preclusters 
-# (a) for imbalanced data
-# (b) if categorical restrictions are passed
-categorical_restrictions <- function(data, equalize, balance, K) {
-  if (argument_exists(balance)) {
-    categories <- merge_into_one_variable(data[, balance])
-    preclusters <- generate_exchange_partners(
-      p = K - 1,
-      categories = categories,
-      similar = TRUE,
-      features = scale(data[, equalize])
-    )
-  } else {
-    preclusters <- imbalanced_preclustering(
-      scale(data[, equalize]), 
-      K = K
-    )
-  }
-  preclusters
-}
-
 # Internal function for min-max anticlustering
 min_max_anticlustering <- function(data, split_by, equalize, balance, design) {
   K <- prod(design)
