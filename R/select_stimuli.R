@@ -37,11 +37,7 @@ select_stimuli <- function(
   design, 
   n = NULL
 ) {
-  if (argument_exists(split_by)) {
-    if (length(design) != length(split_by)) {
-      stop("Length of argument `design` must match length of argument `split_by`.")
-    }
-  }
+  validate_input_selection(data, split_by, equalize, balance, design, n) 
   message_method(data, split_by, n, design)
   if (argument_exists(n)) {
     groups <- subset_anticlustering(data, split_by, equalize, balance, design, n)
