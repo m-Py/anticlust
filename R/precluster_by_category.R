@@ -5,7 +5,13 @@
 categorical_restrictions <- function(data, equalize, balance, K) {
   if (argument_exists(balance)) {
     categories <- merge_into_one_variable(data[, balance])
-    preclusters <- to_numeric(precluster_per_category(features, categories, K))
+    preclusters <- to_numeric(
+      precluster_per_category(
+        data[, equalize, drop = FALSE], 
+        categories, 
+        K
+      )
+    )
   } else {
     preclusters <- imbalanced_preclustering(
       scale(data[, equalize]), 
