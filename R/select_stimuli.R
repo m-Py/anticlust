@@ -41,6 +41,11 @@ select_stimuli <- function(
   design, 
   n = NULL
 ) {
+  if (argument_exists(split_by)) {
+    if (length(design) != length(split_by)) {
+      stop("Length of argument `design` must match length of argument `split_by`.")
+    }
+  }
   message_method(data, split_by, n, design)
   if (argument_exists(n)) {
     groups <- subset_anticlustering(data, split_by, equalize, balance, design, n)
@@ -85,9 +90,6 @@ subset_anticlustering <- function(data, split_by, equalize, balance, design, n) 
     
   # Some additional work needs to be done if min-max anticlustering is required
   if (argument_exists(split_by)) {
-    if (length(design) != length(split_by)) {
-      stop("NO!")
-    }
     distances2 <- by(preselection[, split_by], preclusters, dist)
     objectives2 <- sapply(distances2, sum)
     objectives <- objectives - objectives2
@@ -165,9 +167,6 @@ categorical_restrictions <- function(data, equalize, balance, K) {
 
 # Internal function for min-max anticlustering
 min_max_anticlustering <- function(data, split_by, equalize, balance, design) {
-  if (length(design) != length(split_by)) {
-    stop("NO!")
-  }
   K <- prod(design)
   N <- nrow(data)
   preclusters <- categorical_restrictions(data, equalize, balance, K)
