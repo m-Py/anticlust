@@ -15,7 +15,7 @@ subset_anticlustering <- function(data, split_by, equalize, balance, design, n) 
   preselection <- safely_exclude_na(data, split_by, equalize, balance, K, n)
   
   # get most similar items, possibly under categorical restrictions
-  preclusters <- categorical_restrictions(preselection, equalize, balance, K)
+  preclusters <- preclustering(preselection, equalize, balance, K)
   
   # only select clusters of size `K`
   filled <- which(table(preclusters) == K)
@@ -45,19 +45,13 @@ subset_anticlustering <- function(data, split_by, equalize, balance, design, n) 
   preselection <- preselection[is_in_output, ]
   preclusters  <- preclusters[is_in_output]
   
-  iv <- NULL
-  obj_fun <- "distance"
-  if (argument_exists(split_by)) {
-    iv <- scale(preselection[, split_by])
-    obj_fun <- make_obj_function(data, equalize, split_by, design) 
-  }
-  
-  # now optimize assignment using exchange method
-  anticlusters <- anticlustering(
-    features = scale(preselection[, c(equalize, split_by)]),
-    K = K,
-    categories = preclusters,
-    objective = obj_fun
+  # divide the preclustered items into different sets using (min-max) anticlustering
+  anticlusters <- wrap_anticlustering(
+    preselection, 
+    equalize, 
+    split_by,
+    design,
+    preclusters
   )
   
   # prepare output: Needs to incorporate NA for non-selected items
@@ -85,27 +79,3 @@ safely_exclude_na <- function(data, split_by, equalize, balance, K, n) {
   data
 }
 
-
-# Generate an objective functions for min-max anticlustering
-
-make_obj_function <- function(data, equalize, split_by, design) {
-  
-  # get all levels of clusters and the corresponding levels for split variables
-  levels <- expand.grid(lapply(design, function(x) 1:x))
-  
-  # combine to a single objective function
-  function(cl, data) {
-    similarity_covariates <- obj_value_distance(
-      cl, 
-      data[, equalize, drop = FALSE]
-    )
-    dissims <- c()
-    for (i in 1:length(design)) {
-      clusters <- levels[, i][cl]
-      # compute sum of distances within cluster
-      distances <- by(data[, split_by[i]], clusters, dist)
-      dissims[i] <- sum(sapply(distances, sum))
-    }
-    similarity_covariates - sum(dissims)
-  }
-}

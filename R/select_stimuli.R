@@ -45,10 +45,9 @@ select_stimuli <- function(
   message_method(data, split_by, n, design)
   if (argument_exists(n)) {
     groups <- subset_anticlustering(data, split_by, equalize, balance, design, n)
-  } else if (argument_exists(split_by) && !argument_exists(n)) {
-    groups <- wrap_min_max_anticlustering(data, split_by, equalize, balance, design)
-  } else if (!argument_exists(split_by) && !argument_exists(n)) {
-    groups <- wrap_anticlustering(data, equalize, balance, design)
+  } else {
+    preclusters <- preclustering(data, equalize, balance, prod(design))
+    groups <- wrap_anticlustering(data, equalize, split_by, design, preclusters)
   }
   # return the original data with column describing the stimulus set.
   # remove non-selected stimuli
@@ -56,41 +55,49 @@ select_stimuli <- function(
   data[!is.na(groups), ]
 }
 
-# Internal function for min-max anticlustering
-wrap_min_max_anticlustering <- function(data, split_by, equalize, balance, design) {
-  K <- prod(design)
-  N <- nrow(data)
-  preclusters <- categorical_restrictions(data, equalize, balance, K)
-  anticlustering(
-    features = scale(data[, equalize]),
-    K = K,
-    iv = scale(data[, split_by]),
-    categories = preclusters
+wrap_anticlustering <- function(data, equalize, split_by, design, preclusters) {
+  # First, generate objective function (either anticlustering or 
+  # min-max-anticlustering); default objective: anticluster editing
+  obj_fun <- "distance"
+  # min-max anticlustering if `split_by` exists
+  if (argument_exists(split_by)) {
+    iv <- scale(data[, split_by])
+    obj_fun <- make_obj_function(data, equalize, split_by, design) 
+  }
+  
+  # optimize set assignment using exchange method  
+  anticlusters <- anticlustering(
+    features = scale(data[, c(equalize, split_by)]),
+    K = prod(design),
+    categories = preclusters,
+    objective = obj_fun
   )
 }
 
-# Internal function for anticlustering
-wrap_anticlustering <- function(data, equalize, balance, K) {
-  preclusters <- categorical_restrictions(data, equalize, balance, K)
+
+# Generate an objective functions for min-max anticlustering
+make_obj_function <- function(data, equalize, split_by, design) {
   
-  # initial assignment based on preclustering
-  K <- anticlustering(
-    data[, equalize],
-    K = K,
-    categories = preclusters
-  )
+  # get all levels of clusters and the corresponding levels for split variables
+  levels <- expand.grid(lapply(design, function(x) 1:x))
   
-  categories <- NULL
-  if (argument_exists(balance)) {
-    categories <- merge_into_one_variable(data[, balance])
+  # combine to a single objective function
+  function(cl, data) {
+    similarity_covariates <- obj_value_distance(
+      cl, 
+      data[, equalize, drop = FALSE]
+    )
+    dissims <- c()
+    for (i in 1:length(design)) {
+      clusters <- levels[, i][cl]
+      # compute sum of distances within cluster
+      distances <- by(data[, split_by[i]], clusters, dist)
+      dissims[i] <- sum(sapply(distances, sum))
+    }
+    similarity_covariates - sum(dissims)
   }
-  
-  anticlustering(
-    features = scale(data[, equalize]),
-    K = K,
-    categories = categories
-  )
 }
+
 
 message_method <- function(data, split_by, n, design) {
   K <- prod(design)
