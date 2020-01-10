@@ -61,7 +61,6 @@ wrap_anticlustering <- function(data, equalize, split_by, design, preclusters) {
   obj_fun <- "distance"
   # min-max anticlustering if `split_by` exists
   if (argument_exists(split_by)) {
-    iv <- scale(data[, split_by])
     obj_fun <- make_obj_function(data, equalize, split_by, design) 
   }
   
