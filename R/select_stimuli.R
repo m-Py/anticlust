@@ -140,8 +140,10 @@ safely_exclude_na <- function(data, split_by, equalize, balance, K, n) {
   # can remove data if enough entries remain after NA exclusion
   if ((K * n) <= sum(has_no_na)) {
     data <- data[has_no_na, , drop = FALSE]
-    message("\n", sum(!has_no_na), " records could be excluded due to missing values.\n",
-            "Selecting stimuli from the remaining ", nrow(data), " records.")
+    if (sum(!has_no_na) > 0) {
+      message("\n", sum(!has_no_na), " records could be excluded due to missing values.\n",
+              "Selecting stimuli from the remaining ", nrow(data), " records.")
+    }
   }
   data
 }
