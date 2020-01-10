@@ -22,9 +22,11 @@ should be balanced across sets}
 
 \item{design}{Specifies the number of groups per \code{split_by} 
 feature. Is a vector of length \code{ncol(split_by)} (or of length
-1 if only one - or no - \code{split_by} feature is passed).}
+1 if one or no \code{split_by} feature is passed).}
 
-\item{n}{The number of elements per set.}
+\item{n}{The number of elements per set. If not specified, the complete 
+date set is partitioned into subsets (the number of subsets is specified
+using the \code{design} argument).}
 }
 \value{
 A data frame that has the same columns as the original input 

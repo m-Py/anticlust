@@ -19,8 +19,10 @@
 #'     should be balanced across sets
 #' @param design Specifies the number of groups per \code{split_by} 
 #'     feature. Is a vector of length \code{ncol(split_by)} (or of length
-#'     1 if only one - or no - \code{split_by} feature is passed).
-#' @param n The number of elements per set.
+#'     1 if one or no \code{split_by} feature is passed).
+#' @param n The number of elements per set. If not specified, the complete 
+#'     date set is partitioned into subsets (the number of subsets is specified
+#'     using the \code{design} argument).
 #'
 #' @return A data frame that has the same columns as the original input 
 #'    (the data frame \code{data}), but has an additional called \code{SET}.
