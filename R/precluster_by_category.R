@@ -2,7 +2,7 @@
 # A wrapper to obtain preclusters 
 # (a) for imbalanced data
 # (b) if categorical restrictions are passed
-categorical_restrictions <- function(data, equalize, balance, K) {
+preclustering <- function(data, equalize, balance, K) {
   if (argument_exists(balance)) {
     categories <- merge_into_one_variable(data[, balance])
     preclusters <- to_numeric(
