@@ -1,22 +1,8 @@
  
 # TODO
-# - add categorical constrains (using an argument `balance`)
-#     + should be able to include preclustering retrictions
-# - for subset anticlustering: do categorical preclustering at the
-#   beginnung; then, select only preclusters having the correct size;
-#   the select the best preclusters
-# - add control parameters fro the function select_stimuli (number 
-#   of elements per group (as matrix?); p can be control parameter;
-#   thresholds on divide parameter; objective for anticlustering 
-#   [anticluster editing / k-means]; something to guide importance
-#   of maximizing dissimilarity wrt independent variable and minimize
-#   similarity wrt covariates)
-# - examples in code (need new data set!)
 # - generate_exchange_partners should call the clustering function defined
 #   below that can deal with data that cannot be split in N/K parts
-# - control parameter for weights of `equalize` variables
-# - maybe: argument pca: should a pca be conducted on the features?
-# - use categories argument (as argument `balance`)
+# - control parameter for weights of `equalize` / `split_by` variables
 
 
 #' Select stimuli for experiments
