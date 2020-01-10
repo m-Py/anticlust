@@ -46,16 +46,6 @@ precluster_per_category <- function(features, categories, K) {
   merge_into_one_variable(cbind(cl, categories))
 }
 
-# Combining preclustering restrictions and categorical restrictions
-# is only possible if
-# a) the number of elements per category can be divided by K
-# b) the number of elements per anticluster/category combination can be divided by K
-preclustering_possible <- function(categories, K) {
-  tab <- table(categories)
-  !any(tab %% (K^2) != 0)
-}
-
-
 # Wrap the balanced clustering function to allow for some imbalancing
 # @param features
 # @param K the Number of anticlusters (! -> the number of clusters returned is ~ nrow(features) / K)
