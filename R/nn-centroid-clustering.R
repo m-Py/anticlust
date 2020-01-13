@@ -18,10 +18,6 @@ nn_centroid_clustering <- function(data, K, groups = NULL) {
     # compute nearest neighbors for element that is furthest away
     max_away <- which.max(distances)
     clustered <- get_nearest_neighbours(data, max_away, K, groups)
-    # as soon as no more neighbours are found: exit
-    if (any(is.na(clustered))) {
-      break
-    }
     clusters[idx[clustered]] <- counter
     data <- data[-clustered, , drop = FALSE]
     distances <- distances[-clustered]
