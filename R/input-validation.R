@@ -16,7 +16,7 @@
 input_handling_anticlustering <- function(features, distances,
                                           K, objective, method,
                                           preclustering, nrep,
-                                          categories, iv) {
+                                          categories) {
 
   ## Merge categories variable so that `length` can be applied:
   categories <- merge_into_one_variable(categories)
@@ -27,10 +27,6 @@ input_handling_anticlustering <- function(features, distances,
 
   if (argument_exists(features) && argument_exists(distances)) {
     stop("Only pass one of the arguments 'features' or 'distances'.")
-  }
-
-  if (argument_exists(iv) && argument_exists(distances)) {
-    stop("Do not use the `iv` argument together with the `distances` argument.")
   }
 
   ## Validate feature input
@@ -89,14 +85,6 @@ input_handling_anticlustering <- function(features, distances,
     if (preclustering == TRUE) {
       stop("K must be a divider of the number of elements. ",
            "(Try out preclustering = FALSE.)")
-    }
-  }
-
-  if (argument_exists(iv)) {
-    iv <- as.matrix(iv)
-    validate_input(iv, "iv", objmode = "numeric")
-    if (nrow(iv) != N) {
-      stop("The argument `iv` and the argument `features` (or `distances`) imply a different N")
     }
   }
 

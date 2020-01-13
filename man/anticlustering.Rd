@@ -6,7 +6,7 @@
 \usage{
 anticlustering(features = NULL, distances = NULL, K,
   objective = "distance", method = "exchange", preclustering = FALSE,
-  nrep = 10, categories = NULL, iv = NULL)
+  nrep = 10, categories = NULL)
 }
 \arguments{
 \item{features}{A numeric vector, matrix or data.frame of data
@@ -159,15 +159,6 @@ only available in combination with the random sampling and exchange
 method, but not with the exact ILP approach. Note that
 it is currently \strong{not} possible to apply preclustering constraints
 and categorical constraints at the same time.
-
-\strong{Min-max anticlustering}
-
-It is possible to conduct »min-max anticlustering«. That is: For
-some variables, similarity is maximized between sets, whereas for
-other variables, similarity is minimized. Use the argument \code{iv}
-to define variables whose values should be dissimilar between sets;
-\code{iv} is used the same way as \code{features} whose values are
-made similar between sets.
 
 \strong{Recommendations}
 

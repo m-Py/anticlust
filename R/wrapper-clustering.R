@@ -106,7 +106,7 @@ balanced_clustering <- function(features = NULL, distances = NULL,
 
   input_handling_anticlustering(features, distances, K,
                                 "distance", method, TRUE, 1,
-                                NULL, NULL)
+                                NULL)
   
   data <- process_input(features, distances)
   

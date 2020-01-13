@@ -151,15 +151,6 @@
 #' it is currently \strong{not} possible to apply preclustering constraints
 #' and categorical constraints at the same time.
 #'
-#' \strong{Min-max anticlustering}
-#'
-#' It is possible to conduct »min-max anticlustering«. That is: For
-#' some variables, similarity is maximized between sets, whereas for
-#' other variables, similarity is minimized. Use the argument \code{iv}
-#' to define variables whose values should be dissimilar between sets;
-#' \code{iv} is used the same way as \code{features} whose values are
-#' made similar between sets.
-#'
 #' \strong{Recommendations}
 #'
 #' The following recommendations are provided on using this function:
@@ -257,11 +248,11 @@
 anticlustering <- function(features = NULL, distances = NULL,
                            K, objective = "distance", method = "exchange",
                            preclustering = FALSE, nrep = 10,
-                           categories = NULL, iv = NULL) {
+                           categories = NULL) {
 
   ## Get data into required format
   input_handling_anticlustering(features, distances, K, objective,
-                                method, preclustering, nrep, categories, iv)
+                                method, preclustering, nrep, categories)
 
   ## Only deal with 1 data object (either features or distances)
   data <- process_input(features, distances)
@@ -277,21 +268,20 @@ anticlustering <- function(features = NULL, distances = NULL,
   }
 
   # Some preprocessing: get objective function, preclusters and categories:
-  obj_function <- get_objective_function(data, objective, K, iv)
+  obj_function <- get_objective_function(data, objective, K)
   # Preclustering and categorical constraints are both processed in the
   # variable `categories` after this step:
   categories <- get_categorical_constraints(data, K, preclustering, categories)
 
   ## Redirect to fast exchange method for k-means exchange
   if (class(objective) != "function" && objective == "variance" &&
-      method == "exchange" && sum(is.na(K)) == 0 && !argument_exists(iv)) {
+      method == "exchange" && sum(is.na(K)) == 0) {
     return(fast_anticlustering(data, K, Inf, categories))
   }
 
   ## Redirect to fast exchange method for anticluster editing
   if (class(objective) != "function" && objective == "distance" &&
-      method == "exchange"  && !argument_exists(iv) &&
-      sum(is.na(K)) == 0) {
+      method == "exchange" && sum(is.na(K)) == 0) {
     return(fast_exchange_dist(data, K, categories))
   }
 
@@ -316,11 +306,8 @@ process_input <- function(features, distances) {
 # Determine the objective function needed for the input
 # The function returns a function. It is ensured that the function
 # removes missing values before computing the objective. Missing values
-# mean that there are NAs in the clustering vector. If an independent
-# variable was passed via `iv`, the objective function will incorporate
-# a reversed anticlustering term (i.e., cluster term) ensuring that
-# sets with higher dissimilarity in the IV are favored.
-get_objective_function <- function(data, objective, K, iv) {
+# mean that there are NAs in the clustering vector. 
+get_objective_function <- function(data, objective, K) {
   if (class(objective) == "function") {
     obj_function <- objective
   } else {
@@ -348,16 +335,7 @@ get_objective_function <- function(data, objective, K, iv) {
     obj <- obj_function
   }
 
-  ## Min-max application: independent variable is present
-  if (argument_exists(iv)) { # make means in independent variable different
-    iv <- as.matrix(iv)
-    obj2 <- function(clusters, data) {
-      obj(clusters, data) + obj(clusters, iv) * (-1)
-    }
-  } else {
-    obj2 <- obj
-  }
-  obj2
+  obj
 }
 
 
