@@ -51,14 +51,8 @@ get_nearest_neighbours <- function(data, max_away, K, groups) {
     nns <- rep(NA, K-1)
     for (i in seq_along(other_groups)) {
       tmp_data <- data[groups == other_groups[i], , drop = FALSE]
-      
-      ## check if a neighbor can be found at all; otherwise return NA!
-      if (nrow(tmp_data) > 0) {
-        nn <- c(nn2(tmp_data, current_element, 1)$nn.idx)
-        nns[i] <- which(groups == other_groups[i])[nn]
-      } else {
-        nns[i] <- NA
-      }
+      nn <- c(nn2(tmp_data, current_element, 1)$nn.idx)
+      nns[i] <- which(groups == other_groups[i])[nn]
     }
     nns <- c(max_away, nns)
     return(nns)
