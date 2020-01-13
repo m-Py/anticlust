@@ -2,7 +2,7 @@
 # nearest neighbor centroid clustering
 
 # data = feature data frame
-# K = size of the small groups
+# K = size of the small groups (not the number of clusters!)
 # groups = vector of length nrow(data); if passed, K-partite matching is conducted,
 # i.e., each element is clustered with elements that are in *other* groups than 
 # the element itself
@@ -24,7 +24,7 @@ nn_centroid_clustering <- function(data, K, groups = NULL) {
     idx  <- idx[-clustered]
     counter <- counter + 1
   }
-  clusters
+  order_cluster_vector(clusters)
 }
 
 # Get nearest neighbours for a current element

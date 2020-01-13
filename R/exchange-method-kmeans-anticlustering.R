@@ -265,5 +265,5 @@ get_neighbours <- function(features, k_neighbours, categories) {
 
 # A convenience function converting any categorical input to numeric
 to_numeric <- function(x) {
-  as.numeric(as.factor(x))
+  as.numeric(factor(x))
 }

@@ -27,4 +27,4 @@ Authors@R: c(person(given='Martin', family='Papenberg',
         comment='centroid based clustering algorithm') )
 Version: 0.3.0-2
 Date: 2019-12-11
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2

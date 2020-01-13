@@ -33,11 +33,6 @@
 #'     \code{"sampling"}.
 #' @param categories A vector, data.frame or matrix representing one or
 #'     several categorical constraints. See details.
-#' @param iv A vector, data.frame or matrix representing features that act
-#'     as "independent variables", i.e., variables whose values
-#'     are made as different as possible between sets (the opposite of
-#'     the \code{features} argument). Cannot be used in conjunction with
-#'     the argument \code{distances}.
 #'
 #' @return A vector of length N that assigns a group (i.e, a number
 #'     between 1 and K) to each input element.
@@ -302,6 +297,15 @@ process_input <- function(features, distances) {
   data
 }
 
+# Ensure that a distance matrix is passed
+convert_to_distances <- function(data) {
+  if (!is_distance_matrix(data)) {
+    distances <- as.matrix(dist(data))
+  } else {
+    distances <- data
+  }
+  distances
+}
 
 # Determine the objective function needed for the input
 # The function returns a function. It is ensured that the function
@@ -382,7 +386,7 @@ get_preclusters <- function(data, K) {
     K <- length(unique(K))
   }
   N <- nrow(data)
-  nn_centroid_clustering(data, N / K)
+  nn_centroid_clustering(data, K)
 }
 
 # Direct to exchange method or sampling

@@ -40,23 +40,6 @@ test_that("distance input works for precluster ILP", {
   }
 })
 
-test_that("distance input works for complete enumeration", {
-  conditions <- expand.grid(m = 1:4, p = 2)
-  for (k in 1:nrow(conditions)) {
-    m_features <- conditions[k, "m"]
-    K <- conditions[k, "p"]
-    n_elements <- K * 5 # n must be multiplier of p
-    features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
-    distances <- dist(features)
-
-    ac_feat <- enum_anticlustering(features, K = K)
-    ac_dist <- enum_anticlustering(distances = distances, K = K)
-
-    expect_equal(distance_objective_(ac_feat, dist(features)),
-                 distance_objective_(ac_feat, distances))
-  }
-})
-
 test_that("distance input works for heuristic without preclustering", {
   conditions <- expand.grid(m = 1:4, p = 2:4)
   for (k in 1:nrow(conditions)) {

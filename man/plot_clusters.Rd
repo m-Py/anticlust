@@ -4,12 +4,28 @@
 \alias{plot_clusters}
 \title{Visualize a cluster analysis}
 \usage{
-plot_clusters(features, clustering, within_connection = FALSE,
-  between_connection = FALSE, illustrate_variance = FALSE,
-  show_axes = FALSE, xlab = NULL, ylab = NULL, xlim = NULL,
-  ylim = NULL, col = NULL, pch = 19, main = "", cex = 1.2,
-  cex.axis = 1.2, cex.lab = 1.2, lwd = 1.5, lty = 2,
-  frame.plot = FALSE, cex_centroid = 2)
+plot_clusters(
+  features,
+  clustering,
+  within_connection = FALSE,
+  between_connection = FALSE,
+  illustrate_variance = FALSE,
+  show_axes = FALSE,
+  xlab = NULL,
+  ylab = NULL,
+  xlim = NULL,
+  ylim = NULL,
+  col = NULL,
+  pch = 19,
+  main = "",
+  cex = 1.2,
+  cex.axis = 1.2,
+  cex.lab = 1.2,
+  lwd = 1.5,
+  lty = 2,
+  frame.plot = FALSE,
+  cex_centroid = 2
+)
 }
 \arguments{
 \item{features}{A data.frame or matrix representing the features that

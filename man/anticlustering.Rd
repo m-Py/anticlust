@@ -4,9 +4,16 @@
 \alias{anticlustering}
 \title{Anticlustering}
 \usage{
-anticlustering(features = NULL, distances = NULL, K,
-  objective = "distance", method = "exchange", preclustering = FALSE,
-  nrep = 10, categories = NULL)
+anticlustering(
+  features = NULL,
+  distances = NULL,
+  K,
+  objective = "distance",
+  method = "exchange",
+  preclustering = FALSE,
+  nrep = 10,
+  categories = NULL
+)
 }
 \arguments{
 \item{features}{A numeric vector, matrix or data.frame of data
@@ -45,12 +52,6 @@ method. This argument only has an effect if \code{method} is
 
 \item{categories}{A vector, data.frame or matrix representing one or
 several categorical constraints. See details.}
-
-\item{iv}{A vector, data.frame or matrix representing features that act
-as "independent variables", i.e., variables whose values
-are made as different as possible between sets (the opposite of
-the \code{features} argument). Cannot be used in conjunction with
-the argument \code{distances}.}
 }
 \value{
 A vector of length N that assigns a group (i.e, a number

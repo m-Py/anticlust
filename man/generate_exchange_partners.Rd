@@ -4,8 +4,13 @@
 \alias{generate_exchange_partners}
 \title{Generate exchange partners for anticlustering}
 \usage{
-generate_exchange_partners(N = NULL, p, categories = NULL,
-  similar = FALSE, features = NULL)
+generate_exchange_partners(
+  N = NULL,
+  p,
+  categories = NULL,
+  similar = FALSE,
+  features = NULL
+)
 }
 \arguments{
 \item{N}{The number of elements. Does not need to be passed if either

@@ -9,8 +9,7 @@ The integer linear programming method was implemented by Martin
 Papenberg.
 }
 \usage{
-balanced_clustering(features = NULL, distances = NULL, K,
-  method = "heuristic")
+balanced_clustering(features = NULL, distances = NULL, K, method = "heuristic")
 }
 \arguments{
 \item{features}{A vector, matrix or data.frame of data points. Rows
