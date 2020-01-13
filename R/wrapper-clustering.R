@@ -13,7 +13,7 @@
 #'     the upper and lower triangular matrix represent the pairwise
 #'     dissimilarities.
 #' @param K How many clusters should be created.
-#' @param method One of "heuristic", "nn", or "ilp". See details.
+#' @param method One of "heuristic" or "ilp". See details.
 #'
 #' @return A vector representing the cluster affiliation of all elements.
 #'
@@ -28,13 +28,7 @@
 #' clustered with its (N/K)-1 nearest neighbours. From the remaining
 #' elements, the element farthest to the centroid is selected and again
 #' clustered with its (N/K)-1 neighbours; the procedure is repeated
-#' until all elements are part of a cluster. The same algorithm is 
-#' computed when you use \code{method = "nn"}. However, the \code{"nn"}
-#' implementation is faster and applicable to larger data sets because 
-#' it does not compute a distance matrix, but instead relies on nearest 
-#' neighbour search as implemented via \code{\link[RANN]{nn2}}. Currently,
-#' \code{method = "nn"} is only applicable when data is passed via the 
-#' \code{features} argument.
+#' until all elements are part of a cluster. 
 #'
 #' An exact method (\code{method = "ilp"}) can be used to solve cluster
 #' editing optimally. The cluster editing objective minimizes the sum
@@ -113,18 +107,11 @@ balanced_clustering <- function(features = NULL, distances = NULL,
   input_handling_anticlustering(features, distances, K,
                                 "distance", method, TRUE, 1,
                                 NULL, NULL)
-
-  data <- process_input(features, distances, "distance", method)
-
+  
+  data <- process_input(features, distances)
+  
   if (method == "ilp") {
     return(balanced_cluster_editing(data, K, solver_available()))
   }
-  if (method == "nn") {
-    if (argument_exists(distances)) {
-      stop("Can use method `nn` only with argument `features` as input.")
-    }
-    return(nn_centroid_clustering(data, nrow(data) / K))
-  }
-
-  centroid_clustering(data, K = K)
+  nn_centroid_clustering(data, NROW(data) / K)
 }

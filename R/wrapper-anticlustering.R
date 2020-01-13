@@ -303,22 +303,12 @@ anticlustering <- function(features = NULL, distances = NULL,
 # Function that processes input and returns the data set that the
 # optimization is conducted on as matrix (for exchange and sampling methods)
 # Returned matrix either represents distances or features.
-process_input <- function(features, distances, objective, method) {
+process_input <- function(features, distances) {
   if (argument_exists(features)) {
     data <- as.matrix(features)
-    class(data) <- c("features", class(data))
     return(data)
   }
   data <- as.matrix(as.dist(distances))
-  class(data) <- c("distances", class(data))
-  data
-}
-
-# Sometimes it is necessary to check that distance input is available
-convert_to_distances <- function(data) {
-  if ("features" %in% class(data)) {
-    return(as.matrix(dist(data)))
-  }
   data
 }
 

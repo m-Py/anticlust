@@ -28,7 +28,7 @@ dissimilarities.}
 
 \item{K}{How many clusters should be created.}
 
-\item{method}{One of "heuristic", "nn", or "ilp". See details.}
+\item{method}{One of "heuristic" or "ilp". See details.}
 }
 \value{
 A vector representing the cluster affiliation of all elements.
@@ -46,13 +46,7 @@ central element acts as the centroid). The farthest element is
 clustered with its (N/K)-1 nearest neighbours. From the remaining
 elements, the element farthest to the centroid is selected and again
 clustered with its (N/K)-1 neighbours; the procedure is repeated
-until all elements are part of a cluster. The same algorithm is 
-computed when you use \code{method = "nn"}. However, the \code{"nn"}
-implementation is faster and applicable to larger data sets because 
-it does not compute a distance matrix, but instead relies on nearest 
-neighbour search as implemented via \code{\link[RANN]{nn2}}. Currently,
-\code{method = "nn"} is only applicable when data is passed via the 
-\code{features} argument.
+until all elements are part of a cluster. 
 
 An exact method (\code{method = "ilp"}) can be used to solve cluster
 editing optimally. The cluster editing objective minimizes the sum
