@@ -11,8 +11,10 @@
 #' @noRd
 #'
 balanced_cluster_editing <- function(data, K, solver) {
-  distances <- convert_to_distances(data)
-  ilp <- anticlustering_ilp(distances, K, solver = solver)
+  if (!is_distance_matrix(data)) {
+    data <- as.matrix(dist(data))
+  }
+  ilp <- anticlustering_ilp(data, K, solver = solver)
   solution <- solve_ilp(ilp, solver, "min")
-  ilp_to_groups(solution, nrow(distances))
+  ilp_to_groups(solution, nrow(data))
 }
