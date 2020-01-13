@@ -404,7 +404,7 @@ get_preclusters <- function(data, K) {
     K <- length(unique(K))
   }
   N <- nrow(data)
-  centroid_clustering(data, N / K)
+  nn_centroid_clustering(data, N / K)
 }
 
 # Direct to exchange method or sampling
