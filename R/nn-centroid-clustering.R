@@ -66,10 +66,15 @@ get_nearest_neighbours <- function(data, max_away, K, groups) {
   nn2(data, data[max_away, , drop = FALSE], K)$nn.idx
 }
 
-# Compute the distances from centroid of a data set
-distances_from_centroid <- function(data) {
-  centroid <- t(as.matrix(colMeans(data)))
-  c(dist_from_centers(data, centroid, squared = FALSE))
-}
-
+# Compute the distances from centroid of a data set.
+# Centroid is either computed in euclidean space or taken as a central element
+distances_from_centroid <- function(x) {
+  if (is_distance_matrix(x)) {
+    distances <- as.matrix(x)
+    maxima <- apply(distances, 1, max)
+    centroid <- which.min(maxima)
+    return(distances[centroid, ])
+  }
+  centroid <- t(as.matrix(colMeans(x)))
+  c(dist_from_centers(x, centroid, squared = FALSE))
 }
