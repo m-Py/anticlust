@@ -18,7 +18,11 @@ nn_centroid_clustering <- function(data, K, groups = NULL) {
     max_away <- which.max(distances)
     clustered <- get_nearest_neighbours(data, max_away, K, groups)
     clusters[idx[clustered]] <- counter
-    data <- data[-clustered, , drop = FALSE]
+    if (is_distance_matrix(data)) {
+      data <- data[-clustered, -clustered, drop = FALSE]
+    } else {
+      data <- data[-clustered, , drop = FALSE]
+    }
     distances <- distances[-clustered]
     groups <- groups[-clustered]
     idx  <- idx[-clustered]
@@ -31,11 +35,12 @@ nn_centroid_clustering <- function(data, K, groups = NULL) {
 # param data: the data
 # param may_away: the index of the element that is furthest away from 
 #   the cluster centroid and for which nearest neighbors are sought
-# param K: The number of clusters / nearest neighbours
+# param K: The number of nearest neighbours (including the element itself!)
 # param groups = vector of length nrow(data); elements are clustered with elements in *other* groups 
 # return: The indices of the current element as vector. !! The first
 #   index is the element itself !!
-get_nearest_neighbours <- function(data, max_away, K, groups) {
+get_nearest_neighbours <- function(data, max_away, k, groups) {
+  
   # k-partite clustering
   if (argument_exists(groups)) {
     K <- length(unique(groups))
@@ -63,9 +68,9 @@ get_nearest_neighbours <- function(data, max_away, K, groups) {
   
   # normal clustering - no grouping restrictions
   if (is_distance_matrix(data)) {
-    nns <- order(data[max_away, ])[1:K]
+    nns <- order(data[max_away, ])[1:k]
   } else {
-    nns <- nn2(data, data[max_away, , drop = FALSE], K)$nn.idx
+    nns <- nn2(data, data[max_away, , drop = FALSE], k)$nn.idx
   }
   nns
 }
