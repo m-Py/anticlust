@@ -1,5 +1,5 @@
 
-#' Create K balanced clusters
+#' Create balanced clusters
 #'
 #' @param features A vector, matrix or data.frame of data points. Rows
 #'     correspond to elements and columns correspond to features. A
@@ -15,7 +15,8 @@
 #' @param K How many clusters should be created.
 #' @param method One of "heuristic" or "ilp". See details.
 #'
-#' @return A vector representing the cluster affiliation of all elements.
+#' @return An integer vector representing the cluster affiliation of 
+#'     each data point
 #'
 #' @details
 #'
@@ -23,11 +24,11 @@
 #' clusters. The function offers two methods, a heuristic method and an
 #' exact method. The heuristic (\code{method = "heuristic"}) computes
 #' the centroid of all available elements and identifies the element
-#' farthest to it (if the input is a dissimilarity matrix, the most
-#' central element acts as the centroid). The farthest element is
-#' clustered with its (N/K)-1 nearest neighbours. From the remaining
+#' farthest to it. If the input is a dissimilarity matrix, the most
+#' central element acts as the centroid. The farthest element is
+#' clustered with its \code{(N/K) - 1} nearest neighbours. From the remaining
 #' elements, the element farthest to the centroid is selected and again
-#' clustered with its (N/K)-1 neighbours; the procedure is repeated
+#' clustered with its \code{(N/K) - 1} neighbours; the procedure is repeated
 #' until all elements are part of a cluster. 
 #'
 #' An exact method (\code{method = "ilp"}) can be used to solve cluster
@@ -49,9 +50,9 @@
 #'
 #' @source
 #'
-#' The heuristic method was developed and contributed by m.eik michalke.
-#' The integer linear programming method was implemented by Martin
-#' Papenberg.
+#' The heuristic method was originally developed and contributed by m.eik michalke.
+#' It was later rewritten by Martin Papenberg, who also implemented the exact integer linear
+#' programming method.
 #'
 #' @export
 #'
@@ -62,38 +63,15 @@
 #'
 #' @examples
 #'
-#' data(iris)
-#' # Only use numeric attributes
-#' clusters <- balanced_clustering(distances = dist(iris[, -5]), K = 3)
-#' # Compare feature means by anticluster
-#' by(iris[, -5], clusters, function(x) round(colMeans(x), 2))
-#' # Plot the anticlustering
-#' par(mfrow = c(1, 2))
-#' plot_clusters(iris[, 1:2], clusters)
-#' plot_clusters(iris[, 3:4], clusters)
-#'
-#'
-#' ## Exact balanced cluster editing method
-#' # Create artifical data
-#' n_features <- 2
-#' N <- 30
-#' K <- 3
-#' features <- matrix(rnorm(N * n_features), ncol = n_features)
-#' ac1 <- balanced_clustering(features, K = K, method = "ilp")
-#' ac2 <- balanced_clustering(features, K = K, method = "heuristic")
-#'
-#' ## Compare exact and heuristic balanced cluster editing
-#' par(mfrow = c(1, 2))
-#' plot_clusters(features, ac1, within_connection = TRUE,
-#'               main = "optimal cluster editing", xlab = "", ylab = "")
-#' plot_clusters(features, ac2, within_connection = TRUE,
-#'               main = "heuristic cluster editing", xlab = "", ylab = "")
-#'
-#' # Method `nn`
-#'
-#' lds <- data.frame(f1 = rnorm(10000), f2 = rnorm(10000))
-#' cl <- balanced_clustering(lds, K = 10, method = "nn")
+#' # Cluster a data set and visualize results
+#' N <- 1000
+#' lds <- data.frame(f1 = rnorm(N), f2 = rnorm(N))
+#' cl <- balanced_clustering(lds, K = 10)
 #' plot_clusters(lds, clustering = cl)
+#' 
+#' # Repeat using a distance matrix as input
+#' cl2 <- balanced_clustering(distances = dist(lds), K = 10)
+#' plot_clusters(lds, clustering = cl2)
 #'
 #' @references
 #'
