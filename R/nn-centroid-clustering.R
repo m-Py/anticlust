@@ -8,7 +8,6 @@
 # the element itself
 nn_centroid_clustering <- function(data, K, groups = NULL) {
   data <- as.matrix(data)
-
   distances <- distances_from_centroid(data)
   counter <- 1
   idx <- 1:nrow(data)
@@ -37,23 +36,38 @@ nn_centroid_clustering <- function(data, K, groups = NULL) {
 # return: The indices of the current element as vector. !! The first
 #   index is the element itself !!
 get_nearest_neighbours <- function(data, max_away, K, groups) {
+  # k-partite clustering
   if (argument_exists(groups)) {
+    K <- length(unique(groups))
     groups <- to_numeric(groups)
     current_group <- groups[max_away]
     other_groups <- (1:K)[-current_group]
     current_element <- data[max_away, , drop = FALSE]
-    
     # get nearest neighbour in each other group
     nns <- rep(NA, K-1)
     for (i in seq_along(other_groups)) {
-      tmp_data <- data[groups == other_groups[i], , drop = FALSE]
-      nn <- c(nn2(tmp_data, current_element, 1)$nn.idx)
-      nns[i] <- which(groups == other_groups[i])[nn]
+      if (is_distance_matrix(data)) {
+        # get indices of elements in other groups
+        idx_other <- which(groups == other_groups[i])
+        most_similar <- order(current_element)
+        nns[i] <- most_similar[most_similar %in% idx_other][1]
+      } else {
+        tmp_data <- data[groups == other_groups[i], , drop = FALSE]
+        nn <- c(nn2(tmp_data, current_element, 1)$nn.idx)
+        nns[i] <- which(groups == other_groups[i])[nn]
+      }
     }
     nns <- c(max_away, nns)
     return(nns)
   }
-  nn2(data, data[max_away, , drop = FALSE], K)$nn.idx
+  
+  # normal clustering - no grouping restrictions
+  if (is_distance_matrix(data)) {
+    nns <- order(data[max_away, ])[1:K]
+  } else {
+    nns <- nn2(data, data[max_away, , drop = FALSE], K)$nn.idx
+  }
+  nns
 }
 
 # Compute the distances from centroid of a data set.
