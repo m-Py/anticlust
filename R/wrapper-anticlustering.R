@@ -264,7 +264,7 @@ anticlustering <- function(features = NULL, distances = NULL,
                                 method, preclustering, nrep, categories, iv)
 
   ## Only deal with 1 data object (either features or distances)
-  data <- process_input(features, distances, objective, method)
+  data <- process_input(features, distances)
 
   ## Exact method using ILP
   if (method == "ilp") {
