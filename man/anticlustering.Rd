@@ -160,27 +160,6 @@ only available in combination with the random sampling and exchange
 method, but not with the exact ILP approach. Note that
 it is currently \strong{not} possible to apply preclustering constraints
 and categorical constraints at the same time.
-
-\strong{Recommendations}
-
-The following recommendations are provided on using this function:
-
-\enumerate{
- \item If it is desired that the feature means are as similar as possible
-     between sets, select \code{objective = "variance"}
- \item If the average similarity between elements in different sets
-     should be maximized (i.e., making sets as a whole similar to
-     each other), select \code{objective = "distance"}
- \item When the objective is \code{"distance"} and an exact approach
-     is infeasible: select \code{method = "exchange"}; it is also
-     possible to activate \code{preclustering = TRUE}, which improves
-     run time and often does not even impair quality of the solution.
- \item Generally, the exchange method is preferred over random
-     sampling. Use random sampling only for large data sets or if
-     a fast solution is needed. However, even in that case, using
-     the exchange method with preclustering activated or using the function
-     \code{\link{fast_anticlustering}} is usually preferred.
-}
 }
 \examples{
 
@@ -192,33 +171,17 @@ data(iris)
 head(iris[, -5]) # these features are made similar across sets
 
 
-## Optimize the variance criterion using the exchange method
+## Optimize the cluster editing (distance) criterion using the exchange method
 anticlusters <- anticlustering(
   iris[, -5],
   K = 3,
-  objective = "variance",
+  objective = "distance",
   method = "exchange"
 )
 # Compare feature means by anticluster
 by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
 # Compare standard deviations by anticluster
 by(iris[, -5], anticlusters, function(x) round(apply(x, 2, sd), 2))
-
-
-## Optimize the cluster editing objective while activating preclustering
-anticlusters <- anticlustering(
-  iris[, -5],
-  K = 3,
-  method = "exchange",
-  objective = "distance",
-  preclustering = TRUE
-)
-by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
-# Anticluster editing (method = "distance") tends to make the
-# standard deviations more similar, while k-means (method = "variance")
-# tends to make the means more similar):
-by(iris[, -5], anticlusters, function(x) round(apply(x, 2, sd), 2))
-
 
 
 ## Incorporate categorical restrictions:
@@ -230,6 +193,27 @@ anticlusters <- anticlustering(
   nrep = 1
 )
 table(iris[, 5], anticlusters)
+
+
+## Use preclustering and variance (k-means) criterion on large data sets
+N <- 1000
+K = 2
+lds <- data.frame(f1 = rnorm(N), f2 = rnorm(N))
+ac <- anticlustering(
+  lds, 
+  K = K,
+  objective = "variance",
+  preclustering = TRUE
+)
+
+# The following is equivalent to setting `preclustering = TRUE`:
+cl <- balanced_clustering(lds, K = N / K)
+ac <- anticlustering(
+  lds, 
+  K = K,
+  objective = "variance",
+  categories = cl
+)
 
 }
 \references{

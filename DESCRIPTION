@@ -5,9 +5,9 @@ Description: Anticlustering partitions a pool of elements into subsets
         (i.e., anticlusters) in such a way that the subsets are as
         similar as possible. This is accomplished by maximizing instead
         of minimizing a clustering objective, such as the intra-cluster
-        variance or the sum of pairwise distances within clusters. This
-        way, anticlustering maximizes the data heterogeneity within all
-        clusters. The package includes exact and heuristic approaches
+        variance or the sum of pairwise distances within clusters. Thus
+        anticlustering maximizes the heterogeneity within anticlusters. 
+        The package includes exact and heuristic approaches
         for anticlustering. The exact approach requires that a linear
         programming solver is installed. The package also offers
         methods for classical clustering problems under size
@@ -16,15 +16,14 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 URL: https://github.com/m-Py/anticlust
-Suggests: gurobi, Rglpk, Rcplex, testthat, knitr, rmarkdown, dplyr
+Suggests: gurobi, Rglpk, Rcplex, testthat
 Imports: Matrix, RANN
 Depends: R (>= 3.4.0)
 BugReports: https://github.com/m-Py/anticlust/issues
-VignetteBuilder: knitr, rmarkdown
 Authors@R: c(person(given='Martin', family='Papenberg',
         email='martin.papenberg@hhu.de', role=c('aut', 'cre', 'cph')),
         person(given='Meik', family='Michalke', role=c('ctb'),
         comment='centroid based clustering algorithm') )
-Version: 0.3.0-2
+Version: 0.3.1
 Date: 2019-12-11
 RoxygenNote: 7.0.2
