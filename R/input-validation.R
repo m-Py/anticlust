@@ -316,19 +316,3 @@ legal_number_of_clusters <- function(features, clusters) {
     stop("The number of elements is not a multiplier of the number of anticlusters")
   invisible(NULL)
 }
-
-#' Is a matrix a legal distance matrix
-#'
-#' @param m a Matrix
-#' @return TRUE if `m` is distance matrix, FALSE otherwise
-#' @noRd
-is_distance_matrix <- function(m) {
-  m <- as.matrix(m)
-  if (nrow(m) != ncol(m)) {
-    return(FALSE)
-  }
-  lower <- m[lower.tri(m)]
-  m <- t(m)
-  upper <- m[lower.tri(m)]
-  all(lower == upper)
-}

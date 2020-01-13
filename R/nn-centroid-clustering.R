@@ -72,3 +72,20 @@ distances_from_centroid <- function(x) {
   centroid <- t(as.matrix(colMeans(x)))
   c(dist_from_centers(x, centroid, squared = FALSE))
 }
+
+
+#' Is a matrix a legal distance matrix
+#'
+#' @param m a Matrix
+#' @return TRUE if `m` is distance matrix, FALSE otherwise
+#' @noRd
+is_distance_matrix <- function(m) {
+  m <- as.matrix(m)
+  if (nrow(m) != ncol(m)) {
+    return(FALSE)
+  }
+  lower <- m[lower.tri(m)]
+  m <- t(m)
+  upper <- m[lower.tri(m)]
+  all(lower == upper)
+}
