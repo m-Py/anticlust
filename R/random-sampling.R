@@ -151,9 +151,9 @@ categorical_sampling <- function(categories, K) {
 
 # sample function must be redefined for categorical sampling just in case
 # there is a category with only 1 member
-sample_ <- function(x) {
+sample_ <- function(x, ...) {
   if (length(x) == 1) {
     return(x)
   }
-  sample(x)
+  sample(x, ...)
 }

@@ -10,23 +10,30 @@
 ## in function `matching`
 nn_centroid_clustering <- function(data, K, groups = NULL, dummy = NULL) {
   data <- as.matrix(data)
+  N <- nrow(data)
   
   if (!argument_exists(dummy)) {
     distances <- distances_from_centroid(data)
+    dummy <- rep(FALSE, nrow(data))
   } else {
     # ensure that dummy items are never selected as "max-away" item
     distances <- distances_from_centroid(data[!dummy, , drop = FALSE])
     distances <- c(distances, rep(-Inf, sum(dummy == TRUE)))
   }
   
+  if (argument_exists(groups)) {
+    # smallest group determine what matches are possible
+    smallest_group <- which.min(table(groups[!dummy]))
+  }
+  
   counter <- 1
   idx <- 1:nrow(data)
   clusters <- rep(NA, nrow(data))
   
-  while (nrow(data) > 0) {
+  while (nrow(data) > 1) {
     # compute nearest neighbors for element that is furthest away
-    max_away <- which.max(distances)
-    clustered <- get_nearest_neighbours(data, max_away, K, groups)
+    target <- get_target(distances, groups, smallest_group, dummy)
+    clustered <- get_nearest_neighbours(data, target, K, groups)
     clusters[idx[clustered]] <- counter
     if (is_distance_matrix(data)) {
       data <- data[-clustered, -clustered, drop = FALSE]
@@ -36,10 +43,36 @@ nn_centroid_clustering <- function(data, K, groups = NULL, dummy = NULL) {
     distances <- distances[-clustered]
     groups <- groups[-clustered]
     idx  <- idx[-clustered]
+    dummy <- dummy[-clustered]
     counter <- counter + 1
+    # for bipartite matching: stop as soon the smallest group is matched
+    # with elements from the other groups
+    if (argument_exists(groups)) {
+      if (sum(groups[!dummy] == smallest_group) == 0) {
+        break
+      }
+    }
   }
+  # for subset matching: fill the remaining clusters: 
+  clusters[is.na(clusters)] <- N:(N - sum(is.na(clusters)) + 1)
   order_cluster_vector(clusters)
 }
+
+# Find target element for which neighbours are sought
+# param distances: distances to a cluster centroid
+get_target <- function(distances, groups, smallest_group, dummy) {
+  # if bipartite subset selection is required: 
+  # select a member from the smallest group
+  if (argument_exists(groups) && (sum(dummy) > 0)) {
+    groups <- groups[!dummy]
+    # return the most extreme member from the smallest group as target
+    ids_smallest <- which(groups == smallest_group)
+    ordered_distances <- order(distances)
+    return(ordered_distances[ordered_distances %in% ids_smallest][1])
+  }
+  which.max(distances)
+}
+
 
 # Get nearest neighbours for a current element
 # param data: the data

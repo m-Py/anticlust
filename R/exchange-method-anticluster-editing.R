@@ -124,7 +124,7 @@ order_cluster_vector <- function(clusters) {
   unique_clusters <- unique(clusters)
   K <- length(unique_clusters)
   clusters <- factor(clusters, levels = unique_clusters, labels = 1:K)
-  as.numeric(clusters)
+  to_numeric(clusters)
 }
 
 ## Swap items in a boolean matrix for indexing.

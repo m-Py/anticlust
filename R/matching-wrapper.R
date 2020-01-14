@@ -21,9 +21,7 @@
 #'     vector is passed, the argument \code{p} is ignored and matches are
 #'     sought between elements of different groups.
 #'
-#' @return An integer vector encoding the matches. Elements are \code{NA} if
-#'     no match was found (this only happens if the data cannot be evenly split
-#'     into matches.)
+#' @return An integer vector encoding the matches.
 #'
 #'
 #' @details
@@ -67,8 +65,9 @@ matching <- function(features = NULL, distances = NULL, p = NULL, groups = NULL)
   augmented <- augment_data(data, p, groups)
   data <- augmented$data
   groups <- augmented$groups
+  # pass dummy argument that informs the called functions of the presence
+  # of data augmentation
   dummy <- rep(c(FALSE, TRUE), c(N, nrow(data) - N))
-  print(dummy)
   cl <- nn_centroid_clustering(data, p, groups, dummy = dummy)
   cl[1:N] # remove augmented data points
 }
