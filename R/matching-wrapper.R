@@ -55,6 +55,18 @@
 #'   within_connection = TRUE
 #' )
 #' 
+#' # Use unequal-sized groups: Only selects matches for some elements
+#' N <- 33
+#' data <- matrix(rnorm(N), ncol = 1)
+#' groups <- sample(1:2, size = N, replace = TRUE, prob = c(0.7, 0.3))
+#' matched <- matching(data[, 1], groups = groups)
+#' plot_clusters(
+#'   cbind(groups, data), 
+#'   clustering = matched, 
+#'   within_connection = TRUE
+#' )
+#' 
+#' 
 #' @export
 #'
 
