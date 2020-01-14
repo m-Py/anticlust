@@ -7,7 +7,7 @@
 # i.e., each element is clustered with elements that are in *other* groups than 
 # the element itself
 # dummy = a T/F vector encoding if a data point is "real" and was not added 
-## in function `matching`
+# in function `matching`
 nn_centroid_clustering <- function(data, K, groups = NULL, dummy = NULL) {
   data <- as.matrix(data)
   N <- nrow(data)
