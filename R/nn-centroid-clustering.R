@@ -16,7 +16,7 @@ nn_centroid_clustering <- function(data, K, groups = NULL, dummy = NULL) {
     distances <- distances_from_centroid(data)
     dummy <- rep(FALSE, nrow(data))
   } else {
-    # ensure that dummy items are never selected as "max-away" item
+    # ensure that dummy items are never selected as target items
     distances <- distances_from_centroid(data[!dummy, , drop = FALSE])
     distances <- c(distances, rep(-Inf, sum(dummy == TRUE)))
   }
@@ -31,7 +31,7 @@ nn_centroid_clustering <- function(data, K, groups = NULL, dummy = NULL) {
   clusters <- rep(NA, nrow(data))
   
   while (nrow(data) > 1) {
-    # compute nearest neighbors for element that is furthest away
+    # compute nearest neighbors for a target element
     target <- get_target(distances, groups, smallest_group, dummy)
     clustered <- get_nearest_neighbours(data, target, K, groups)
     clusters[idx[clustered]] <- counter
@@ -60,6 +60,9 @@ nn_centroid_clustering <- function(data, K, groups = NULL, dummy = NULL) {
 
 # Find target element for which neighbours are sought
 # param distances: distances to a cluster centroid
+# param groups: groupingg vector
+# param smallest_group: id of the group having the fewest members
+# param dummy: T/F vector indicating if each data point is "real"
 get_target <- function(distances, groups, smallest_group, dummy) {
   # if bipartite subset selection is required: 
   # select a member from the smallest group
@@ -70,6 +73,7 @@ get_target <- function(distances, groups, smallest_group, dummy) {
     ordered_distances <- order(distances)
     return(ordered_distances[ordered_distances %in% ids_smallest][1])
   }
+  # otherwise: return most extreme item across all elements
   which.max(distances)
 }
 
