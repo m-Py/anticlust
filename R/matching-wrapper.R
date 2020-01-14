@@ -126,11 +126,5 @@ add_dimensions_ <- function(data, rows, cols) {
   new_mat <- matrix(extreme_value, nrow = rows, ncol = cols)
   ## add data into augmented matrix
   new_mat[1:old_dims[1], 1:old_dims[2]] <- data
-  # if a feature matrix is passed, make half of the new values extreme into the other direction
-  if (!is_distance_matrix(data) && rows > old_dims[1]) {
-    start <- old_dims[1] + 1
-    end <- old_dims[1] + floor((rows - old_dims[1]) / 2)
-    new_mat[start:end, ] <- extreme_value * (-1)
-  }
   new_mat
 }
