@@ -1,8 +1,9 @@
 
 #' Matching
 #'
-#' Conduct K-partite and unrestricted minimum distance matching to find pairs 
-#' or larger groups of similar elements.
+#' Conduct K-partite or unrestricted (minimum distance) matching to find pairs 
+#' or groups of similar elements. Finding matches is by default based on the Euclidean 
+#' distance between data points, but a custom distance measure can also be employed.
 #'
 #' @param features A numeric vector, matrix or data.frame of data
 #'     points.  Rows correspond to elements and columns correspond to
@@ -45,7 +46,6 @@
 #' triplets <- matching(lds, p = 3)
 #' plot_clusters(lds, clustering = triplets, within_connection = TRUE)
 #'
-#'
 #' # Match between different plant species
 #' species <- iris$Species != "setosa"
 #' matched <- matching(iris[species, 1], groups = iris[species, 5])
@@ -70,7 +70,7 @@
 #' @export
 #'
 
-matching <- function(features = NULL, distances = NULL, p = NULL, groups = NULL) {
+matching <- function(features = NULL, distances = NULL, p = 2, groups = NULL) {
   data <- process_input(features, distances)
   N <- nrow(data)
   # augment data if input is imbalanced
