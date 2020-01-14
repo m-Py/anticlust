@@ -67,7 +67,9 @@ matching <- function(features = NULL, distances = NULL, p = NULL, groups = NULL)
   augmented <- augment_data(data, p, groups)
   data <- augmented$data
   groups <- augmented$groups
-  cl <- nn_centroid_clustering(data, p, groups)
+  dummy <- rep(c(FALSE, TRUE), c(N, nrow(data) - N))
+  print(dummy)
+  cl <- nn_centroid_clustering(data, p, groups, dummy = dummy)
   cl[1:N] # remove augmented data points
 }
 

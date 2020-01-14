@@ -6,9 +6,19 @@
 # groups = vector of length nrow(data); if passed, K-partite matching is conducted,
 # i.e., each element is clustered with elements that are in *other* groups than 
 # the element itself
-nn_centroid_clustering <- function(data, K, groups = NULL) {
+# dummy = a T/F vector encoding if a data point is "real" and was not added 
+## in function `matching`
+nn_centroid_clustering <- function(data, K, groups = NULL, dummy = NULL) {
   data <- as.matrix(data)
-  distances <- distances_from_centroid(data)
+  
+  if (!argument_exists(dummy)) {
+    distances <- distances_from_centroid(data)
+  } else {
+    # ensure that dummy items are never selected as "max-away" item
+    distances <- distances_from_centroid(data[!dummy, , drop = FALSE])
+    distances <- c(distances, rep(-Inf, sum(dummy == TRUE)))
+  }
+  
   counter <- 1
   idx <- 1:nrow(data)
   clusters <- rep(NA, nrow(data))

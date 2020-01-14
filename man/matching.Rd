@@ -4,7 +4,7 @@
 \alias{matching}
 \title{Matching}
 \usage{
-matching(features, distances, p = NULL, groups = NULL)
+matching(features = NULL, distances = NULL, p = NULL, groups = NULL)
 }
 \arguments{
 \item{features}{A numeric vector, matrix or data.frame of data
@@ -28,7 +28,9 @@ vector is passed, the argument \code{p} is ignored and matches are
 sought between elements of different groups.}
 }
 \value{
-An integer vector encoding the matches.
+An integer vector encoding the matches. Elements are \code{NA} if
+    no match was found (this only happens if the data cannot be evenly split
+    into matches.)
 }
 \description{
 Conduct K-partite and unrestricted minimum distance matching to find pairs 
