@@ -148,6 +148,9 @@ draw_all_cliques <- function(x, y, assignment, lwd = 1.5, lty = 1, cols) {
 
 # draw edges connecting all elements of a clique
 draw_clique <- function(x, y, col, lwd = 1.5, lty = 1) {
+  if (length(x) == 1) {
+    return(invisible(NULL))
+  }
   connections <- connections_within_clique(x, y)
   cords <- data.frame(x = x, y = y)
   cords <- cords[c(t(connections)), ]

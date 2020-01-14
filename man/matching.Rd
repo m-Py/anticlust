@@ -31,13 +31,17 @@ sought between elements of different groups.}
 An integer vector encoding the matches.
 }
 \description{
-Conduct bipartite and unrestricted matching to find pairs or larger
-groups of similar elements.
+Conduct K-partite and unrestricted minimum distance matching to find pairs 
+or larger groups of similar elements.
 }
 \details{
-This function actually implements the same algorithm as \code{\link{balanced_clustering}}
-but it differs with regard to the interface: Here, we specify the size of the groups.
-Moreover, it is possible to specify grouping restrictions enabling K-partite matching.
+If the argument \code{features} is passed, matching is done based on the Euclidean
+distance between data points. To find matches, this function uses
+the same algorithm as implemented in \code{\link{balanced_clustering}}
+but it differs with regard to the interface: This function specifies the size of the groups,
+\code{\link{balanced_clustering}} specifies 
+the number of the clusters. Moreover, this function makes it possible to specify grouping 
+restrictions using the \code{groups} argument, thus enabling K-partite minimum matching.
 }
 \examples{
 
