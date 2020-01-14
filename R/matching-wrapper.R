@@ -1,9 +1,9 @@
 
 #' Matching
-#' 
-#' Conduct bipartite and unrestricted matching to find pairs or larger 
-#' groups of similar elements.
-#' 
+#'
+#' Conduct K-partite and unrestricted minimum distance matching to find pairs 
+#' or larger groups of similar elements.
+#'
 #' @param features A numeric vector, matrix or data.frame of data
 #'     points.  Rows correspond to elements and columns correspond to
 #'     features. A vector represents a single numeric feature.
@@ -15,44 +15,50 @@
 #'     \code{\link{as.dist}}) or a \code{matrix} where the entries of
 #'     the upper and lower triangular matrix represent the pairwise
 #'     dissimilarities.
-#' @param p The size of the groups; the default is 2, in which case the 
+#' @param p The size of the groups; the default is 2, in which case the
 #'     function returns pairs.
-#' @param groups An optional vector inducing grouping restrictions. If the 
+#' @param groups An optional vector inducing grouping restrictions. If the
 #'     vector is passed, the argument \code{p} is ignored and matches are
-#'     sought between elements of different groups. 
-#' 
+#'     sought between elements of different groups.
+#'
 #' @return An integer vector encoding the matches.
+#'
+#'
+#' @details
 #' 
-#' 
-#' @details 
-#' 
-#' This function actually implements the same algorithm as \code{\link{balanced_clustering}}
-#' but it differs with regard to the interface: Here, we specify the size of the groups.
-#' Moreover, it is possible to specify grouping restrictions enabling K-partite matching.
-#' 
+#' If the argument \code{features} is passed, matching is done based on the Euclidean
+#' distance between data points. To find matches, this function uses
+#' the same algorithm as implemented in \code{\link{balanced_clustering}}
+#' but it differs with regard to the interface: This function specifies the size of the groups,
+#' \code{\link{balanced_clustering}} specifies 
+#' the number of the clusters. Moreover, this function makes it possible to specify grouping 
+#' restrictions using the \code{groups} argument, thus enabling K-partite minimum matching.
+#'
 #' @author
 #' Martin Papenberg \email{martin.papenberg@@hhu.de}
-#' 
+#'
 #' @examples
-#' 
+#'
 #' # Find triplets
 #' N <- 300
 #' lds <- data.frame(f1 = rnorm(N), f2 = rnorm(N))
 #' triplets <- matching(lds, p = 3)
 #' plot_clusters(lds, clustering = triplets, within_connection = TRUE)
-#' 
-#' 
+#'
+#'
 #' # Match between different plant species
-#' idx <- 1:100
-#' matched <- matching(iris[idx, 1], p = 3, groups = iris[idx, 5])
+#' species <- iris$Species != "setosa"
+#' matched <- matching(iris[species, 1], groups = iris[species, 5])
 #' plot_clusters(
-#'   data.frame(group = as.numeric(iris[idx, 5]), feature = iris[idx, 1]), 
-#'   clustering = matched, 
+#'   data.frame(Species = as.numeric(iris[species, 5]), Sepal.Length = iris[species, 1]),
+#'   clustering = matched,
 #'   within_connection = TRUE
 #' )
 #' 
+#' @export
+#'
 
-matching <- function(features, distances, p, groups = NULL) {
+matching <- function(features, distances, p = NULL, groups = NULL) {
   data <- process_input(features, distances)
   nn_centroid_clustering(data, p, groups)
 }

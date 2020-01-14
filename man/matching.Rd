@@ -4,7 +4,7 @@
 \alias{matching}
 \title{Matching}
 \usage{
-matching(features, distances, p, groups = NULL)
+matching(features, distances, p = NULL, groups = NULL)
 }
 \arguments{
 \item{features}{A numeric vector, matrix or data.frame of data
@@ -20,10 +20,10 @@ indicate higher dissimilarity. Can be an object of class
 the upper and lower triangular matrix represent the pairwise
 dissimilarities.}
 
-\item{p}{The size of the groups; the default is 2, in which case the 
+\item{p}{The size of the groups; the default is 2, in which case the
 function returns pairs.}
 
-\item{groups}{An optional vector inducing grouping restrictions. If the 
+\item{groups}{An optional vector inducing grouping restrictions. If the
 vector is passed, the argument \code{p} is ignored and matches are
 sought between elements of different groups.}
 }
@@ -31,7 +31,7 @@ sought between elements of different groups.}
 An integer vector encoding the matches.
 }
 \description{
-Conduct bipartite and unrestricted matching to find pairs or larger 
+Conduct bipartite and unrestricted matching to find pairs or larger
 groups of similar elements.
 }
 \details{
@@ -49,11 +49,11 @@ plot_clusters(lds, clustering = triplets, within_connection = TRUE)
 
 
 # Match between different plant species
-idx <- 1:100
-matched <- matching(iris[idx, 1], p = 3, groups = iris[idx, 5])
+species <- iris$Species != "setosa"
+matched <- matching(iris[species, 1], groups = iris[species, 5])
 plot_clusters(
-  data.frame(group = as.numeric(iris[idx, 5]), feature = iris[idx, 1]), 
-  clustering = matched, 
+  data.frame(Species = as.numeric(iris[species, 5]), Sepal.Length = iris[species, 1]),
+  clustering = matched,
   within_connection = TRUE
 )
 
