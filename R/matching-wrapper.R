@@ -73,6 +73,7 @@
 matching <- function(features = NULL, distances = NULL, p = 2, groups = NULL) {
   data <- process_input(features, distances)
   N <- nrow(data)
+  groups <- merge_into_one_variable(groups)
   # augment data if input is imbalanced
   augmented <- augment_data(data, p, groups)
   data <- augmented$data
