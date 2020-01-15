@@ -41,7 +41,7 @@
 #' @examples
 #'
 #' # Find triplets
-#' N <- 300
+#' N <- 299
 #' lds <- data.frame(f1 = rnorm(N), f2 = rnorm(N))
 #' triplets <- matching(lds, p = 3)
 #' plot_clusters(lds, clustering = triplets, within_connection = TRUE)
@@ -74,19 +74,7 @@ matching <- function(features = NULL, distances = NULL, p = 2, groups = NULL) {
   data <- process_input(features, distances)
   N <- nrow(data)
   groups <- merge_into_one_variable(groups)
-  # augment data if input is imbalanced
-  augmented <- augment_data(data, p, groups)
-  data <- augmented$data
-  groups <- augmented$groups
-  # pass dummy argument that informs the called functions of the presence
-  # of data augmentation
-  dummy <- rep(c(FALSE, TRUE), c(N, nrow(data) - N))
-  cl <- nn_centroid_clustering(data, p, groups, dummy = dummy)
-  # remove augmented data points
-  cl <- cl[1:N]
-  
-  # set unmatched elements to NA in matching vector
-  cl <- remove_unmatched_elements(cl, p, groups)
+  cl <- nn_centroid_clustering(data, p, groups)
   # Before returning: order the group numbers by objective - most similar 
   # matches have lower indices
   sort_by_objective(cl, data, N)
@@ -119,75 +107,4 @@ sort_by_objective <- function(cl, data, N) {
   new[merged$order_matches] <- merged$objective_id
   cl[!is.na(cl)] <- new
   cl
-}
-
-# only return fully matched matches (where p items have been matched),
-# assign NA to the other elements
-remove_unmatched_elements <- function(cl, p, groups) {
-  if (argument_exists(groups)) {
-    size <- length(unique(groups))
-  } else {
-    size <- p
-  }
-  full_matches <- which(table(cl) == size)
-  cl[!cl %in% full_matches] <- NA
-  return(cl)
-}
-
-
-# If the data is imbalanced: Augment it
-augment_data <- function(data, p, groups) {
-  if (argument_exists(groups)) {
-    groups <- to_numeric(groups)
-    return(augment_kpartite(data, groups))
-  } else {
-    return(list(data = augment_unrestricted(data, p), groups = NULL))
-  }
-}
-
-augment_kpartite <- function(data, groups) {
-  tab <- table(groups)
-  # case 1: groups are balanced; then simply return
-  if (all(tab == tab[1])) {
-    return(list(data = data, groups = groups))
-  }
-  # case 2: data must be augmented
-  left_over <- max(tab) - tab
-  data <- add_dimensions(data, sum(left_over))
-  # augment grouping vector
-  groups <- c(groups, rep(1:max(groups), left_over))
-  list(data = data, groups = groups)
-}
-
-# Case: unrestricted matching, data cannot be split in groups of size p
-augment_unrestricted <- function(data, p) {
-  # how much do we need to add:
-  offset <- nrow(data) %% p
-  # invert offset (we need to *add* columns)
-  offset <- ifelse(offset == 0, 0, offset * (-1) + p)
-  data <- add_dimensions(data, offset)
-  data
-}
-
-# param n: how many data points should be added to the matrix
-add_dimensions <- function(data, n) {
-  if (is_distance_matrix(data)) {
-    # add rows and columns in distance matrix
-    data <- add_dimensions_(data, nrow(data) + n, nrow(data) + n)
-  } else {
-    # only add rows for feature matrix
-    data <- add_dimensions_(data, nrow(data) + n, ncol(data))
-  }
-  data
-}
-
-# Add rows / columns to matrix
-add_dimensions_ <- function(data, rows, cols) {
-  old_dims <- dim(data)
-  # add high value -- added values must be dissimilar to all other values!
-  extreme_value <- round(max(data) * 100000)
-  new_mat <- matrix(extreme_value, nrow = rows, ncol = cols)
-  ## add data into augmented matrix
-  new_mat[1:old_dims[1], 1:old_dims[2]] <- data
-  new_mat
 }

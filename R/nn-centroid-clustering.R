@@ -6,33 +6,25 @@
 # groups = vector of length nrow(data); if passed, K-partite matching is conducted,
 # i.e., each element is clustered with elements that are in *other* groups than 
 # the element itself
-# dummy = a T/F vector encoding if a data point is "real" and was not added 
-# in function `matching`
-nn_centroid_clustering <- function(data, K, groups = NULL, dummy = NULL) {
+nn_centroid_clustering <- function(data, K, groups = NULL) {
   data <- as.matrix(data)
   N <- nrow(data)
-  
-  if (!argument_exists(dummy)) {
-    distances <- distances_from_centroid(data)
-    dummy <- rep(FALSE, nrow(data))
-  } else {
-    # ensure that dummy items are never selected as target items
-    distances <- distances_from_centroid(data[!dummy, , drop = FALSE])
-    distances <- c(distances, rep(-Inf, sum(dummy == TRUE)))
-  }
-  
+  distances <- distances_from_centroid(data)
+
   if (argument_exists(groups)) {
-    # smallest group determine what matches are possible
-    smallest_group <- which.min(table(groups[!dummy]))
+    # smallest group determines what matches are possible
+    smallest_group <- which.min(table(groups))
+    K <- length(unique(groups))
   }
   
+  # some book-keeping variables for the loop
   counter <- 1
   idx <- 1:nrow(data)
   clusters <- rep(NA, nrow(data))
   
-  while (nrow(data) > 1) {
+  while (nrow(data) > (K-1)) {
     # compute nearest neighbors for a target element
-    target <- get_target(distances, groups, smallest_group, dummy)
+    target <- get_target(distances, groups, smallest_group)
     clustered <- get_nearest_neighbours(data, target, K, groups)
     clusters[idx[clustered]] <- counter
     if (is_distance_matrix(data)) {
@@ -43,12 +35,11 @@ nn_centroid_clustering <- function(data, K, groups = NULL, dummy = NULL) {
     distances <- distances[-clustered]
     groups <- groups[-clustered]
     idx  <- idx[-clustered]
-    dummy <- dummy[-clustered]
     counter <- counter + 1
     # for bipartite matching: stop as soon the smallest group is matched
     # with elements from the other groups
     if (argument_exists(groups)) {
-      if (sum(groups[!dummy] == smallest_group) == 0) {
+      if (sum(groups == smallest_group) == 0) {
         break
       }
     }
@@ -62,12 +53,10 @@ nn_centroid_clustering <- function(data, K, groups = NULL, dummy = NULL) {
 # param distances: distances to a cluster centroid
 # param groups: groupingg vector
 # param smallest_group: id of the group having the fewest members
-# param dummy: T/F vector indicating if each data point is "real"
-get_target <- function(distances, groups, smallest_group, dummy) {
+get_target <- function(distances, groups, smallest_group) {
   # if bipartite subset selection is required: 
   # select a member from the smallest group
-  if (argument_exists(groups) && (sum(dummy) > 0)) {
-    groups <- groups[!dummy]
+  if (argument_exists(groups)) {
     # return the most extreme member from the smallest group as target
     ids_smallest <- which(groups == smallest_group)
     ordered_distances <- order(distances)
@@ -86,11 +75,10 @@ get_target <- function(distances, groups, smallest_group, dummy) {
 # param groups = vector of length nrow(data); elements are clustered with elements in *other* groups 
 # return: The indices of the current element as vector. !! The first
 #   index is the element itself !!
-get_nearest_neighbours <- function(data, max_away, k, groups) {
+get_nearest_neighbours <- function(data, max_away, K, groups) {
   
   # k-partite clustering
   if (argument_exists(groups)) {
-    K <- length(unique(groups))
     groups <- to_numeric(groups)
     current_group <- groups[max_away]
     other_groups <- (1:K)[-current_group]
@@ -115,9 +103,9 @@ get_nearest_neighbours <- function(data, max_away, k, groups) {
   
   # normal clustering - no grouping restrictions
   if (is_distance_matrix(data)) {
-    nns <- order(data[max_away, ])[1:k]
+    nns <- order(data[max_away, ])[1:K]
   } else {
-    nns <- nn2(data, data[max_away, , drop = FALSE], k)$nn.idx
+    nns <- nn2(data, data[max_away, , drop = FALSE], K)$nn.idx
   }
   nns
 }
