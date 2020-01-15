@@ -82,8 +82,58 @@ matching <- function(features = NULL, distances = NULL, p = 2, groups = NULL) {
   # of data augmentation
   dummy <- rep(c(FALSE, TRUE), c(N, nrow(data) - N))
   cl <- nn_centroid_clustering(data, p, groups, dummy = dummy)
-  cl[1:N] # remove augmented data points
+  # remove augmented data points
+  cl <- cl[1:N]
+  
+  # set unmatched elements to NA in matching vector
+  cl <- remove_unmatched_elements(cl, p, groups)
+  # Before returning: order the group numbers by objective - most similar 
+  # matches have lower indices
+  sort_by_objective(cl, data, N)
 }
+
+sort_by_objective <- function(cl, data, N) {
+  selected <- (1:N)[!is.na(cl)]
+  cl_sub <- cl[selected]
+  cl_sub <- order_cluster_vector(cl_sub)
+  if (is_distance_matrix(data)) {
+    data <- data[selected, selected]
+    objectives <- sapply(
+      1:max(cl_sub), 
+      function(x) sum(as.dist(data[cl_sub == x, cl_sub == x]))
+    )
+  } else {
+    data <- data[selected, , drop = FALSE]
+    objectives <- sapply(
+      1:max(cl_sub), 
+      function(x) sum(dist(data[cl_sub == x, ]))
+    )
+  }
+  # recode original matching labels according to objective
+  N <- length(cl_sub)
+  # sorry for this code, but it works and it was really complicated
+  one <- data.frame(match = cl_sub, order_matches = 1:length(cl_sub))
+  two <- data.frame(match = order(objectives), objective_id = 1:length(objectives))
+  merged <- merge(one, two)
+  new <- rep(NA, N)
+  new[merged$order_matches] <- merged$objective_id
+  cl[!is.na(cl)] <- new
+  cl
+}
+
+# only return fully matched matches (where p items have been matched),
+# assign NA to the other elements
+remove_unmatched_elements <- function(cl, p, groups) {
+  if (argument_exists(groups)) {
+    size <- length(unique(groups))
+  } else {
+    size <- p
+  }
+  full_matches <- which(table(cl) == size)
+  cl[!cl %in% full_matches] <- NA
+  return(cl)
+}
+
 
 # If the data is imbalanced: Augment it
 augment_data <- function(data, p, groups) {
