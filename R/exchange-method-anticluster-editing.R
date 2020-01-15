@@ -122,9 +122,11 @@ clusters_from_selection_matrix <- function(selection_matrix) {
 # return: A clustering vector in order
 order_cluster_vector <- function(clusters) {
   unique_clusters <- unique(clusters)
+  # deal with NA
+  unique_clusters <- unique_clusters[!is.na(unique_clusters)]
   K <- length(unique_clusters)
   clusters <- factor(clusters, levels = unique_clusters, labels = 1:K)
-  to_numeric(clusters)
+  as.numeric(clusters)
 }
 
 ## Swap items in a boolean matrix for indexing.
