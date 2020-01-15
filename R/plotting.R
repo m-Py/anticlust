@@ -84,6 +84,10 @@ plot_clusters <- function(features, clustering, within_connection = FALSE,
   ## Just in case anybody passes something weird (i.e., cluster numbers
   ## do not start at 1):
   clustering <- to_numeric(clustering)
+  # Replace NAs in clustering vector
+  clustering[is.na(clustering)] <- seq(
+    max(clustering, na.rm = TRUE) + 1, length.out = sum(is.na(clustering))
+  )
 
   ## More input handling:
   K <- length(unique(clustering))
