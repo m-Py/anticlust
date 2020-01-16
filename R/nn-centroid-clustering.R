@@ -21,7 +21,6 @@ nn_centroid_clustering <- function(data, K, groups = NULL, match_extreme_first =
   counter <- 1
   idx <- 1:nrow(data)
   clusters <- rep(NA, nrow(data))
-  
   while (nrow(data) > (K-1)) {
     # Get target item
     target <- get_target(distances, groups, smallest_group, match_extreme_first)
@@ -143,7 +142,7 @@ is_distance_matrix <- function(m) {
 # Subset a distance or feature data matrix (not knowing which one)
 subset_data_matrix <- function(data, selection) {
   if (is_distance_matrix(data)) {
-    data <- data[selection, selection]
+    data <- data[selection, selection, drop = FALSE]
   } else {
     data <- data[selection, , drop = FALSE]
   }
