@@ -28,7 +28,7 @@ vector is passed, the argument \code{p} is ignored and matches are
 sought between elements of different groups.}
 }
 \value{
-An integer vector encoding the matches.
+An integer vector encoding the matches. See details for more information.
 }
 \description{
 Conduct K-partite or unrestricted (minimum distance) matching to find pairs 
@@ -43,17 +43,28 @@ but it differs with regard to the interface: This function specifies the size of
 \code{\link{balanced_clustering}} specifies 
 the number of the clusters. Moreover, this function makes it possible to specify grouping 
 restrictions using the \code{groups} argument, thus enabling K-partite minimum matching.
+
+The output of this function is an integer vector encoding which elements have 
+been matched. The grouping numbers are sorted by similarity. That is, elements with the
+grouping number »1« are most similar to each other, followed by 2 etc (groups having different
+similarity indices are still assigned a different grouping number). Similarity is measured
+as the sum of pairwise (Euclidean) distances within groups \code{\link{distance_objective}}.
+Some elements of the output may be \code{NA}. This happens if it is not possible to evenly
+split the item pool evenly into groups of size \code{p} or if the categories described by
+the argument \code{groups} are of different size. Unmatched items are then assigned \code{NA}.
 }
 \examples{
 
 # Find triplets
-N <- 300
+N <- 299 # two elements will not be matched
 lds <- data.frame(f1 = rnorm(N), f2 = rnorm(N))
 triplets <- matching(lds, p = 3)
+table(triplets)
+sum(is.na(triplets))
 plot_clusters(lds, clustering = triplets, within_connection = TRUE)
 
 # Match between different plant species
-species <- iris$Species != "setosa"
+species <- iris$Species != "versicolor"
 matched <- matching(iris[species, 1], groups = iris[species, 5])
 plot_clusters(
   data.frame(Species = as.numeric(iris[species, 5]), Sepal.Length = iris[species, 1]),
