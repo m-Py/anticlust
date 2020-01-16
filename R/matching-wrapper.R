@@ -1,9 +1,10 @@
 
 #' Matching
 #'
-#' Conduct K-partite or unrestricted (minimum distance) matching to find pairs 
-#' or groups of similar elements. Finding matches is by default based on the Euclidean 
-#' distance between data points, but a custom distance measure can also be employed.
+#' Conduct K-partite or unrestricted (minimum distance) matching to
+#' find pairs or groups of similar elements. By default, finding
+#' matches is based on the Euclidean distance between data points, but
+#' a custom distance measure can also be employed.
 #'
 #' @param features A numeric vector, matrix or data.frame of data
 #'     points.  Rows correspond to elements and columns correspond to
@@ -16,36 +17,54 @@
 #'     \code{\link{as.dist}}) or a \code{matrix} where the entries of
 #'     the upper and lower triangular matrix represent the pairwise
 #'     dissimilarities.
-#' @param p The size of the groups; the default is 2, in which case the
-#'     function returns pairs.
-#' @param groups An optional vector inducing grouping restrictions. If the
-#'     vector is passed, the argument \code{p} is ignored and matches are
-#'     sought between elements of different groups.
-#' @param match_extreme_first Logical: Determines if matches are sought for extreme
-#'     elements first or for central elements. If not specified, is determined on
-#'     the basis of the other arguments (see details).
+#' @param p The size of the groups; the default is 2, in which case
+#'     the function returns pairs.
+#' @param groups An optional categorical vector inducing grouping
+#'     restrictions. If passed, the argument \code{p} is ignored and
+#'     matches are sought between elements of different groups.
+#' @param match_extreme_first Logical: Determines if matches are
+#'     sought for extreme elements first or for central elements. If
+#'     not specified, is determined on the basis of the other
+#'     arguments (see Details).
 #'
-#' @return An integer vector encoding the matches. See details for more information.
+#' @return An integer vector encoding the matches. See Setails for
+#'     more information.
 #'
 #'
 #' @details
 #' 
-#' If the argument \code{features} is passed, matching is done based on the Euclidean
-#' distance between data points. To find matches, this function uses
-#' the same algorithm as implemented in \code{\link{balanced_clustering}}
-#' but it differs with regard to the interface: This function specifies the size of the groups,
-#' \code{\link{balanced_clustering}} specifies 
-#' the number of the clusters. Moreover, this function makes it possible to specify grouping 
-#' restrictions using the \code{groups} argument, thus enabling K-partite minimum matching.
+#' If the argument \code{features} is passed, matching is done based
+#' on the Euclidean distance between data points. If the argument
+#' \code{distances} is passed, this matrix serves to define
+#' dissimilarity between data points. To find matches, the algorithm
+#' proceeds by selecting a target element and then searching its
+#' nearest neighbours. Critical to the behaviour or the algorithm is
+#' the order in which target elements are selected. In most cases the
+#' most extreme elements are selected first, i.e., elements with the
+#' highest distance to the center of the data set (see
+#' \code{\link{balanced_clustering}}). By setting the argument
+#' \code{match_extreme_first} to \code{FALSE}, it is possible to
+#' enforce that elements close to the center are first selected as
+#' targets. By default, this only happens for unrestricted matching
+#' (that is, if the argument \code{groups} is not specified) if the
+#' data set cannot be evenly divided into groups of size \code{p}. In
+#' all other cases, \code{match_extreme_first} is set to \code{TRUE}
+#' by default. If the argument \code{groups} is passed and the groups
+#' are of different size, the target elements is always selected from
+#' the smallest group (because in this group, all elements can be
+#' matched).
 #' 
-#' The output of this function is an integer vector encoding which elements have 
-#' been matched. The grouping numbers are sorted by similarity. That is, elements with the
-#' grouping number »1« are most similar to each other, followed by 2 etc (groups having different
-#' similarity indices are still assigned a different grouping number). Similarity is measured
-#' as the sum of pairwise (Euclidean) distances within groups \code{\link{distance_objective}}.
-#' Some elements of the output may be \code{NA}. This happens if it is not possible to evenly
-#' split the item pool evenly into groups of size \code{p} or if the categories described by
-#' the argument \code{groups} are of different size. Unmatched items are then assigned \code{NA}.
+#' The output is an integer vector encoding which elements have been
+#' matched. The grouping numbers are sorted by similarity. That is,
+#' elements with the grouping number »1« are most similar to each
+#' other, followed by 2 etc (groups having the same similarity index
+#' are still assigned a different grouping number, though). Similarity
+#' is measured as the sum of pairwise (Euclidean) distances within
+#' groups \code{\link{distance_objective}}.  Some elements of the
+#' output may be \code{NA}. This happens if it is not possible to
+#' evenly split the item pool evenly into groups of size \code{p} or
+#' if the categories described by the argument \code{groups} are of
+#' different size. Unmatched items are then assigned \code{NA}.
 #' 
 #' 
 #' @author
@@ -54,14 +73,18 @@
 #' @examples
 #'
 #' # Find triplets
-#' N <- 299 # two elements will not be matched
+#' N <- 29 # two elements will not be matched
 #' lds <- data.frame(f1 = rnorm(N), f2 = rnorm(N))
 #' triplets <- matching(lds, p = 3)
 #' table(triplets)
 #' sum(is.na(triplets))
-#' plot_clusters(lds, clustering = triplets, within_connection = TRUE)
+#' plot_clusters(
+#'   lds,
+#'   clustering = triplets,
+#'   within_connection = TRUE
+#' )
 #'
-#' # Use unequal-sized groups: Only selects matches for some elements
+#' # Bipartite matching with unequal-sized groups: Only selects matches for some elements
 #' N <- 100
 #' data <- matrix(rnorm(N), ncol = 1)
 #' groups <- sample(1:2, size = N, replace = TRUE, prob = c(0.7, 0.3))
@@ -72,25 +95,37 @@
 #'   within_connection = TRUE
 #' )
 #' 
-#' # Match between different plant species
+#' # Match between different plant species in the »iris« data set
 #' species <- iris$Species != "versicolor"
-#' matched <- matching(iris[species, 1], groups = iris[species, 5])
-#' plot_clusters(
-#'   data.frame(Species = as.numeric(iris[species, 5]), Sepal.Length = iris[species, 1]),
-#'   clustering = matched,
-#'   within_connection = TRUE
+#' matched <- matching(
+#'   iris[species, 1], 
+#'   groups = iris[species, 5]
 #' )
 #' # Adjust `match_extreme_first` argument
-#' matched <- matching(
+#' matched2 <- matching(
 #'   iris[species, 1], 
 #'   groups = iris[species, 5],
 #'   match_extreme_first = FALSE
 #' )
-#' plot_clusters(
-#'   data.frame(Species = as.numeric(iris[species, 5]), Sepal.Length = iris[species, 1]),
-#'   clustering = matched,
-#'   within_connection = TRUE
+#' # Plot the matching results
+#' par(mfrow = c(1, 2))
+#' data <- data.frame(
+#'   Species = as.numeric(iris[species, 5]),
+#'   Sepal.Length = iris[species, 1]
 #' )
+#' plot_clusters(
+#'   data,
+#'   clustering = matched,
+#'   within_connection = TRUE,
+#'   main = "Extreme elements matched first"
+#' )
+#' plot_clusters(
+#'   data,
+#'   clustering = matched2,
+#'   within_connection = TRUE,
+#'   main = "Central elements matched first"
+#' )
+#' par(mfrow = c(1, 1))
 #' 
 #' 
 #' @export
