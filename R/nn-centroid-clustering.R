@@ -6,7 +6,7 @@
 # groups = vector of length nrow(data); if passed, K-partite matching is conducted,
 # i.e., each element is clustered with elements that are in *other* groups than 
 # the element itself
-nn_centroid_clustering <- function(data, K, groups = NULL) {
+nn_centroid_clustering <- function(data, K, groups = NULL, match_extreme_first = TRUE) {
   data <- as.matrix(data)
   N <- nrow(data)
   distances <- distances_from_centroid(data)
@@ -24,7 +24,7 @@ nn_centroid_clustering <- function(data, K, groups = NULL) {
   
   while (nrow(data) > (K-1)) {
     # compute nearest neighbors for a target element
-    target <- get_target(distances, groups, smallest_group)
+    target <- get_target(distances, groups, smallest_group, match_extreme_first)
     clustered <- get_nearest_neighbours(data, target, K, groups)
     clusters[idx[clustered]] <- counter
     if (is_distance_matrix(data)) {
@@ -52,17 +52,20 @@ nn_centroid_clustering <- function(data, K, groups = NULL) {
 # param distances: distances to a cluster centroid
 # param groups: groupingg vector
 # param smallest_group: id of the group having the fewest members
-get_target <- function(distances, groups, smallest_group) {
+get_target <- function(distances, groups, smallest_group, match_extreme_first) {
   # if bipartite subset selection is required: 
   # select a member from the smallest group
   if (argument_exists(groups) && any(table(groups) > smallest_group)) {
     # return the most extreme member from the smallest group as target
     ids_smallest <- which(groups == smallest_group)
-    ordered_distances <- order(distances)
+    ordered_distances <- order(distances, decreasing = match_extreme_first)
     return(ordered_distances[ordered_distances %in% ids_smallest][1])
   }
-  # otherwise: return most extreme item across all elements
-  which.max(distances)
+  # otherwise: select an item from all elements
+  if (match_extreme_first) {
+    return(which.max(distances))
+  }
+  which.min(distances)
 }
 
 

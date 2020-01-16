@@ -21,6 +21,9 @@
 #' @param groups An optional vector inducing grouping restrictions. If the
 #'     vector is passed, the argument \code{p} is ignored and matches are
 #'     sought between elements of different groups.
+#' @param match_extreme_first Logical: Determines if matches are sought for extreme
+#'     elements first or for central elements. If not specified, is determined on
+#'     the basis of the other arguments (see details).
 #'
 #' @return An integer vector encoding the matches. See details for more information.
 #'
@@ -58,17 +61,8 @@
 #' sum(is.na(triplets))
 #' plot_clusters(lds, clustering = triplets, within_connection = TRUE)
 #'
-#' # Match between different plant species
-#' species <- iris$Species != "versicolor"
-#' matched <- matching(iris[species, 1], groups = iris[species, 5])
-#' plot_clusters(
-#'   data.frame(Species = as.numeric(iris[species, 5]), Sepal.Length = iris[species, 1]),
-#'   clustering = matched,
-#'   within_connection = TRUE
-#' )
-#' 
 #' # Use unequal-sized groups: Only selects matches for some elements
-#' N <- 33
+#' N <- 100
 #' data <- matrix(rnorm(N), ncol = 1)
 #' groups <- sample(1:2, size = N, replace = TRUE, prob = c(0.7, 0.3))
 #' matched <- matching(data[, 1], groups = groups)
@@ -78,18 +72,66 @@
 #'   within_connection = TRUE
 #' )
 #' 
+#' # Match between different plant species
+#' species <- iris$Species != "versicolor"
+#' matched <- matching(iris[species, 1], groups = iris[species, 5])
+#' plot_clusters(
+#'   data.frame(Species = as.numeric(iris[species, 5]), Sepal.Length = iris[species, 1]),
+#'   clustering = matched,
+#'   within_connection = TRUE
+#' )
+#' # Adjust `match_extreme_first` argument
+#' matched <- matching(
+#'   iris[species, 1], 
+#'   groups = iris[species, 5],
+#'   match_extreme_first = FALSE
+#' )
+#' plot_clusters(
+#'   data.frame(Species = as.numeric(iris[species, 5]), Sepal.Length = iris[species, 1]),
+#'   clustering = matched,
+#'   within_connection = TRUE
+#' )
+#' 
 #' 
 #' @export
 #'
 
-matching <- function(features = NULL, distances = NULL, p = 2, groups = NULL) {
+matching <- function(
+  features = NULL, 
+  distances = NULL, 
+  p = 2, 
+  groups = NULL,
+  match_extreme_first = NULL
+) {
   data <- process_input(features, distances)
   N <- nrow(data)
   groups <- merge_into_one_variable(groups)
-  cl <- nn_centroid_clustering(data, p, groups)
+  match_extreme_first <- determine_matching_order(groups, p, match_extreme_first, N)
+  
+  if (!argument_exists(match_extreme_first)) {
+    
+  }
+  
+  cl <- nn_centroid_clustering(data, p, groups, match_extreme_first)
   # Before returning: order the group numbers by objective - most similar 
   # matches have lower indices
   sort_by_objective(cl, data, N)
+}
+
+# Determine conditions when matching does not start with extreme elements
+# (if the user does not specify argument `match_extreme_first`)
+determine_matching_order <- function(groups, p, match_extreme_first, N) {
+  if (argument_exists(match_extreme_first)) {
+    return(match_extreme_first)
+  }
+  if (argument_exists(groups)) {
+    return(TRUE)
+  }
+  if (N %% p != 0) {
+    return(FALSE)
+  }
+  # match extreme first for unrestricted, balanced matching
+  TRUE
 }
 
 sort_by_objective <- function(cl, data, N) {

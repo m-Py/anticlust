@@ -4,7 +4,13 @@
 \alias{matching}
 \title{Matching}
 \usage{
-matching(features = NULL, distances = NULL, p = 2, groups = NULL)
+matching(
+  features = NULL,
+  distances = NULL,
+  p = 2,
+  groups = NULL,
+  match_extreme_first = NULL
+)
 }
 \arguments{
 \item{features}{A numeric vector, matrix or data.frame of data
@@ -26,6 +32,10 @@ function returns pairs.}
 \item{groups}{An optional vector inducing grouping restrictions. If the
 vector is passed, the argument \code{p} is ignored and matches are
 sought between elements of different groups.}
+
+\item{match_extreme_first}{Logical: Determines if matches are sought for extreme
+elements first or for central elements. If not specified, is determined on
+the basis of the other arguments (see details).}
 }
 \value{
 An integer vector encoding the matches. See details for more information.
@@ -63,23 +73,34 @@ table(triplets)
 sum(is.na(triplets))
 plot_clusters(lds, clustering = triplets, within_connection = TRUE)
 
+# Use unequal-sized groups: Only selects matches for some elements
+N <- 100
+data <- matrix(rnorm(N), ncol = 1)
+groups <- sample(1:2, size = N, replace = TRUE, prob = c(0.7, 0.3))
+matched <- matching(data[, 1], groups = groups, match_extreme_first = TRUE)
+plot_clusters(
+  cbind(groups, data), 
+  clustering = matched, 
+  within_connection = TRUE
+)
+
 # Match between different plant species
-species <- iris$Species != "versicolor"
+species <- iris$Species != "setosa"
 matched <- matching(iris[species, 1], groups = iris[species, 5])
 plot_clusters(
   data.frame(Species = as.numeric(iris[species, 5]), Sepal.Length = iris[species, 1]),
   clustering = matched,
   within_connection = TRUE
 )
-
-# Use unequal-sized groups: Only selects matches for some elements
-N <- 33
-data <- matrix(rnorm(N), ncol = 1)
-groups <- sample(1:2, size = N, replace = TRUE, prob = c(0.7, 0.3))
-matched <- matching(data[, 1], groups = groups)
+# Adjust `match_extreme_first` argument
+matched <- matching(
+  iris[species, 1], 
+  groups = iris[species, 5],
+  match_extreme_first = TRUE
+)
 plot_clusters(
-  cbind(groups, data), 
-  clustering = matched, 
+  data.frame(Species = as.numeric(iris[species, 5]), Sepal.Length = iris[species, 1]),
+  clustering = matched,
   within_connection = TRUE
 )
 
