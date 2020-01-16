@@ -68,20 +68,19 @@ get_target <- function(distances, groups, smallest_group) {
 
 # Get nearest neighbours for a current element
 # param data: the data
-# param may_away: the index of the element that is furthest away from 
-#   the cluster centroid and for which nearest neighbors are sought
+# param target: the index of the element for which nearest neighbors are sought
 # param K: The number of nearest neighbours (including the element itself!)
 # param groups = vector of length nrow(data); elements are clustered with elements in *other* groups 
 # return: The indices of the current element as vector. !! The first
 #   index is the element itself !!
-get_nearest_neighbours <- function(data, max_away, K, groups) {
+get_nearest_neighbours <- function(data, target, K, groups) {
   
   # k-partite clustering
   if (argument_exists(groups)) {
     groups <- to_numeric(groups)
-    current_group <- groups[max_away]
+    current_group <- groups[target]
     other_groups <- (1:K)[-current_group]
-    current_element <- data[max_away, , drop = FALSE]
+    current_element <- data[target, , drop = FALSE]
     # get nearest neighbour in each other group
     nns <- rep(NA, K-1)
     for (i in seq_along(other_groups)) {
@@ -96,15 +95,15 @@ get_nearest_neighbours <- function(data, max_away, K, groups) {
         nns[i] <- which(groups == other_groups[i])[nn]
       }
     }
-    nns <- c(max_away, nns)
+    nns <- c(target, nns)
     return(nns)
   }
   
   # normal clustering - no grouping restrictions
   if (is_distance_matrix(data)) {
-    nns <- order(data[max_away, ])[1:K]
+    nns <- order(data[target, ])[1:K]
   } else {
-    nns <- nn2(data, data[max_away, , drop = FALSE], K)$nn.idx
+    nns <- nn2(data, data[target, , drop = FALSE], K)$nn.idx
   }
   nns
 }
