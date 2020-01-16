@@ -9,7 +9,7 @@ matching(
   distances = NULL,
   p = 2,
   groups = NULL,
-  match_extreme_first = NULL
+  match_extreme_first = TRUE
 )
 }
 \arguments{
@@ -33,7 +33,7 @@ the function returns pairs.}
 restrictions. If passed, the argument \code{p} is ignored and
 matches are sought between elements of different groups.}
 
-\item{match_extreme_first}{Logical: Determines if matches are
+\item{match_extreme_first}{Logical: Determines if matches are first
 sought for extreme elements first or for central elements. If
 not specified, is determined on the basis of the other
 arguments (see Details).}
@@ -55,19 +55,15 @@ on the Euclidean distance between data points. If the argument
 dissimilarity between data points. To find matches, the algorithm
 proceeds by selecting a target element and then searching its
 nearest neighbours. Critical to the behaviour or the algorithm is
-the order in which target elements are selected. In most cases the
-most extreme elements are selected first, i.e., elements with the
-highest distance to the center of the data set (see
+the order in which target elements are selected. By default
+the most extreme elements are selected first, i.e., elements
+with the highest distance to the center of the data set (see
 \code{\link{balanced_clustering}}). By setting the argument
 \code{match_extreme_first} to \code{FALSE}, it is possible to
 enforce that elements close to the center are first selected as
-targets. By default, this only happens for unrestricted matching
-(that is, if the argument \code{groups} is not specified) if the
-data set cannot be evenly divided into groups of size \code{p}. In
-all other cases, \code{match_extreme_first} is set to \code{TRUE}
-by default. If the argument \code{groups} is passed and the groups
-are of different size, the target elements is always selected from
-the smallest group (because in this group, all elements can be
+targets. If the argument \code{groups} is passed and the groups are
+of different size, target elements are always selected from the
+smallest group (because in this group, all elements can be
 matched).
 
 The output is an integer vector encoding which elements have been
@@ -96,10 +92,11 @@ plot_clusters(
   within_connection = TRUE
 )
 
-# Bipartite matching with unequal-sized groups: Only selects matches for some elements
+# Bipartite matching with unequal-sized groups:
+# Only selects matches for some elements
 N <- 100
 data <- matrix(rnorm(N), ncol = 1)
-groups <- sample(1:2, size = N, replace = TRUE, prob = c(0.7, 0.3))
+groups <- sample(1:2, size = N, replace = TRUE, prob = c(0.8, 0.2))
 matched <- matching(data[, 1], groups = groups)
 plot_clusters(
   cbind(groups, data), 

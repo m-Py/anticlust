@@ -55,11 +55,14 @@ nn_centroid_clustering <- function(data, K, groups = NULL, match_extreme_first =
 get_target <- function(distances, groups, smallest_group, match_extreme_first) {
   # if bipartite subset selection is required: 
   # select a member from the smallest group
-  if (argument_exists(groups) && any(table(groups) > smallest_group)) {
-    # return the most extreme member from the smallest group as target
-    ids_smallest <- which(groups == smallest_group)
-    ordered_distances <- order(distances, decreasing = match_extreme_first)
-    return(ordered_distances[ordered_distances %in% ids_smallest][1])
+  if (argument_exists(groups)) {
+    group_sizes <- table(groups)
+    if (any(group_sizes != group_sizes[1])) {
+      # return the most extreme member from the smallest group as target
+      ids_smallest <- which(groups == smallest_group)
+      ordered_distances <- order(distances, decreasing = match_extreme_first)
+      return(ordered_distances[ordered_distances %in% ids_smallest][1])
+    }
   }
   # otherwise: select an item from all elements
   if (match_extreme_first) {
