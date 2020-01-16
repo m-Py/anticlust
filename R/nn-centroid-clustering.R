@@ -45,7 +45,6 @@ nn_centroid_clustering <- function(data, K, groups = NULL) {
     }
   }
   # for subset matching: fill the remaining clusters: 
-  clusters[is.na(clusters)] <- N:(N - sum(is.na(clusters)) + 1)
   order_cluster_vector(clusters)
 }
 
@@ -56,7 +55,7 @@ nn_centroid_clustering <- function(data, K, groups = NULL) {
 get_target <- function(distances, groups, smallest_group) {
   # if bipartite subset selection is required: 
   # select a member from the smallest group
-  if (argument_exists(groups)) {
+  if (argument_exists(groups) && any(table(groups) > smallest_group)) {
     # return the most extreme member from the smallest group as target
     ids_smallest <- which(groups == smallest_group)
     ordered_distances <- order(distances)
