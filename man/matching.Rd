@@ -56,7 +56,7 @@ a custom distance measure can also be employed.
 \details{
 If the argument \code{features} is passed, matching is done based
 on the Euclidean distance between data points. If the argument
-\code{distances} is passed, this matrix serves to define
+\code{distances} is passed, entries in this matrix define
 dissimilarity between data points. To find matches, the algorithm
 proceeds by selecting a target element and then searching its
 nearest neighbours. Critical to the behaviour or the algorithm is

@@ -169,7 +169,12 @@ match_within <- function(data, p, match_between, match_within, match_extreme_fir
   c <- length(unique(match_within))
   for (i in 1:c) {
     tmp_data <- subset_data_matrix(data, match_within == i)
-    cl_tmp <- nn_centroid_clustering(tmp_data, p, match_between, match_extreme_first)
+    cl_tmp <- nn_centroid_clustering(
+      tmp_data, 
+      p, 
+      match_between[match_within == i], 
+      match_extreme_first
+    )
     # ensure that different cluster numbers are given to different groups
     cl[match_within == i] <- ifelse(is.na(cl_tmp), NA, paste0(cl_tmp, "_", i))
   }
