@@ -19,13 +19,16 @@
 #'     dissimilarities.
 #' @param p The size of the groups; the default is 2, in which case
 #'     the function returns pairs.
-#' @param groups An optional categorical vector inducing grouping
-#'     restrictions. If passed, the argument \code{p} is ignored and
-#'     matches are sought between elements of different groups.
+#' @param match_between An optional vector, \code{data.frame} or
+#'     matrix representing one or several categorical constraints. If
+#'     passed, the argument \code{p} is ignored and matches are sought
+#'     between elements of different categories.
+#' @param match_within An optional vector, \code{data.frame} or matrix
+#'     representing one or several categorical constraints. If passed,
+#'     matches are sought between elements of the same category.
 #' @param match_extreme_first Logical: Determines if matches are first
-#'     sought for extreme elements first or for central elements. If
-#'     not specified, is determined on the basis of the other
-#'     arguments (see Details).
+#'     sought for extreme elements first or for central
+#'     elements. Defaults to \code{TRUE}.
 #'
 #' @return An integer vector encoding the matches. See Setails for
 #'     more information.
@@ -35,20 +38,20 @@
 #' 
 #' If the argument \code{features} is passed, matching is done based
 #' on the Euclidean distance between data points. If the argument
-#' \code{distances} is passed, this matrix serves to define
+#' \code{distances} is passed, entries in this matrix define
 #' dissimilarity between data points. To find matches, the algorithm
 #' proceeds by selecting a target element and then searching its
 #' nearest neighbours. Critical to the behaviour or the algorithm is
-#' the order in which target elements are selected. By default
-#' the most extreme elements are selected first, i.e., elements
-#' with the highest distance to the center of the data set (see
+#' the order in which target elements are selected. By default the
+#' most extreme elements are selected first, i.e., elements with the
+#' highest distance to the center of the data set (see
 #' \code{\link{balanced_clustering}}). By setting the argument
 #' \code{match_extreme_first} to \code{FALSE}, it is possible to
 #' enforce that elements close to the center are first selected as
-#' targets. If the argument \code{groups} is passed and the groups are
-#' of different size, target elements are always selected from the
-#' smallest group (because in this group, all elements can be
-#' matched).
+#' targets. If the argument \code{match_between} is passed and the
+#' groups specified via this argument are of different size, target
+#' elements are always selected from the smallest group (because in
+#' this group, all elements can be matched).
 #' 
 #' The output is an integer vector encoding which elements have been
 #' matched. The grouping numbers are sorted by similarity. That is,
@@ -56,12 +59,14 @@
 #' other, followed by 2 etc (groups having the same similarity index
 #' are still assigned a different grouping number, though). Similarity
 #' is measured as the sum of pairwise (Euclidean) distances within
-#' groups \code{\link{distance_objective}}.  Some elements of the
-#' output may be \code{NA}. This happens if it is not possible to
+#' groups (see \code{\link{distance_objective}}).  Some elements of
+#' the output may be \code{NA}. This happens if it is not possible to
 #' evenly split the item pool evenly into groups of size \code{p} or
-#' if the categories described by the argument \code{groups} are of
-#' different size. Unmatched items are then assigned \code{NA}.
+#' if the categories described by the argument \code{match_between}
+#' are of different size; unmatched items are assigned \code{NA}.
 #' 
+#' @note It is possible to specify grouping restrictions via 
+#' \code{match_between} and \code{match_within} at the same time.
 #' 
 #' @author
 #' Martin Papenberg \email{martin.papenberg@@hhu.de}
@@ -85,23 +90,31 @@
 #' N <- 100
 #' data <- matrix(rnorm(N), ncol = 1)
 #' groups <- sample(1:2, size = N, replace = TRUE, prob = c(0.8, 0.2))
-#' matched <- matching(data[, 1], groups = groups)
+#' matched <- matching(data[, 1], match_between = groups)
 #' plot_clusters(
 #'   cbind(groups, data), 
 #'   clustering = matched, 
 #'   within_connection = TRUE
 #' )
 #' 
+#' # Match objects from the same category only
+#' matched <- matching(
+#'   schaper2019[, 3:6], 
+#'   p = 3, 
+#'   match_within = schaper2019$room
+#' )
+#' table(matched, schaper2019$room)
+#' 
 #' # Match between different plant species in the »iris« data set
 #' species <- iris$Species != "versicolor"
 #' matched <- matching(
 #'   iris[species, 1], 
-#'   groups = iris[species, 5]
+#'   match_between = iris[species, 5]
 #' )
 #' # Adjust `match_extreme_first` argument
 #' matched2 <- matching(
 #'   iris[species, 1], 
-#'   groups = iris[species, 5],
+#'   match_between = iris[species, 5],
 #'   match_extreme_first = FALSE
 #' )
 #' # Plot the matching results
@@ -132,19 +145,43 @@ matching <- function(
   features = NULL, 
   distances = NULL, 
   p = 2, 
-  groups = NULL,
+  match_between = NULL,
+  match_within = NULL,
   match_extreme_first = TRUE
 ) {
   data <- process_input(features, distances)
-  N <- nrow(data)
-  groups <- merge_into_one_variable(groups)
-  cl <- nn_centroid_clustering(data, p, groups, match_extreme_first)
+  match_between <- merge_into_one_variable(match_between)
+  if (argument_exists(match_within)) {
+    cl <- match_within(data, p, match_between, match_within, match_extreme_first)
+  } else {
+    cl <- nn_centroid_clustering(data, p, match_between, match_extreme_first)
+  }
   # Before returning: order the group numbers by objective - most similar 
   # matches have lower indices
-  sort_by_objective(cl, data, N)
+  sort_by_objective(cl, data)
+}
+
+# conduct a matching for each category if `match_within` is passed
+match_within <- function(data, p, match_between, match_within, match_extreme_first) {
+  match_within <- merge_into_one_variable(match_within)
+  N <- nrow(data)
+  cl <- rep(NA, N)
+  c <- length(unique(match_within))
+  for (i in 1:c) {
+    if (is_distance_matrix(data)) {
+      tmp_data <- data[match_within == i, match_within == i]
+    } else {
+      tmp_data <- data[match_within == i, , drop = FALSE]
+    }
+    cl_tmp <- nn_centroid_clustering(tmp_data, p, match_between, match_extreme_first)
+    # ensure that different cluster numbers are given to different groups
+    cl[match_within == i] <- ifelse(is.na(cl_tmp), NA, paste0(cl_tmp, "_", i))
+  }
+  to_numeric(cl)
 }
 
 sort_by_objective <- function(cl, data, N) {
+  N <- nrow(data)
   selected <- (1:N)[!is.na(cl)]
   cl_sub <- cl[selected]
   cl_sub <- order_cluster_vector(cl_sub)

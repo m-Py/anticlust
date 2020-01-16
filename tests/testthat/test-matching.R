@@ -35,7 +35,7 @@ test_that("Matching function behaves correctly with `p` argument", {
   expect_true(!is.unsorted(objectives))
 })
 
-test_that("Matching function behaves correctly with `groups` argument", {
+test_that("Matching function behaves correctly with `match_between` argument", {
   # generate some random data
   m <- sample(1:4, size = 1)
   n <- sample(20:100, size = 1)
@@ -48,7 +48,7 @@ test_that("Matching function behaves correctly with `groups` argument", {
   
   # feature input
   # test that matches are of size 
-  matches <- matching(data, groups = groups)
+  matches <- matching(data, match_between = groups)
   expect_true(all(table(matches) == p))
   # non-fitting elements have NA
   n_matched <- (min(table(groups)) * p) # how many elements were matched
@@ -62,7 +62,7 @@ test_that("Matching function behaves correctly with `groups` argument", {
   
   # repeat the above for distance input
   data <- as.matrix(dist(data))
-  matches <- matching(data, groups = groups)
+  matches <- matching(data, match_between = groups)
   expect_true(all(table(matches) == p))
   # non-fitting elements have NA
   n_matched <- (min(table(groups)) * p) # how many elements were matched
