@@ -23,26 +23,22 @@ nn_centroid_clustering <- function(data, K, groups = NULL, match_extreme_first =
   clusters <- rep(NA, nrow(data))
   
   while (nrow(data) > (K-1)) {
-    # compute nearest neighbors for a target element
+    # Get target item
     target <- get_target(distances, groups, smallest_group, match_extreme_first)
+    # Compute nearest neighbors for target element
     clustered <- get_nearest_neighbours(data, target, K, groups)
     clusters[idx[clustered]] <- counter
-    if (is_distance_matrix(data)) {
-      data <- data[-clustered, -clustered, drop = FALSE]
-    } else {
-      data <- data[-clustered, , drop = FALSE]
-    }
+    # Remove matched elements:
+    data <- subset_data_matrix(data, -clustered)
     distances <- distances[-clustered]
     groups <- groups[-clustered]
     idx  <- idx[-clustered]
-    counter <- counter + 1
     # for bipartite matching: stop as soon the smallest group is matched
     # with elements from the other groups
-    if (argument_exists(groups)) {
-      if (sum(groups == smallest_group) == 0) {
-        break
-      }
+    if (argument_exists(groups) && !(smallest_group %in% groups)) {
+      break
     }
+    counter <- counter + 1
   }
   # for subset matching: fill the remaining clusters: 
   order_cluster_vector(clusters)
@@ -142,4 +138,14 @@ is_distance_matrix <- function(m) {
   m <- t(m)
   upper <- m[lower.tri(m)]
   all(lower == upper)
+}
+
+# Subset a distance or feature data matrix (not knowing which one)
+subset_data_matrix <- function(data, selection) {
+  if (is_distance_matrix(data)) {
+    data <- data[selection, selection]
+  } else {
+    data <- data[selection, , drop = FALSE]
+  }
+  data
 }
