@@ -10,7 +10,8 @@ matching(
   p = 2,
   match_between = NULL,
   match_within = NULL,
-  match_extreme_first = TRUE
+  match_extreme_first = TRUE,
+  target_group = NULL
 )
 }
 \arguments{
@@ -42,6 +43,8 @@ matches are sought between elements of the same category.}
 \item{match_extreme_first}{Logical: Determines if matches are first
 sought for extreme elements first or for central
 elements. Defaults to \code{TRUE}.}
+
+\item{target_group}{lawl}
 }
 \value{
 An integer vector encoding the matches. See Setails for

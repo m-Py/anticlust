@@ -29,6 +29,7 @@
 #' @param match_extreme_first Logical: Determines if matches are first
 #'     sought for extreme elements first or for central
 #'     elements. Defaults to \code{TRUE}.
+#' @param target_group lawl
 #'
 #' @return An integer vector encoding the matches. See Setails for
 #'     more information.
@@ -147,14 +148,21 @@ matching <- function(
   p = 2, 
   match_between = NULL,
   match_within = NULL,
-  match_extreme_first = TRUE
+  match_extreme_first = TRUE,
+  target_group = NULL
 ) {
   data <- process_input(features, distances)
+  if (argument_exists(target_group)) {
+    id <- which(match_between == target_group)[1]
+  }
   match_between <- merge_into_one_variable(match_between)
+  if (argument_exists(target_group)) {
+    target_group <- match_between[id]
+  }
   if (argument_exists(match_within)) {
-    cl <- match_within(data, p, match_between, match_within, match_extreme_first)
+    cl <- match_within(data, p, match_between, match_within, match_extreme_first, target_group)
   } else {
-    cl <- nn_centroid_clustering(data, p, match_between, match_extreme_first)
+    cl <- nn_centroid_clustering(data, p, match_between, match_extreme_first, target_group)
   }
   # Before returning: order the group numbers by objective - most similar 
   # matches have lower indices
@@ -162,7 +170,7 @@ matching <- function(
 }
 
 # conduct a matching for each category if `match_within` is passed
-match_within <- function(data, p, match_between, match_within, match_extreme_first) {
+match_within <- function(data, p, match_between, match_within, match_extreme_first, target_group) {
   match_within <- merge_into_one_variable(match_within)
   N <- nrow(data)
   cl <- rep(NA, N)
