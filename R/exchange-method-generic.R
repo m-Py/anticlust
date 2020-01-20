@@ -154,7 +154,7 @@ initialize_clusters <- function(data, K, obj_function, categories) {
   ## Initial assignment based on categorical constraints
   ## (categorical constraints may be preclustering constraints)
   if (argument_exists(categories)) {
-    return(random_sampling(data, K, obj_function, nrep = 1, categories))
+    return(categorical_sampling(categories, K))
   }
   ## Initial random assignment unrestricted:
   sample(rep_len(1:K, length.out = nrow(data)))

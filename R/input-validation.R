@@ -80,7 +80,7 @@ input_handling_anticlustering <- function(features, distances,
   if (length(K) == 1 && N %% K != 0) {
     if (method == "ilp") {
       stop("K must be a divider of the number of elements when using the ILP method. ",
-           "(Try out method = 'exchange' or method = 'sampling'.)")
+           "(Try out method = 'exchange'.)")
     }
     if (preclustering == TRUE) {
       stop("K must be a divider of the number of elements. ",
@@ -91,14 +91,14 @@ input_handling_anticlustering <- function(features, distances,
   validate_input(nrep, "nrep", "numeric", len = 1, greater_than = 0,
                  must_be_integer = TRUE)
   validate_input(method, "method", len = 1,
-                 input_set = c("ilp", "sampling", "exchange", "heuristic", "nn"))
+                 input_set = c("ilp", "exchange", "heuristic"))
 
   if (method == "ilp") {
     solver <- solver_available()
     if (solver == FALSE) {
       stop("\n\nAn exact solution was requested, but none of the linear ",
            "programming \npackages 'Rglpk', 'gurobi', or 'Rcplex' is ",
-           "available. \n\nTry `method = 'sampling'`, `method = 'exchange'` or install ",
+           "available. \n\nTry `method = 'exchange'` or install ",
            "a linear programming solver \nto obtain an exact solution. ",
            "For example, install the GNU linear \nprogramming kit: \n\n",
            "- On windows, visit ",
@@ -117,7 +117,7 @@ input_handling_anticlustering <- function(features, distances,
     validate_input(objective, "objective", input_set = c("distance", "variance"), len = 1)
     if (objective == "variance" && method == "ilp") {
       stop("You cannot use integer linear programming method to maximize the variance criterion. ",
-           "Use objective = 'distance', method = 'sampling', or method = 'exchange' instead")
+           "Use objective = 'distance', or method = 'exchange' instead")
       if (argument_exists(distances) && objective == "variance") {
         stop("The argument 'distances' cannot be used if the argument 'objective' is 'variance'.")
       }

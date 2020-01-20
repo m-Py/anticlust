@@ -10,7 +10,7 @@ test_that("categorical constraints are met for one categorie (vector input)", {
   for (K in 2:4) {
     for (C in 2:4) {
       categories <- sample(rep_len(1:C, N))
-      ac <- anticlustering(features, K = K, categories = categories, method = "sampling", nrep = 1)
+      ac <- categorical_sampling(categories = categories, K = K)
       tab <- table(categories, ac)
       ## At most 1 deviation between categories in anticlusters
       expect_equal(all(abs(tab - tab[[1]]) <= 1), TRUE)
@@ -47,7 +47,7 @@ test_that("categorical constraints are met for two categories (data.frame or mat
 
 
         ## 3. Are the categories balanced across anticlusters?
-        ac <- anticlustering(features, K = K, categories = categories, method = "sampling", nrep = 10)
+        ac <- categorical_sampling(K = K, categories = merge_into_one_variable(categories))
         tab1 <- table(categories[, 1], ac)
         tab2 <- table(categories[, 2], ac)
         tab3 <- table(categories[, 1], categories[, 2], ac)
@@ -68,7 +68,7 @@ test_that("argument categories can be used to enforce preclustering constraints 
   ## iterate over number of categories & number of anticlusters
   for (K in 2:4) {
     preclusters <- balanced_clustering(features, K = N / K)
-    ac <- anticlustering(features, K = K, method = "sampling", nrep = 1, categories = preclusters)
+    ac <- categorical_sampling(K = K, categories = preclusters)
     tab <- table(ac, preclusters)
     expect_equal(all(tab == 1), TRUE)
   }

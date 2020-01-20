@@ -12,14 +12,14 @@
 #'
 
 fast_exchange_dist <- function(data, K, categories) {
-  distances <- convert_to_distances(data)
+  distances <- convert_to_distances(data)  
+  clusters <- initialize_clusters(distances, K, distance_objective_, categories)
+  best_total <- distance_objective_(clusters, distances)
   distances[upper.tri(distances)] <- 0
   diag(distances) <- 0
-  clusters <- initialize_clusters(distances, K, distance_objective_, categories)
   ## Matrix for indexing the elements in the distance matrix
   selected <- selection_matrix_from_clusters(clusters)
   N <- nrow(distances)
-  best_total <- distance_objective_(clusters, distances)
   for (i in 1:N) {
     exchange_partners <- get_exchange_partners(clusters, i, categories)
     ## Skip if there are zero exchange partners

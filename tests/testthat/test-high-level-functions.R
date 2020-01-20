@@ -36,9 +36,7 @@ test_that("high level anticlustering function runs through", {
                                          method = "ilp",
                                          preclustering = FALSE)
     anticlusters_heuristic <- anticlustering(features,
-                                             K = n_clusters,
-                                             method = "sampling",
-                                             nrep = 5)
+                                             K = n_clusters)
     ## Check that output is valid
     expect_equal(legal_number_of_clusters(features, anticlusters_exact), NULL)
     expect_equal(legal_number_of_clusters(features, anticlusters_heuristic), NULL)
@@ -53,10 +51,10 @@ test_that("high level anticlustering function runs through", {
 
 test_that("all argument combinations run through", {
   conditions <- expand.grid(preclustering = c(TRUE, FALSE),
-                            method = c("ilp", "sampling", "exchange"))
+                            method = c("ilp", "exchange"))
   # Set up matrix to store the objective values obtained by different methods
-  storage <- matrix(ncol = 3, nrow = 2)
-  colnames(storage) <- c("ilp", "sampling", "exchange")
+  storage <- matrix(ncol = 2, nrow = 2)
+  colnames(storage) <- c("ilp", "exchange")
   rownames(storage) <- c("preclustering", "no_preclustering")
 
   criterion <- "distance"

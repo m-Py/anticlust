@@ -9,15 +9,19 @@ test_that("distance input works for exact ILP", {
     K <- conditions[k, "p"]
     n_elements <- K * 5 # n must be multiplier of p
     features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
-    distances <- dist(features)
+    distances <- as.matrix(dist(features))
 
     ac_feat <- anticlustering(features, K = K, preclustering = FALSE,
                               method = "ilp")
     ac_dist <- anticlustering(distances = distances, K = K,
                               preclustering = FALSE,
                               method = "ilp")
-    expect_equal(distance_objective_(ac_feat, dist(features)),
-                 distance_objective_(ac_feat, distances))
+    expect_equal(distance_objective_(ac_dist, distances),
+                 obj_value_distance(ac_feat, features))
+    expect_equal(distance_objective_(ac_dist, distances),
+                 obj_value_distance(ac_dist, features))
+    expect_equal(distance_objective_(ac_feat, distances),
+                 obj_value_distance(ac_dist, features))
   }
 })
 
@@ -28,84 +32,45 @@ test_that("distance input works for precluster ILP", {
     K <- conditions[k, "p"]
     n_elements <- K * 5 # n must be multiplier of p
     features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
-    distances <- dist(features)
+    distances <- as.matrix(dist(features))
 
     ac_feat <- anticlustering(features, K = K, preclustering = TRUE,
                               method = "ilp")
     ac_dist <- anticlustering(distances = distances, K = K,
                               preclustering = TRUE,
                               method = "ilp")
-    expect_equal(distance_objective_(ac_feat, dist(features)),
-                 distance_objective_(ac_feat, distances))
+    expect_equal(distance_objective_(ac_dist, distances),
+                 obj_value_distance(ac_feat, features))
+    expect_equal(distance_objective_(ac_dist, distances),
+                 obj_value_distance(ac_dist, features))
+    expect_equal(distance_objective_(ac_feat, distances),
+                 obj_value_distance(ac_dist, features))
   }
 })
 
-test_that("distance input works for heuristic without preclustering", {
+test_that("distance input works for exchange method", {
   conditions <- expand.grid(m = 1:4, p = 2:4)
   for (k in 1:nrow(conditions)) {
     m_features <- conditions[k, "m"]
     K <- conditions[k, "p"]
     n_elements <- K * 5 # n must be multiplier of p
     features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
-    distances <- dist(features)
+    distances <- as.matrix(dist(features))
 
     ## Use a fixed seed to compare the random sampling method based on
     ## features and distance input
     rnd_seed <- sample(10000, size = 1)
 
     set.seed(rnd_seed)
-    ac_feat <- anticlustering(features, K = K, preclustering = FALSE,
-                              method = "sampling", nrep = 100)
+    ac_feat <- anticlustering(features, K = K)
     set.seed(rnd_seed)
-    ac_dist <- anticlustering(distances = distances, K = K, preclustering = FALSE,
-                              method = "sampling",nrep = 100)
+    ac_dist <- anticlustering(distances = distances, K = K)
 
-    expect_equal(distance_objective_(ac_feat, dist(features)),
-                 distance_objective_(ac_feat, distances))
-  }
-})
-
-test_that("distance input works for heuristic with preclustering", {
-  conditions <- expand.grid(m = 1:4, p = 2:4)
-  for (k in 1:nrow(conditions)) {
-    m_features <- conditions[k, "m"]
-    K <- conditions[k, "p"]
-    n_elements <- K * 5 # n must be multiplier of p
-    features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
-    distances <- dist(features)
-
-    ## Use a fixed seed to compare the random sampling method based on
-    ## features and distance input
-    rnd_seed <- sample(10000, size = 1)
-
-    set.seed(rnd_seed)
-    ## does not work with distance criterion
-    ac_feat <- anticlustering(features, K = K, preclustering = TRUE,
-                              method = "sampling", nrep = 100)
-    set.seed(rnd_seed)
-    ac_dist <- anticlustering(distances = distances, K = K, preclustering = TRUE,
-                              method = "sampling", nrep = 100)
-
-    expect_equal(distance_objective_(ac_feat, dist(features)),
-                 distance_objective_(ac_feat, distances))
-  }
-})
-
-
-test_that("distance input works for clustering function, heuristic method", {
-  conditions <- expand.grid(m = 1:4, p = 2:4)
-  for (k in 1:nrow(conditions)) {
-    m_features <- conditions[k, "m"]
-    K <- conditions[k, "p"]
-    n_elements <- K * 5 # n must be multiplier of p
-    features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
-    distances <- dist(features)
-
-    ## does not work with distance criterion
-    ac_feat <- balanced_clustering(features, K = K, method = "sampling")
-    ac_dist <- balanced_clustering(distances = distances, K = K, method = "sampling")
-
-    expect_equal(distance_objective_(ac_feat, dist(features)),
-                 distance_objective_(ac_feat, distances))
+    expect_equal(distance_objective_(ac_dist, distances),
+                 obj_value_distance(ac_feat, features))
+    expect_equal(distance_objective_(ac_dist, distances),
+                 obj_value_distance(ac_dist, features))
+    expect_equal(distance_objective_(ac_feat, distances),
+                 obj_value_distance(ac_dist, features))
   }
 })

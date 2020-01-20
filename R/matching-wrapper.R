@@ -167,6 +167,7 @@ matching <- function(
 
 # Determine from which group target elements are selected
 get_target_group <- function(data, match_between, target_group) {
+  
   if (!argument_exists(match_between)) { # there is no target group
     return(FALSE)
   }

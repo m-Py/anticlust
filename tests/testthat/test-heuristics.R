@@ -40,11 +40,9 @@ test_that("heuristic anticlustering produces expected output", {
     ## Now anticlustering:
     obj_function <- ifelse(conditions$objective[i] == "distance",
                            obj_value_distance, variance_objective_)
-    anticlusters <- random_sampling(
-      as.matrix(features),
+    anticlusters <- anticlustering(
+      features,
       K = p_anticlusters,
-      nrep = 10,
-      obj_function = obj_function,
       categories = preclusters
     )
     ## Legal number of anticlusters?

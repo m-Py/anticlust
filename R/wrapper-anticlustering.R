@@ -23,14 +23,11 @@
 #'     (default) maximizes the cluster editing objective function; the
 #'     option "variance" maximizes the k-means objective function. See
 #'     details.
-#' @param method One of "exchange" (default), "sampling", or "ilp".  See
+#' @param method One of "exchange" (default) or "ilp".  See
 #'     details.
 #' @param preclustering Boolean. Should a preclustering be conducted
 #'     before anticlusters are created? Defaults to \code{FALSE}. See
 #'     details.
-#' @param nrep The number of repetitions for the random sampling
-#'     method. This argument only has an effect if \code{method} is
-#'     \code{"sampling"}.
 #' @param categories A vector, data.frame or matrix representing one or
 #'     several categorical constraints. See details.
 #'
@@ -113,14 +110,8 @@
 #'
 #' \strong{Heuristic anticlustering}
 #'
-#' In addition to the exact approach---that is only feasible for small
-#' N---the function employs two heuristic approaches. One option
-#' is repeated random sampling (\code{method = "sampling"}): Across a
-#' specified number of runs, each element is assigned to an anticluster
-#' at random and the objective value associated with this assignment is
-#' computed. In the end, the best assignment---the assignment that
-#' maximized the objective function---is returned.  The other option
-#' is the exchange method (\code{method = "exchange"}): Building on an
+#' In the default case, a heuristic method is employed for anticlustering: 
+#' The exchange method (\code{method = "exchange"}): Building on an
 #' initial random assignment, elements are swapped between anticlusters
 #' in such a way that each swap improves set similarity by the largest
 #' amount that is possible in a situation (cf. Späth, 1986). The
@@ -132,8 +123,7 @@
 #' resulting in improved run time while preserving a rather good
 #' solution. This option is recommended for larger N. For very large N,
 #' check out the function \code{\link{fast_anticlustering}} that was
-#' specifically implemented for large data sets (or use the random
-#' sampling method with few repetitions).
+#' specifically implemented for large data sets.
 #'
 #'
 #' \strong{Categorical constraints}
@@ -141,8 +131,8 @@
 #' The argument \code{categories} may induce categorical constraints.
 #' The grouping variables indicated by \code{categories} will be
 #' balanced out across anticlusters. Currently, this functionality is
-#' only available in combination with the random sampling and exchange
-#' method, but not with the exact ILP approach. Note that
+#' only available in combination with the exchange method, but not with 
+#' the exact ILP approach. Note that
 #' it is currently \strong{not} possible to apply preclustering constraints
 #' and categorical constraints at the same time.
 #'
@@ -185,9 +175,7 @@
 #' anticlusters <- anticlustering(
 #'   iris[, -5],
 #'   K = 2,
-#'   categories = iris[, 5],
-#'   method = "sampling",
-#'   nrep = 1
+#'   categories = iris[, 5]
 #' )
 #' table(iris[, 5], anticlusters)
 #' 
@@ -227,12 +215,11 @@
 
 anticlustering <- function(features = NULL, distances = NULL,
                            K, objective = "distance", method = "exchange",
-                           preclustering = FALSE, nrep = 10,
-                           categories = NULL) {
+                           preclustering = FALSE, categories = NULL) {
 
   ## Get data into required format
   input_handling_anticlustering(features, distances, K, objective,
-                                method, preclustering, nrep, categories)
+                                method, preclustering, 10, categories)
 
   ## Only deal with 1 data object (either features or distances)
   data <- process_input(features, distances)
@@ -266,12 +253,11 @@ anticlustering <- function(features = NULL, distances = NULL,
   }
 
   ## General heuristic optimization:
-  heuristic_anticlustering(data, K, obj_function,
-                           method, nrep, categories)
+  exchange_method(data, K, obj_function, categories)
 }
 
 # Function that processes input and returns the data set that the
-# optimization is conducted on as matrix (for exchange and sampling methods)
+# optimization is conducted on as matrix (for exchange method)
 # Returned matrix either represents distances or features.
 process_input <- function(features, distances) {
   if (argument_exists(features)) {
@@ -372,14 +358,4 @@ get_preclusters <- function(data, K) {
   }
   N <- nrow(data)
   nn_centroid_clustering(data, K)
-}
-
-# Direct to exchange method or sampling
-heuristic_anticlustering <- function(data, K, obj_function,
-                                     method, nrep, categories) {
-  if (method == "sampling" || method == "heuristic") {
-    return(random_sampling(data, K, obj_function, nrep, categories))
-  } else if (method == "exchange") {
-    return(exchange_method(data, K, obj_function, categories))
-  }
 }

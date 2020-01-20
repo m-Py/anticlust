@@ -86,6 +86,7 @@ distance_objective <- function(features = NULL, distances = NULL,
   validate_input(distances, "distances", c("matrix", "dist"))
 
   ## Compute the objective; the above only validates the input
+  distances <- as.matrix(distances)
   distance_objective_(clusters, distances)
 }
 
@@ -102,24 +103,11 @@ distance_objective <- function(features = NULL, distances = NULL,
 #' @noRd
 
 distance_objective_ <- function(anticlusters, data) {
-  K <- length(unique(anticlusters))
-  data <- as.matrix(data)
-  sums_within <- rep(NA, K)
-  for (k in 1:K) {
-    elements <- which(anticlusters == k)
-    selection <- unique_combinations(elements)
-    sums_within[k] <- sum(data[selection])
-  }
+  sums_within <- sapply(
+    unique(anticlusters), 
+    function(i) sum(as.dist(subset_data_matrix(data, anticlusters == i)))
+  )
   return(sum(sums_within))
-}
-
-## This variant to create unique combinations is *much* faster
-## (especially for larger N) than using utils::combn even though it
-## seems that a lot of unnecessary combinations are generated using
-## expand.grid
-unique_combinations <- function(elements) {
-  selection <- as.matrix(expand.grid(elements, elements))
-  selection[selection[, 1] > selection[, 2], ]
 }
 
 
