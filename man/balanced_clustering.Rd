@@ -9,17 +9,13 @@ It was later rewritten by Martin Papenberg, who also implemented the exact integ
 programming method.
 }
 \usage{
-balanced_clustering(features = NULL, distances = NULL, K, method = "heuristic")
+balanced_clustering(x, K, method = "heuristic")
 }
 \arguments{
-\item{features}{A vector, matrix or data.frame of data points. Rows
-correspond to elements and columns correspond to features. A
-vector represents a single feature.}
-
-\item{distances}{Alternative data argument that can be used if
-\code{features} is not passed. A N x N matrix representing the
-pairwise dissimilarities between N elements. Larger values
-indicate higher dissimilarity. Can be an object of class
+\item{x}{The data input. Can be one of two structures: (1) A data matrix
+where rows correspond to elements and columns correspond to
+features (a single numeric feature can be passed as a vector). (2)
+An N x N matrix dissimilarity matrix; can be an object of class
 \code{dist} (e.g., returned by \code{\link{dist}} or
 \code{\link{as.dist}}) or a \code{matrix} where the entries of
 the upper and lower triangular matrix represent the pairwise
@@ -73,7 +69,7 @@ cl <- balanced_clustering(lds, K = 10)
 plot_clusters(lds, clustering = cl)
 
 # Repeat using a distance matrix as input
-cl2 <- balanced_clustering(distances = dist(lds), K = 10)
+cl2 <- balanced_clustering(dist(lds), K = 10)
 plot_clusters(lds, clustering = cl2)
 
 }

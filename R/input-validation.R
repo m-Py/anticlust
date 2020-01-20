@@ -13,40 +13,19 @@
 #' @return NULL
 #'
 #' @noRd
-input_handling_anticlustering <- function(features, distances,
-                                          K, objective, method,
+input_handling_anticlustering <- function(x, K, objective, method,
                                           preclustering, nrep,
                                           categories) {
 
   ## Merge categories variable so that `length` can be applied:
   categories <- merge_into_one_variable(categories)
 
-  if (!argument_exists(features) && !argument_exists(distances)) {
-    stop("One of the arguments 'features' or 'distances' must be given.")
-  }
-
-  if (argument_exists(features) && argument_exists(distances)) {
-    stop("Only pass one of the arguments 'features' or 'distances'.")
-  }
-
   ## Validate feature input
-  if (argument_exists(features)) {
-    features <- as.matrix(features)
-    N <- nrow(features)
-    validate_input(features, "features", objmode = "numeric")
-    if (sum(!complete.cases(features)) >= 1) {
-      warning("There are NAs in your data, take care!")
-    }
-  } else if (argument_exists(distances)) {
-    if (class(distances) == "dist") {
-      distances <- as.matrix(distances)
-    }
-
-    if (!is_distance_matrix(distances)) {
-      stop("The input via argument `distance` is not a distance matrix. ",
-           "Most likely, the upper and lower triangulars of your matrix differ.")
-    }
-    N <- nrow(distances)
+  x <- as.matrix(x)
+  N <- nrow(x)
+  validate_input(x, "features", objmode = "numeric")
+  if (sum(!complete.cases(x)) >= 1) {
+    warning("There are NAs in your data, take care!")
   }
 
   validate_input(preclustering, "preclustering", "logical", len = 1,
@@ -118,8 +97,8 @@ input_handling_anticlustering <- function(features, distances,
     if (objective == "variance" && method == "ilp") {
       stop("You cannot use integer linear programming method to maximize the variance criterion. ",
            "Use objective = 'distance', or method = 'exchange' instead")
-      if (argument_exists(distances) && objective == "variance") {
-        stop("The argument 'distances' cannot be used if the argument 'objective' is 'variance'.")
+      if (objective == "variance" && is_distance_matrix(x)) {
+        stop("You cannot use a distance matrix with the objective 'variance'.")
       }
     }
   }

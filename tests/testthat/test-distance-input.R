@@ -13,7 +13,7 @@ test_that("distance input works for exact ILP", {
 
     ac_feat <- anticlustering(features, K = K, preclustering = FALSE,
                               method = "ilp")
-    ac_dist <- anticlustering(distances = distances, K = K,
+    ac_dist <- anticlustering(distances, K = K,
                               preclustering = FALSE,
                               method = "ilp")
     expect_equal(distance_objective_(ac_dist, distances),
@@ -36,7 +36,7 @@ test_that("distance input works for precluster ILP", {
 
     ac_feat <- anticlustering(features, K = K, preclustering = TRUE,
                               method = "ilp")
-    ac_dist <- anticlustering(distances = distances, K = K,
+    ac_dist <- anticlustering(distances, K = K,
                               preclustering = TRUE,
                               method = "ilp")
     expect_equal(distance_objective_(ac_dist, distances),
@@ -64,7 +64,7 @@ test_that("distance input works for exchange method", {
     set.seed(rnd_seed)
     ac_feat <- anticlustering(features, K = K)
     set.seed(rnd_seed)
-    ac_dist <- anticlustering(distances = distances, K = K)
+    ac_dist <- anticlustering(distances, K = K)
 
     expect_equal(distance_objective_(ac_dist, distances),
                  obj_value_distance(ac_feat, features))

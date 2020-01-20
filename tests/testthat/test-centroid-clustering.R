@@ -12,7 +12,7 @@ test_that("centroid clustering does not throw warning", {
   rownames(features) <- paste0("foo", 1:nrow(features))
   expect_warning(
     cl <- balanced_clustering(
-      distances = dist(features),
+      dist(features),
       K = 2
     ),
     regexp = NA

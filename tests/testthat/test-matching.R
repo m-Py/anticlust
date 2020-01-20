@@ -25,7 +25,7 @@ test_that("Matching function behaves correctly with `p` argument", {
   
   # repeat the above for distance input
   data <- as.matrix(dist(data))
-  matches <- matching(distances = data, p = p)
+  matches <- matching(data, p = p)
   expect_true(all(table(matches) == p))
   expect_equal(sum(is.na(matches)), n %% p)
   objectives <- sapply(
@@ -107,7 +107,7 @@ test_that("Matching function behaves correctly with `match_within` argument", {
   
   # repeat the above for distance input
   # test that matches are of size p
-  matches <- matching(distances = dist(data), p = p, match_within = groups)
+  matches <- matching(dist(data), p = p, match_within = groups)
   expect_true(all(table(matches) == p))
   tab <- table(matches, groups)
   expect_true(all(apply(tab, 1, function(x) sum(x == p)) == 1))
@@ -159,7 +159,7 @@ test_that("Matching behaves correctly when combining `match_within` and `match_b
   # feature input
   # repeat the same for distance input
   matches <- matching(
-    distances = dist(data), 
+    dist(data), 
     p = p, 
     match_between = groups_between,
     match_within = groups_within

@@ -5,8 +5,7 @@
 \title{Anticlustering}
 \usage{
 anticlustering(
-  features = NULL,
-  distances = NULL,
+  x,
   K,
   objective = "distance",
   method = "exchange",
@@ -15,14 +14,10 @@ anticlustering(
 )
 }
 \arguments{
-\item{features}{A numeric vector, matrix or data.frame of data
-points.  Rows correspond to elements and columns correspond to
-features. A vector represents a single numeric feature.}
-
-\item{distances}{Alternative data argument that can be used if
-\code{features} is not passed. An N x N matrix representing the
-pairwise dissimilarities between N elements. Larger values
-indicate higher dissimilarity. Can be an object of class
+\item{x}{The data input. Can be one of two structures: (1) A data matrix
+where rows correspond to elements and columns correspond to
+features (a single numeric feature can be passed as a vector). (2)
+An N x N matrix dissimilarity matrix; can be an object of class
 \code{dist} (e.g., returned by \code{\link{dist}} or
 \code{\link{as.dist}}) or a \code{matrix} where the entries of
 the upper and lower triangular matrix represent the pairwise
@@ -38,7 +33,7 @@ between 1 and the number of groups).}
 option "variance" maximizes the k-means objective function. See
 details.}
 
-\item{method}{One of "exchange" (default) or "ilp".  See
+\item{method}{One of "exchange" (default) or "ilp".See
 details.}
 
 \item{preclustering}{Boolean. Should a preclustering be conducted
@@ -54,7 +49,7 @@ A vector of length N that assigns a group (i.e, a number
 }
 \description{
 Create sets of elements (anticlusters) that are as similar as 
-possible by maximizing the heterogeneity within anticlusters.
+possible to each other, by maximizing the heterogeneity within anticlusters.
 }
 \details{
 This function is used to solve »K anticlustering«. That is,

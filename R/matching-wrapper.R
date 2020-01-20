@@ -6,13 +6,10 @@
 #' matches is based on the Euclidean distance between data points, but
 #' a custom distance measure can also be employed.
 #'
-#' @param features A numeric vector, matrix or data.frame of data
-#'     points.  Rows correspond to elements and columns correspond to
-#'     features. A vector represents a single numeric feature.
-#' @param distances Alternative data argument that can be used if
-#'     \code{features} is not passed. An N x N matrix representing the
-#'     pairwise dissimilarities between N elements. Larger values
-#'     indicate higher dissimilarity. Can be an object of class
+#' @param x The data input. Can be one of two structures: (1) A data matrix
+#'     where rows correspond to elements and columns correspond to
+#'     features (a single numeric feature can be passed as a vector). (2)
+#'     An N x N matrix dissimilarity matrix; can be an object of class
 #'     \code{dist} (e.g., returned by \code{\link{dist}} or
 #'     \code{\link{as.dist}}) or a \code{matrix} where the entries of
 #'     the upper and lower triangular matrix represent the pairwise
@@ -144,15 +141,14 @@
 #'
 
 matching <- function(
-  features = NULL, 
-  distances = NULL, 
+  x, 
   p = 2, 
   match_between = NULL,
   match_within = NULL,
   match_extreme_first = TRUE,
   target_group = NULL
 ) {
-  data <- process_input(features, distances)
+  data <- process_input(x)
   match_between <- merge_into_one_variable(match_between)
   target_group <- get_target_group(data, match_between, target_group)
   if (argument_exists(match_within)) {

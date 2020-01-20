@@ -11,7 +11,7 @@ test_that("heuristic clustering works for different inputs", {
       features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
       clusters <- balanced_clustering(features, K = p)
       expect_equal(legal_number_of_clusters(features, clusters), NULL)
-      clusters <- balanced_clustering(distances = dist(features), K = p)
+      clusters <- balanced_clustering(dist(features), K = p)
       expect_equal(legal_number_of_clusters(features, clusters), NULL)
     }
   }

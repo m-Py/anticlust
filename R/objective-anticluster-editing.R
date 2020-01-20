@@ -3,13 +3,10 @@
 #'
 #' Check the objective value for a given clustering.
 #'
-#' @param features A vector, matrix or data.frame of data points. Rows
-#'     correspond to elements and columns correspond to features. A
-#'     vector represents a single feature.
-#' @param distances Alternative data argument that can be used if
-#'     \code{features} is not passed. A N x N matrix representing the
-#'     pairwise dissimilarities between N elements. Larger values
-#'     indicate higher dissimilarity. Can be an object of class
+#' @param x The data input. Can be one of two structures: (1) A data matrix
+#'     where rows correspond to elements and columns correspond to
+#'     features (a single numeric feature can be passed as a vector). (2)
+#'     An N x N matrix dissimilarity matrix; can be an object of class
 #'     \code{dist} (e.g., returned by \code{\link{dist}} or
 #'     \code{\link{as.dist}}) or a \code{matrix} where the entries of
 #'     the upper and lower triangular matrix represent the pairwise
@@ -33,13 +30,13 @@
 #' data(iris)
 #' distances <- dist(iris[1:60, -5])
 #' ## Clustering
-#' clusters <- balanced_clustering(distances = distances, K = 3)
+#' clusters <- balanced_clustering(distances, K = 3)
 #' # This is low:
-#' distance_objective(distances = distances, clusters = clusters)
+#' distance_objective(distances, clusters)
 #' ## Anticlustering
-#' anticlusters <- anticlustering(distances = distances, K = 3)
+#' anticlusters <- anticlustering(distances, K = 3)
 #' # This is higher:
-#' distance_objective(distances = distances, clusters = anticlusters)
+#' distance_objective(distances, anticlusters)
 #'
 #'
 #' # Illustrates the cluster editing objective as the sum of distances
@@ -67,27 +64,15 @@
 #' https://doi.org/10.31234/osf.io/3razc
 #'
 
-distance_objective <- function(features = NULL, distances = NULL,
-                               clusters) {
-  if (!argument_exists(features) && !argument_exists(distances)) {
-    stop("One of the arguments 'features' or 'distances' must be given.")
-  }
+distance_objective <- function(x, clusters) {
+  x <- as.matrix(x)
+  validate_input(x, "x", objmode = "numeric")
 
-  if (argument_exists(features) && argument_exists(distances)) {
-    stop("Only pass one of the arguments 'features' or 'distances'.")
+  if (!is_distance_matrix(x)) {
+    return(obj_value_distance(clusters, x))
   }
-  validate_input(clusters, "anticlusters", class_string = c("numeric", "factor"))
-  if (argument_exists(features)) {
-    validate_input(features, "features", c("data.frame", "matrix", "numeric"))
-    features <- as.matrix(features)
-    validate_input(features, "features", objmode = "numeric")
-    return(obj_value_distance(clusters, features))
-  }
-  validate_input(distances, "distances", c("matrix", "dist"))
-
-  ## Compute the objective; the above only validates the input
-  distances <- as.matrix(distances)
-  distance_objective_(clusters, distances)
+  distances <- as.matrix(x)
+  distance_objective_(clusters, x)
 }
 
 

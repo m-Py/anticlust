@@ -89,7 +89,7 @@ test_that("different options for preclustering have the same result - distance o
       # preclustering algorithm is slightly different for distance input)
       set.seed(seed)
       ac3 <- anticlustering(
-        distances = dist(features),
+        dist(features),
         K = K,
         objective = "distance",
         categories = preclusters

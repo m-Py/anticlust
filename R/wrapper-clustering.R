@@ -1,13 +1,10 @@
 
 #' Create balanced clusters
 #'
-#' @param features A vector, matrix or data.frame of data points. Rows
-#'     correspond to elements and columns correspond to features. A
-#'     vector represents a single feature.
-#' @param distances Alternative data argument that can be used if
-#'     \code{features} is not passed. A N x N matrix representing the
-#'     pairwise dissimilarities between N elements. Larger values
-#'     indicate higher dissimilarity. Can be an object of class
+#' @param x The data input. Can be one of two structures: (1) A data matrix
+#'     where rows correspond to elements and columns correspond to
+#'     features (a single numeric feature can be passed as a vector). (2)
+#'     An N x N matrix dissimilarity matrix; can be an object of class
 #'     \code{dist} (e.g., returned by \code{\link{dist}} or
 #'     \code{\link{as.dist}}) or a \code{matrix} where the entries of
 #'     the upper and lower triangular matrix represent the pairwise
@@ -70,7 +67,7 @@
 #' plot_clusters(lds, clustering = cl)
 #' 
 #' # Repeat using a distance matrix as input
-#' cl2 <- balanced_clustering(distances = dist(lds), K = 10)
+#' cl2 <- balanced_clustering(dist(lds), K = 10)
 #' plot_clusters(lds, clustering = cl2)
 #'
 #' @references
@@ -79,14 +76,11 @@
 #' for a clustering problem. Mathematical Programming, 45, 59–96.
 #'
 
-balanced_clustering <- function(features = NULL, distances = NULL,
-                                K, method = "heuristic") {
+balanced_clustering <- function(x, K, method = "heuristic") {
 
-  input_handling_anticlustering(features, distances, K,
-                                "distance", method, TRUE, 1,
-                                NULL)
+  input_handling_anticlustering(x, K, "distance", method, TRUE, 1, NULL)
   
-  data <- process_input(features, distances)
+  data <- process_input(x)
   
   if (method == "ilp") {
     return(balanced_cluster_editing(data, K, solver_available()))

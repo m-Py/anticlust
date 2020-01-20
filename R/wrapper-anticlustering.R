@@ -2,15 +2,12 @@
 #' Anticlustering
 #'
 #' Create sets of elements (anticlusters) that are as similar as 
-#' possible by maximizing the heterogeneity within anticlusters.
+#' possible to each other, by maximizing the heterogeneity within anticlusters.
 #'
-#' @param features A numeric vector, matrix or data.frame of data
-#'     points.  Rows correspond to elements and columns correspond to
-#'     features. A vector represents a single numeric feature.
-#' @param distances Alternative data argument that can be used if
-#'     \code{features} is not passed. An N x N matrix representing the
-#'     pairwise dissimilarities between N elements. Larger values
-#'     indicate higher dissimilarity. Can be an object of class
+#' @param x The data input. Can be one of two structures: (1) A data matrix
+#'     where rows correspond to elements and columns correspond to
+#'     features (a single numeric feature can be passed as a vector). (2)
+#'     An N x N matrix dissimilarity matrix; can be an object of class
 #'     \code{dist} (e.g., returned by \code{\link{dist}} or
 #'     \code{\link{as.dist}}) or a \code{matrix} where the entries of
 #'     the upper and lower triangular matrix represent the pairwise
@@ -23,7 +20,7 @@
 #'     (default) maximizes the cluster editing objective function; the
 #'     option "variance" maximizes the k-means objective function. See
 #'     details.
-#' @param method One of "exchange" (default) or "ilp".  See
+#' @param method One of "exchange" (default) or "ilp".See
 #'     details.
 #' @param preclustering Boolean. Should a preclustering be conducted
 #'     before anticlusters are created? Defaults to \code{FALSE}. See
@@ -212,16 +209,14 @@
 #' Control and Cybernetics, 15, 213-218.
 #'
 
-anticlustering <- function(features = NULL, distances = NULL,
-                           K, objective = "distance", method = "exchange",
+anticlustering <- function(x, K, objective = "distance", method = "exchange",
                            preclustering = FALSE, categories = NULL) {
 
   ## Get data into required format
-  input_handling_anticlustering(features, distances, K, objective,
-                                method, preclustering, 10, categories)
+  input_handling_anticlustering(x, K, objective, method, preclustering, 10, categories)
 
   ## Only deal with 1 data object (either features or distances)
-  data <- process_input(features, distances)
+  data <- process_input(x)
 
   ## Exact method using ILP
   if (method == "ilp") {
@@ -258,13 +253,12 @@ anticlustering <- function(features = NULL, distances = NULL,
 # Function that processes input and returns the data set that the
 # optimization is conducted on as matrix (for exchange method)
 # Returned matrix either represents distances or features.
-process_input <- function(features, distances) {
-  if (argument_exists(features)) {
-    data <- as.matrix(features)
+process_input <- function(data) {
+  if (!is_distance_matrix(data)) {
+    data <- as.matrix(data)
     return(data)
   }
-  data <- as.matrix(as.dist(distances))
-  data
+  as.matrix(as.dist(data))
 }
 
 # Ensure that a distance matrix is passed
@@ -289,9 +283,9 @@ get_objective_function <- function(data, objective, K) {
     # 1. Distance objective, distances were passed
     # 2. Distance objective, features were passed
     # 3. Variance objective, features were passed
-    if (objective == "distance" && "distances" %in% class(data)) {
+    if (objective == "distance" && is_distance_matrix(data)) {
       obj_function <- distance_objective_
-    } else if (objective == "distance" && "features" %in% class(data)) {
+    } else if (objective == "distance" && !is_distance_matrix(data)) {
       obj_function <- obj_value_distance
     } else {
       obj_function <- variance_objective_
