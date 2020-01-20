@@ -263,7 +263,18 @@ get_neighbours <- function(features, k_neighbours, categories) {
   sort_by_col(idx, 1)
 }
 
-# A convenience function converting any categorical input to numeric
+#' Converting any categorical input to integer
+#' 
+#' @param x a vector
+#' 
+#' @return A vector of \code{length(x)} where each element is integer
+#' 
+#' @examples 
+#' iris$Species
+#' to_numeric(iris$Species)
+#' 
+#' @export
+#' 
 to_numeric <- function(x) {
   as.numeric(factor(x))
 }
