@@ -29,7 +29,8 @@
 #' @param match_extreme_first Logical: Determines if matches are first
 #'     sought for extreme elements first or for central
 #'     elements. Defaults to \code{TRUE}.
-#' @param target_group lawl
+#' @param target_group Currently, the options "smallest" and "diverse"
+#'     are supported.
 #'
 #' @return An integer vector encoding the matches. See Setails for
 #'     more information.
@@ -152,13 +153,8 @@ matching <- function(
   target_group = NULL
 ) {
   data <- process_input(features, distances)
-  if (argument_exists(target_group)) {
-    id <- which(match_between == target_group)[1]
-  }
   match_between <- merge_into_one_variable(match_between)
-  if (argument_exists(target_group)) {
-    target_group <- match_between[id]
-  }
+  target_group <- get_target_group(data, match_between, target_group)
   if (argument_exists(match_within)) {
     cl <- match_within(data, p, match_between, match_within, match_extreme_first, target_group)
   } else {
@@ -167,6 +163,42 @@ matching <- function(
   # Before returning: order the group numbers by objective - most similar 
   # matches have lower indices
   sort_by_objective(cl, data)
+}
+
+# Determine from which group target elements are selected
+get_target_group <- function(data, match_between, target_group) {
+  if (!argument_exists(match_between)) { # there is no target group
+    return(FALSE)
+  }
+  tab <- table(match_between)
+  # next: target group was not specified by user
+  if (!argument_exists(target_group)) {
+    if (all(tab == tab[1]))  {
+      # if all groups are of same size, there is no target group
+      return(FALSE)
+    } 
+    # smallest group is target group
+    return(which.min(tab))
+  } 
+  # last: user specified target group ("smallest", "diverse")
+  if (target_group == "smallest") {
+    return(which.min(tab))
+  } else if (target_group == "diverse") {
+    which.max(diversity_by_group(data, match_between))
+  }
+  FALSE # be safe
+}
+
+# Compute the diversity by group (variance or sum of distances)
+diversity_by_group <- function(data, groups) {
+  if (!is_distance_matrix(data)) {
+    ## compute multivariate variance by group, return group with maximum variance
+    centers <- cluster_centers(data, clusters)
+    distances <- dist_from_centers(data, centers, squared = TRUE)
+    distances <- distances[cbind(1:nrow(distances), clusters)]
+    return(c(by(distances, clusters, sum)))
+  }
+  sapply(1:max(groups), function(i) sum(as.dist(subset_data_matrix(data, groups == i))))
 }
 
 # conduct a matching for each category if `match_within` is passed

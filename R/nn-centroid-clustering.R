@@ -6,19 +6,13 @@
 # groups = vector of length nrow(data); if passed, K-partite matching is conducted,
 # i.e., each element is clustered with elements that are in *other* groups than 
 # the element itself
-nn_centroid_clustering <- function(data, K, groups = NULL, match_extreme_first = TRUE, target_group = NULL) {
+nn_centroid_clustering <- function(data, K, groups = NULL, match_extreme_first = TRUE, target_group = FALSE) {
   data <- as.matrix(data)
   N <- nrow(data)
   distances <- distances_from_centroid(data)
 
   if (argument_exists(groups)) {
-    # smallest group determines what matches are possible
-    smallest_group <- which.min(table(groups))
     K <- length(unique(groups))
-  }
-  
-  if (argument_exists(target_group)) {
-    smallest_group <- target_group
   }
   
   # some book-keeping variables for the loop
@@ -50,24 +44,25 @@ nn_centroid_clustering <- function(data, K, groups = NULL, match_extreme_first =
 # Find target element for which neighbours are sought
 # param distances: distances to a cluster centroid
 # param groups: groupingg vector
-# param smallest_group: id of the group having the fewest members
-get_target <- function(distances, groups, smallest_group, match_extreme_first) {
+# param target_group: id of the group from which target is selected 
+#    (may be FALSE instead of an ID)
+# param match_extreme_first
+get_target <- function(distances, target_group, match_extreme_first) {
   # if bipartite subset selection is required: 
   # select a member from the smallest group
-  if (argument_exists(groups)) {
-    group_sizes <- table(groups)
-    # return the most extreme member from the smallest group as target
-    ids_smallest <- which(groups == smallest_group)
-    ordered_distances <- order(distances, decreasing = match_extreme_first)
-    return(ordered_distances[ordered_distances %in% ids_smallest][1])
+  if (!target_group) {
+    # no target group specified: select an item from all elements
+    if (match_extreme_first) {
+      return(which.max(distances))
+    } else {
+      return(which.min(distances))
+    }
   }
-  # otherwise: select an item from all elements
-  if (match_extreme_first) {
-    return(which.max(distances))
-  }
-  which.min(distances)
+  # return a member from the target group as target
+  ids_target <- which(groups == target_group)
+  ordered_distances <- order(distances, decreasing = match_extreme_first)
+  ordered_distances[ordered_distances %in% ids_target][1]
 }
-
 
 # Get nearest neighbours for a current element
 # param data: the data
