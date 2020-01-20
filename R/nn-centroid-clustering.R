@@ -14,14 +14,14 @@ nn_centroid_clustering <- function(data, K, groups = NULL, match_extreme_first =
   if (argument_exists(groups)) {
     K <- length(unique(groups))
   }
-  
+
   # some book-keeping variables for the loop
   counter <- 1
   idx <- 1:nrow(data)
   clusters <- rep(NA, nrow(data))
   while (nrow(data) > (K-1)) {
     # Get target item
-    target <- get_target(distances, target_group, match_extreme_first)
+    target <- get_target(distances, groups, target_group, match_extreme_first)
     # Compute nearest neighbors for target element
     clustered <- get_nearest_neighbours(data, target, K, groups)
     clusters[idx[clustered]] <- counter
@@ -47,7 +47,7 @@ nn_centroid_clustering <- function(data, K, groups = NULL, match_extreme_first =
 # param target_group: id of the group from which target is selected 
 #    (may be FALSE instead of an ID)
 # param match_extreme_first
-get_target <- function(distances, target_group, match_extreme_first) {
+get_target <- function(distances, groups, target_group, match_extreme_first) {
   # if bipartite subset selection is required: 
   # select a member from the smallest group
   if (!target_group) {
