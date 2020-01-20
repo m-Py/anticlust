@@ -11,7 +11,6 @@ anticlustering(
   objective = "distance",
   method = "exchange",
   preclustering = FALSE,
-  nrep = 10,
   categories = NULL
 )
 }
@@ -39,16 +38,12 @@ between 1 and the number of groups).}
 option "variance" maximizes the k-means objective function. See
 details.}
 
-\item{method}{One of "exchange" (default), "sampling", or "ilp".  See
+\item{method}{One of "exchange" (default) or "ilp".  See
 details.}
 
 \item{preclustering}{Boolean. Should a preclustering be conducted
 before anticlusters are created? Defaults to \code{FALSE}. See
 details.}
-
-\item{nrep}{The number of repetitions for the random sampling
-method. This argument only has an effect if \code{method} is
-\code{"sampling"}.}
 
 \item{categories}{A vector, data.frame or matrix representing one or
 several categorical constraints. See details.}
@@ -94,6 +89,23 @@ the basic unit of the anticluster editing objective. If a different
 measure of dissimilarity is preferred, you may pass a self-generated
 dissimiliarity matrix via the argument \code{distances}.
 
+\strong{Heuristic anticlustering}
+
+In the default case, a heuristic method is employed for anticlustering: 
+The exchange method (\code{method = "exchange"}): Building on an
+initial random assignment, elements are swapped between anticlusters
+in such a way that each swap improves set similarity by the largest
+amount that is possible in a situation (cf. Späth, 1986). The
+swapping procedure is repeated for each element; because each
+possible swap is investigated for each element, the total number of
+exchanges grows quadratically with input size, rendering the exchange
+method unsuitable for large N. Setting \code{preclustering = TRUE}
+will limit the legal exchange partners to very similar elements,
+resulting in improved run time while preserving a rather good
+solution. This option is recommended for larger N. For very large N,
+check out the function \code{\link{fast_anticlustering}} that was
+specifically implemented for large data sets.
+
 \strong{Exact anticlustering}
 
 The optimal anticluster editing objective can be found via integer
@@ -126,38 +138,13 @@ linear programming. However, it is possible to employ the function
 \code{\link{generate_partitions}} to obtain optimal solutions for
 small problem instances.
 
-\strong{Heuristic anticlustering}
-
-In addition to the exact approach---that is only feasible for small
-N---the function employs two heuristic approaches. One option
-is repeated random sampling (\code{method = "sampling"}): Across a
-specified number of runs, each element is assigned to an anticluster
-at random and the objective value associated with this assignment is
-computed. In the end, the best assignment---the assignment that
-maximized the objective function---is returned.  The other option
-is the exchange method (\code{method = "exchange"}): Building on an
-initial random assignment, elements are swapped between anticlusters
-in such a way that each swap improves set similarity by the largest
-amount that is possible in a situation (cf. Späth, 1986). The
-swapping procedure is repeated for each element; because each
-possible swap is investigated for each element, the total number of
-exchanges grows quadratically with input size, rendering the exchange
-method unsuitable for large N. Setting \code{preclustering = TRUE}
-will limit the legal exchange partners to very similar elements,
-resulting in improved run time while preserving a rather good
-solution. This option is recommended for larger N. For very large N,
-check out the function \code{\link{fast_anticlustering}} that was
-specifically implemented for large data sets (or use the random
-sampling method with few repetitions).
-
-
 \strong{Categorical constraints}
 
 The argument \code{categories} may induce categorical constraints.
 The grouping variables indicated by \code{categories} will be
 balanced out across anticlusters. Currently, this functionality is
-only available in combination with the random sampling and exchange
-method, but not with the exact ILP approach. Note that
+only available in combination with the exchange method, but not with 
+the exact ILP approach. Note that
 it is currently \strong{not} possible to apply preclustering constraints
 and categorical constraints at the same time.
 }
@@ -188,9 +175,7 @@ by(iris[, -5], anticlusters, function(x) round(apply(x, 2, sd), 2))
 anticlusters <- anticlustering(
   iris[, -5],
   K = 2,
-  categories = iris[, 5],
-  method = "sampling",
-  nrep = 1
+  categories = iris[, 5]
 )
 table(iris[, 5], anticlusters)
 

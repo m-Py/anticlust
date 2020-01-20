@@ -44,8 +44,7 @@ variance_objective(
 anticlusters <- anticlustering(
   iris[, -5],
   K = 3,
-  objective = "variance",
-  nrep = 100
+  objective = "variance"
 )
 # This is higher:
 variance_objective(

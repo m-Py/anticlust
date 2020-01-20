@@ -143,14 +143,12 @@ selected$matches <- matching(
   match_extreme_first = FALSE
 )
 
-selected <- subset(selected, !is.na(matches))
-
 # check out some of the best match:
 subset(selected, matches == 1)
 subset(selected, matches == 2)
 
 # Select the 25 best matches:
-final_selection <- subset(selected, matches < 30)
+final_selection <- subset(selected, !is.na(matches) & matches <= 30)
 
 
 # Check quality of the selection:

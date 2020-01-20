@@ -44,7 +44,8 @@ matches are sought between elements of the same category.}
 sought for extreme elements first or for central
 elements. Defaults to \code{TRUE}.}
 
-\item{target_group}{lawl}
+\item{target_group}{Currently, the options "smallest" and "diverse"
+are supported.}
 }
 \value{
 An integer vector encoding the matches. See Setails for
