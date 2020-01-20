@@ -56,7 +56,7 @@ This function is used to solve »K anticlustering«. That is,
 K groups are created in such a way that all groups are
 as similar as possible. In the standard case, groups of equal
 size are returned. Adjust the \code{K} argument to create groups
-of different size (see \code{\link{initialize_K}} for an example).
+of different size. 
 
 Set similarity is assessed using one of two objective functions:
 
@@ -209,8 +209,6 @@ Control and Cybernetics, 15, 213-218.
 }
 \seealso{
 \code{\link{fast_anticlustering}}
-
-\code{\link{initialize_K}}
 
 \code{\link{variance_objective}}
 
