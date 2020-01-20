@@ -29,7 +29,7 @@
 #' @param match_extreme_first Logical: Determines if matches are first
 #'     sought for extreme elements first or for central
 #'     elements. Defaults to \code{TRUE}.
-#' @param target_group Currently, the options "smallest" and "diverse"
+#' @param target_group Currently, the options "none", smallest" and "diverse"
 #'     are supported.
 #'
 #' @return An integer vector encoding the matches. See Setails for
@@ -181,12 +181,14 @@ get_target_group <- function(data, match_between, target_group) {
     # smallest group is target group
     return(which.min(tab))
   } 
-  # last: user specified target group ("smallest", "diverse")
+  # last: user specified target group ("smallest", "diverse", "none")
   if (target_group == "smallest") {
     return(which.min(tab))
   } else if (target_group == "diverse") {
     return(which.max(diversity_by_group(data, match_between)))
-  }
+  } else if (target_group == "none") {
+    return(FALSE)
+  } 
   FALSE # be safe
 }
 
