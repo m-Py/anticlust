@@ -76,6 +76,23 @@
 #' measure of dissimilarity is preferred, you may pass a self-generated
 #' dissimiliarity matrix via the argument \code{distances}.
 #'
+#' \strong{Heuristic anticlustering}
+#'
+#' In the default case, a heuristic method is employed for anticlustering: 
+#' The exchange method (\code{method = "exchange"}): Building on an
+#' initial random assignment, elements are swapped between anticlusters
+#' in such a way that each swap improves set similarity by the largest
+#' amount that is possible in a situation (cf. Späth, 1986). The
+#' swapping procedure is repeated for each element; because each
+#' possible swap is investigated for each element, the total number of
+#' exchanges grows quadratically with input size, rendering the exchange
+#' method unsuitable for large N. Setting \code{preclustering = TRUE}
+#' will limit the legal exchange partners to very similar elements,
+#' resulting in improved run time while preserving a rather good
+#' solution. This option is recommended for larger N. For very large N,
+#' check out the function \code{\link{fast_anticlustering}} that was
+#' specifically implemented for large data sets.
+#'
 #' \strong{Exact anticlustering}
 #'
 #' The optimal anticluster editing objective can be found via integer
@@ -107,25 +124,7 @@
 #' linear programming. However, it is possible to employ the function
 #' \code{\link{generate_partitions}} to obtain optimal solutions for
 #' small problem instances.
-#'
-#' \strong{Heuristic anticlustering}
-#'
-#' In the default case, a heuristic method is employed for anticlustering: 
-#' The exchange method (\code{method = "exchange"}): Building on an
-#' initial random assignment, elements are swapped between anticlusters
-#' in such a way that each swap improves set similarity by the largest
-#' amount that is possible in a situation (cf. Späth, 1986). The
-#' swapping procedure is repeated for each element; because each
-#' possible swap is investigated for each element, the total number of
-#' exchanges grows quadratically with input size, rendering the exchange
-#' method unsuitable for large N. Setting \code{preclustering = TRUE}
-#' will limit the legal exchange partners to very similar elements,
-#' resulting in improved run time while preserving a rather good
-#' solution. This option is recommended for larger N. For very large N,
-#' check out the function \code{\link{fast_anticlustering}} that was
-#' specifically implemented for large data sets.
-#'
-#'
+#' 
 #' \strong{Categorical constraints}
 #'
 #' The argument \code{categories} may induce categorical constraints.
