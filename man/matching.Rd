@@ -98,11 +98,9 @@ It is possible to specify grouping restrictions via
 \examples{
 
 # Find triplets
-N <- 29 # two elements will not be matched
+N <- 120
 lds <- data.frame(f1 = rnorm(N), f2 = rnorm(N))
 triplets <- matching(lds, p = 3)
-table(triplets)
-sum(is.na(triplets))
 plot_clusters(
   lds,
   clustering = triplets,
@@ -127,7 +125,7 @@ matched <- matching(
   p = 3, 
   match_within = schaper2019$room
 )
-table(matched, schaper2019$room)
+head(table(matched, schaper2019$room))
 
 # Match between different plant species in the »iris« data set
 species <- iris$Species != "versicolor"

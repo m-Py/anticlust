@@ -82,11 +82,9 @@
 #' @examples
 #'
 #' # Find triplets
-#' N <- 29 # two elements will not be matched
+#' N <- 120
 #' lds <- data.frame(f1 = rnorm(N), f2 = rnorm(N))
 #' triplets <- matching(lds, p = 3)
-#' table(triplets)
-#' sum(is.na(triplets))
 #' plot_clusters(
 #'   lds,
 #'   clustering = triplets,
@@ -111,7 +109,7 @@
 #'   p = 3, 
 #'   match_within = schaper2019$room
 #' )
-#' table(matched, schaper2019$room)
+#' head(table(matched, schaper2019$room))
 #' 
 #' # Match between different plant species in the »iris« data set
 #' species <- iris$Species != "versicolor"
@@ -233,6 +231,7 @@ match_within <- function(data, p, match_between, match_within, match_extreme_fir
   to_numeric(cl)
 }
 
+# After matching was conducted, reorder the group labels by similarity
 sort_by_objective <- function(cl, data, N) {
   N <- nrow(data)
   selected <- (1:N)[!is.na(cl)]
