@@ -184,8 +184,9 @@ get_target_group <- function(data, match_between, target_group) {
     return(which.max(diversity_by_group(data, match_between)))
   } else if (target_group == "none") {
     return(FALSE)
-  } 
-  FALSE # be safe
+  } else {
+    stop("argument `target_group` must be one of 'smallest', 'diverse' or 'none'")
+  }
 }
 
 # Compute the diversity by group (variance or sum of distances)
