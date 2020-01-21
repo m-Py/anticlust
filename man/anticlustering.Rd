@@ -24,9 +24,8 @@ the upper and lower triangular matrix represent the pairwise
 dissimilarities.}
 
 \item{K}{How many anticlusters should be created. Alternatively:
-A vector of length N. Each entry in this vector
-describes the initial grouping of an input element (as a number
-between 1 and the number of groups).}
+A vector of length N where entry describes the initial grouping of 
+an input element.}
 
 \item{objective}{The objective to be maximized. The option "distance"
 (default) maximizes the cluster editing objective function; the
@@ -151,7 +150,6 @@ and categorical constraints at the same time.
 
 data(iris)
 head(iris[, -5]) # these features are made similar across sets
-
 
 ## Optimize the cluster editing (distance) criterion using the exchange method
 anticlusters <- anticlustering(

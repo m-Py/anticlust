@@ -4,7 +4,7 @@
 #' Conduct K-partite or unrestricted (minimum distance) matching to
 #' find pairs or groups of similar elements. By default, finding
 #' matches is based on the Euclidean distance between data points, but
-#' a custom distance measure can also be employed.
+#' a custom dissimilarity measure can also be employed.
 #'
 #' @param x The data input. Can be one of two structures: (1) A data matrix
 #'     where rows correspond to elements and columns correspond to
@@ -35,22 +35,31 @@
 #'
 #' @details
 #' 
-#' If the argument \code{features} is passed, matching is done based
+#' If the data input \code{x} is a feature matrix, matching is done based
 #' on the Euclidean distance between data points. If the argument
-#' \code{distances} is passed, entries in this matrix define
-#' dissimilarity between data points. To find matches, the algorithm
+#' \code{x} is a dissimilarity matrix, matching is based on the user-specified
+#' dissimilarities. To find matches, the algorithm
 #' proceeds by selecting a target element and then searching its
 #' nearest neighbours. Critical to the behaviour or the algorithm is
-#' the order in which target elements are selected. By default the
+#' the order in which target elements are selected. By default, the
 #' most extreme elements are selected first, i.e., elements with the
-#' highest distance to the center of the data set (see
-#' \code{\link{balanced_clustering}}). By setting the argument
-#' \code{match_extreme_first} to \code{FALSE}, it is possible to
-#' enforce that elements close to the center are first selected as
-#' targets. If the argument \code{match_between} is passed and the
+#' highest distance to the centroid of the data set (see
+#' \code{\link{balanced_clustering}}). Set the argument
+#' \code{match_extreme_first} to \code{FALSE}, to enforce that 
+#' elements near the centroid are first selected as targets. 
+#' 
+#' If the argument \code{match_between} is passed and the
 #' groups specified via this argument are of different size, target
-#' elements are always selected from the smallest group (because in
-#' this group, all elements can be matched).
+#' elements are selected from the smallest group by default (because in
+#' this group, all elements can be matched). When a grouping restriction 
+#' via \code{match_between} is included, it is possible to further specify 
+#' how matches are selected through the option \code{target_group}.
+#' When specifying \code{"none"}, matches are always selected from extreme elements,
+#' irregardless of group affiliation (or from central elements first if 
+#' \code{match_extreme_first = FALSE}). 
+#' With option \code{"smallest"}, matches are selected from the smallest group. 
+#' With option \code{"diverse"}, matches are selected from the group with 
+#' the largest variance. 
 #' 
 #' The output is an integer vector encoding which elements have been
 #' matched. The grouping numbers are sorted by similarity. That is,
@@ -58,11 +67,11 @@
 #' other, followed by 2 etc (groups having the same similarity index
 #' are still assigned a different grouping number, though). Similarity
 #' is measured as the sum of pairwise (Euclidean) distances within
-#' groups (see \code{\link{distance_objective}}).  Some elements of
-#' the output may be \code{NA}. This happens if it is not possible to
+#' groups (see \code{\link{distance_objective}}).  Some unmatched elements 
+#' may be \code{NA}. This happens if it is not possible to
 #' evenly split the item pool evenly into groups of size \code{p} or
 #' if the categories described by the argument \code{match_between}
-#' are of different size; unmatched items are assigned \code{NA}.
+#' are of different size.
 #' 
 #' @note It is possible to specify grouping restrictions via 
 #' \code{match_between} and \code{match_within} at the same time.
