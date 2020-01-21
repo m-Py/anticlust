@@ -78,7 +78,7 @@
 
 balanced_clustering <- function(x, K, method = "heuristic") {
 
-  input_handling_anticlustering(x, K, "distance", method, TRUE, 1, NULL)
+  input_handling_anticlustering(x, K, "distance", method, TRUE, NULL)
   
   data <- process_input(x)
   

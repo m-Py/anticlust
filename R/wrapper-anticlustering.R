@@ -209,7 +209,7 @@ anticlustering <- function(x, K, objective = "distance", method = "exchange",
                            preclustering = FALSE, categories = NULL) {
 
   ## Get data into required format
-  input_handling_anticlustering(x, K, objective, method, preclustering, 10, categories)
+  input_handling_anticlustering(x, K, objective, method, preclustering, categories)
 
   ## Only deal with 1 data object (either features or distances)
   data <- process_input(x)

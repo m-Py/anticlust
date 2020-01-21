@@ -14,8 +14,7 @@
 #'
 #' @noRd
 input_handling_anticlustering <- function(x, K, objective, method,
-                                          preclustering, nrep,
-                                          categories) {
+                                          preclustering, categories) {
 
   ## Merge categories variable so that `length` can be applied:
   categories <- merge_into_one_variable(categories)
@@ -62,13 +61,10 @@ input_handling_anticlustering <- function(x, K, objective, method,
            "(Try out method = 'exchange'.)")
     }
     if (preclustering == TRUE) {
-      stop("K must be a divider of the number of elements. ",
-           "(Try out preclustering = FALSE.)")
+      stop("The data set cannot be clustered into equal-sized parts.")
     }
   }
 
-  validate_input(nrep, "nrep", "numeric", len = 1, greater_than = 0,
-                 must_be_integer = TRUE)
   validate_input(method, "method", len = 1,
                  input_set = c("ilp", "exchange", "heuristic"))
 
