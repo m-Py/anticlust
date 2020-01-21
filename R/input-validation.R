@@ -21,6 +21,7 @@ input_handling_anticlustering <- function(x, K, objective, method,
 
   ## Validate feature input
   validate_data_matrix(x)
+  N <- nrow(as.matrix(x))
 
   validate_input(preclustering, "preclustering", "logical", len = 1,
                  input_set = c(TRUE, FALSE), not_na = TRUE)
