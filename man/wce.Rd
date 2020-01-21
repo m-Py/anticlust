@@ -2,7 +2,7 @@
 % Please edit documentation in R/weighted-cluster-editing.R
 \name{wce}
 \alias{wce}
-\title{Solve weighted cluster editing exactly}
+\title{Exact weighted cluster editing}
 \usage{
 wce(weights)
 }
@@ -14,7 +14,7 @@ agreement (this is unlike in the \code{\link{anticlustering}} function)}
 The clusters
 }
 \description{
-Solve weighted cluster editing exactly
+Exact weighted cluster editing
 }
 \examples{
 features <- swiss

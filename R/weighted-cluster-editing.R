@@ -1,5 +1,5 @@
 
-#' Solve weighted cluster editing exactly
+#' Exact weighted cluster editing
 #'
 #' @param weights A N x N weight matrix. Larger values indicate stronger
 #'     agreement (this is unlike in the \code{\link{anticlustering}} function)
