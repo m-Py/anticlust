@@ -11,7 +11,8 @@ Description: Anticlustering partitions a pool of elements into subsets
         for anticlustering. The exact approach requires that a linear
         programming solver is installed. The package also offers
         methods for classical clustering problems under size
-        constraints, i.e., creating balanced clusters of equal size.
+        constraints, i.e., creating balanced clusters of equal size, and
+        matching algorithms.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -24,6 +25,6 @@ Authors@R: c(person(given='Martin', family='Papenberg',
         email='martin.papenberg@hhu.de', role=c('aut', 'cre', 'cph')),
         person(given='Meik', family='Michalke', role=c('ctb'),
         comment='centroid based clustering algorithm') )
-Version: 0.3.1
-Date: 2019-12-11
+Version: 0.4.0
+Date: 2020-21-01
 RoxygenNote: 7.0.2
