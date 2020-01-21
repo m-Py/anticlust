@@ -120,3 +120,19 @@ obj_value_distance <- function(anticlusters, data) {
   objective <- sum(sapply(distances, sum))
   return(objective)
 }
+
+# Compute distance objective by cluster
+distance_objective_by_group <- function(data, cl) {
+  if (is_distance_matrix(data)) {
+    objectives <- sapply(
+      sort(unique(cl)), 
+      function(x) sum(as.dist(data[cl == x, cl == x]))
+    )
+  } else {
+    objectives <- sapply(
+      sort(unique(cl)), 
+      function(x) sum(dist(data[cl == x, ]))
+    )
+  }
+  objectives
+}

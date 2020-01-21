@@ -237,19 +237,7 @@ sort_by_objective <- function(cl, data, N) {
   selected <- (1:N)[!is.na(cl)]
   cl_sub <- cl[selected]
   cl_sub <- order_cluster_vector(cl_sub)
-  if (is_distance_matrix(data)) {
-    data <- data[selected, selected]
-    objectives <- sapply(
-      1:max(cl_sub), 
-      function(x) sum(as.dist(data[cl_sub == x, cl_sub == x]))
-    )
-  } else {
-    data <- data[selected, , drop = FALSE]
-    objectives <- sapply(
-      1:max(cl_sub), 
-      function(x) sum(dist(data[cl_sub == x, ]))
-    )
-  }
+  objectives <- distance_objective_by_group(subset_data_matrix(data, selected), cl_sub)
   # recode original matching labels according to objective
   N <- length(cl_sub)
   # sorry for this code, but it works and it was really complicated
