@@ -20,12 +20,7 @@ input_handling_anticlustering <- function(x, K, objective, method,
   categories <- merge_into_one_variable(categories)
 
   ## Validate feature input
-  x <- as.matrix(x)
-  N <- nrow(x)
-  validate_input(x, "features", objmode = "numeric")
-  if (sum(!complete.cases(x)) >= 1) {
-    warning("There are NAs in your data, take care!")
-  }
+  validate_data_matrix(x)
 
   validate_input(preclustering, "preclustering", "logical", len = 1,
                  input_set = c(TRUE, FALSE), not_na = TRUE)
@@ -162,7 +157,7 @@ validate_input <- function(obj, argument_name, class_string = NULL,
 
   ## - Check length of input
   if (argument_exists(len)) {
-    if (length(obj) != len) {
+    if (NROW(obj) != len) {
       stop(argument_name, " must have length ", len)
     }
   }
@@ -173,7 +168,13 @@ validate_input <- function(obj, argument_name, class_string = NULL,
       stop(argument_name, " must be greater than ", greater_than)
     }
   }
-
+  
+  if (not_na == TRUE) {
+    if (sum(is.na(obj) >= 1)) {
+      stop(argument_name, " must not be NA, but contains NA")
+    }
+  }
+  
   ## - Check if input has to be integer
   if (must_be_integer == TRUE && any(obj %% 1 != 0)) {
     stop(argument_name, " must be integer")
@@ -202,13 +203,16 @@ validate_input <- function(obj, argument_name, class_string = NULL,
     }
   }
 
-  if (not_na == TRUE) {
-    if (sum(is.na(obj) >= 1)) {
-      stop(argument_name, " cannot must not be NA but contains NA")
-    }
-  }
-
   return(invisible(NULL))
+}
+
+## Validate feature input
+validate_data_matrix <- function(x) {
+  x <- as.matrix(x)
+  validate_input(x, "features", objmode = "numeric")
+  if (sum(!complete.cases(x)) >= 1) {
+    warning("There are missing values in your data, take care!")
+  }
 }
 
 ## Validate input for the `validate_input` function (these errors are
@@ -278,4 +282,52 @@ legal_number_of_clusters <- function(features, clusters) {
   if (nrow(features) %% n_anticlusters != 0)
     stop("The number of elements is not a multiplier of the number of anticlusters")
   invisible(NULL)
+}
+
+
+input_validation_matching <- function(
+  x, p, 
+  match_between, 
+  match_within, 
+  match_extreme_first, 
+  target_group
+) {
+  validate_data_matrix(x)
+  N <- nrow(as.matrix(x))
+  validate_input(
+    p, "p", 
+    len = 1, 
+    must_be_integer = TRUE, 
+    not_na = TRUE
+  )
+  if (argument_exists(match_between)) {
+    validate_input(
+      match_between, 
+      "match_between", 
+      len = N
+    )
+  }
+  if (argument_exists(match_within)) {
+    validate_input(
+      match_within, 
+      "match_within", 
+      len = N
+    )
+  }
+  validate_input(
+    match_extreme_first, 
+    "match_extreme_first", 
+    len = 1, 
+    input_set = c(TRUE, FALSE), 
+    not_na = TRUE
+  )
+  if (argument_exists(target_group)) {
+    validate_input(
+      target_group, 
+      "target_group", 
+      len = 1, 
+      input_set = c("smallest", "diverse", "none"), 
+      not_na = TRUE
+    )
+  }
 }

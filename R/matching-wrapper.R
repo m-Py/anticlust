@@ -157,6 +157,9 @@ matching <- function(
   match_extreme_first = TRUE,
   target_group = NULL
 ) {
+  
+  input_validation_matching(x, p, match_between, match_within, match_extreme_first, target_group)
+  
   data <- process_input(x)
   match_between <- merge_into_one_variable(match_between)
   target_group <- get_target_group(data, match_between, target_group)
