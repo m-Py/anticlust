@@ -24,27 +24,26 @@ the upper and lower triangular matrix represent the pairwise
 dissimilarities.}
 
 \item{K}{How many anticlusters should be created. Alternatively:
-A vector of length N where entry describes the initial grouping of 
-an input element.}
+A vector of length N where entries describe the initial grouping of 
+the input data points.}
 
 \item{objective}{The objective to be maximized. The option "distance"
 (default) maximizes the cluster editing objective function; the
 option "variance" maximizes the k-means objective function. See
-details.}
+Details.}
 
-\item{method}{One of "exchange" (default) or "ilp".See
-details.}
+\item{method}{One of "exchange" (default) or "ilp". See Details.}
 
 \item{preclustering}{Boolean. Should a preclustering be conducted
 before anticlusters are created? Defaults to \code{FALSE}. See
-details.}
+Details.}
 
 \item{categories}{A vector, data.frame or matrix representing one or
-several categorical constraints. See details.}
+several categorical constraints. See Details.}
 }
 \value{
 A vector of length N that assigns a group (i.e, a number
-    between 1 and K) to each input element.
+    between 1 and \code{K}) to each input element.
 }
 \description{
 Create sets of elements (anticlusters) that are as similar as 
@@ -81,7 +80,7 @@ If the argument \code{features} is passed together with
 \code{objective = "distance"}, the Euclidean distance is computed as
 the basic unit of the anticluster editing objective. If a different
 measure of dissimilarity is preferred, you may pass a self-generated
-dissimiliarity matrix via the argument \code{distances}.
+dissimiliarity matrix via the argument \code{x}.
 
 \strong{Heuristic anticlustering}
 
@@ -102,7 +101,7 @@ specifically implemented for large data sets.
 
 \strong{Exact anticlustering}
 
-The optimal anticluster editing objective can be found via integer
+An optimal anticluster editing objective can be found via integer
 linear programming. To this end, set \code{method = "ilp"}. To obtain
 an optimal solution, a linear programming solver must be installed
 and usable from R. The \code{anticlust} package supports the open
@@ -113,7 +112,7 @@ package \code{gurobi}) and IBM CPLEX (called from the package
 solvers. The optimal solution is retrieved by setting \code{objective
 = "distance"}, \code{method = "ilp"} and \code{preclustering =
 FALSE}. Use this combination of arguments only for small problem
-sizes (maybe <= 30 elements).
+sizes.
 
 To relax the optimality condition, it is possible to set the argument
 \code{preclustering = TRUE}. In this case, the anticluster editing
@@ -121,7 +120,7 @@ objective is still optimized using integer linear programming, but a
 preprocessing forbids very similar elements to be assigned to the
 same anticluster. Thus, before the anticlustering objective is
 optimized, a cluster analysis identifies small groups of similar
-elements (pairs if K = 2, triplets if K = 3, and so forth). The
+elements (pairs if \code{K = 2}, triplets if \code{K = 3}, and so forth). The
 preclustering reduces the size of the solution space, making the ILP
 approach applicable for larger problem instances. With preclustering,
 optimality is no longer guaranteed, but the solution is usually

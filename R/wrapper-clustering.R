@@ -1,5 +1,5 @@
 
-#' Create balanced clusters
+#' Create balanced clusters of equal size
 #'
 #' @param x The data input. Can be one of two structures: (1) A data matrix
 #'     where rows correspond to elements and columns correspond to
@@ -17,7 +17,7 @@
 #'
 #' @details
 #'
-#' This function partitions a set of elements into K equal sized
+#' This function partitions a set of elements into \code{K} equal-sized
 #' clusters. The function offers two methods, a heuristic method and an
 #' exact method. The heuristic (\code{method = "heuristic"}) computes
 #' the centroid of all available elements and identifies the element

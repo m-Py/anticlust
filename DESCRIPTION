@@ -1,18 +1,18 @@
 Package: anticlust
 Type: Package
 Title: Subset Partitioning via Anticlustering
-Description: Anticlustering partitions a pool of elements into subsets
-        (i.e., anticlusters) in such a way that the subsets are as
-        similar as possible. This is accomplished by maximizing instead
-        of minimizing a clustering objective, such as the intra-cluster
-        variance or the sum of pairwise distances within clusters. Thus
-        anticlustering maximizes the heterogeneity within anticlusters. 
-        The package includes exact and heuristic approaches
-        for anticlustering. The exact approach requires that a linear
-        programming solver is installed. The package also offers
-        methods for classical clustering problems under size
-        constraints, i.e., creating balanced clusters of equal size, and
-        matching algorithms.
+Description: A set of functions for anticlustering, matching, and cluster
+    analyis. Anticlustering partitions a pool of elements into subsets 
+    (i.e., anticlusters) in such a way that the subsets are as similar as 
+    possible. This is accomplished by maximizing instead of minimizing a 
+    clustering objective, such as the intra-cluster variance or the sum of 
+    pairwise distances within clusters. Thus, anticlustering maximizes the 
+    heterogeneity within anticlusters. `anticlust` implements exact and 
+    heuristic approaches for anticlustering. The exact approach requires 
+    that a linear programming solver is installed (gurobi, CPLEX, or the
+    GNU linear programming kit). Functions for classical clustering problems
+    under size constraints (i.e., creating equal-sized clusters) and 
+    (unrestricted or K-partite) matching are also implemented.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -27,10 +27,9 @@ Suggests:
 Imports: Matrix, RANN
 Depends: R (>= 3.4.0)
 BugReports: https://github.com/m-Py/anticlust/issues
-Authors@R: c(person(given='Martin', family='Papenberg',
-        email='martin.papenberg@hhu.de', role=c('aut', 'cre', 'cph')),
-        person(given='Meik', family='Michalke', role=c('ctb'),
-        comment='centroid based clustering algorithm') )
+Author: Martin Papenberg [aut, cre], Meik Michalke [ctb]
+Maintainer: Martin Papenberg <martin.papenberg@hhu.de>
+Authors@R: c(person(given='Martin', family='Papenberg', email='martin.papenberg@hhu.de', role=c('aut', 'cre')), person(given='Meik', family='Michalke', role=c('ctb'), comment='centroid based clustering algorithm') )
 Version: 0.4.0
 Date: 2020-21-01
 RoxygenNote: 7.0.2

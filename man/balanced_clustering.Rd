@@ -2,7 +2,7 @@
 % Please edit documentation in R/wrapper-clustering.R
 \name{balanced_clustering}
 \alias{balanced_clustering}
-\title{Create balanced clusters}
+\title{Create balanced clusters of equal size}
 \source{
 The heuristic method was originally developed and contributed by m.eik michalke.
 It was later rewritten by Martin Papenberg, who also implemented the exact integer linear
@@ -30,10 +30,10 @@ An integer vector representing the cluster affiliation of
     each data point
 }
 \description{
-Create balanced clusters
+Create balanced clusters of equal size
 }
 \details{
-This function partitions a set of elements into K equal sized
+This function partitions a set of elements into \code{K} equal-sized
 clusters. The function offers two methods, a heuristic method and an
 exact method. The heuristic (\code{method = "heuristic"}) computes
 the centroid of all available elements and identifies the element

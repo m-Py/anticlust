@@ -325,7 +325,8 @@ best <- subset(schaper2019, triplet <= 10)
 ```
 
 After the matching, we use anticlustering to assign the matched words to 
-sets:
+sets. 
+
 
 ```{r}
 best$anticluster <- anticlustering(
@@ -334,19 +335,34 @@ best$anticluster <- anticlustering(
   categories = best$triplet,
   objective = "variance"
 )
+```
 
+In this function call, we pass the `triplets` to the argument `categories`, 
+thus ensuring that the matched items are assigned to different sets. We can confirm
+this worked by looking at the cross table of `triplet` and `anticluster`:
+
+```{r}
+table(best$triplet, best$anticluster)
+```
+
+Anticlustering strives to assign the matched triplets to the different sets in 
+such a way that all sets are as similar as possible. Note that by ensuring
+that the triplets only consisted of items from the same room, the room
+was also balanced across anticlusters: 
+
+```{r}
+table(best$room, best$anticluster)
+```
+
+Last, we check out the descriptive statistics by anticluster, confirming 
+that the sets are indeed quite similar on all numeric attributes:
+
+```{r}
 ## check out quality of the solution
 mean_sd_tab(
   subset(best, select = 3:6), 
   best$anticluster
 )
-```
-
-By ensuring that our matches only consisted of items from the same room, 
-the room is balanced across anticlusters: 
-
-```{r}
-table(best$room, best$anticluster)
 ```
 
 ## References

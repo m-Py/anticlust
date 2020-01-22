@@ -192,6 +192,7 @@ plot_clusters(
   col = cols,
   pch = 3:5
 )
+par(mfrow = c(1, 1))
 
 ```
 

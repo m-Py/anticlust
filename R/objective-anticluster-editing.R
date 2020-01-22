@@ -1,7 +1,7 @@
 
-#' Objective value for the cluster editing distance objective
+#' Cluster editing distance objective
 #'
-#' Check the objective value for a given clustering.
+#' Compute the cluster editing objective for a given clustering.
 #'
 #' @param x The data input. Can be one of two structures: (1) A data matrix
 #'     where rows correspond to elements and columns correspond to
@@ -12,8 +12,7 @@
 #'     the upper and lower triangular matrix represent the pairwise
 #'     dissimilarities.
 #' @param clusters A vector representing (anti)clusters (e.g.,
-#'     returned by \code{\link{anticlustering}} or
-#'     \code{\link{balanced_clustering}}).
+#'     returned by \code{\link{anticlustering}}).
 #'
 #' @return The cluster editing objective
 #'
@@ -21,8 +20,8 @@
 #'
 #' The cluster editing objective objective is given by the sum of the
 #' pairwise distances between elements within the same (anti)clusters.
-#' When the argument \code{features} is passed, the Euclidean distance
-#' is used.
+#' When the input \code{x} is a feature matrix, the Euclidean distance
+#' is computed as the basic distance unit.
 #'
 #'
 #' @examples

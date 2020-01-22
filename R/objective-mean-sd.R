@@ -1,23 +1,22 @@
 
 #' An objective function measuring similarity of sets
 #'
-#' Defines set similarity as the discrepancy in means and standard deviations
+#' Compute the discrepancy in means and standard deviations between clusters.
 #'
 #' @importFrom stats sd var
 #'
 #' @param clusters A clustering vector
 #' @param features The features
 #'
-#' @return A value quantifying set similarity. Higher values indicate
-#'     that the discrepancy in means and standard deviations
-#'     are low.
+#' @return A value quantifying similarity in means and standard deviations. 
+#'     Higher values indicate that means and standard deviations are more
+#'     similar.
 #'
 #' @details
 #'
-#' Use this function as the \code{objective} in the anticlustering
-#' function to make means and standard deviations as similar
-#' as possible.
-#'
+#' This function can be passed as the argument \code{objective} to the 
+#' function \code{\link{anticlustering}} to minimize differences in means 
+#' and standard deviations between anticlusters.
 #'
 #' @examples
 #' data(schaper2019)

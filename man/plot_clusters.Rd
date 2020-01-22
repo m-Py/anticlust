@@ -95,6 +95,7 @@ anticlusters <- anticlustering(features, K = K)
 par(mfrow = c(1, 2))
 plot_clusters(features, clusters, main = "Cluster editing", within_connection = TRUE)
 plot_clusters(features, anticlusters, main = "Anticluster editing", within_connection = TRUE)
+par(mfrow = c(1, 1))
 
 }
 \author{

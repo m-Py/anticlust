@@ -40,10 +40,10 @@ sought for extreme elements first or for central
 elements. Defaults to \code{TRUE}.}
 
 \item{target_group}{Currently, the options "none", smallest" and "diverse"
-are supported.}
+are supported. See Details.}
 }
 \value{
-An integer vector encoding the matches. See Setails for
+An integer vector encoding the matches. See Details for
     more information.
 }
 \description{
@@ -81,8 +81,8 @@ the largest variance.
 
 The output is an integer vector encoding which elements have been
 matched. The grouping numbers are sorted by similarity. That is,
-elements with the grouping number »1« are most similar to each
-other, followed by 2 etc (groups having the same similarity index
+elements with the grouping number »1« have the highest intra-group
+similarity, followed by 2 etc (groups having the same similarity index
 are still assigned a different grouping number, though). Similarity
 is measured as the sum of pairwise (Euclidean) distances within
 groups (see \code{\link{distance_objective}}).  Some unmatched elements 
