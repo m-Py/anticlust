@@ -32,5 +32,5 @@ mean_sd_tab(iris[, -5], iris[, 5])
 
 }
 \author{
-: Martin Papenberg
+Martin Papenberg \email{martin.papenberg@hhu.de}
 }

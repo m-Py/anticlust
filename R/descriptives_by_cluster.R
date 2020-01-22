@@ -16,7 +16,9 @@
 #' data(iris)
 #' mean_sd_tab(iris[, -5], iris[, 5])
 #' 
-#' @author: Martin Papenberg
+#' @author
+#' Martin Papenberg \email{martin.papenberg@@hhu.de}
+#' 
 #' @export
 
 mean_sd_tab <- function(features, groups, decimals = 2, na.rm  = FALSE, 

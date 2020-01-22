@@ -6,6 +6,9 @@
 #' @return The number of partitions
 #'
 #' @export
+#' 
+#' @examples
+#' n_partitions(20, 2)
 #'
 n_partitions <- function(N, K) {
   if (N %% K != 0) {

@@ -17,3 +17,7 @@ The number of partitions
 \description{
 Number of equal sized partitions
 }
+\examples{
+n_partitions(20, 2)
+
+}

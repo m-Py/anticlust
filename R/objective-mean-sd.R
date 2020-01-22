@@ -30,7 +30,6 @@
 #' )
 #' by(features, ac, function(x) round(colMeans(x), 2))
 #' by(features, ac, function(x) round(apply(x, 2, sd), 2))
-#' by(features, ac, function(x) round(apply(x, 2, median), 2))
 #'
 #' @export
 #'

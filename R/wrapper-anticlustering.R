@@ -75,10 +75,10 @@
 #' \strong{Heuristic anticlustering}
 #'
 #' In the default case, a heuristic method is employed for anticlustering: 
-#' The exchange method (\code{method = "exchange"}): Building on an
+#' the exchange method (\code{method = "exchange"}). Building on an
 #' initial random assignment, elements are swapped between anticlusters
 #' in such a way that each swap improves set similarity by the largest
-#' amount that is possible in a situation (cf. Späth, 1986). The
+#' amount that is possible. The
 #' swapping procedure is repeated for each element; because each
 #' possible swap is investigated for each element, the total number of
 #' exchanges grows quadratically with input size, rendering the exchange

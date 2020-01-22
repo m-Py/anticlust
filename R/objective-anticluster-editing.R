@@ -38,20 +38,6 @@
 #' # This is higher:
 #' distance_objective(distances, anticlusters)
 #'
-#'
-#' # Illustrates the cluster editing objective as the sum of distances
-#' # within groups (needs an integer linear programming solver!)
-#' n_elements <- 12
-#' features <- matrix(runif(n_elements * 2), ncol = 2)
-#' n_groups <- 2
-#' clusters <- balanced_clustering(features, K = n_groups, method = "ilp")
-#' anticlusters <- anticlustering(features, K = n_groups, method = "ilp")
-#' par(mfrow = c(1, 2))
-#' plot_clusters(features, clusters, within_connection = TRUE,
-#'               main = "Minimum within-group distances")
-#' plot_clusters(features, anticlusters, within_connection = TRUE,
-#'               main = "Maximum within-group distances")
-#'
 #' @export
 #'
 #' @author

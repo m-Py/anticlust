@@ -9,6 +9,7 @@
 #' @return A vector representing the clustering.
 #'
 #' @noRd
+#' 
 #'
 balanced_cluster_editing <- function(data, K, solver) {
   if (!is_distance_matrix(data)) {
