@@ -74,18 +74,5 @@ range_diff <- function(x, na.rm) {
 #'
 #' @noRd
 force_decimals <- function(x, decimals = 2) {
-  return(vectorize_print(x, decimals, force_decimals_))
-}
-
-force_decimals_ <- function(x, decimals) {
-  if (is.na(x)) {
-    return(NA_character_)
-  }
-  return(format(round(x, decimals), nsmall = decimals, scientific = FALSE))
-}
-
-vectorize_print <- function(x, decimals, FUN, ...) {
-  x <- as.numeric(x)
-  x_ <- vapply(x, FUN, FUN.VALUE = "character", decimals, ...)
-  return(x_)
+  format(round(x, decimals), nsmall = decimals, scientific = FALSE)
 }
