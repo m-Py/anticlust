@@ -11,7 +11,7 @@ wce(weights)
 agreement (this is unlike in the \code{\link{anticlustering}} function)}
 }
 \value{
-The clusters
+An integer vector representing the cluster affiliation of each data point
 }
 \description{
 Exact weighted cluster editing

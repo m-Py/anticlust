@@ -4,7 +4,8 @@
 #' @param weights A N x N weight matrix. Larger values indicate stronger
 #'     agreement (this is unlike in the \code{\link{anticlustering}} function)
 #'
-#' @return The clusters
+#' @return An integer vector representing the cluster affiliation of each data point
+#' 
 #'
 #' @examples
 #' \dontrun{
