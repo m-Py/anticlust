@@ -114,6 +114,7 @@ get_exchange_partners <- function(clusters, i, categories) {
 # return: The initialized clusters
 initialize_clusters <- function(N, K, categories) {
   if (length(K) > 1) {
+    K <- to_numeric(K)
     return(K) # K is already an anticluster assignment
   }
   ## Initial assignment based on categorical constraints
