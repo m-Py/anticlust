@@ -79,8 +79,7 @@
 balanced_clustering <- function(x, K, method = "heuristic") {
 
   input_validation_anticlustering(x, K, "distance", method, TRUE, NULL)
-  
-  data <- process_input(x)
+  data <- to_matrix(x)
   
   if (method == "ilp") {
     return(balanced_cluster_editing(data, K, solver_available()))

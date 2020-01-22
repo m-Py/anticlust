@@ -209,9 +209,7 @@ anticlustering <- function(x, K, objective = "distance", method = "exchange",
 
   ## Get data into required format
   input_validation_anticlustering(x, K, objective, method, preclustering, categories)
-
-  ## Convert input to matrix
-  data <- process_input(x)
+  data <- to_matrix(x)
 
   ## Exact method using ILP
   if (method == "ilp") {
@@ -244,7 +242,7 @@ anticlustering <- function(x, K, objective = "distance", method = "exchange",
 # Function that processes input and returns the data set that the
 # optimization is conducted on as matrix (for exchange method)
 # Returned matrix either represents distances or features.
-process_input <- function(data) {
+to_matrix <- function(data) {
   if (!is_distance_matrix(data)) {
     data <- as.matrix(data)
     return(data)
