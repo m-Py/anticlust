@@ -4,13 +4,13 @@
 \alias{generate_partitions}
 \title{Generate all partitions of same cardinality}
 \usage{
-generate_partitions(K, N, generate_permutations = FALSE)
+generate_partitions(N, K, generate_permutations = FALSE)
 }
 \arguments{
-\item{K}{How many partitions}
-
 \item{N}{The total N. \code{K} has to be dividble
 by \code{N}.}
+
+\item{K}{How many partitions}
 
 \item{generate_permutations}{If TRUE, all permutations are returned,
 resulting in duplicate partitions.}
@@ -44,7 +44,7 @@ to inspect all partitions while ignoring duplicated permutations.
 N <- 14
 K <- 2
 features <- matrix(sample(N * 2, replace = TRUE), ncol = 2)
-partitions <- generate_partitions(K, N)
+partitions <- generate_partitions(N, K)
 length(partitions) # number of possible partitions
 
 ## Create an objective function that takes the partition

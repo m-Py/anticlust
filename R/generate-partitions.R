@@ -1,9 +1,9 @@
 
 #' Generate all partitions of same cardinality
 #'
-#' @param K How many partitions
 #' @param N The total N. \code{K} has to be dividble
 #'     by \code{N}.
+#' @param K How many partitions
 #' @param generate_permutations If TRUE, all permutations are returned,
 #'     resulting in duplicate partitions.
 #'
@@ -33,7 +33,7 @@
 #' N <- 14
 #' K <- 2
 #' features <- matrix(sample(N * 2, replace = TRUE), ncol = 2)
-#' partitions <- generate_partitions(K, N)
+#' partitions <- generate_partitions(N, K)
 #' length(partitions) # number of possible partitions
 #'
 #' ## Create an objective function that takes the partition
@@ -95,7 +95,7 @@
 #' Martin Papenberg \email{martin.papenberg@@hhu.de}
 #'
 
-generate_partitions <- function(K, N, generate_permutations = FALSE) {
+generate_partitions <- function(N, K, generate_permutations = FALSE) {
   if (N %% K != 0) {
     stop("K must be a divider of N.")
   }

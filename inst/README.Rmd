@@ -125,7 +125,7 @@ features <- matrix(rnorm(N * 2), ncol = 2)
 K <- 3
 
 ## Generate all possible partitions to divide N items in K sets:
-partitions <- generate_partitions(K, N)
+partitions <- generate_partitions(N, K)
 
 ## Create an objective function that takes the partition
 ## as first argument (then, we can use sapply to compute
