@@ -61,10 +61,14 @@
 #'   iris[, -5],
 #'   anticlusters
 #' )
-#'
+#' 
+#' # Illustrate variance objective
+#' N <- 18
+#' data <- matrix(rnorm(N * 2), ncol = 2)
+#' cl <- balanced_clustering(data, K = 3)
+#' plot_clusters(data, cl, illustrate_variance = TRUE)
 
 variance_objective <- function(features, clusters) {
-  validate_input(features, "features", c("data.frame", "matrix", "numeric"))
   features <- as.matrix(features)
   validate_input(features, "features", objmode = "numeric")
   validate_input(clusters, "anticlusters", class_string = c("numeric", "factor"))
