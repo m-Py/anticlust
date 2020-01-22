@@ -87,7 +87,7 @@
 #' triplets <- matching(lds, p = 3)
 #' plot_clusters(
 #'   lds,
-#'   clustering = triplets,
+#'   clusters = triplets,
 #'   within_connection = TRUE
 #' )
 #'
@@ -99,7 +99,7 @@
 #' matched <- matching(data[, 1], match_between = groups)
 #' plot_clusters(
 #'   cbind(groups, data), 
-#'   clustering = matched, 
+#'   clusters = matched, 
 #'   within_connection = TRUE
 #' )
 #' 
@@ -131,13 +131,13 @@
 #' )
 #' plot_clusters(
 #'   data,
-#'   clustering = matched,
+#'   clusters = matched,
 #'   within_connection = TRUE,
 #'   main = "Extreme elements matched first"
 #' )
 #' plot_clusters(
 #'   data,
-#'   clustering = matched2,
+#'   clusters = matched2,
 #'   within_connection = TRUE,
 #'   main = "Central elements matched first"
 #' )
