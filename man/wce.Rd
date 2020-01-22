@@ -30,6 +30,7 @@ FALSE}. Use this combination of arguments only for small problem
 sizes (maybe <= 30 elements).
 }
 \examples{
+\dontrun{
 features <- swiss
 distances <- dist(scale(swiss))
 hist(distances)
@@ -39,6 +40,7 @@ hist(distances)
 agreements <- ifelse(as.matrix(distances) < 3, 1, -1)
 clusters <- wce(agreements)
 plot(swiss, col = clusters, pch = 19)
+}
 
 }
 \author{

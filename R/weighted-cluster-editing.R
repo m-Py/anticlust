@@ -7,6 +7,7 @@
 #' @return The clusters
 #'
 #' @examples
+#' \dontrun{
 #' features <- swiss
 #' distances <- dist(scale(swiss))
 #' hist(distances)
@@ -16,7 +17,8 @@
 #' agreements <- ifelse(as.matrix(distances) < 3, 1, -1)
 #' clusters <- wce(agreements)
 #' plot(swiss, col = clusters, pch = 19)
-#'
+#' }
+#' 
 #' @export
 #'
 #' @author
