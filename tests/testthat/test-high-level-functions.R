@@ -3,6 +3,7 @@ context("Test high-level functions for equal sized clustering and anticlustering
 library("anticlust")
 
 test_that("high level equal sized clustering function runs through", {
+  skip_on_cran()
   conditions <- expand.grid(m = 1:4, p = 2:4)
   for (k in 1:nrow(conditions)) {
     m_features <- conditions[k, "m"]
@@ -26,6 +27,7 @@ test_that("high level equal sized clustering function runs through", {
 
 
 test_that("high level anticlustering function runs through", {
+  skip_on_cran()
   conditions <- expand.grid(m = 1:4, p = 2:3)
   for (k in 1:nrow(conditions)) {
     m_features <- conditions[k, "m"]
@@ -50,6 +52,7 @@ test_that("high level anticlustering function runs through", {
 
 
 test_that("all argument combinations run through", {
+  skip_on_cran()
   conditions <- expand.grid(preclustering = c(TRUE, FALSE),
                             method = c("ilp", "exchange"))
   # Set up matrix to store the objective values obtained by different methods

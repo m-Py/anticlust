@@ -3,6 +3,7 @@ context("Test distance input")
 library("anticlust")
 
 test_that("distance input works for exact ILP", {
+  skip_on_cran()
   conditions <- expand.grid(m = 1:4, p = 2)
   for (k in 1:nrow(conditions)) {
     m_features <- conditions[k, "m"]
@@ -26,6 +27,7 @@ test_that("distance input works for exact ILP", {
 })
 
 test_that("distance input works for precluster ILP", {
+  skip_on_cran()
   conditions <- expand.grid(m = 1:4, p = 2)
   for (k in 1:nrow(conditions)) {
     m_features <- conditions[k, "m"]
