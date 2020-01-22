@@ -66,11 +66,11 @@ needed to use one of the commercial solvers.
 N <- 1000
 lds <- data.frame(f1 = rnorm(N), f2 = rnorm(N))
 cl <- balanced_clustering(lds, K = 10)
-plot_clusters(lds, clustering = cl)
+plot_clusters(lds, clusters = cl)
 
 # Repeat using a distance matrix as input
 cl2 <- balanced_clustering(dist(lds), K = 10)
-plot_clusters(lds, clustering = cl2)
+plot_clusters(lds, clusters = cl2)
 
 }
 \references{

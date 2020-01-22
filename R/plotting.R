@@ -3,7 +3,7 @@
 #'
 #' @param features A data.frame or matrix representing the features that
 #'     are plotted. Must have two columns.
-#' @param clustering A vector representing the clustering
+#' @param clusters A vector representing the clustering
 #' @param within_connection Boolean. Connect the elements within each
 #'     clusters through lines? Useful to illustrate a graph structure.
 #' @param between_connection Boolean. Connect the elements between each
@@ -17,15 +17,6 @@
 #' @param ylab The label for the y-axis
 #' @param xlim The limits for the x-axis
 #' @param ylim The limits for the y-axis
-#' @param col The coloring of the groups, optional argument. If this
-#'     argument is passed, it needs to be a #' character vector of the
-#'     same length as there are clusters, and each element of the vector
-#'     is a color.
-#' @param pch A numeric vector representing the symbol used to plot
-#'     data points (see \code{\link{par}}). Should either be of length 1,
-#'     then the same symbol is used for all plots, or should have the
-#'     same length as there are different clusters. In the latter case,
-#'     each cluster has a different plotting symbol.
 #' @param main The title of the plot
 #' @param cex The size of the plotting symbols, see \code{\link{par}}
 #' @param cex.axis The size of the values on the axes
@@ -46,28 +37,32 @@
 #' @importFrom grDevices rainbow
 #' @importFrom graphics lines par plot points
 #'
-#' @details In most cases, the argument `clustering` is a vector
-#'   returned by one of the functions \code{\link{anticlustering}} or
-#'   \code{\link{balanced_clustering}}. However, the plotting function
-#'   can also be used to plot the results of other cluster functions
-#'   such as \code{\link{kmeans}}.
+#' @details In most cases, the argument \code{clusters} is a vector
+#'   returned by one of the functions \code{\link{anticlustering}},
+#'   \code{\link{balanced_clustering}} or \code{\link{matching}}. 
+#'   However, the plotting function can also be used to plot the results 
+#'   of other cluster functions such as \code{\link{kmeans}}. This function
+#'   is usually just used to get a fast impression of the results of an 
+#'   (anti)clustering assignment, but limited in its functionality. 
+#'   It is useful for depicting the intra-cluster connections using 
+#'   argument \code{within_connection}.
 #'
 #' @examples
 #'
-#' n_elements <- 9
-#' features <- matrix(runif(n_elements * 2), ncol = 2)
-#' n_groups <- 3
-#' clusters <- balanced_clustering(features, K = n_groups)
-#' anticlusters <- anticlustering(features, K = n_groups)
+#' N <- 15
+#' features <- matrix(runif(N * 2), ncol = 2)
+#' K <- 3
+#' clusters <- balanced_clustering(features, K = K)
+#' anticlusters <- anticlustering(features, K = K)
 #' par(mfrow = c(1, 2))
-#' plot_clusters(features, clusters, pch = c(15, 16, 17), main = "Cluster editing")
-#' plot_clusters(features, anticlusters, pch = c(15, 16, 17), main = "Anticluster editing")
+#' plot_clusters(features, clusters, main = "Cluster editing", within_connection = TRUE)
+#' plot_clusters(features, anticlusters, main = "Anticluster editing", within_connection = TRUE)
 #'
-plot_clusters <- function(features, clustering, within_connection = FALSE,
+plot_clusters <- function(features, clusters, within_connection = FALSE,
                           between_connection = FALSE, illustrate_variance = FALSE,
                           show_axes = FALSE, xlab = NULL, ylab = NULL,
                           xlim = NULL, ylim = NULL,
-                          col = NULL, pch = 19, main = "", cex = 1.2,
+                          main = "", cex = 1.2,
                           cex.axis = 1.2, cex.lab = 1.2, lwd = 1.5,
                           lty = 2, frame.plot = FALSE, cex_centroid = 2) {
   if (!argument_exists(xlim)) {
@@ -78,26 +73,16 @@ plot_clusters <- function(features, clustering, within_connection = FALSE,
   }
   if (ncol(features) != 2)
     stop("Can only plot two features")
-  if (nrow(features) != length(clustering))
+  if (nrow(features) != length(clusters))
     stop("There must be a cluster for each element - nrow(features) != length(clustering)")
 
   ## Just in case anybody passes something weird (i.e., cluster numbers
   ## do not start at 1):
-  clustering <- to_numeric(clustering)
+  clusters <- to_numeric(clusters)
   # Replace NAs in clustering vector
-  clustering[is.na(clustering)] <- seq(
-    max(clustering, na.rm = TRUE) + 1, length.out = sum(is.na(clustering))
+  clusters[is.na(clusters)] <- seq(
+    max(clusters, na.rm = TRUE) + 1, length.out = sum(is.na(clusters))
   )
-
-  ## More input handling:
-  K <- length(unique(clustering))
-  if (length(pch) == K)
-    pch <- pch[clustering]
-  else if (length(pch) == 1)
-    pch <- pch # :-)
-  else
-    stop("Length of argument pch must be 1 the number of different anticlusters")
-
 
   ## Specify axis labels if they cannot be assumed from data matrix or argument
   if (is.null(xlab))
@@ -107,35 +92,36 @@ plot_clusters <- function(features, clustering, within_connection = FALSE,
 
   x <- features[, 1]
   y <- features[, 2]
-  if (is.null(col) == TRUE)
-    col <- rainbow(K)
-  ## Set colors for cliques
-  if (length(col) != K)
-    stop("If you specify colors, you have to specify as many colors as there are clusters")
-  col <- col[clustering]
+
+  ## Set colors for clusters
+  K <- length(unique(clusters))
+  col <- rainbow(K)
+  col <- col[clusters]
+  
+  # Draw plot
   axt <- "n"
   if (show_axes == TRUE)
     axt <- "s"
   plot(x, y, las = 1, cex.axis = cex.axis, cex.lab = cex.lab,
        col = col, xlab = xlab, ylab = ylab, cex = cex, bg = col,
-       xaxt = axt, yaxt = axt, pch = pch, main = main,
+       xaxt = axt, yaxt = axt, pch = 19, main = main,
        frame.plot = frame.plot, xlim = xlim, ylim = ylim)
   ## Draw graph structure
   if (within_connection == TRUE) {
-    draw_all_cliques(x, y, clustering, cols = col, lwd = lwd, lty = lty)
+    draw_all_cliques(x, y, clusters, cols = col, lwd = lwd, lty = lty)
   }
   if (between_connection == TRUE) {
     if (K == 2) {
-      draw_between_cliques(x, y, clustering, lwd = lwd, lty = lty)
+      draw_between_cliques(x, y, clusters, lwd = lwd, lty = lty)
       ## redraw points so that the lines do notlay the points
-      points(x, y, cex = cex, pch = pch, col = col)
+      points(x, y, cex = cex, pch = 19, col = col)
     } else {
       warning("Connections between elements of different clusters were ",
-              "not drawn because there were more than two anticlusters")
+              "not drawn because there were more than two clusters.")
     }
   }
   if (illustrate_variance) {
-    illustrate_variance(features, clustering, col, lwd, lty, cex_centroid)
+    illustrate_variance(features, clusters, col, lwd, lty, cex_centroid)
   }
 }
 

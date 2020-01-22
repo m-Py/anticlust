@@ -6,7 +6,7 @@
 \usage{
 plot_clusters(
   features,
-  clustering,
+  clusters,
   within_connection = FALSE,
   between_connection = FALSE,
   illustrate_variance = FALSE,
@@ -15,8 +15,6 @@ plot_clusters(
   ylab = NULL,
   xlim = NULL,
   ylim = NULL,
-  col = NULL,
-  pch = 19,
   main = "",
   cex = 1.2,
   cex.axis = 1.2,
@@ -31,7 +29,7 @@ plot_clusters(
 \item{features}{A data.frame or matrix representing the features that
 are plotted. Must have two columns.}
 
-\item{clustering}{A vector representing the clustering}
+\item{clusters}{A vector representing the clustering}
 
 \item{within_connection}{Boolean. Connect the elements within each
 clusters through lines? Useful to illustrate a graph structure.}
@@ -53,17 +51,6 @@ to `FALSE`.}
 \item{xlim}{The limits for the x-axis}
 
 \item{ylim}{The limits for the y-axis}
-
-\item{col}{The coloring of the groups, optional argument. If this
-argument is passed, it needs to be a #' character vector of the
-same length as there are clusters, and each element of the vector
-is a color.}
-
-\item{pch}{A numeric vector representing the symbol used to plot
-data points (see \code{\link{par}}). Should either be of length 1,
-then the same symbol is used for all plots, or should have the
-same length as there are different clusters. In the latter case,
-each cluster has a different plotting symbol.}
 
 \item{main}{The title of the plot}
 
@@ -88,22 +75,26 @@ effect only if \code{illustrate_variance} is \code{TRUE})}
 Visualize a cluster analysis
 }
 \details{
-In most cases, the argument `clustering` is a vector
-  returned by one of the functions \code{\link{anticlustering}} or
-  \code{\link{balanced_clustering}}. However, the plotting function
-  can also be used to plot the results of other cluster functions
-  such as \code{\link{kmeans}}.
+In most cases, the argument \code{clusters} is a vector
+  returned by one of the functions \code{\link{anticlustering}},
+  \code{\link{balanced_clustering}} or \code{\link{matching}}. 
+  However, the plotting function can also be used to plot the results 
+  of other cluster functions such as \code{\link{kmeans}}. This function
+  is usually just used to get a fast impression of the results of an 
+  (anti)clustering assignment, but limited in its functionality. 
+  It is useful for depicting the intra-cluster connections using 
+  argument \code{within_connection}.
 }
 \examples{
 
-n_elements <- 9
-features <- matrix(runif(n_elements * 2), ncol = 2)
-n_groups <- 3
-clusters <- balanced_clustering(features, K = n_groups)
-anticlusters <- anticlustering(features, K = n_groups)
+N <- 15
+features <- matrix(runif(N * 2), ncol = 2)
+K <- 3
+clusters <- balanced_clustering(features, K = K)
+anticlusters <- anticlustering(features, K = K)
 par(mfrow = c(1, 2))
-plot_clusters(features, clusters, pch = c(15, 16, 17), main = "Cluster editing")
-plot_clusters(features, anticlusters, pch = c(15, 16, 17), main = "Anticluster editing")
+plot_clusters(features, clusters, main = "Cluster editing", within_connection = TRUE)
+plot_clusters(features, anticlusters, main = "Anticluster editing", within_connection = TRUE)
 
 }
 \author{
