@@ -1,12 +1,14 @@
 
-#' Ratings for 96 objects
+#' Ratings for 96 words
 #'
-#' An item set that was used in experiments by Schaper, Kuhlmann and
-#' Bayen (2019; in press).
+#' A stimulus set that was used in experiments by Schaper, Kuhlmann and
+#' Bayen (2019a; 2019b). The item pool consists of 96 German words. 
+#' Each word represents an object that is either 
+#' typically found in a bathroom or in a kitchen. 
 #'
 #' @format A data frame with 96 rows and 7 variables
 #' \describe{
-#'   \item{item}{The name of the object (in German)}
+#'   \item{item}{The name of an object (in German)}
 #'   \item{room}{The room in which the item is typically found; can be
 #'       'kitchen' or 'bathroom'}
 #'   \item{rating_consistent}{How expected would it
@@ -15,7 +17,8 @@
 #'       be to find the \code{item} in the atypical \code{room}}
 #'   \item{syllables}{The number of syllables in the object name}
 #'   \item{frequency}{A value indicating the relative frequency of the
-#'       object name in German language}
+#'       object name in German language (lower values indicate higher
+#'       frequency)}
 #'   \item{list}{Represents the set affiliation of the \code{item} as
 #'       realized in experiments by Schaper et al.}
 #' }
