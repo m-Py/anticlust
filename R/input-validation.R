@@ -13,7 +13,7 @@
 #' @return NULL
 #'
 #' @noRd
-input_handling_anticlustering <- function(x, K, objective, method,
+input_validation_anticlustering <- function(x, K, objective, method,
                                           preclustering, categories) {
 
   ## Merge categories variable so that `length` can be applied:
@@ -32,10 +32,9 @@ input_handling_anticlustering <- function(x, K, objective, method,
 
   # Allow that K is an initial assignment of elements to clusters
   if (length(K) == 1) {
-    validate_input(K, "K", "numeric", len = 1,
-                   greater_than = 1, must_be_integer = TRUE)
+    validate_input(K, "K", len = 1, greater_than = 1, must_be_integer = TRUE, not_na = TRUE)
   } else {
-    validate_input(K, "K", "numeric", len = N)
+    validate_input(K, "K", "numeric", len = N, not_na = TRUE)
     if (method != "exchange") {
       stop("Passing an initial cluster assignment via the argument `K` ",
            "only works with method = 'exchange'")
@@ -85,7 +84,7 @@ input_handling_anticlustering <- function(x, K, objective, method,
   }
 
   if (class(objective) != "function") {
-    validate_input(objective, "objective", input_set = c("distance", "variance"), len = 1)
+    validate_input(objective, "objective", input_set = c("distance", "variance"), len = 1, not_na = TRUE)
     if (objective == "variance" && method == "ilp") {
       stop("You cannot use integer linear programming method to maximize the variance criterion. ",
            "Use objective = 'distance', or method = 'exchange' instead")

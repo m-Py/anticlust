@@ -77,7 +77,7 @@
 #'
 
 fast_anticlustering <- function(features, K, k_neighbours = Inf, categories = NULL) {
-  input_handling_anticlustering(features, K, "variance",
+  input_validation_anticlustering(features, K, "variance",
                                 "exchange", FALSE, categories)
 
   if (!isTRUE(k_neighbours == Inf)) {
@@ -86,7 +86,7 @@ fast_anticlustering <- function(features, K, k_neighbours = Inf, categories = NU
   }
   features <- as.matrix(features)
   neighbours <- get_neighbours(features, k_neighbours, categories)
-  init <- initialize_clusters(features, K, variance_objective_, categories)
+  init <- initialize_clusters(nrow(features), K, categories)
   fast_exchange_(features, init, categories, neighbours)
 }
 
@@ -161,6 +161,7 @@ get_exchange_partners_kmeans <- function(clusters, i, nearest_neighbors, categor
   ## Do not change with other elements that are in the same cluster
   exchange_partners[clusters[exchange_partners] != clusters[i]]
 }
+
 #' Update a cluster center after swapping two elements
 #'
 #' @param centers The current cluster centers
@@ -261,20 +262,4 @@ get_neighbours <- function(features, k_neighbours, categories) {
     colnames(idx) <- NULL
   }
   sort_by_col(idx, 1)
-}
-
-#' Converting any categorical input to integer
-#' 
-#' @param x a vector
-#' 
-#' @return A vector of \code{length(x)} where each element is integer
-#' 
-#' @examples 
-#' iris$Species
-#' to_numeric(iris$Species)
-#' 
-#' @export
-#' 
-to_numeric <- function(x) {
-  as.numeric(factor(x))
 }

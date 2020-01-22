@@ -67,62 +67,18 @@
 distance_objective <- function(x, clusters) {
   x <- as.matrix(x)
   validate_input(x, "x", objmode = "numeric")
-
-  if (!is_distance_matrix(x)) {
-    return(obj_value_distance(clusters, x))
-  }
-  distances <- as.matrix(x)
   distance_objective_(clusters, x)
 }
 
-
-#' Internal function for distance objective via input through distances
-#'
-#' @param anticlusters A vector of n anticlusters
-#' @param data A n x n matrix of distances
-#'
-#' @details
-#' The second argument is named `data` to have a consistent
-#' interface with the other objective value computation functions.
-#'
-#' @noRd
-
-distance_objective_ <- function(anticlusters, data) {
-  sums_within <- sapply(
-    unique(anticlusters), 
-    function(i) sum(as.dist(subset_data_matrix(data, anticlusters == i)))
-  )
-  return(sum(sums_within))
-}
-
-
-#' Objective value for the distance criterion
-#'
-#' @param anticlusters A vector representing the anticluster affiliation
-#' @param data A data.frame, matrix or vector representing the
-#'     features that are used in the assignment.
-#'
-#' @return Scalar, the total sum of within-cluster distances (based
-#'     on the Euclidean distance).
-#'
-#' @details
-#' The second argument is named `data` to have a consistent
-#' interface with the other objective value computation functions.
-#'
-#' @importFrom stats dist
-#'
-#' @noRd
-
-obj_value_distance <- function(anticlusters, data) {
-  ## determine distances within each group
-  distances <- by(data, anticlusters, dist)
-  ## determine objective as the sum of all distances per group
-  objective <- sum(sapply(distances, sum))
-  return(objective)
+# other order of the arguments, needed for some internal handling
+distance_objective_ <- function(clusters, x) {
+  sum(distance_objective_by_group(clusters, x))
 }
 
 # Compute distance objective by cluster
-distance_objective_by_group <- function(data, cl) {
+# param data: distance matrix or feature matrix
+# param cl: cluster assignment
+distance_objective_by_group <- function(cl, data) {
   if (is_distance_matrix(data)) {
     objectives <- sapply(
       sort(unique(cl)), 

@@ -39,7 +39,7 @@ test_that("heuristic anticlustering produces expected output", {
 
     ## Now anticlustering:
     obj_function <- ifelse(conditions$objective[i] == "distance",
-                           obj_value_distance, variance_objective_)
+                           distance_objective_, variance_objective_)
     anticlusters <- anticlustering(
       features,
       K = p_anticlusters,

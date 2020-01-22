@@ -31,7 +31,7 @@ test_that("fast exchange and exchange functions yield the same results - anticlu
   K <- 2
   clusters <- rep(1:K, 5)
   features <- matrix(rnorm(K * 10), ncol = 2)
-  ac <- anticlustering(features, K = clusters, objective = obj_value_distance)
+  ac <- anticlustering(features, K = clusters, objective = distance_objective_)
   ac_fast <- fast_exchange_dist(as.matrix(dist(features)), clusters, NULL)
   expect_equal(all(ac == ac_fast), TRUE)
 
@@ -39,7 +39,7 @@ test_that("fast exchange and exchange functions yield the same results - anticlu
   K <- 3
   clusters <- rep(1:K, 5)
   features <- matrix(rnorm(K * 10), ncol = 2)
-  ac <- anticlustering(features, K = clusters, objective = obj_value_distance)
+  ac <- anticlustering(features, K = clusters, objective = distance_objective_)
   ac_fast <- fast_exchange_dist(as.matrix(dist(features)), clusters, NULL)
   expect_equal(all(ac == ac_fast), TRUE)
 
@@ -47,14 +47,14 @@ test_that("fast exchange and exchange functions yield the same results - anticlu
   K <- 4
   clusters <- rep(1:K, 5)
   features <- matrix(rnorm(K * 10), ncol = 2)
-  ac <- anticlustering(features, K = clusters, objective = obj_value_distance)
+  ac <- anticlustering(features, K = clusters, objective = distance_objective_)
   ac_fast <- fast_exchange_dist(as.matrix(dist(features)), clusters, NULL)
   expect_equal(all(ac == ac_fast), TRUE)
 
   ## Test preclustering restrictions
   features <- schaper2019[, 3:6]
   ac <- anticlustering(features, K = rep_len(1:2, nrow(schaper2019)),
-                       objective = obj_value_distance, preclustering = TRUE)
+                       objective = distance_objective_, preclustering = TRUE)
   ac_fast <- anticlustering(features, K = rep_len(1:2, nrow(schaper2019)),
                             objective = "distance", preclustering = TRUE)
   expect_equal(all(ac == ac_fast), TRUE)
@@ -62,7 +62,7 @@ test_that("fast exchange and exchange functions yield the same results - anticlu
   ## Test categorical restrictions
   features <- schaper2019[, 3:6]
   ac <- anticlustering(features, K = rep_len(1:2, nrow(schaper2019)),
-                       objective = obj_value_distance,
+                       objective = distance_objective_,
                        categories = schaper2019$room)
   ac_fast <- anticlustering(features, K = rep_len(1:2, nrow(schaper2019)),
                             objective = "distance",
@@ -75,7 +75,7 @@ test_that("fast exchange and exchange functions yield the same results - anticlu
     anticlustering(
       features,
       K = rep_len(1:2, nrow(schaper2019)),
-      objective = obj_value_distance,
+      objective = distance_objective_,
       preclustering = TRUE,
       categories = schaper2019$room)
   )

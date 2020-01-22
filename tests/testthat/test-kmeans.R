@@ -14,6 +14,16 @@ context("KMeans-Maximizing")
 # 4. Matrix, distances from points to anticluster centers,
 #    p columns, n rows
 
+
+## A standard (or squared) euclidean distance between two data points
+## Currently, this function is only used in the test files.
+euc_dist <- function(x1, x2, squared = FALSE) {
+  if (squared)
+    return(sum((x1 - x2)^2))
+  sqrt(sum((x1 - x2)^2))
+}
+
+
 test_that("computation of cluster centers and distances to centers is correct", {
   ## Vary number of features
   for (m in 1:4) {

@@ -13,7 +13,7 @@ test_that("computing distance objectives in specialized exchange method is equal
         clusters <- sample(rep(1:K, N/K))
 
         objective <- distance_objective_(clusters, distances)
-        objective2 <- obj_value_distance(clusters, features)
+        objective2 <- distance_objective_(clusters, features)
         expect_equal(objective, objective2)
 
         # Swap two items and check objective

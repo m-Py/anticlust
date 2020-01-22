@@ -52,6 +52,11 @@ variance_objective(
   anticlusters
 )
 
+# Illustrate variance objective
+N <- 18
+data <- matrix(rnorm(N * 2), ncol = 2)
+cl <- balanced_clustering(data, K = 3)
+plot_clusters(data, cl, illustrate_variance = TRUE)
 }
 \references{
 Jain, A. K. (2010). Data clustering: 50 years beyond k-means.

@@ -20,7 +20,7 @@ test_that("all levels of heuristicism work and that exact approach has best obje
                                            solver, preclustering = i)
       anti_list[[i + 1]] <- anticlusters
       # Allow for some numeric imprecision of ILP solver:
-      obj_values[i + 1]  <- round(obj_value_distance(anticlusters, features), 10)
+      obj_values[i + 1]  <- round(distance_objective_(anticlusters, features), 10)
     }
     ## Exact solution must have maximum objective
     expect_equal(which.max(obj_values), 1)

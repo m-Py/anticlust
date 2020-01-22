@@ -31,7 +31,7 @@
 #'     between 1 and K) to each input element.
 #'
 #' @importFrom Matrix sparseMatrix
-#' @importFrom stats as.dist
+#' @importFrom stats as.dist dist
 #'
 #' @export
 #'
@@ -209,9 +209,9 @@ anticlustering <- function(x, K, objective = "distance", method = "exchange",
                            preclustering = FALSE, categories = NULL) {
 
   ## Get data into required format
-  input_handling_anticlustering(x, K, objective, method, preclustering, categories)
+  input_validation_anticlustering(x, K, objective, method, preclustering, categories)
 
-  ## Only deal with 1 data object (either features or distances)
+  ## Convert input to matrix
   data <- process_input(x)
 
   ## Exact method using ILP
@@ -223,27 +223,23 @@ anticlustering <- function(x, K, objective = "distance", method = "exchange",
       preclustering)
     )
   }
-
-  # Some preprocessing: get objective function, preclusters and categories:
-  obj_function <- get_objective_function(data, objective, K)
+  
   # Preclustering and categorical constraints are both processed in the
   # variable `categories` after this step:
   categories <- get_categorical_constraints(data, K, preclustering, categories)
-
-  ## Redirect to fast exchange method for k-means exchange
-  if (class(objective) != "function" && objective == "variance" &&
-      method == "exchange" && sum(is.na(K)) == 0) {
-    return(fast_anticlustering(data, K, Inf, categories))
+  
+  if (class(objective) == "function") {
+    # most generic exchange method, deals with any objective function
+    return(exchange_method(data, K, objective, categories))
   }
 
-  ## Redirect to fast exchange method for anticluster editing
-  if (class(objective) != "function" && objective == "distance" &&
-      method == "exchange" && sum(is.na(K)) == 0) {
+  # Redirect to specialized fast exchange methods for distance and 
+  # variance objectives
+  if (objective == "variance") {
+    return(fast_anticlustering(data, K, Inf, categories))
+  } else if (objective == "distance") {
     return(fast_exchange_dist(data, K, categories))
   }
-
-  ## General heuristic optimization:
-  exchange_method(data, K, obj_function, categories)
 }
 
 # Function that processes input and returns the data set that the
@@ -257,94 +253,20 @@ process_input <- function(data) {
   as.matrix(as.dist(data))
 }
 
-# Ensure that a distance matrix is passed
-convert_to_distances <- function(data) {
-  if (!is_distance_matrix(data)) {
-    distances <- as.matrix(dist(data))
-  } else {
-    distances <- data
-  }
-  distances
-}
-
-# Determine the objective function needed for the input
-# The function returns a function. It is ensured that the function
-# removes missing values before computing the objective. Missing values
-# mean that there are NAs in the clustering vector. 
-get_objective_function <- function(data, objective, K) {
-  if (class(objective) == "function") {
-    obj_function <- objective
-  } else {
-    ## Determine how to compute objective, three cases:
-    # 1. Distance objective, distances were passed
-    # 2. Distance objective, features were passed
-    # 3. Variance objective, features were passed
-    if (objective == "distance" && is_distance_matrix(data)) {
-      obj_function <- distance_objective_
-    } else if (objective == "distance" && !is_distance_matrix(data)) {
-      obj_function <- obj_value_distance
-    } else {
-      obj_function <- variance_objective_
-    }
-  }
-
-  ## Handle NA in initial cluster assignment
-  if (sum(is.na(K)) > 0) {
-    obj <- function(clusters, data) {
-      data <- data[!is.na(clusters), , drop = FALSE]
-      clusters <- clusters[!is.na(clusters)]
-      obj_function(clusters, data)
-    }
-  } else {
-    obj <- obj_function
-  }
-
-  obj
-}
-
-
-
 # Determines if preclustering constraints or categorical constraints
 # are present. Returns either of them or NULL. The input validation
 # ensures that at most one of the constraints is present when this
 # function is called.
 get_categorical_constraints <- function(data, K, preclustering, categories) {
   if (preclustering == TRUE) {
-    return(get_preclusters(data, K))
+    if (length(K) > 1) {
+      K <- length(unique(K))
+    }
+    N <- nrow(data)
+    return(nn_centroid_clustering(data, K))
   }
   if (argument_exists(categories)) {
     return(merge_into_one_variable(categories))
   }
   NULL
-}
-
-
-#' Merge several grouping variable into one
-#'
-#' @param categories A vector, data.frame or matrix that represents
-#'     one or several categorical constraints.
-#'
-#' @return A vector representing the group membership (or the combination
-#'     of group memberships) as one variable
-#'
-#' @noRd
-#'
-
-merge_into_one_variable <- function(categories) {
-  if (is.null(categories)) {
-    return(NULL)
-  }
-  categories <- data.frame(categories)
-  categories <- factor(do.call(paste0, as.list(categories)))
-  # sort as numeric to get consistent return value
-  order_cluster_vector(to_numeric(categories))
-}
-
-## function that computes preclusters
-get_preclusters <- function(data, K) {
-  if (length(K) > 1) {
-    K <- length(unique(K))
-  }
-  N <- nrow(data)
-  nn_centroid_clustering(data, K)
 }

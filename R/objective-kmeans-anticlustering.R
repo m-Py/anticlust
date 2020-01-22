@@ -134,11 +134,3 @@ dist_from_centers <- function(features, centers, squared) {
   }
   z
 }
-
-## A standard (or squared) euclidean distance between two data points
-## Currently, this function is only used in the test files.
-euc_dist <- function(x1, x2, squared = FALSE) {
-  if (squared)
-    return(sum((x1 - x2)^2))
-  sqrt(sum((x1 - x2)^2))
-}

@@ -13,7 +13,7 @@
 
 fast_exchange_dist <- function(data, K, categories) {
   distances <- convert_to_distances(data)  
-  clusters <- initialize_clusters(distances, K, distance_objective_, categories)
+  clusters <- initialize_clusters(nrow(distances), K, categories)
   best_total <- distance_objective_(clusters, distances)
   distances[upper.tri(distances)] <- 0
   diag(distances) <- 0
@@ -111,22 +111,6 @@ clusters_from_selection_matrix <- function(selection_matrix) {
     clusters[which(selection_matrix[i, ] == TRUE)] <- next_cluster_index
   }
   clusters
-}
-
-# Order a clustering vector
-
-# For a clustering vector, ensure that the first cluster that occurs
-# in the vector is 1, the next 2, etc ... until K
-
-# param clusters: A clustering vector with elements 1, ..., K indicating cluster membership
-# return: A clustering vector in order
-order_cluster_vector <- function(clusters) {
-  unique_clusters <- unique(clusters)
-  # deal with NA
-  unique_clusters <- unique_clusters[!is.na(unique_clusters)]
-  K <- length(unique_clusters)
-  clusters <- factor(clusters, levels = unique_clusters, labels = 1:K)
-  as.numeric(clusters)
 }
 
 ## Swap items in a boolean matrix for indexing.

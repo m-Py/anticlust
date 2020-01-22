@@ -16,12 +16,12 @@ test_that("distance input works for exact ILP", {
     ac_dist <- anticlustering(distances, K = K,
                               preclustering = FALSE,
                               method = "ilp")
-    expect_equal(distance_objective_(ac_dist, distances),
-                 obj_value_distance(ac_feat, features))
-    expect_equal(distance_objective_(ac_dist, distances),
-                 obj_value_distance(ac_dist, features))
     expect_equal(distance_objective_(ac_feat, distances),
-                 obj_value_distance(ac_dist, features))
+                 distance_objective_(ac_feat, features))
+    expect_equal(distance_objective_(ac_dist, distances),
+                 distance_objective_(ac_dist, features))
+    expect_equal(distance_objective_(ac_feat, distances),
+                 distance_objective_(ac_dist, distances))
   }
 })
 
@@ -39,12 +39,12 @@ test_that("distance input works for precluster ILP", {
     ac_dist <- anticlustering(distances, K = K,
                               preclustering = TRUE,
                               method = "ilp")
-    expect_equal(distance_objective_(ac_dist, distances),
-                 obj_value_distance(ac_feat, features))
-    expect_equal(distance_objective_(ac_dist, distances),
-                 obj_value_distance(ac_dist, features))
     expect_equal(distance_objective_(ac_feat, distances),
-                 obj_value_distance(ac_dist, features))
+                 distance_objective_(ac_feat, features))
+    expect_equal(distance_objective_(ac_dist, distances),
+                 distance_objective_(ac_dist, features))
+    expect_equal(distance_objective_(ac_feat, distances),
+                 distance_objective_(ac_dist, distances))
   }
 })
 
@@ -66,11 +66,11 @@ test_that("distance input works for exchange method", {
     set.seed(rnd_seed)
     ac_dist <- anticlustering(distances, K = K)
 
-    expect_equal(distance_objective_(ac_dist, distances),
-                 obj_value_distance(ac_feat, features))
-    expect_equal(distance_objective_(ac_dist, distances),
-                 obj_value_distance(ac_dist, features))
     expect_equal(distance_objective_(ac_feat, distances),
-                 obj_value_distance(ac_dist, features))
+                 distance_objective_(ac_feat, features))
+    expect_equal(distance_objective_(ac_dist, distances),
+                 distance_objective_(ac_dist, features))
+    expect_equal(distance_objective_(ac_feat, distances),
+                 distance_objective_(ac_dist, distances))
   }
 })

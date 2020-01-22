@@ -45,3 +45,13 @@ exact_anticlustering <- function(data, K, solver, preclustering) {
   solution <- solve_ilp(ilp, solver)
   ilp_to_groups(solution, N)
 }
+
+# Ensure that a distance matrix is passed
+convert_to_distances <- function(data) {
+  if (!is_distance_matrix(data)) {
+    distances <- as.matrix(dist(data))
+  } else {
+    distances <- data
+  }
+  distances
+}

@@ -1,28 +1,4 @@
 
-
-# What data structures are needed for the exchange method:
-#
-# *Generic*
-# (a) A distance matrix/feature matrix
-# (b) A vector of clusters (i.e., elements in 1, ..., K)
-# (c) A function object computing the objective. The first argument
-#     is `clusters`, the second argument is `data`
-#
-#
-# *Anticluster editing*
-# (a) A distance matrix. The upper triangle is 0 and the diagonal is 0.
-# (b) A vector of clusters (i.e., elements in 1, ..., K)
-# (c) A boolean N x N matrix where TRUE in cell [i,j]
-#     indicates that elements i and j are in the same (anti)cluster
-#
-#
-# *K-means anticlustering*
-# (a) A matrix of cluster centers. Each row corresponds to a
-#     cluster and each column corresponds to a feature
-# (b) A vector where each entry is the number of elements in each cluster
-# (c)
-
-
 #' Solve anticlustering using the modified exchange method
 #'
 #' @param data the data -- a N x N dissimilarity matrix or a N x M
@@ -41,7 +17,7 @@
 
 exchange_method <- function(data, K, obj_function, categories) {
 
-  clusters <- initialize_clusters(data, K, obj_function, categories)
+  clusters <- initialize_clusters(NROW(data), K, categories)
   N <- nrow(data)
   best_total <- obj_function(clusters, data)
   for (i in 1:N) {
@@ -120,17 +96,7 @@ get_exchange_partners <- function(clusters, i, categories) {
   ## Feasible exchange partners:
   # (a) are in different anticluster
   # (b) are in the same category/precluster
-  # (c) are NA (and in the same precluster/category)
   exchange_partners <- (clusters != clusters[i]) & allowed_category
-  ## NA is converted to TRUE/FALSE. TRUE if: the current item is not NA.
-  ## FALSE if: the current item is NA (then swapping NA with NA does nothing)
-  ## This works because: An item only has NA if its cluster is currently 
-  ## NA and has the same category/precluster
-  if (is.na(clusters[i])) {
-    exchange_partners[is.na(exchange_partners)] <- FALSE
-  } else {
-    exchange_partners[is.na(exchange_partners)] <- TRUE
-  }
   (1:N)[exchange_partners]
 }
 
@@ -142,12 +108,11 @@ get_exchange_partners <- function(clusters, i, categories) {
 # (c) a random assignment that balances the categories across anticlusters
 #     (if categories are preclusters: each preclustered item is assigned
 #      to a different anticlusters)
-# param data: The data the optimization is conducted on (distance matrix/ feature matrix)
+# param N: The number of cases
 # param K: The number of clusters or an initial clustering assignment
-# param obj_function: A function object computing the objective value
 # param categories: A vector of categories
 # return: The initialized clusters
-initialize_clusters <- function(data, K, obj_function, categories) {
+initialize_clusters <- function(N, K, categories) {
   if (length(K) > 1) {
     return(K) # K is already an anticluster assignment
   }
@@ -157,5 +122,5 @@ initialize_clusters <- function(data, K, obj_function, categories) {
     return(categorical_sampling(categories, K))
   }
   ## Initial random assignment unrestricted:
-  sample(rep_len(1:K, length.out = nrow(data)))
+  sample(rep_len(1:K, length.out = N))
 }

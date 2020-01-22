@@ -237,7 +237,7 @@ sort_by_objective <- function(cl, data, N) {
   selected <- (1:N)[!is.na(cl)]
   cl_sub <- cl[selected]
   cl_sub <- order_cluster_vector(cl_sub)
-  objectives <- distance_objective_by_group(subset_data_matrix(data, selected), cl_sub)
+  objectives <- distance_objective_by_group(cl_sub, subset_data_matrix(data, selected))
   # recode original matching labels according to objective
   N <- length(cl_sub)
   # sorry for this code, but it works and it was really complicated
