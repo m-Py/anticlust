@@ -33,10 +33,7 @@
 #' \code{Rglpk}) and the commercial solvers gurobi (called from the
 #' package \code{gurobi}) and IBM CPLEX (called from the package
 #' \code{Rcplex}). A license is needed to use one of the commercial
-#' solvers. The optimal solution is retrieved by setting \code{objective
-#' = "distance"}, \code{method = "ilp"} and \code{preclustering =
-#' FALSE}. Use this combination of arguments only for small problem
-#' sizes (maybe <= 30 elements).
+#' solvers. 
 #'
 
 wce <- function(weights) {
