@@ -1,15 +1,7 @@
 
 
 #' Validating the arguments passed to `anticlustering`
-#'
-#' This function ensures that:
-#' (a) All arguments have correct type
-#' (b) Method "ilp" can only be used with objective = "distance"
-#' (c) A solver package has to be installed if method = "ilp"
-#' (d) A legal number of anticlusters was requested
-#'
-#' Takes the same parameters as \code{anticlustering}
-#'
+#' 
 #' @return NULL
 #'
 #' @noRd
