@@ -185,7 +185,7 @@ test_that("Matching behaves correctly when combining `match_within` and `match_b
 test_that("Algorithm matches the element it should match", {
   # generate some random data
   m <- sample(1:4, size = 1)
-  n <- sample(10:100, size = 1)
+  n <- sample(40:100, size = 1)
   data <- matrix(rnorm(n * m), ncol = m)
   p <- sample(2:5, size = 1)
   
@@ -211,7 +211,7 @@ test_that("Algorithm matches the element it should match", {
           target_group <- FALSE
         } else {
           groups <- to_numeric(sample(1:p, size = n, replace = TRUE))
-          while (any(table(groups) < 2) && length(unique(table(groups))) == 1) {
+          while (any(table(groups) < 2) || length(unique(table(groups))) == 1) {
             groups <- sample(1:p, size = n, replace = TRUE)
           }
           groups <- merge_into_one_variable(groups)
@@ -233,5 +233,4 @@ test_that("Algorithm matches the element it should match", {
       }
     }
   }
-
 })
