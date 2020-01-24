@@ -52,11 +52,9 @@ default as the basic unit of the cluster editing objective. If
 another distance measure is preferred, users may pass a self-computed
 dissimiliarity matrix via the argument \code{distances}. The optimal
 cluster editing objective can be found via integer linear
-programming. To obtain an optimal solution for balanced cluster
-editing, a linear programming solver must be installed. 
-To this end, set \code{method = "ilp"}. The \code{anticlust} package 
-requires the open source GNU linear programming kit for the exact 
-method, which is called from the package \code{Rglpk}).
+programming. To obtain an optimal solution, the open source GNU linear 
+programming kit (available from https://www.gnu.org/software/glpk/glpk.html) 
+and the R package \code{Rglpk} must be installed.
 }
 \examples{
 

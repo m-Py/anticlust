@@ -1,8 +1,11 @@
 
 #' Exact weighted cluster editing
 #'
-#' @param weights A N x N weight matrix. Larger values indicate stronger
-#'     agreement (this is unlike in the \code{\link{anticlustering}} function)
+#' Optimally solves weighted cluster editing (also known as »correlation clustering« or
+#' »clique partitioning problem«). 
+#'
+#' @param x A N x N similarity matrix. Larger values indicate stronger
+#'     agreement / similarity between a pair of data points
 #'
 #' @return An integer vector representing the cluster affiliation of each data point
 #' 
@@ -27,22 +30,41 @@
 #' 
 #' @details 
 #' 
-#' To obtain an optimal solution for weighted cluster editing, 
-#' a linear programming solver must be installed
-#' and usable from R. The \code{anticlust} package 
-#' requires the open source GNU linear programming kit, which 
-#' is called from the package \code{Rglpk}).
+#' Finds the clustering that maximizes the sum of pairwise similarities within clusters. 
+#' In the input some similarities should be negative (indicating dissimilarity) because 
+#' otherwise the maximum sum of similarities is obtained by simply joining all elements 
+#' within a single big cluster.
+#' 
+#' To use this function, the open source GNU linear programming
+#' kit (available from https://www.gnu.org/software/glpk/glpk.html) 
+#' and the R package \code{Rglpk} must be installed. 
+#' 
+#' @references
+#'
+#' 
+#' Bansal, N., Blum, A., & Chawla, S. (2004). Correlation clustering. 
+#' Machine Learning, 56, 89–113. 
+#' 
+#' Böcker, S., & Baumbach, J. (2013). Cluster editing. In Conference on 
+#' Computability in Europe (pp. 33–44).
+#' 
+#' Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
+#' for a clustering problem. Mathematical Programming, 45, 59-96.
+#' 
+#' Wittkop, T., Emig, D., Lange, S., Rahmann, S., Albrecht, M., Morris, J. H., . . . Baumbach,
+#' J. (2010). Partitioning biological data with transitivity clustering. Nature Methods, 7,
+#' 419–420. 
 #'
 
-wce <- function(weights) {
+wce <- function(x) {
   validate_solver()
-  validate_data_matrix(weights)
-  if (!is_distance_matrix(weights)) {
-    stop("The input via argument `weights` is not a weight matrix, ",
+  validate_data_matrix(x)
+  if (!is_distance_matrix(x)) {
+    stop("The input via argument `weights` is not a similarity matrix, ",
          "the upper and lower triangulars of your matrix differ.")
   }
-  weights <- as.matrix(weights)
-  ilp <- anticlustering_ilp(weights, K = 0, FALSE) # k is irrelevant
+  x <- as.matrix(x)
+  ilp <- anticlustering_ilp(x, K = 0, FALSE) # k is irrelevant
   solution <- solve_ilp(ilp, "max")
-  ilp_to_groups(solution, nrow(weights))
+  ilp_to_groups(solution, nrow(x))
 }

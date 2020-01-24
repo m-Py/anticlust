@@ -4,24 +4,28 @@
 \alias{wce}
 \title{Exact weighted cluster editing}
 \usage{
-wce(weights)
+wce(x)
 }
 \arguments{
-\item{weights}{A N x N weight matrix. Larger values indicate stronger
-agreement (this is unlike in the \code{\link{anticlustering}} function)}
+\item{x}{A N x N similarity matrix. Larger values indicate stronger
+agreement / similarity between a pair of data points}
 }
 \value{
 An integer vector representing the cluster affiliation of each data point
 }
 \description{
-Exact weighted cluster editing
+Optimally solves weighted cluster editing (also known as »correlation clustering« or
+»clique partitioning problem«).
 }
 \details{
-To obtain an optimal solution for weighted cluster editing, 
-a linear programming solver must be installed
-and usable from R. The \code{anticlust} package 
-requires the open source GNU linear programming kit, which 
-is called from the package \code{Rglpk}).
+Finds the clustering that maximizes the sum of pairwise similarities within clusters. 
+In the input some similarities should be negative (indicating dissimilarity) because 
+otherwise the maximum sum of similarities is obtained by simply joining all elements 
+within a single big cluster.
+
+To use this function, the open source GNU linear programming
+kit (available from https://www.gnu.org/software/glpk/glpk.html) 
+and the R package \code{Rglpk} must be installed.
 }
 \examples{
 \dontrun{
@@ -36,6 +40,20 @@ clusters <- wce(agreements)
 plot(swiss, col = clusters, pch = 19)
 }
 
+}
+\references{
+Bansal, N., Blum, A., & Chawla, S. (2004). Correlation clustering. 
+Machine Learning, 56, 89–113. 
+
+Böcker, S., & Baumbach, J. (2013). Cluster editing. In Conference on 
+Computability in Europe (pp. 33–44).
+
+Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
+for a clustering problem. Mathematical Programming, 45, 59-96.
+
+Wittkop, T., Emig, D., Lange, S., Rahmann, S., Albrecht, M., Morris, J. H., . . . Baumbach,
+J. (2010). Partitioning biological data with transitivity clustering. Nature Methods, 7,
+419–420.
 }
 \author{
 Martin Papenberg \email{martin.papenberg@hhu.de}

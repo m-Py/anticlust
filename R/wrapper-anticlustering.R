@@ -92,10 +92,9 @@
 #'
 #' An optimal anticluster editing objective can be found via integer
 #' linear programming. To this end, set \code{method = "ilp"}. To obtain
-#' an optimal solution, a linear programming solver must be installed
-#' and usable from R. The \code{anticlust} package requires the open
-#' source GNU linear programming kit for the exact methods, which is 
-#' called from the package \code{Rglpk}). The optimal solution is retrieved by
+#' an optimal solution, the open source GNU linear programming kit (available from 
+#' https://www.gnu.org/software/glpk/glpk.html) and the R package 
+#' \code{Rglpk} must be installed. The optimal solution is retrieved by
 #' setting \code{objective = "distance"}, \code{method = "ilp"} and 
 #' \code{preclustering = FALSE}. Use this combination of arguments only for 
 #' small problem sizes.
