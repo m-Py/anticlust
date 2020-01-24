@@ -31,6 +31,5 @@ Author: Martin Papenberg [aut, cre], Meik Michalke [ctb]
 Maintainer: Martin Papenberg <martin.papenberg@hhu.de>
 Authors@R: c(person(given='Martin', family='Papenberg', email='martin.papenberg@hhu.de', role=c('aut', 'cre')), person(given='Meik', family='Michalke', role=c('ctb'), comment='centroid based clustering algorithm') )
 Version: 0.4.0
-Date: 2020-21-01
 RoxygenNote: 7.0.2
 VignetteBuilder: knitr
