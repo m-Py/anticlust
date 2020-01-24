@@ -312,7 +312,8 @@ input_validation_matching <- function(
 #' 
 #' @importFrom utils installed.packages
 #' 
-#' noRd
+#' @noRd
+#' 
 solver_available <- function() {
   pcks <- rownames(installed.packages())
   if ("Rglpk" %in% pcks) {
