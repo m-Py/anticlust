@@ -25,7 +25,7 @@ Suggests:
 Imports: Matrix, RANN
 Depends: R (>= 3.4.0)
 BugReports: https://github.com/m-Py/anticlust/issues
-Author: Martin Papenberg [aut, cre], Meik Michalke [ctb]
+Author: Martin Papenberg [aut, cre], Meik Michalke [ctb] (centroid based clustering algorithm)
 Maintainer: Martin Papenberg <martin.papenberg@hhu.de>
 Authors@R: c(person(given='Martin', family='Papenberg', email='martin.papenberg@hhu.de', role=c('aut', 'cre')), person(given='Meik', family='Michalke', role=c('ctb'), comment='centroid based clustering algorithm') )
 Version: 0.4.0
