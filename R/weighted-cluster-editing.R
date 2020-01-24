@@ -29,23 +29,20 @@
 #' 
 #' To obtain an optimal solution for weighted cluster editing, 
 #' a linear programming solver must be installed
-#' and usable from R. The \code{anticlust} package supports the open
-#' source GNU linear programming kit (called from the package
-#' \code{Rglpk}) and the commercial solvers gurobi (called from the
-#' package \code{gurobi}) and IBM CPLEX (called from the package
-#' \code{Rcplex}). A license is needed to use one of the commercial
-#' solvers. 
+#' and usable from R. The \code{anticlust} package 
+#' requires the open source GNU linear programming kit, which 
+#' is called from the package \code{Rglpk}).
 #'
 
 wce <- function(weights) {
+  validate_solver()
   validate_data_matrix(weights)
   if (!is_distance_matrix(weights)) {
-    stop("The input via argument `weights` is not a distance matrix. ",
-         "Maybe the upper and lower triangulars of your matrix differ.")
+    stop("The input via argument `weights` is not a weight matrix, ",
+         "the upper and lower triangulars of your matrix differ.")
   }
-  solver <- solver_available()
   weights <- as.matrix(weights)
-  ilp <- anticlustering_ilp(weights, K = 0, solver, FALSE) # k is irrelevant
-  solution <- solve_ilp(ilp, solver, "max")
+  ilp <- anticlustering_ilp(weights, K = 0, FALSE) # k is irrelevant
+  solution <- solve_ilp(ilp, "max")
   ilp_to_groups(solution, nrow(weights))
 }

@@ -56,23 +56,7 @@ input_validation_anticlustering <- function(x, K, objective, method,
                  input_set = c("ilp", "exchange", "heuristic"), not_na = TRUE)
 
   if (method == "ilp") {
-    solver <- solver_available()
-    if (solver == FALSE) {
-      stop("\n\nAn exact solution was requested, but none of the linear ",
-           "programming \npackages 'Rglpk', 'gurobi', or 'Rcplex' is ",
-           "available. \n\nTry `method = 'exchange'` or install ",
-           "a linear programming solver \nto obtain an exact solution. ",
-           "For example, install the GNU linear \nprogramming kit: \n\n",
-           "- On windows, visit ",
-           "http://gnuwin32.sourceforge.net/packages/glpk.htm \n\n",
-           "- Use homebrew to install it on mac, 'brew install glpk' \n\n",
-           "- 'sudo apt install libglpk-dev' on Ubuntu ",
-           "\n\nThen, install the Rglpk package via ",
-           "`install.packages('Rglpk')`. \n\nOtherwise, you may obtain ",
-           "a license for one of ",
-           "the commercial solvers \ngurobi or IBM CPLEX (they are free ",
-           "for academic use).")
-    }
+    validate_solver()
   }
 
   if (class(objective) != "function") {
@@ -322,4 +306,32 @@ input_validation_matching <- function(
       not_na = TRUE
     )
   }
+}
+
+#' Check if a solver package can be used
+#' 
+#' @importFrom utils installed.packages
+#' 
+#' noRd
+solver_available <- function() {
+  pcks <- rownames(installed.packages())
+  if ("Rglpk" %in% pcks) {
+    return(TRUE) 
+  } 
+  return(FALSE)
+}
+
+validate_solver <- function() {
+  if (!solver_available()) {
+    stop("\n\nAn exact method was requested, but the linear ",
+         "programming \npackage 'Rglpk' is not ",
+         "available. You have to install the GNU linear \nprogramming kit first: \n\n",
+         "- On windows, visit ",
+         "http://gnuwin32.sourceforge.net/packages/glpk.htm \n\n",
+         "- Use homebrew to install it on mac, 'brew install glpk' \n\n",
+         "- 'sudo apt install libglpk-dev' on Ubuntu ",
+         "\n\nThen, install the Rglpk package via ",
+         "`install.packages('Rglpk')`.")
+  }
+  return(invisible(NULL))
 }

@@ -6,8 +6,6 @@
 #'     object of class \code{dist} (i.e., has been converted to matrix
 #'     before this function is called)
 #' @param K How many anticlusters should be created.
-#' @param solver A string identifying the solver to be used ("Rglpk",
-#'     "gurobi", or "Rcplex")
 #' @param preclustering Boolean, should a preclustering be conducted
 #'     before anticlusters are created.
 #'
@@ -16,15 +14,14 @@
 #'
 #' @noRd
 
-exact_anticlustering <- function(data, K, solver, preclustering) {
+exact_anticlustering <- function(data, K, preclustering) {
   
   distances <- convert_to_distances(data)
   N <- nrow(distances)
 
   if (preclustering == TRUE) {
-    ilp <- anticlustering_ilp(distances, N / K,
-                              solver = solver)
-    solution <- solve_ilp(ilp, solver, "min")
+    ilp <- anticlustering_ilp(distances, N / K)
+    solution <- solve_ilp(ilp, "min")
     preclusters <- ilp_to_groups(solution, N)
     ## Fix distances - ensures that the most similar items are assigned
     ## to different groups
@@ -34,15 +31,15 @@ exact_anticlustering <- function(data, K, solver, preclustering) {
     ilp$rhs <- c(rep(1, choose(N, 3) * 3),
                  rep((N / K) - 1, N))
     ## Solve edited ILP
-    solution <- solve_ilp(ilp, solver)
+    solution <- solve_ilp(ilp)
     assignment <- ilp_to_groups(solution, N)
     return(assignment)
   }
 
   ## Here the ILP is created without adjusting distances; i.e., true
   ## exact anticlustering
-  ilp <- anticlustering_ilp(distances, K, solver = solver)
-  solution <- solve_ilp(ilp, solver)
+  ilp <- anticlustering_ilp(distances, K)
+  solution <- solve_ilp(ilp)
   ilp_to_groups(solution, N)
 }
 

@@ -19,12 +19,9 @@ Exact weighted cluster editing
 \details{
 To obtain an optimal solution for weighted cluster editing, 
 a linear programming solver must be installed
-and usable from R. The \code{anticlust} package supports the open
-source GNU linear programming kit (called from the package
-\code{Rglpk}) and the commercial solvers gurobi (called from the
-package \code{gurobi}) and IBM CPLEX (called from the package
-\code{Rcplex}). A license is needed to use one of the commercial
-solvers.
+and usable from R. The \code{anticlust} package 
+requires the open source GNU linear programming kit, which 
+is called from the package \code{Rglpk}).
 }
 \examples{
 \dontrun{

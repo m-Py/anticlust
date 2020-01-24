@@ -18,9 +18,7 @@ Encoding: UTF-8
 LazyData: true
 URL: https://github.com/m-Py/anticlust
 Suggests: 
-    gurobi,
     Rglpk,
-    Rcplex,
     testthat,
     knitr,
     rmarkdown

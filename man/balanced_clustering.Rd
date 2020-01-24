@@ -53,12 +53,10 @@ another distance measure is preferred, users may pass a self-computed
 dissimiliarity matrix via the argument \code{distances}. The optimal
 cluster editing objective can be found via integer linear
 programming. To obtain an optimal solution for balanced cluster
-editing, a linear programming solver must be installed and usable
-from R. The `anticlust` package supports the open source GNU linear
-programming kit (called from the package \code{Rglpk}) and the
-commercial solvers gurobi (called from the package \code{gurobi}) and
-IBM CPLEX (called from the package \code{Rcplex}). A license is
-needed to use one of the commercial solvers.
+editing, a linear programming solver must be installed. 
+To this end, set \code{method = "ilp"}. The \code{anticlust} package 
+requires the open source GNU linear programming kit for the exact 
+method, which is called from the package \code{Rglpk}).
 }
 \examples{
 

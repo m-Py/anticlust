@@ -4,8 +4,6 @@
 #' @param distances An n x n matrix representing the
 #'     distances between items
 #' @param K The number of groups to be created
-#' @param solver A string identifing the solver to be used ("Rglpk",
-#'     "gurobi", or "Rcplex")
 #' @param group_restriction If FALSE, there is no restriction on the
 #'     group size, leading to a normal weighted cluster editing formulation
 #'
@@ -14,10 +12,10 @@
 #' @noRd
 #'
 
-anticlustering_ilp <- function(distances, K, solver, group_restriction = TRUE) {
+anticlustering_ilp <- function(distances, K, group_restriction = TRUE) {
 
   ## Initialize some constant variables:
-  equality_signs <- equality_identifiers(solver)
+  equality_signs <- equality_identifiers()
   n_items        <- nrow(distances)
   group_size     <- n_items / K
   costs          <- vectorize_weights(distances)
@@ -63,33 +61,16 @@ anticlustering_ilp <- function(distances, K, solver, group_restriction = TRUE) {
   return(instance)
 }
 
-# Based on the solver, return identifiers for equality relationships
-#
-# @param solver A string identifing the solver to be used ("Rglpk",
-#     "gurobi", or "cplex")
+# Return identifiers for equality relationships
 #
 # @return A list of three elements containing strings representing
 #     equality (e), lower (l), and greater (g) relationships
 #
-equality_identifiers <- function(solver) {
-  ## identify solver because they use different identifiers for
-  ## equality:
-  if (solver == "Rglpk") {
-    equal_sign <- "=="
-    lower_sign <- "<="
-    greater_sign <- ">="
-  } else if (solver == "gurobi") {
-    equal_sign <- "="
-    lower_sign <- "<="
-    greater_sign <- ">="
-  } else if (solver == "Rcplex") {
-    equal_sign <- "E"
-    lower_sign <- "L"
-    greater_sign <- "G"
-  } else {
-    stop("solver must be 'Rcplex', 'Rglpk', or 'gurobi'")
-  }
-  return(list(e = equal_sign, l = lower_sign, g = greater_sign))
+equality_identifiers <- function() {
+  equal_sign <- "=="
+  lower_sign <- "<="
+  greater_sign <- ">="
+  list(e = equal_sign, l = lower_sign, g = greater_sign)
 }
 
 

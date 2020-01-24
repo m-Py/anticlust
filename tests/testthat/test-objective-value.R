@@ -27,9 +27,8 @@ test_that("objective value for distance criterion is computed correctly", {
     n_elements <- p_anticlusters * 3 # n must be multiplier of p
     features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
     distances <- as.matrix(dist(features))
-    solver <- solver_available()
-    ilp <- anticlustering_ilp(distances, p_anticlusters, solver)
-    solution <- solve_ilp(ilp, solver, "min")
+    ilp <- anticlustering_ilp(distances, p_anticlusters)
+    solution <- solve_ilp(ilp, "min")
     anticlusters <- ilp_to_groups(solution, n_elements)
     expect_equal(solution$obj, distance_objective_(anticlusters, features))
   }
