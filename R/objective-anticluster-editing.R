@@ -52,6 +52,7 @@
 distance_objective <- function(x, clusters) {
   x <- as.matrix(x)
   validate_input(x, "x", objmode = "numeric")
+  validate_input(clusters, "clusters", len = nrow(features), not_na = TRUE)
   distance_objective_(clusters, x)
 }
 

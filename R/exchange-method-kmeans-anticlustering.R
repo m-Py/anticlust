@@ -81,7 +81,7 @@ fast_anticlustering <- function(features, K, k_neighbours = Inf, categories = NU
                                 "exchange", FALSE, categories)
 
   if (!isTRUE(k_neighbours == Inf)) {
-    validate_input(k_neighbours, "k_neighbours", "numeric", len = 1,
+    validate_input(k_neighbours, "k_neighbours", objmode = "numeric", len = 1,
                    must_be_integer = TRUE, greater_than = 0, not_na = TRUE)
   }
   features <- as.matrix(features)

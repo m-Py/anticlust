@@ -15,7 +15,7 @@ input_validation_anticlustering <- function(x, K, objective, method,
   validate_data_matrix(x)
   N <- nrow(as.matrix(x))
 
-  validate_input(preclustering, "preclustering", "logical", len = 1,
+  validate_input(preclustering, "preclustering", len = 1,
                  input_set = c(TRUE, FALSE), not_na = TRUE)
 
   if (argument_exists(categories) && preclustering == TRUE) {
@@ -24,9 +24,9 @@ input_validation_anticlustering <- function(x, K, objective, method,
 
   # Allow that K is an initial assignment of elements to clusters
   if (length(K) == 1) {
-    validate_input(K, "K", len = 1, greater_than = 1, must_be_integer = TRUE, not_na = TRUE)
+    validate_input(K, "K", objmode = "numeric", len = 1, greater_than = 1, must_be_integer = TRUE, not_na = TRUE)
   } else {
-    validate_input(K, "K", "numeric", len = N, not_na = TRUE)
+    validate_input(K, "K", objmode = "numeric", len = N, not_na = TRUE)
     if (method != "exchange") {
       stop("Passing an initial cluster assignment via the argument `K` ",
            "only works with method = 'exchange'")
@@ -83,14 +83,9 @@ input_validation_anticlustering <- function(x, K, objective, method,
 #' @param argument_name A string indicating the name of the object
 #'   This name is used when an error is thrown so the user
 #'   is informed on the cause of the error.
-#' @param class_string A character vector of legal classes. If
-#'   \code{class_string} is "numeric", it will be expanded to
-#'   c("numeric", "integer", "double"). The class is tested via the
-#'   function \code{class}. This means that if \code{obj} is a matrix,
-#'   it is necessary to pass \code{class_string = "matrix"}; you cannot
-#'   refer to the "mode" of the matrix.
 #' @param len Optional numeric vector for objects having a length
-#'   (mostly for vectors).
+#'   (mostly for vectors). Tests via `NROW`, so can also test matrix-like 
+#'   objects.
 #' @param greater_than Optional scalar indicating if numeric input has
 #'   to be greater than a specified number.
 #' @param must_be_integer Optional logical vector indicating if numeric
@@ -107,29 +102,15 @@ input_validation_anticlustering <- function(x, K, objective, method,
 #'
 #' @noRd
 
-validate_input <- function(obj, argument_name, class_string = NULL,
-                           len = NULL, greater_than = NULL, must_be_integer = FALSE,
-                           groupsize = NULL, input_set = NULL, objmode = NULL,
-                           not_na = FALSE) {
+validate_input <- function(obj, argument_name, len = NULL, greater_than = NULL,
+                           must_be_integer = FALSE, groupsize = NULL, input_set = NULL, 
+                           objmode = NULL, not_na = FALSE) {
 
-  self_validation(argument_name, class_string, len, greater_than,
+  self_validation(argument_name, len, greater_than,
                   must_be_integer, groupsize, input_set,
                   objmode, not_na)
 
   argument_name <- paste("Argument", argument_name)
-  
-  ## - Check class of object
-  if (argument_exists(class_string))  {
-    # Allow for all numeric types:
-    if ("numeric" %in% class_string) {
-      class_string <- c(class_string, "integer", "double")
-    }
-    correct_class <- class(obj) %in% class_string
-    if (!correct_class) {
-      stop(argument_name, " must be of class '",
-           paste(class_string, collapse = "' or '"), "'")
-    }
-  }
 
   ## - Check length of input
   if (argument_exists(len)) {
@@ -193,13 +174,10 @@ validate_data_matrix <- function(x) {
 
 ## Validate input for the `validate_input` function (these errors are
 ## not for users, but only for developers)
-self_validation <- function(argument_name, class_string, len, greater_than,
+self_validation <- function(argument_name, len, greater_than,
                             must_be_integer, groupsize,
                             input_set, objmode, not_na) {
-  if (argument_exists(class_string)) {
-    stopifnot(class(class_string) == "character")
-    stopifnot(class(argument_name) == "character")
-  }
+
   if (argument_exists(len)) {
     stopifnot(class(len) %in% c("numeric", "integer"))
     stopifnot(length(len) == 1)

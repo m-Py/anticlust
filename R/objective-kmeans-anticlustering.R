@@ -71,7 +71,7 @@
 variance_objective <- function(features, clusters) {
   features <- as.matrix(features)
   validate_input(features, "features", objmode = "numeric")
-  validate_input(clusters, "anticlusters", class_string = c("numeric", "factor"))
+  validate_input(clusters, "clusters", len = nrow(features), not_na = TRUE)
   variance_objective_(clusters, features)
 }
 
