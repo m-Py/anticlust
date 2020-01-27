@@ -30,7 +30,7 @@ merge_into_one_variable <- function(categories) {
 #' iris$Species
 #' to_numeric(iris$Species)
 #' 
-#' @export
+#' @noRd
 #' 
 to_numeric <- function(x) {
   as.numeric(factor(x))
