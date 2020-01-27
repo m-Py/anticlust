@@ -168,8 +168,9 @@ validate_input <- function(obj, argument_name, len = NULL, greater_than = NULL,
 validate_data_matrix <- function(x) {
   x <- as.matrix(x)
   validate_input(x, "features", objmode = "numeric")
-  if (sum(!complete.cases(x)) >= 1) {
-    warning("There are missing values in your data, take care!")
+  if (any(is.na(x))) {
+    stop("Your data contains `NA`. I cannot proceed because ",
+         "I cannot estimate similarity for data including missing values. Sorry!")
   }
 }
 
