@@ -4,10 +4,10 @@
 \alias{fast_anticlustering}
 \title{Fast anticlustering}
 \usage{
-fast_anticlustering(features, K, k_neighbours = Inf, categories = NULL)
+fast_anticlustering(x, K, k_neighbours = Inf, categories = NULL)
 }
 \arguments{
-\item{features}{A numeric vector, matrix or data.frame of data
+\item{x}{A numeric vector, matrix or data.frame of data
 points.  Rows correspond to elements and columns correspond to
 features. A vector represents a single numeric feature.}
 

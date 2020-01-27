@@ -5,7 +5,7 @@
 #' k-means variance criterion with an exchange method. Can be used for
 #' very large data sets.
 #'
-#' @param features A numeric vector, matrix or data.frame of data
+#' @param x A numeric vector, matrix or data.frame of data
 #'     points.  Rows correspond to elements and columns correspond to
 #'     features. A vector represents a single numeric feature.
 #' @param K How many anticlusters should be created.
@@ -76,18 +76,18 @@
 #' by(features, ac_fast, function(x) round(colMeans(x), 2))
 #'
 
-fast_anticlustering <- function(features, K, k_neighbours = Inf, categories = NULL) {
-  input_validation_anticlustering(features, K, "variance",
+fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL) {
+  input_validation_anticlustering(x, K, "variance",
                                 "exchange", FALSE, categories)
 
   if (!isTRUE(k_neighbours == Inf)) {
     validate_input(k_neighbours, "k_neighbours", objmode = "numeric", len = 1,
                    must_be_integer = TRUE, greater_than = 0, not_na = TRUE)
   }
-  features <- as.matrix(features)
-  neighbours <- get_neighbours(features, k_neighbours, categories)
-  init <- initialize_clusters(nrow(features), K, categories)
-  fast_exchange_(features, init, categories, neighbours)
+  x <- as.matrix(x)
+  neighbours <- get_neighbours(x, k_neighbours, categories)
+  init <- initialize_clusters(nrow(x), K, categories)
+  fast_exchange_(x, init, categories, neighbours)
 }
 
 #' Solve anticlustering using the fast exchange method

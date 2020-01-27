@@ -3,7 +3,7 @@
 #'
 #' Check the objective value for a given clustering.
 #'
-#' @param features A vector, matrix or data.frame of data points. Rows
+#' @param x A vector, matrix or data.frame of data points. Rows
 #'     correspond to elements and columns correspond to features. A
 #'     vector represents a single feature.
 #' @param clusters A vector representing (anti)clusters (e.g., returned
@@ -68,11 +68,11 @@
 #' cl <- balanced_clustering(data, K = 3)
 #' plot_clusters(data, cl, illustrate_variance = TRUE)
 
-variance_objective <- function(features, clusters) {
-  features <- as.matrix(features)
-  validate_input(features, "features", objmode = "numeric")
-  validate_input(clusters, "clusters", len = nrow(features), not_na = TRUE)
-  variance_objective_(clusters, features)
+variance_objective <- function(x, clusters) {
+  x <- as.matrix(x)
+  validate_input(x, "features", objmode = "numeric")
+  validate_input(clusters, "clusters", len = nrow(x), not_na = TRUE)
+  variance_objective_(clusters, x)
 }
 
 # Internal function - no input handling

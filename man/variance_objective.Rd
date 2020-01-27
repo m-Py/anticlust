@@ -4,10 +4,10 @@
 \alias{variance_objective}
 \title{Objective value for the variance criterion}
 \usage{
-variance_objective(features, clusters)
+variance_objective(x, clusters)
 }
 \arguments{
-\item{features}{A vector, matrix or data.frame of data points. Rows
+\item{x}{A vector, matrix or data.frame of data points. Rows
 correspond to elements and columns correspond to features. A
 vector represents a single feature.}
 
