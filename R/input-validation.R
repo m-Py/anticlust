@@ -56,7 +56,7 @@ input_validation_anticlustering <- function(x, K, objective, method,
                  input_set = c("ilp", "exchange", "heuristic"), not_na = TRUE)
 
   if (method == "ilp") {
-    validate_solver()
+    check_if_solver_is_available()
   }
 
   if (class(objective) != "function") {
@@ -308,22 +308,9 @@ input_validation_matching <- function(
   }
 }
 
-#' Check if a solver package can be used
-#' 
-#' @importFrom utils installed.packages
-#' 
-#' @noRd
-#' 
-solver_available <- function() {
-  pcks <- rownames(installed.packages())
-  if ("Rglpk" %in% pcks) {
-    return(TRUE) 
-  } 
-  return(FALSE)
-}
-
-validate_solver <- function() {
-  if (!solver_available()) {
+# Check if a solver package can be used
+check_if_solver_is_available <- function() {
+  if (!requireNamespace("Rglpk", quietly = TRUE)) {
     stop("\n\nAn exact method was requested, but the linear ",
          "programming \npackage 'Rglpk' is not ",
          "available. You have to install the GNU linear \nprogramming kit first: \n\n",

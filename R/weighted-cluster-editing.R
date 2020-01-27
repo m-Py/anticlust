@@ -57,7 +57,7 @@
 #'
 
 wce <- function(x) {
-  validate_solver()
+  check_if_solver_is_available()
   validate_data_matrix(x)
   if (!is_distance_matrix(x)) {
     stop("The input via argument `weights` is not a similarity matrix, ",
