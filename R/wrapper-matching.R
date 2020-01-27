@@ -192,7 +192,7 @@ get_target_group <- function(data, match_between, target_group) {
   if (target_group == "smallest") {
     return(which.min(tab))
   } else if (target_group == "diverse") {
-    return(which.max(diversity_by_group(data, match_between)))
+    return(which.max(distance_objective_by_group(match_between, data)))
   } else if (target_group == "none") {
     return(FALSE)
   } else {
@@ -200,17 +200,6 @@ get_target_group <- function(data, match_between, target_group) {
   }
 }
 
-# Compute the diversity by group (variance or sum of distances)
-diversity_by_group <- function(data, groups) {
-  if (!is_distance_matrix(data)) {
-    ## compute multivariate variance by group, return group with maximum variance
-    centers <- cluster_centers(data, groups)
-    distances <- dist_from_centers(data, centers, squared = TRUE)
-    distances <- distances[cbind(1:nrow(distances), groups)]
-    return(c(by(distances, groups, sum)))
-  }
-  sapply(1:max(groups), function(i) sum(as.dist(subset_data_matrix(data, groups == i))))
-}
 
 # conduct a matching for each category if `match_within` is passed
 match_within <- function(data, p, match_between, match_within, match_extreme_first, target_group) {
