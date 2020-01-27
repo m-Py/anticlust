@@ -19,7 +19,8 @@ input_validation_anticlustering <- function(x, K, objective, method,
                  input_set = c(TRUE, FALSE), not_na = TRUE)
 
   if (argument_exists(categories) && preclustering == TRUE) {
-    stop("It is currently not possible to apply both preclustering and categorical constraints.")
+    stop("Argument `categories was passed while `preclustering` was `TRUE`; ",
+         "it is currently not possible to apply both preclustering and categorical constraints.")
   }
 
   # Allow that K is an initial assignment of elements to clusters
