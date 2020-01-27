@@ -22,10 +22,10 @@ Finds the clustering that maximizes the sum of pairwise similarities within clus
 In the input some similarities should be negative (indicating dissimilarity) because 
 otherwise the maximum sum of similarities is obtained by simply joining all elements 
 within a single big cluster.
-
-To use this function, the open source GNU linear programming
-kit (available from https://www.gnu.org/software/glpk/glpk.html) 
-and the R package \code{Rglpk} must be installed.
+}
+\note{
+This function requires the R package \code{Rglpk} and the GNU linear 
+programming kit.
 }
 \examples{
 \dontrun{

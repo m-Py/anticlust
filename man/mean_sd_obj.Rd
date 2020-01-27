@@ -9,7 +9,8 @@ mean_sd_obj(clusters, features)
 \arguments{
 \item{clusters}{A clustering vector}
 
-\item{features}{The features}
+\item{features}{A matrix or data.frame of data points. Rows
+correspond to elements and columns correspond to features.}
 }
 \value{
 A value quantifying similarity in means and standard deviations. 

@@ -19,7 +19,7 @@ by \code{\link{anticlustering}} or
 The total within-cluster variance
 }
 \description{
-Check the objective value for a given clustering.
+Compute the k-means variance objective for a given clustering.
 }
 \details{
 The variance objective is given by the sum of the squared

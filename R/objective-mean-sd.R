@@ -6,7 +6,8 @@
 #' @importFrom stats sd var
 #'
 #' @param clusters A clustering vector
-#' @param features The features
+#' @param features A matrix or data.frame of data points. Rows
+#'     correspond to elements and columns correspond to features.
 #'
 #' @return A value quantifying similarity in means and standard deviations. 
 #'     Higher values indicate that means and standard deviations are more

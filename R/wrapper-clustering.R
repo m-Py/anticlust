@@ -1,14 +1,14 @@
 
 #' Create balanced clusters of equal size
 #'
-#' @param x The data input. Can be one of two structures: (1) A data matrix
-#'     where rows correspond to elements and columns correspond to
-#'     features (a single numeric feature can be passed as a vector). (2)
-#'     An N x N matrix dissimilarity matrix; can be an object of class
-#'     \code{dist} (e.g., returned by \code{\link{dist}} or
-#'     \code{\link{as.dist}}) or a \code{matrix} where the entries of
-#'     the upper and lower triangular matrix represent the pairwise
-#'     dissimilarities.
+#' @param x The data input. Can be one of two structures: (1) A data
+#'     matrix where rows correspond to elements and columns correspond
+#'     to features (a single numeric feature can be passed as a
+#'     vector). (2) An N x N matrix dissimilarity matrix; can be an
+#'     object of class \code{dist} (e.g., returned by
+#'     \code{\link{dist}} or \code{\link{as.dist}}) or a \code{matrix}
+#'     where the entries of the upper and lower triangular matrix
+#'     represent the pairwise dissimilarities.
 #' @param K How many clusters should be created.
 #' @param method One of "heuristic" or "ilp". See details.
 #'
@@ -17,35 +17,37 @@
 #'
 #' @details
 #'
-#' This function partitions a set of elements into \code{K} equal-sized
-#' clusters. The function offers two methods, a heuristic method and an
-#' exact method. The heuristic (\code{method = "heuristic"}) computes
-#' the centroid of all available elements and identifies the element
-#' farthest to it. If the input is a dissimilarity matrix, the most
-#' central element acts as the centroid. The farthest element is
-#' clustered with its \code{(N/K) - 1} nearest neighbours. From the remaining
-#' elements, the element farthest to the centroid is selected and again
-#' clustered with its \code{(N/K) - 1} neighbours; the procedure is repeated
-#' until all elements are part of a cluster. 
+#' This function partitions a set of elements into \code{K}
+#' equal-sized clusters. The function offers two methods, a heuristic
+#' method and an exact method. The heuristic (\code{method =
+#' "heuristic"}) computes the centroid of all available elements and
+#' identifies the element farthest to it. If the input is a
+#' dissimilarity matrix, the most central element acts as the
+#' centroid. The farthest element is clustered with its \code{(N/K) -
+#' 1} nearest neighbours. From the remaining elements, the element
+#' farthest to the centroid is selected and again clustered with its
+#' \code{(N/K) - 1} neighbours; the procedure is repeated until all
+#' elements are part of a cluster.
 #'
-#' An exact method (\code{method = "ilp"}) can be used to solve cluster
-#' editing optimally. The cluster editing objective minimizes the sum
-#' of pairwise distances within clusters. If the argument
+#' An exact method (\code{method = "ilp"}) can be used to solve
+#' cluster editing optimally. The cluster editing objective minimizes
+#' the sum of pairwise distances within clusters. If the argument
 #' \code{features} is passed, the Euclidean distance is computed by
 #' default as the basic unit of the cluster editing objective. If
-#' another distance measure is preferred, users may pass a self-computed
-#' dissimiliarity matrix via the argument \code{distances}. The optimal
-#' cluster editing objective can be found via integer linear
-#' programming. To obtain an optimal solution, the open source GNU linear 
-#' programming kit (available from https://www.gnu.org/software/glpk/glpk.html) 
-#' and the R package \code{Rglpk} must be installed. 
+#' another distance measure is preferred, users may pass a
+#' self-computed dissimiliarity matrix via the argument
+#' \code{distances}. The optimal cluster editing objective can be
+#' found via integer linear programming. To obtain an optimal
+#' solution, the open source GNU linear programming kit (available
+#' from https://www.gnu.org/software/glpk/glpk.html) and the R package
+#' \code{Rglpk} must be installed.
 #'
 #'
 #' @source
 #'
-#' The heuristic method was originally developed and contributed by m.eik michalke.
-#' It was later rewritten by Martin Papenberg, who also implemented the exact integer linear
-#' programming method.
+#' The heuristic method was originally developed and contributed by
+#' m.eik michalke. It was later rewritten by Martin Papenberg, who
+#' also implemented the exact integer linear programming method.
 #'
 #' @export
 #'

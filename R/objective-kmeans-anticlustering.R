@@ -1,7 +1,7 @@
 
 #' Objective value for the variance criterion
 #'
-#' Check the objective value for a given clustering.
+#' Compute the k-means variance objective for a given clustering.
 #'
 #' @param x A vector, matrix or data.frame of data points. Rows
 #'     correspond to elements and columns correspond to features. A

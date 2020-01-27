@@ -6,14 +6,14 @@
 #' matches is based on the Euclidean distance between data points, but
 #' a custom dissimilarity measure can also be employed.
 #'
-#' @param x The data input. Can be one of two structures: (1) A data matrix
-#'     where rows correspond to elements and columns correspond to
-#'     features (a single numeric feature can be passed as a vector). (2)
-#'     An N x N matrix dissimilarity matrix; can be an object of class
-#'     \code{dist} (e.g., returned by \code{\link{dist}} or
-#'     \code{\link{as.dist}}) or a \code{matrix} where the entries of
-#'     the upper and lower triangular matrix represent the pairwise
-#'     dissimilarities.
+#' @param x The data input. Can be one of two structures: (1) A data
+#'     matrix where rows correspond to elements and columns correspond
+#'     to features (a single numeric feature can be passed as a
+#'     vector). (2) An N x N matrix dissimilarity matrix; can be an
+#'     object of class \code{dist} (e.g., returned by
+#'     \code{\link{dist}} or \code{\link{as.dist}}) or a \code{matrix}
+#'     where the entries of the upper and lower triangular matrix
+#'     represent the pairwise dissimilarities.
 #' @param p The size of the groups; the default is 2, in which case
 #'     the function returns pairs.
 #' @param match_between An optional vector, \code{data.frame} or
@@ -26,8 +26,8 @@
 #' @param match_extreme_first Logical: Determines if matches are first
 #'     sought for extreme elements first or for central
 #'     elements. Defaults to \code{TRUE}.
-#' @param target_group Currently, the options "none", smallest" and "diverse"
-#'     are supported. See Details.
+#' @param target_group Currently, the options "none",
+#'     smallest" and "diverse" are supported. See Details.
 #'
 #' @return An integer vector encoding the matches. See Details for
 #'     more information.
@@ -35,46 +35,47 @@
 #'
 #' @details
 #' 
-#' If the data input \code{x} is a feature matrix, matching is done based
-#' on the Euclidean distance between data points. If the argument
-#' \code{x} is a dissimilarity matrix, matching is based on the user-specified
-#' dissimilarities. To find matches, the algorithm
+#' If the data input \code{x} is a feature matrix, matching is done
+#' based on the Euclidean distance between data points. If the
+#' argument \code{x} is a dissimilarity matrix, matching is based on
+#' the user-specified dissimilarities. To find matches, the algorithm
 #' proceeds by selecting a target element and then searching its
 #' nearest neighbours. Critical to the behaviour or the algorithm is
 #' the order in which target elements are selected. By default, the
 #' most extreme elements are selected first, i.e., elements with the
 #' highest distance to the centroid of the data set (see
 #' \code{\link{balanced_clustering}}). Set the argument
-#' \code{match_extreme_first} to \code{FALSE}, to enforce that 
-#' elements near the centroid are first selected as targets. 
+#' \code{match_extreme_first} to \code{FALSE}, to enforce that
+#' elements near the centroid are first selected as targets.
 #' 
-#' If the argument \code{match_between} is passed and the
-#' groups specified via this argument are of different size, target
-#' elements are selected from the smallest group by default (because in
-#' this group, all elements can be matched). When a grouping restriction 
-#' via \code{match_between} is included, it is possible to further specify 
-#' how matches are selected through the option \code{target_group}.
-#' When specifying \code{"none"}, matches are always selected from extreme elements,
-#' irregardless of group affiliation (or from central elements first if 
-#' \code{match_extreme_first = FALSE}). 
-#' With option \code{"smallest"}, matches are selected from the smallest group. 
-#' With option \code{"diverse"}, matches are selected from the group with 
-#' the largest variance. 
+#' If the argument \code{match_between} is passed and the groups
+#' specified via this argument are of different size, target elements
+#' are selected from the smallest group by default (because in this
+#' group, all elements can be matched). When a grouping restriction
+#' via \code{match_between} is included, it is possible to further
+#' specify how matches are selected through the option
+#' \code{target_group}.  When specifying \code{"none"}, matches are
+#' always selected from extreme elements, irregardless of group
+#' affiliation (or from central elements first if
+#' \code{match_extreme_first = FALSE}).  With option
+#' \code{"smallest"}, matches are selected from the smallest group.
+#' With option \code{"diverse"}, matches are selected from the most
+#' heterogenous group.
 #' 
 #' The output is an integer vector encoding which elements have been
 #' matched. The grouping numbers are sorted by similarity. That is,
 #' elements with the grouping number »1« have the highest intra-group
-#' similarity, followed by 2 etc (groups having the same similarity index
-#' are still assigned a different grouping number, though). Similarity
-#' is measured as the sum of pairwise (Euclidean) distances within
-#' groups (see \code{\link{distance_objective}}).  Some unmatched elements 
-#' may be \code{NA}. This happens if it is not possible to
-#' evenly split the item pool evenly into groups of size \code{p} or
-#' if the categories described by the argument \code{match_between}
-#' are of different size.
+#' similarity, followed by 2 etc (groups having the same similarity
+#' index are still assigned a different grouping number,
+#' though). Similarity is measured as the sum of pairwise (Euclidean)
+#' distances within groups (see \code{\link{distance_objective}}).
+#' Some unmatched elements may be \code{NA}. This happens if it is not
+#' possible to evenly split the item pool evenly into groups of size
+#' \code{p} or if the categories described by the argument
+#' \code{match_between} are of different size.
 #' 
-#' @note It is possible to specify grouping restrictions via 
-#' \code{match_between} and \code{match_within} at the same time.
+#' @note It is possible to specify grouping restrictions via
+#'     \code{match_between} and \code{match_within} at the same time.
 #' 
 #' @author
 #' Martin Papenberg \email{martin.papenberg@@hhu.de}
