@@ -11,10 +11,6 @@
 #'
 #' @noRd
 sort_by_col <- function(x, col, decreasing = FALSE) {
-  if (!class(x) %in% c("data.frame", "matrix"))
-    stop("The data that is to be sorted has false structure")
-  if (!mode(col) %in% c("character", "numeric"))
-    stop("Sorting index has false data type")
   if (length(col) != 1)
     stop("False input, can only select by one column")
   x[order(x[, col], decreasing = decreasing), ]
