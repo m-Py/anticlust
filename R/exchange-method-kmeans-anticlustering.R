@@ -215,16 +215,6 @@ get_neighbours <- function(features, k_neighbours, categories) {
     k_neighbours <- min(nrow(features), k_neighbours + 1)
   }
 
-  ## indicices of non NA values; RANN::nn2 does not deal with NA
-  bool_complete <- complete.cases(features)
-  complete <- which(bool_complete)
-  not_complete <- which(!bool_complete)
-  ## exclude NA elements from nearest neighbor computation
-  features <- features[complete, ]
-  if (argument_exists(categories)) {
-    categories <- categories[complete]
-  }
-
   ## Compute nearest neighbors; within categories if categories
   ## are available!
   if (!argument_exists(categories)) {
@@ -249,17 +239,5 @@ get_neighbours <- function(features, k_neighbours, categories) {
     idx <- sort_by_col(idx, 1)
   }
 
-  ## now deal with NA:
-  if (sum(not_complete) >= 1) {
-    ## recover original indices (before NA exclusion)
-    dims <- dim(idx)
-    idx <- complete[idx]
-    dim(idx) <- dims ## recover original structure
-    ## make elements with NA exchange partners among each other:
-    NA_partners <- sample(not_complete, size = (k_neighbours - 1) * length(not_complete), replace = TRUE)
-    not_complete_idx <- cbind(not_complete, matrix(NA_partners, ncol = k_neighbours - 1))
-    idx <- rbind(idx, not_complete_idx)
-    colnames(idx) <- NULL
-  }
   sort_by_col(idx, 1)
 }
