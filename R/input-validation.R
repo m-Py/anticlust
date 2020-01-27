@@ -156,8 +156,7 @@ validate_input <- function(obj, argument_name, len = NULL, greater_than = NULL,
   ## - Check mode of input
   if (argument_exists(objmode)) {
     if (mode(obj) != objmode) {
-      stop(argument_name, " must be ", objmode,
-           ", but is ", mode(obj))
+      stop(argument_name, " must be ", objmode, ", but is ", mode(obj))
     }
   }
 
@@ -167,10 +166,12 @@ validate_input <- function(obj, argument_name, len = NULL, greater_than = NULL,
 ## Validate feature input
 validate_data_matrix <- function(x) {
   x <- as.matrix(x)
-  validate_input(x, "features", objmode = "numeric")
+  if (mode(x) != "numeric") {
+    stop("Your data (the first argument `x`) should only contain numeric entries, but this is not the case.")
+  }
   if (any(is.na(x))) {
     stop("Your data contains `NA`. I cannot proceed because ",
-         "I cannot estimate similarity for data including missing values. Sorry!")
+         "I cannot estimate similarity for data that has missing values. Sorry!")
   }
 }
 
@@ -291,9 +292,8 @@ input_validation_matching <- function(
 # Check if a solver package can be used
 check_if_solver_is_available <- function() {
   if (!requireNamespace("Rglpk", quietly = TRUE)) {
-    stop("\n\nAn exact method was requested, but the linear ",
-         "programming \npackage 'Rglpk' is not ",
-         "available. You have to install the GNU linear \nprogramming kit first: \n\n",
+    stop("\n\nAn exact method was requested, but the package 'Rglpk' is not \n",
+         "available. Possibly, you have to install the GNU linear \nprogramming kit first: \n\n",
          "- On windows, visit ",
          "http://gnuwin32.sourceforge.net/packages/glpk.htm \n\n",
          "- Use homebrew to install it on mac, 'brew install glpk' \n\n",
