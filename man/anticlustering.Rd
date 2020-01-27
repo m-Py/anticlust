@@ -139,36 +139,19 @@ and categorical constraints at the same time.
 }
 \examples{
 
-## Use anticlustering on the iris data set. Create sets of plants
-## that are as similar as possible with regard to all four features
-## of the iris plants
-
-data(iris)
-head(iris[, -5]) # these features are made similar across sets
-
-## Optimize the cluster editing (distance) criterion using the exchange method
+# Optimize the cluster editing (distance) criterion
 anticlusters <- anticlustering(
-  iris[, -5],
+  schaper2019[, 3:6],
   K = 3,
-  objective = "distance",
-  method = "exchange"
+  categories = schaper2019$room
 )
 # Compare feature means by anticluster
-by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
+by(schaper2019[, 3:6], anticlusters, function(x) round(colMeans(x), 2))
 # Compare standard deviations by anticluster
-by(iris[, -5], anticlusters, function(x) round(apply(x, 2, sd), 2))
+by(schaper2019[, 3:6], anticlusters, function(x) round(apply(x, 2, sd), 2))
 
 
-## Incorporate categorical restrictions:
-anticlusters <- anticlustering(
-  iris[, -5],
-  K = 2,
-  categories = iris[, 5]
-)
-table(iris[, 5], anticlusters)
-
-
-## Use preclustering and variance (k-means) criterion on large data sets
+## Use preclustering and variance (k-means) criterion on large data set
 N <- 1000
 K = 2
 lds <- data.frame(f1 = rnorm(N), f2 = rnorm(N))
