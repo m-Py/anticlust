@@ -21,14 +21,15 @@ Description: Anticlustering partitions a pool of elements into
     minimizing a clustering objective function, such as the intra-cluster
     variance (used in k-means clustering) or the sum of pairwise distances
     within clusters. Thus, anticlustering creates similar sets of elements
-    by maximizing heterogeneity within anticlusters. `anticlust`
+    by maximizing heterogeneity within anticlusters. This package
     implements exact and heuristic anticlustering algorithms as described
     in Papenberg and Klau (2019; <doi:10.31234/osf.io/3razc>). The exact
-    approach requires that the GNU linear programming kit is installed.
-    Exact and heuristic algorithms for classical clustering problems under
-    size constraints (i.e., creating equal-sized clusters) are also
-    implemented, as well as methods for (unrestricted or K-partite)
-    matching.
+    approach requires that the GNU linear programming kit
+    (https://www.gnu.org/software/glpk/glpk.html) and the R package
+    `Rglpk` (https://cran.R-project.org/package=Rglpk) are installed.
+    Also includes methods for classical clustering problems under size
+    constraints (i.e., creating equal-sized clusters), as well as methods
+    for (unrestricted or K-partite) matching.
 License: MIT + file LICENSE
 URL: https://github.com/m-Py/anticlust
 BugReports: https://github.com/m-Py/anticlust/issues
