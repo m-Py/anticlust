@@ -78,12 +78,12 @@ test_that("Matching function behaves correctly with `match_between` argument", {
 test_that("Matching function behaves correctly with `match_within` argument", {
   # generate some random data
   m <- sample(1:4, size = 1)
-  n <- sample(20:100, size = 1)
+  n <- sample(40:100, size = 1)
   data <- matrix(rnorm(n * m), ncol = m)
   p <- sample(2:5, size = 1)
   n_groups <- sample(2:5, size = 1)
   groups <- sample(1:n_groups, size = n, replace = TRUE)
-  while (any(table(groups) < p)) {
+  while (any(table(groups) < p) || length(unique(groups)) != n_groups) {
     groups <- sample(1:p, size = n, replace = TRUE)
   }
   
