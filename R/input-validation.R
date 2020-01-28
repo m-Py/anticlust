@@ -54,7 +54,7 @@ input_validation_anticlustering <- function(x, K, objective, method,
   }
 
   validate_input(method, "method", len = 1,
-                 input_set = c("ilp", "exchange", "heuristic"), not_na = TRUE)
+                 input_set = c("ilp", "exchange", "heuristic", "centroid"), not_na = TRUE)
 
   if (method == "ilp") {
     check_if_solver_is_available()

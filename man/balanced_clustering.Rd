@@ -4,12 +4,12 @@
 \alias{balanced_clustering}
 \title{Create balanced clusters of equal size}
 \source{
-The heuristic method was originally developed and contributed by
+The centroid method was originally developed and contributed by
 m.eik michalke. It was later rewritten by Martin Papenberg, who
 also implemented the exact integer linear programming method.
 }
 \usage{
-balanced_clustering(x, K, method = "heuristic")
+balanced_clustering(x, K, method = "centroid")
 }
 \arguments{
 \item{x}{The data input. Can be one of two structures: (1) A data
@@ -23,7 +23,7 @@ represent the pairwise dissimilarities.}
 
 \item{K}{How many clusters should be created.}
 
-\item{method}{One of "heuristic" or "ilp". See details.}
+\item{method}{One of "centroid" or "ilp". See details.}
 }
 \value{
 An integer vector representing the cluster affiliation of 
@@ -34,24 +34,27 @@ Create balanced clusters of equal size
 }
 \details{
 This function partitions a set of elements into \code{K}
-equal-sized clusters. The function offers two methods, a heuristic
-method and an exact method. The heuristic (\code{method =
-"heuristic"}) computes the centroid of all available elements and
-identifies the element farthest to it. If the input is a
+equal-sized clusters. The function offers two methods: a heuristic
+and an exact method. The heuristic (\code{method = "centroid"})
+first computes the centroid of all data points. If the input is a
 dissimilarity matrix, the most central element acts as the
-centroid. The farthest element is clustered with its \code{(N/K) -
-1} nearest neighbours. From the remaining elements, the element
-farthest to the centroid is selected and again clustered with its
+centroid; if the input is a feature matrix, the centroid is the
+mean vector of all columns. When the centroid is identified, the
+element having the highest distance from the centroid is clustered
+with its \code{(N/K) - 1} nearest neighbours. Neighbourhood is
+defined according to the Euclidean distance if the data input is a
+feature matrix. From the remaining elements, the element farthest
+to the centroid is selected and again clustered with its
 \code{(N/K) - 1} neighbours; the procedure is repeated until all
 elements are part of a cluster.
 
-An exact method (\code{method = "ilp"}) can be used to solve
-cluster editing optimally. The cluster editing objective minimizes
-the sum of pairwise distances within clusters. If the argument
-\code{features} is passed, the Euclidean distance is computed by
-default as the basic unit of the cluster editing objective. If
-another distance measure is preferred, users may pass a
-self-computed dissimiliarity matrix via the argument
+An exact method (\code{method = "ilp"}) can be used to solve the
+weighted cluster editing problem optimally. The cluster editing
+objective minimizes the sum of pairwise distances within
+clusters. If the argument \code{features} is passed, the Euclidean
+distance is computed by default as the basic unit of the cluster
+editing objective. If another distance measure is preferred, users
+may pass a self-computed dissimiliarity matrix via the argument
 \code{distances}. The optimal cluster editing objective can be
 found via integer linear programming. To obtain an optimal
 solution, the open source GNU linear programming kit (available
