@@ -2,3 +2,6 @@
 ^\.Rproj\.user$
 build.sh
 build-package.R
+inst/README.*
+README.md
+inst/README_files
