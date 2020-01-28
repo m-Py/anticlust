@@ -1,37 +1,53 @@
-Package: anticlust
 Type: Package
+Package: anticlust
 Title: Subset Partitioning via Anticlustering
-Description: Anticlustering partitions a pool of elements into subsets
-    (i.e., anticlusters) in such a way that the subsets are as similar
-    as possible. This is accomplished by maximizing instead of
-    minimizing a clustering objective function, such as the
-    intra-cluster variance (used in k-means clustering) or the sum of
-    pairwise distances within clusters. Thus, anticlustering creates
-    similar sets of elements by maximizing heterogeneity within
-    anticlusters. `anticlust` implements exact and heuristic
-    anticlustering algorithms as described in Papenberg and Klau
-    (2019; <doi:10.31234/osf.io/3razc>). The exact approach requires
-    that the GNU linear programming kit is installed. Exact and
-    heuristic algorithms for classical clustering problems under size
-    constraints (i.e., creating equal-sized clusters) are also
+Version: 0.4.0
+Authors@R: 
+    c(person(given = "Martin",
+             family = "Papenberg",
+             role = c("aut", "cre"),
+             email = "martin.papenberg@hhu.de",
+             comment = c(ORCID = "0000-0002-9900-4268")),
+      person(given = "Meik",
+             family = "Michalke",
+             role = "ctb",
+             comment = "centroid based clustering algorithm"))
+Author: Martin Papenberg [aut, cre], Meik Michalke [ctb]
+    (centroid based clustering algorithm)
+Maintainer: Martin Papenberg <martin.papenberg@hhu.de>
+Description: Anticlustering partitions a pool of elements into
+    subsets (i.e., anticlusters) in such a way that the subsets are as
+    similar as possible. This is accomplished by maximizing instead of
+    minimizing a clustering objective function, such as the intra-cluster
+    variance (used in k-means clustering) or the sum of pairwise distances
+    within clusters. Thus, anticlustering creates similar sets of elements
+    by maximizing heterogeneity within anticlusters. `anticlust`
+    implements exact and heuristic anticlustering algorithms as described
+    in Papenberg and Klau (2019; <doi:10.31234/osf.io/3razc>). The exact
+    approach requires that the GNU linear programming kit is installed.
+    Exact and heuristic algorithms for classical clustering problems under
+    size constraints (i.e., creating equal-sized clusters) are also
     implemented, as well as methods for (unrestricted or K-partite)
     matching.
 License: MIT + file LICENSE
+URL: https://github.com/m-Py/anticlust
+BugReports: https://github.com/m-Py/anticlust/issues
+Depends: 
+    R (>= 3.4.0)
+Imports: 
+    Matrix,
+    RANN (>= 2.6.0)
+Suggests: 
+    knitr,
+    Rglpk,
+    rmarkdown,
+    testthat
+VignetteBuilder: 
+    knitr
 Encoding: UTF-8
 LazyData: true
-URL: https://github.com/m-Py/anticlust
-Suggests: 
-    Rglpk,
-    testthat,
-    knitr,
-    rmarkdown
-Imports: Matrix, RANN
-Depends: R (>= 3.4.0)
-BugReports: https://github.com/m-Py/anticlust/issues
-Author: Martin Papenberg [aut, cre], Meik Michalke [ctb] (centroid based clustering algorithm)
-Maintainer: Martin Papenberg <martin.papenberg@hhu.de>
-Authors@R: c(person(given='Martin', family='Papenberg', email='martin.papenberg@hhu.de', role=c('aut', 'cre'), comment = c(ORCID = '0000-0002-9900-4268')), person(given='Meik', family='Michalke', role=c('ctb'), comment='centroid based clustering algorithm'))
-Version: 0.4.0
 RoxygenNote: 7.0.2
-VignetteBuilder: knitr
-SystemRequirements: Two optional system requirements: (1) the exact (anti)clustering algorithms require the GLPK library (http://www.gnu.org/software/glpk/), (2) rendering the package vignette requires pandoc (https://pandoc.org)
+SystemRequirements: Two optional system requirements: (1) the
+    exact (anti)clustering algorithms require the GLPK library
+    (http://www.gnu.org/software/glpk/), (2) rendering the package
+    vignette requires pandoc (https://pandoc.org)
