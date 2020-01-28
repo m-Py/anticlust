@@ -5,8 +5,13 @@
 # K = size of the small groups (not the number of clusters!)
 # groups = vector of length nrow(data); if passed, K-partite matching is conducted,
 # i.e., each element is clustered with elements that are in *other* groups than 
-# the element itself
-nn_centroid_clustering <- function(data, K, groups = NULL, match_extreme_first = TRUE, target_group = FALSE) {
+# the element itself. Consists of integers 1, ..., K
+nn_centroid_clustering <- function(
+  data, K, 
+  groups = NULL, 
+  match_extreme_first = TRUE, 
+  target_group = FALSE
+) {
   data <- as.matrix(data)
   N <- nrow(data)
   distances <- distances_from_centroid(data)
@@ -16,40 +21,43 @@ nn_centroid_clustering <- function(data, K, groups = NULL, match_extreme_first =
   }
 
   # some book-keeping variables for the loop
-  counter <- 1
+  cluster_id <- 1
   idx <- 1:nrow(data)
   clusters <- rep(NA, nrow(data))
-  while (nrow(data) > (K-1)) {
+  while (data_fits(data, K) && no_group_empty(groups, K)) {
     # Get target item
     target <- get_target(distances, groups, target_group, match_extreme_first)
     # Compute nearest neighbors for target element
     clustered <- get_nearest_neighbours(data, target, K, groups)
-    clusters[idx[clustered]] <- counter
+    clusters[idx[clustered]] <- cluster_id
     # Remove matched elements:
     data <- subset_data_matrix(data, -clustered)
     distances <- distances[-clustered]
     groups <- groups[-clustered]
     idx  <- idx[-clustered]
-    # for bipartite matching: stop as soon the smallest group is matched
-    # with elements from the other groups
-    if (argument_exists(groups) && any(!(1:K %in% groups))) {
-      break
-    }
-    counter <- counter + 1
+    # increase cluster id for next elements
+    cluster_id <- cluster_id + 1
   }
-  # for subset matching: fill the remaining clusters: 
   order_cluster_vector(clusters)
+}
+
+# simple test: does a data frame still fit into pieces of K units
+data_fits <- function(data, K)  {
+  nrow(data) > (K-1)
+}
+
+# for k-partite matching: test if no group is empty 
+no_group_empty <- function(groups, K) {
+  !(argument_exists(groups) && any(!(1:K %in% groups)))
 }
 
 # Find target element for which neighbours are sought
 # param distances: distances to a cluster centroid
-# param groups: groupingg vector
+# param groups: grouping vector (%in% 1, ..., K)
 # param target_group: id of the group from which target is selected 
 #    (may be FALSE instead of an ID)
-# param match_extreme_first
+# param match_extreme_first: boolean
 get_target <- function(distances, groups, target_group, match_extreme_first) {
-  # if bipartite subset selection is required: 
-  # select a member from the smallest group
   if (!target_group) {
     # no target group specified: select an item from all elements
     if (match_extreme_first) {
