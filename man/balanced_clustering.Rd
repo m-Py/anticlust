@@ -5,8 +5,8 @@
 \title{Create balanced clusters of equal size}
 \source{
 The centroid method was originally developed and contributed by
-m.eik michalke. It was later rewritten by Martin Papenberg, who
-also implemented the exact integer linear programming method.
+Meik Michalke. It was later rewritten by Martin Papenberg, who
+also implemented the integer linear programming method.
 }
 \usage{
 balanced_clustering(x, K, method = "centroid")
@@ -23,7 +23,7 @@ represent the pairwise dissimilarities.}
 
 \item{K}{How many clusters should be created.}
 
-\item{method}{One of "centroid" or "ilp". See details.}
+\item{method}{One of "centroid" or "ilp". See Details.}
 }
 \value{
 An integer vector representing the cluster affiliation of 
@@ -37,28 +37,32 @@ This function partitions a set of elements into \code{K}
 equal-sized clusters. The function offers two methods: a heuristic
 and an exact method. The heuristic (\code{method = "centroid"})
 first computes the centroid of all data points. If the input is a
-dissimilarity matrix, the most central element acts as the
-centroid; if the input is a feature matrix, the centroid is the
-mean vector of all columns. When the centroid is identified, the
-element having the highest distance from the centroid is clustered
-with its \code{(N/K) - 1} nearest neighbours. Neighbourhood is
-defined according to the Euclidean distance if the data input is a
-feature matrix. From the remaining elements, the element farthest
-to the centroid is selected and again clustered with its
-\code{(N/K) - 1} neighbours; the procedure is repeated until all
-elements are part of a cluster.
+feature matrix, the centroid is defined as the mean vector of all
+columns. If the input is a dissimilarity matrix, the most central
+element acts as the centroid; the most central element is defined
+as the element having the minimum maximal distance to all other
+elements. After identifying the centroid, the algorithm proceeds as
+follows: The element having the highest distance from the centroid
+is clustered with its \code{(N/K) - 1} nearest neighbours
+(neighbourhood is defined according to the Euclidean distance if
+the data input is a feature matrix). From the remaining elements,
+again the element farthest to the centroid is selected and
+clustered with its \code{(N/K) - 1} neighbours; the procedure is
+repeated until all elements are part of a cluster.
 
-An exact method (\code{method = "ilp"}) can be used to solve the
-weighted cluster editing problem optimally. The cluster editing
-objective minimizes the sum of pairwise distances within
-clusters. If the argument \code{features} is passed, the Euclidean
-distance is computed by default as the basic unit of the cluster
+An exact method (\code{method = "ilp"}) can be used to solve
+equal-sized weighted cluster editing optimally (implements the
+integer linear program described in Papenberg & Klau, Appendix
+B). The cluster editing objective is the sum of pairwise distances
+within clusters, clustering is accomplished by minimizing this
+objective. If the argument \code{x} is a features matrix, the
+Euclidean distance is computed as the basic unit of the cluster
 editing objective. If another distance measure is preferred, users
 may pass a self-computed dissimiliarity matrix via the argument
-\code{distances}. The optimal cluster editing objective can be
-found via integer linear programming. To obtain an optimal
-solution, the open source GNU linear programming kit (available
-from https://www.gnu.org/software/glpk/glpk.html) and the R package
+\code{x}. The optimal cluster editing objective can be found via
+integer linear programming. To obtain an optimal solution, the open
+source GNU linear programming kit (available from
+https://www.gnu.org/software/glpk/glpk.html) and the R package
 \code{Rglpk} must be installed.
 }
 \examples{
@@ -77,9 +81,13 @@ plot_clusters(lds, clusters = cl2)
 \references{
 Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
 for a clustering problem. Mathematical Programming, 45, 59–96.
+
+Papenberg, M., & Klau, G. W. (2019, October 30). Using
+anticlustering to partition a stimulus pool into equivalent parts.
+https://doi.org/10.31234/osf.io/3razc
 }
 \author{
 Martin Papenberg \email{martin.papenberg@hhu.de}
 
-m.eik michalke \email{meik.michalke@hhu.de}
+Meik Michalke \email{meik.michalke@hhu.de}
 }

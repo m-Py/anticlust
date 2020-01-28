@@ -53,32 +53,32 @@ matches is based on the Euclidean distance between data points, but
 a custom dissimilarity measure can also be employed.
 }
 \details{
-If the data input \code{x} is a feature matrix, matching is done
-based on the Euclidean distance between data points. If the
-argument \code{x} is a dissimilarity matrix, matching is based on
-the user-specified dissimilarities. To find matches, the algorithm
+If the data input \code{x} is a feature matrix, matching is based
+on the Euclidean distance between data points. If the argument
+\code{x} is a dissimilarity matrix, matching is based on the
+user-specified dissimilarities. To find matches, the algorithm
 proceeds by selecting a target element and then searching its
 nearest neighbours. Critical to the behaviour or the algorithm is
 the order in which target elements are selected. By default, the
 most extreme elements are selected first, i.e., elements with the
 highest distance to the centroid of the data set (see
-\code{\link{balanced_clustering}}). Set the argument
-\code{match_extreme_first} to \code{FALSE}, to enforce that
-elements near the centroid are first selected as targets.
+\code{\link{balanced_clustering}} that relies on the same
+algorithm). Set the argument \code{match_extreme_first} to
+\code{FALSE}, to enforce that elements close to the centroid are
+first selected as targets.
 
 If the argument \code{match_between} is passed and the groups
 specified via this argument are of different size, target elements
 are selected from the smallest group by default (because in this
-group, all elements can be matched). When a grouping restriction
-via \code{match_between} is included, it is possible to further
-specify how matches are selected through the option
-\code{target_group}.  When specifying \code{"none"}, matches are
-always selected from extreme elements, irregardless of group
-affiliation (or from central elements first if
-\code{match_extreme_first = FALSE}).  With option
-\code{"smallest"}, matches are selected from the smallest group.
-With option \code{"diverse"}, matches are selected from the most
-heterogenous group.
+group, all elements can be matched). However, it is also possible
+to specify how matches are selected through the option
+\code{target_group}. When specifying \code{"none"}, matches are
+always selected from extreme elements, irregardless of the group
+sizes (or from central elements first if \code{match_extreme_first
+= FALSE}). With option \code{"smallest"}, matches are selected from
+the smallest group. With option \code{"diverse"}, matches are
+selected from the most heterogenous group according to the sum of
+pairwise distances within groups.
 
 The output is an integer vector encoding which elements have been
 matched. The grouping numbers are sorted by similarity. That is,

@@ -109,13 +109,15 @@ for large data sets.
 \strong{Exact anticlustering}
 
 An optimal anticluster editing objective can be found via integer
-linear programming. To this end, set \code{method = "ilp"}. To obtain
-an optimal solution, the open source GNU linear programming kit (available from 
-https://www.gnu.org/software/glpk/glpk.html) and the R package 
-\code{Rglpk} must be installed. The optimal solution is retrieved by
-setting \code{objective = "distance"}, \code{method = "ilp"} and 
-\code{preclustering = FALSE}. Use this combination of arguments only for 
-small problem sizes.
+linear programming (the integer linear program implemented here can
+be found in Papenberg & Klau, 2019, Appendix B). To this end, set
+\code{method = "ilp"}. To obtain an optimal solution, the open
+source GNU linear programming kit (available from
+https://www.gnu.org/software/glpk/glpk.html) and the R package
+\code{Rglpk} must be installed. The optimal solution is retrieved
+by setting \code{objective = "distance"}, \code{method = "ilp"} and
+\code{preclustering = FALSE}. Use this combination of arguments
+only for small problem sizes.
 
 To relax the optimality requirement, it is possible to set the
 argument \code{preclustering = TRUE}. In this case, the anticluster
@@ -148,17 +150,18 @@ constraints at the same time.
 \strong{Custom objective function}
 
 It is possible to pass a \code{function} to the argument
-\code{objective}. In this case, the exchange method assigns
-elements to groups in such a way that the return value of this
-custom function is maximized. Hence, the function should return
-larger values when anticlusters are more similar. The function must
-take two arguments: the first being the clustering assignment, the
+\code{objective}. See \code{\link{mean_sd_obj}} for an example. If
+\code{objective} is a function, the exchange method assigns
+elements to anticlusters in such a way that the return value of the
+custom function is maximized (hence, the function should return
+larger values when anticlusters are more similar). It has to take
+two arguments: the first being the clustering assignment, the
 second being the data argument. That is, the argument \code{x} will
 be passed down to the user-defined function as second argument,
-however \strong{only after} \code{as.matrix} has been called on
-it. This implies that in the function code, columns cannot be
-accessed using \code{data.frame} operations such as \code{$}. See
-\code{\link{mean_sd_obj}} for an example.
+however \strong{only after} \code{\link{as.matrix}} has been called
+on it. This implies that in the function body, columns of the data
+set cannot be accessed using \code{data.frame} operations such as
+\code{$}.
 }
 \examples{
 
