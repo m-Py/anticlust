@@ -12,7 +12,8 @@ Authors@R:
              family = "Michalke",
              role = "ctb",
              comment = "centroid based clustering algorithm"))
-Author: Martin Papenberg [aut, cre], Meik Michalke [ctb]
+Author: Martin Papenberg [aut, cre]
+    (<https://orcid.org/0000-0002-9900-4268>), Meik Michalke [ctb]
     (centroid based clustering algorithm)
 Maintainer: Martin Papenberg <martin.papenberg@hhu.de>
 Description: Anticlustering partitions a pool of elements into
