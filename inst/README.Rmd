@@ -9,15 +9,20 @@ output:
 
 # anticlust
 
-`anticlust` is an `R` package for »anticlustering«, a method to 
-partition a set of elements into subsets in such a way that the subsets 
-are as similar as possible. The package `anticlust` was originally 
-developed to assign items to experimental conditions in experimental 
-psychology, but it can be applied whenever a user requires that a given 
-set of elements has to be partitioned into similar subsets. The package 
-is still under active developement; expect changes and improvements 
-before it will be submitted to CRAN. Check out the [NEWS 
-file](https://m-py.github.io/anticlust/NEWS.html) for recent changes.
+Anticlustering partitions a pool of elements into subsets (i.e., 
+anticlusters) in such a way that the subsets are as similar as possible. 
+This is accomplished by maximizing instead of minimizing a clustering 
+objective function, such as the intra-cluster variance (used in k-means 
+clustering) or the sum of pairwise distances within clusters. Thus, 
+anticlustering creates similar sets of elements by maximizing 
+heterogeneity within anticlusters. The package `anticlust` implements 
+anticlustering algorithms as described in Papenberg and Klau (2019). It 
+was originally developed to assign items to experimental conditions in 
+experimental psychology, but it can be applied whenever a user requires 
+that a given set of elements has to be partitioned into similar subsets. 
+
+Check out the [NEWS file](https://m-py.github.io/anticlust/NEWS.html) 
+for recent changes in `anticlust`.
 
 ```{r setup, include = FALSE}
 library("anticlust")
@@ -42,26 +47,27 @@ library("remotes") # if not available: install.packages("remotes")
 install_github("m-Py/anticlust")
 ```
 
-## How do I learn about anticlustering
+## How do I learn about `anticlust`
 
-This page contains some basic information on anticlustering. More 
+This page contains some basic information the package `anticlust`. More 
 information is available via the following sources:
 
 1. There is a preprint available (»Using anticlustering to partition a 
    stimulus pool into equivalent parts«) describing the theoretical 
    background of anticlustering and the `anticlust` package in detail. 
    It can be retrieved from [https://psyarxiv.com/3razc/](https://psyarxiv.com/3razc/)
-
-2. I am working on some vignettes on typical usages of the 
-  `anticlust` for stimulus selection in psychological research. 
-  A work-in-progress can be found 
-  [here](https://m-py.github.io/anticlust/stimulus-selection.html). 
-
+2. A vignette detailing how to use the anticlust package for stimulus 
+selection in experiments can be found 
+[here](https://m-py.github.io/anticlust/stimulus-selection.html). 
 3. Use the R help. The main function of the package is `anticlustering()`
   and the help page of the function (`?anticlustering`) is useful to learn
   more about anticlustering. It provides explanations of all function
   parameters and how they relate to the theoretical background of
-  anticlustering.
+  anticlustering. 
+4. Other useful functions of the `anticlust` package are 
+`balanced_clustering()` and `matching()`. For more information on these 
+functions, consult their respective help pages and see the examples 
+below.
   
 ## A quick start
 
@@ -91,13 +97,17 @@ by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
 ```
 
 As illustrated in the example, we can use the function 
-`anticlustering()` to create similar sets of elements. The function 
-takes as input a data table describing the elements that should be 
-assigned to sets. In the data table, each row represents an element, for 
-example a person, word or a photo. Each column is a numeric variable 
-describing one of the elements' features. The table may be an R `matrix` 
-or `data.frame`; a single feature can also be passed as a `vector`. The 
-number of groups is specified through the argument `K`.
+`anticlustering()` to create similar sets of elements. In this case 
+"similar" primarily means that the mean values of the variables are 
+pretty much the same across three groups. The function 
+`anticlustering()` takes as input a data table describing the elements 
+that should be assigned to sets. In the data table, each row represents 
+an element, for example a person, word or a photo. Each column is a 
+numeric variable describing one of the elements' features. The table may 
+be an R `matrix` or `data.frame`; a single feature can also be passed as 
+a `vector`. The number of groups is specified through the argument `K`. 
+(Alternatively, it is also possible to pass a dissimilarity matrix 
+describing the pairwise distance between elements.)
 
 To quantify set similarity, `anticlust` may employ one of two measures
 that have been developed in the context of cluster analysis:
@@ -113,7 +123,7 @@ elements that have been assigned to three sets. Each element is
 described by two numeric features, displayed as the *x* and *y* axis:
 
 ```{r, out.width = '100%', echo = FALSE}
-knitr::include_graphics("objectives_updated.png")
+knitr::include_graphics("./README_files/objectives_updated.png")
 ```
 
 
@@ -239,6 +249,39 @@ anticlusters <- anticlustering(
 ## The species are as balanced as possible across anticlusters:
 table(anticlusters, iris[, 5])
 
+```
+
+## Matching and clustering
+
+Anticlustering in a sense creates sets of dissimilar elements; the 
+heterogenity within anticlusters is maximized (either using the cluster 
+editing or k-means objective as measure of heterogenity). The 
+`anticlust` package also provides functions for "classical" clustering
+applications: `balanced_clustering()` creates sets of elements that are 
+similar while ensuring that clusters are of equal size. This is an 
+example:
+
+```{r}
+# Generate random data, cluster the data set and visualize results
+N <- 1000
+lds <- data.frame(var1 = rnorm(N), var2 = rnorm(N))
+cl <- balanced_clustering(lds, K = 10)
+plot_clusters(lds, clusters = cl)
+```
+
+The function `matching()` is very similar, but is usually used to find 
+small groups of similar elements, e.g., triplets as in this example: 
+
+```{r}
+# Generate random data and find triplets of similar elements:
+N <- 120
+lds <- data.frame(var1 = rnorm(N), var2 = rnorm(N))
+triplets <- matching(lds, p = 3)
+plot_clusters(
+  lds,
+  clusters = triplets,
+  within_connection = TRUE
+)
 ```
 
 ## Questions and suggestions
