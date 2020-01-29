@@ -54,22 +54,17 @@ install_github("m-Py/anticlust")
 This README contains some basic information the package `anticlust`. More 
 information is available via the following sources:
 
-1. There is a preprint available (»Using anticlustering to partition a 
-   stimulus pool into equivalent parts«) describing the theoretical 
-   background of anticlustering and the `anticlust` package in detail. 
-   It can be retrieved from [https://psyarxiv.com/3razc/](https://psyarxiv.com/3razc/)
-2. A vignette detailing how to use the anticlust package for stimulus 
-selection in experiments can be found 
-[here](https://m-py.github.io/anticlust/stimulus-selection.html). 
-3. Use the R help. The main function of the package is `anticlustering()`
-  and the help page of the function (`?anticlustering`) is useful to learn
-  more about anticlustering. It provides explanations of all function
-  parameters and how they relate to the theoretical background of
-  anticlustering. 
-4. Other useful functions of the `anticlust` package are 
-`balanced_clustering()` and `matching()`. For more information on these 
-functions, consult their respective help pages and see the examples 
-below.
+- A preprint is available (»Using anticlustering to partition a 
+stimulus pool into equivalent parts«) describing the theoretical 
+background of anticlustering and the `anticlust` package in detail. 
+It can be retrieved from [https://psyarxiv.com/3razc/](https://psyarxiv.com/3razc/).
+
+- The [package website](https://m-py.github.io/anticlust/) contains all 
+relevant documentation. This includes a
+[vignette](https://m-py.github.io/anticlust/articles/stimulus-selection.html)
+detailing how to use the anticlust package for stimulus 
+selection in experiments and documentation for the main `anticlust` 
+functions `anticlustering()`, `balanced_clustering()` and `matching()`.
 
 ## A quick start
 
@@ -281,7 +276,8 @@ plot_clusters(
 If you have any question on the `anticlust` package or any suggestions
 (which are greatly appreciated), I encourage you to contact me via email
 (martin.papenberg@hhu.de) or [Twitter](https://twitter.com/MPapenberg),
-or to open an issue on this Github repository.
+or to open an 
+[issue on the Github repository](https://github.com/m-Py/anticlust/issues).
 
 ## Reference
 

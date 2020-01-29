@@ -13,9 +13,6 @@ was originally developed to assign items to experimental conditions in
 experimental psychology, but it can be applied whenever a user requires
 that a given set of elements has to be partitioned into similar subsets.
 
-Check out the [NEWS file](https://m-py.github.io/anticlust/NEWS.html)
-for recent changes in `anticlust`.
-
 Installation
 ------------
 
@@ -25,25 +22,20 @@ Installation
 How do I learn about `anticlust`
 --------------------------------
 
-This page contains some basic information the package `anticlust`. More
-information is available via the following sources:
+This README contains some basic information the package `anticlust`.
+More information is available via the following sources:
 
-1.  There is a preprint available (»Using anticlustering to partition a
+-   A preprint is available (»Using anticlustering to partition a
     stimulus pool into equivalent parts«) describing the theoretical
     background of anticlustering and the `anticlust` package in detail.
-    It can be retrieved from <https://psyarxiv.com/3razc/>
-2.  A vignette detailing how to use the anticlust package for stimulus
-    selection in experiments can be found
-    [here](https://m-py.github.io/anticlust/stimulus-selection.html).
-3.  Use the R help. The main function of the package is
-    `anticlustering()` and the help page of the function
-    (`?anticlustering`) is useful to learn more about anticlustering. It
-    provides explanations of all function parameters and how they relate
-    to the theoretical background of anticlustering.
-4.  Other useful functions of the `anticlust` package are
-    `balanced_clustering()` and `matching()`. For more information on
-    these functions, consult their respective help pages and see the
-    examples below.
+    It can be retrieved from <https://psyarxiv.com/3razc/>.
+
+-   The [package website](https://m-py.github.io/anticlust/) contains
+    all relevant documentation. This includes a
+    [vignette](https://m-py.github.io/anticlust/articles/stimulus-selection.html)
+    detailing how to use the anticlust package for stimulus selection in
+    experiments and documentation for the main `anticlust` functions
+    `anticlustering()`, `balanced_clustering()` and `matching()`.
 
 A quick start
 -------------
@@ -179,7 +171,7 @@ example:
     N <- 1000
     lds <- data.frame(var1 = rnorm(N), var2 = rnorm(N))
     cl <- balanced_clustering(lds, K = 10)
-    plot_clusters(lds, clusters = cl)
+    plot_clusters(lds, clusters = cl, show_axes = TRUE)
 
 <img src="man/figures/clustering-1.png" style="display: block; margin: auto;" />
 
@@ -193,7 +185,8 @@ small groups of similar elements, e.g., triplets as in this example:
     plot_clusters(
       lds,
       clusters = triplets,
-      within_connection = TRUE
+      within_connection = TRUE,
+      show_axes = TRUE
     )
 
 <img src="man/figures/matching-1.png" style="display: block; margin: auto;" />
@@ -204,8 +197,8 @@ Questions and suggestions
 If you have any question on the `anticlust` package or any suggestions
 (which are greatly appreciated), I encourage you to contact me via email
 (<a href="mailto:martin.papenberg@hhu.de" class="email">martin.papenberg@hhu.de</a>)
-or [Twitter](https://twitter.com/MPapenberg), or to open an issue on
-this Github repository.
+or [Twitter](https://twitter.com/MPapenberg), or to open an [issue on
+the Github repository](https://github.com/m-Py/anticlust/issues).
 
 Reference
 ---------
