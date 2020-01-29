@@ -6,3 +6,4 @@ inst/man
 .Ruserdata
 README.html
 inst/README.md
+docs/*
