@@ -22,9 +22,6 @@ experimental psychology, but it can be applied whenever a user requires
 that a given set of elements has to be partitioned into similar 
 subsets. 
 
-Check out the [NEWS file](https://m-py.github.io/anticlust/NEWS.html) 
-for recent changes in `anticlust`.
-
 ```{r setup, include = FALSE}
 library("anticlust")
 
@@ -54,7 +51,7 @@ install_github("m-Py/anticlust")
 
 ## How do I learn about `anticlust`
 
-This page contains some basic information the package `anticlust`. More 
+This README contains some basic information the package `anticlust`. More 
 information is available via the following sources:
 
 1. There is a preprint available (»Using anticlustering to partition a 
@@ -73,7 +70,7 @@ selection in experiments can be found
 `balanced_clustering()` and `matching()`. For more information on these 
 functions, consult their respective help pages and see the examples 
 below.
-  
+
 ## A quick start
 
 In this initial example, I use the main function `anticlustering()` to
