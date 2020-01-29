@@ -22,8 +22,8 @@ Installation
 How do I learn about `anticlust`
 --------------------------------
 
-This README contains some basic information the package `anticlust`.
-More information is available via the following sources:
+This README contains some basic information on the `R` package
+`anticlust`. More information is available via the following sources:
 
 -   A preprint is available (»Using anticlustering to partition a
     stimulus pool into equivalent parts«) describing the theoretical
