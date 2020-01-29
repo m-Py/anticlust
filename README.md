@@ -112,28 +112,26 @@ that have been developed in the context of cluster analysis:
 The k-means objective is given by the sum of the squared distances
 between cluster centers and individual data points. The cluster editing
 objective is the sum of pairwise distances within each anticluster. The
-following plot illustrates both objectives for 15 elements that have
+following plot illustrates both objectives for 12 elements that have
 been assigned to three sets. Each element is described by two numeric
 features, displayed as the *x* and *y* axis:
 
-<img src="./inst/README_files/objectives_updated.png" width="100%" style="display: block; margin: auto;" />
+<img src="man/figures/objectives-1.png" style="display: block; margin: auto;" />
 
-The lines connecting the dots illustrate the distances that enter the
-objective functions. For anticluster editing (“distance objective”),
-lines are drawn between pairs of elements within the same anticluster,
-because the objective is the sum of the pairwise distances between
-elements in the same cluster. For k-means anticlustering (“variance
-objective”), lines are drawn between each element and the cluster
-centroid, because the objective is the sum of the squared distances
-between cluster centers and elements.
+The lines connecting the dots illustrate the values that enter the
+objective functions. For (anti)cluster editing (“distance objective”,
+plots on the right side), lines are drawn between pairs of elements
+within the same cluster, because the objective is the sum of the
+pairwise distances between elements that are part of the same cluster.
+For k-means (anticlustering) (“variance objective”, plots on the left
+side ), lines are drawn connecting eech element and the centroid of the
+cluster to which the element is assigned, because the objective is the
+sum of the squared distances between cluster centers and elements.
 
 Minimizing either the distance or the variance objective creates three
-distinct clusters of elements (as shown in the upper plots), whereas
+distinct clusters of elements (as shown in the lower plots), whereas
 maximization leads to a strong overlap of the three sets, i.e., three
-anticlusters (as shown in the lower plots). For anticlustering, the
-distance objective maximizes the average similarity between elements in
-different sets, whereas the variance objective tends to maximize the
-similarity of the cluster centers (i.e., the feature means).
+anticlusters (as shown in the upper plots).
 
 To vary the objective function in the `anticlust` package, we can change
 the parameter `objective`. To use anticluster editing, use
@@ -183,7 +181,7 @@ example:
     cl <- balanced_clustering(lds, K = 10)
     plot_clusters(lds, clusters = cl)
 
-<img src="./inst/README_files/figure-markdown_strict/unnamed-chunk-5-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/clustering-1.png" style="display: block; margin: auto;" />
 
 The function `matching()` is very similar, but is usually used to find
 small groups of similar elements, e.g., triplets as in this example:
@@ -198,7 +196,7 @@ small groups of similar elements, e.g., triplets as in this example:
       within_connection = TRUE
     )
 
-<img src="./inst/README_files/figure-markdown_strict/unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/matching-1.png" style="display: block; margin: auto;" />
 
 Questions and suggestions
 -------------------------

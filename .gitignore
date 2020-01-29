@@ -1,6 +1,8 @@
 inst/doc
+inst/man
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
 README.html
+inst/README.md

@@ -5,3 +5,5 @@ build-package.R
 inst/README.*
 README.md
 inst/README_files
+inst/man
+inst/README.md
