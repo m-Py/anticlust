@@ -30,8 +30,6 @@ functionality is needed, install version 0.3.0 from Github:
 remotes::install_github("m-Py/anticlust", ref = "v0.3.0")
 ```
 
-## Minor changes
-
 * `mean_sd_obj()` no longer computes the discrepancy of 
 medians, only in means and standard deviations (as the name also 
 suggests).
