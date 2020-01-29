@@ -36,15 +36,8 @@ functionalities:
 - Maximize differences between stimulus sets with regard to some variables
 - Balance the occurrence of a categorical variable between stimulus sets
 
-First, to follow the code in this tutorial, install the package 
-`anticlust` and load it:
-
-```{r, eval = FALSE}
-if (!"remotes" %in% rownames(installed.packages())) {
-  install.packages("remotes")
-}
-remotes::install_github("m-Py/anticlust")
-```
+To follow the code in this tutorial, load the `anticlust` 
+package first:
 
 ```{r}
 library(anticlust)
@@ -175,7 +168,7 @@ If we are not sure how many items should be part of our experiment, the
 function `plot_similarity()` may help. It plots an index of similarity 
 (see `?plot_similarity`) for each match:
 
-```{r}
+```{r, similarity-plot}
 plot_similarity(
   covariates, 
   groups = selected$matches
@@ -304,8 +297,13 @@ data("schaper2019")
 
 If we do not want to include all 96 words in our experiment, we can 
 again use the `matching()` function to select a subset of similar 
-stimuli that we employ. We use the argument `match_within` to ensure 
-that all triplets consist of items belonging to the same room:
+stimuli that we employ. Again, we wish the select three groups that 
+are as similar as possible on all variables, but we only use a subset
+of all 96 items. To achieve this goal, we create triplets of similar
+stimuli using `matching()`; afterwards, the items belonging to the 
+same triplet will be assigned to different experimental sets. 
+We use the argument `match_within` to ensure that all triplets
+consist of items belonging to the same room:
 
 ```{r}
 # First, identify triplets of similar word, within room
@@ -324,8 +322,8 @@ subset(schaper2019, triplet == 2)
 best <- subset(schaper2019, triplet <= 10)
 ```
 
-After the matching, we use anticlustering to assign the matched words to 
-sets. 
+Now, we use `anticlustering()` to assign the matched words to different
+sets:
 
 
 ```{r}
