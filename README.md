@@ -1,4 +1,5 @@
-# anticlust <a href='https://m-py.github.io/anticlust/'><img src='man/figures/anticlustStickerV1-0.svg' align="right" height="160" /></a>
+anticlust <a href='https://m-py.github.io/anticlust/'><img src='man/figures/anticlustStickerV1-0.svg' align="right" height="160" /></a>
+=======================================================================================================================================
 
 Anticlustering partitions a pool of elements into subsets (i.e.,
 anticlusters) in such a way that the subsets are as similar as possible.
