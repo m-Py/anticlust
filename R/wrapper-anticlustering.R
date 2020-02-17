@@ -132,9 +132,7 @@
 #' The grouping variables indicated by \code{categories} will be
 #' balanced out across anticlusters. Currently, this functionality is
 #' only available in combination with the exchange method, but not
-#' with the exact ILP approach. Note that it is currently \strong{not}
-#' possible to apply preclustering constraints and categorical
-#' constraints at the same time.
+#' with the exact ILP approach. 
 #' 
 #' \strong{Custom objective function}
 #' 
