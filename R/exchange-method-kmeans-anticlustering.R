@@ -113,7 +113,7 @@ fast_exchange_ <- function(data, clusters, categories, nearest_neighbors) {
   for (i in 1:N) {
     # cluster of current item
     cluster_i <- clusters[i]
-    exchange_partners <- get_exchange_partners_kmeans(clusters, i, nearest_neighbors, categories)
+    exchange_partners <- get_exchange_partners_kmeans(clusters, i, nearest_neighbors)
     ## Sometimes an exchange cannot take place
     if (length(exchange_partners) == 0) {
       next
@@ -161,9 +161,8 @@ fast_exchange_ <- function(data, clusters, categories, nearest_neighbors) {
 #' @return The new distances
 #' @noRd
 update_distances <- function(features, centers, distances, cluster_i, cluster_j) {
-  id_cl <- c(cluster_i, cluster_j)
-  for (k in id_cl) {
-    distances[,k] <- colSums((t(features) - centers[k,])^2)
+  for (k in c(cluster_i, cluster_j)) {
+    distances[, k] <- colSums((t(features) - centers[k,])^2)
   }
   distances
 }
@@ -171,12 +170,8 @@ update_distances <- function(features, centers, distances, cluster_i, cluster_j)
 # Function to determine exchange partners for one element. All elements that are
 # (a) not in the same cluster already
 # (b) have the same category
-get_exchange_partners_kmeans <- function(clusters, i, nearest_neighbors, categories) {
+get_exchange_partners_kmeans <- function(clusters, i, nearest_neighbors) {
   exchange_partners <- nearest_neighbors[i, -1]
-  if (!is.null(categories)) {
-    exchange_partners <- exchange_partners[categories[exchange_partners] == categories[i]]
-  }
-  ## Do not change with other elements that are in the same cluster
   exchange_partners[clusters[exchange_partners] != clusters[i]]
 }
 
