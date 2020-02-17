@@ -14,7 +14,7 @@ prevents sorting.
 
 - Some changes to documentation
 - There is now a package website at https://m-py.github.io/anticlust/
-- TODO: Additional error handling
+- Additional error handling
 
 ## Internal
 
