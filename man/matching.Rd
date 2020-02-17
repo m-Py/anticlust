@@ -10,7 +10,8 @@ matching(
   match_between = NULL,
   match_within = NULL,
   match_extreme_first = TRUE,
-  target_group = NULL
+  target_group = NULL,
+  sort_output = TRUE
 )
 }
 \arguments{
@@ -41,6 +42,9 @@ elements. Defaults to \code{TRUE}.}
 
 \item{target_group}{Currently, the options "none",
 smallest" and "diverse" are supported. See Details.}
+
+\item{sort_output}{Boolean. If \code{TRUE} (default), the output clusters 
+are sorted by similarity. See Details.}
 }
 \value{
 An integer vector encoding the matches. See Details for
@@ -86,8 +90,10 @@ elements with the grouping number »1« have the highest intra-group
 similarity, followed by 2 etc (groups having the same similarity
 index are still assigned a different grouping number,
 though). Similarity is measured as the sum of pairwise (Euclidean)
-distances within groups (see \code{\link{distance_objective}}).
-Some unmatched elements may be \code{NA}. This happens if it is not
+distances within groups (see \code{\link{distance_objective}}). To 
+prevent sorting by similarity (this is some extra computational burden),
+set \code{sort_output = FALSE}. Some unmatched elements may be \code{NA}. 
+This happens if it is not
 possible to evenly split the item pool evenly into groups of size
 \code{p} or if the categories described by the argument
 \code{match_between} are of different size.

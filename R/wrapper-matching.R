@@ -28,6 +28,9 @@
 #'     elements. Defaults to \code{TRUE}.
 #' @param target_group Currently, the options "none",
 #'     smallest" and "diverse" are supported. See Details.
+#' @param sort_output Boolean. If \code{TRUE} (default), the output clusters 
+#'     are sorted by similarity. See Details.
+#'     
 #'
 #' @return An integer vector encoding the matches. See Details for
 #'     more information.
@@ -68,8 +71,10 @@
 #' similarity, followed by 2 etc (groups having the same similarity
 #' index are still assigned a different grouping number,
 #' though). Similarity is measured as the sum of pairwise (Euclidean)
-#' distances within groups (see \code{\link{distance_objective}}).
-#' Some unmatched elements may be \code{NA}. This happens if it is not
+#' distances within groups (see \code{\link{distance_objective}}). To 
+#' prevent sorting by similarity (this is some extra computational burden),
+#' set \code{sort_output = FALSE}. Some unmatched elements may be \code{NA}. 
+#' This happens if it is not
 #' possible to evenly split the item pool evenly into groups of size
 #' \code{p} or if the categories described by the argument
 #' \code{match_between} are of different size.
@@ -154,7 +159,8 @@ matching <- function(
   match_between = NULL,
   match_within = NULL,
   match_extreme_first = TRUE,
-  target_group = NULL
+  target_group = NULL,
+  sort_output = TRUE
 ) {
   
   input_validation_matching(x, p, match_between, match_within, match_extreme_first, target_group)
@@ -169,7 +175,10 @@ matching <- function(
   }
   # Before returning: order the group numbers by objective - most similar 
   # matches have lower indices
-  sort_by_objective(cl, data)
+  if (sort_output) {
+    return(sort_by_objective(cl, data))
+  }
+  cl
 }
 
 # Determine from which group target elements are selected

@@ -6,6 +6,9 @@
 in a call to `anticlustering()`. In this case, exchange partners are clustered
 within the same category, using a call to `matching()` passing `categories` to 
 `match_within()`.
+- It is now possible to prevent sorting the output by similarity in `matching()` 
+using a new argument `sort_output`. Its default is `TRUE`, setting it to `FALSE` 
+prevents sorting.
 
 ## Minor 
 
