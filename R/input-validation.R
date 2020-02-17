@@ -45,9 +45,6 @@ input_validation_anticlustering <- function(x, K, objective, method,
       stop("K must be a divider of the number of elements when using the ILP method. ",
            "(Try out method = 'exchange'.)")
     }
-    if (preclustering == TRUE) {
-      stop("The data set cannot be clustered into equal-sized parts.")
-    }
   }
 
   validate_input(method, "method", len = 1,

@@ -2,11 +2,13 @@
 
 ## Major
 
-- Preclustering and categorical constraints can now be used at the same time
-in a call to `anticlustering()`. In this case, exchange partners are clustered
+- In `anticlustering()`, preclustering and categorical constraints can now be used 
+at the same time. In this case, exchange partners are clustered
 within the same category, using a call to `matching()` passing `categories` to 
 `match_within()`.
-- It is now possible to prevent sorting the output by similarity in `matching()` 
+- In `anticlustering()`, it is now possible to use `preclustering = TRUE` for
+unbalanced data size.
+- In `matching()`, it is now possible to prevent sorting the output by similarity
 using a new argument `sort_output`. Its default is `TRUE`, setting it to `FALSE` 
 prevents sorting.
 
