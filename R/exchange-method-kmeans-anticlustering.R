@@ -113,7 +113,7 @@ fast_exchange_ <- function(data, clusters, categories, nearest_neighbors) {
   for (i in 1:N) {
     # cluster of current item
     cluster_i <- clusters[i]
-    exchange_partners <- get_exchange_partners_kmeans(clusters, i, nearest_neighbors)
+    exchange_partners <- get_exchange_partners_kmeans(clusters, i, nearest_neighbors, categories)
     ## Sometimes an exchange cannot take place
     if (length(exchange_partners) == 0) {
       next
@@ -170,8 +170,11 @@ update_distances <- function(features, centers, distances, cluster_i, cluster_j)
 # Function to determine exchange partners for one element. All elements that are
 # (a) not in the same cluster already
 # (b) have the same category
-get_exchange_partners_kmeans <- function(clusters, i, nearest_neighbors) {
+get_exchange_partners_kmeans <- function(clusters, i, nearest_neighbors, categories) {
   exchange_partners <- nearest_neighbors[i, -1]
+  if (!is.null(categories)) {
+    exchange_partners <- exchange_partners[categories[exchange_partners] == categories[i]]
+  }
   exchange_partners[clusters[exchange_partners] != clusters[i]]
 }
 
@@ -201,56 +204,16 @@ update_centers <- function(centers, features, i, j, cluster_i, cluster_j, tab) {
   centers
 }
 
-#' Get neigbours for fast preclustering (by category)
+#' Get neigbours for fast preclustering 
 #'
 #' @details
 #'
 #' Computes the k nearest neighbours for each input element using
-#' RANN::nn2. Deals with NA: elements with NA are treated as
-#' neighbours among each other because RANN::nn2 does not deal with
-#' NA. Computes neighbors within each category because exchange
-#' partners are only sought among neighbors and members of the same
-#' category (it would not make sense to compute nearest neighbors
-#' across categories because this function is only used as preprocessing
-#' for the exchange algorithm)
-#'
-#' @importFrom stats complete.cases
+#' RANN::nn2.
 #'
 #' @noRd
 
 
-get_neighbours <- function(features, k_neighbours, categories) {
-
-  if (argument_exists(categories)) {
-    min_n <- min(table(categories))
-    k_neighbours <- min(k_neighbours + 1, min_n)
-  } else {
-    k_neighbours <- min(nrow(features), k_neighbours + 1)
-  }
-
-  ## Compute nearest neighbors; within categories if categories
-  ## are available!
-  if (!argument_exists(categories)) {
-    idx <- RANN::nn2(features, k = k_neighbours)$nn.idx
-  } else {
-    categories <- to_numeric(categories)
-    ncategories <- length(unique(categories))
-    nns <- by(features, categories, RANN::nn2, k = k_neighbours)
-    nns <- lapply(nns, function(x) x$nn.idx)
-    ## get original indices for each category
-    ## (converts indices per category in global indices)
-    ## i is a category; x is the NN data structure
-    get_index <- function(i, x) {
-      which(categories == i)[x[[i]]]
-    }
-    idx <- lapply(1:ncategories, get_index, x = nns)
-    ## change dimensions to original nearest neighbour structure
-    for (i in 1:length(idx)) {
-      dim(idx[[i]]) <- dim(nns[[i]])
-    }
-    idx <- do.call(rbind, idx)
-    idx <- sort_by_col(idx, 1)
-  }
-
-  sort_by_col(idx, 1)
+nearest_neighbours <- function(features, k_neighbours) {
+  RANN::nn2(features, k = min(k_neighbours, nrow(features)))$nn.idx
 }
