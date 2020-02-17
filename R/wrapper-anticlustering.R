@@ -265,19 +265,31 @@ to_matrix <- function(data) {
 }
 
 # Determines if preclustering constraints or categorical constraints
-# are present. Returns either of them or NULL. The input validation
-# ensures that at most one of the constraints is present when this
-# function is called.
+# are present. Returns a grouping vector if one or both constraints 
+# have been passed, or NULL if none is required
 get_categorical_constraints <- function(data, K, preclustering, categories) {
   if (preclustering == TRUE) {
     if (length(K) > 1) {
       K <- length(unique(K))
     }
     N <- nrow(data)
-    return(matching(data, p = K, match_within = categories))
+    matches <- matching(data, p = K, match_within = categories, sort_output = FALSE)
+    # deal with NA in matches
+    return(replace_na_by_index(matches))
   }
   if (argument_exists(categories)) {
     return(merge_into_one_variable(categories))
   }
   NULL
+}
+
+replace_na_by_index <- function(matches) {
+  na_matches <- is.na(matches)
+  NAs <- sum(na_matches) 
+  if (NAs == 0) {
+    return(matches)
+  }
+  max_group <- max(matches, na.rm = TRUE)
+  matches[na_matches] <- max_group + 1:NAs 
+  matches
 }

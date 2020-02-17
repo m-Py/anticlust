@@ -85,7 +85,7 @@ fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL) {
                    must_be_integer = TRUE, greater_than = 0, not_na = TRUE)
   }
   x <- as.matrix(x)
-  neighbours <- get_neighbours(x, k_neighbours, categories)
+  neighbours <- nearest_neighbours(x, k_neighbours)
   init <- initialize_clusters(nrow(x), K, categories)
   fast_exchange_(x, init, categories, neighbours)
 }
