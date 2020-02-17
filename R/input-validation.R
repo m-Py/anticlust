@@ -10,10 +10,12 @@ input_validation_anticlustering <- function(x, K, objective, method,
 
   ## Merge categories variable so that `length` can be applied:
   categories <- merge_into_one_variable(categories)
-
+  
+  
   ## Validate feature input
   validate_data_matrix(x)
-  N <- nrow(as.matrix(x))
+  x <- as.matrix(x)
+  N <- nrow(x)
 
   validate_input(preclustering, "preclustering", len = 1,
                  input_set = c(TRUE, FALSE), not_na = TRUE)
