@@ -1,5 +1,12 @@
 # anticlust 0.4.1
 
+## Major
+
+- Preclustering and categorical constraints can now be used at the same time
+in a call to `anticlustering()`. In this case, exchange partners are clustered
+within the same category, using a call to `matching()` passing `categories` to 
+`match_within()`.
+
 ## Minor 
 
 - Some changes to documentation

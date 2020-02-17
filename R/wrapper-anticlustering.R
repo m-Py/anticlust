@@ -274,7 +274,7 @@ get_categorical_constraints <- function(data, K, preclustering, categories) {
       K <- length(unique(K))
     }
     N <- nrow(data)
-    return(nn_centroid_clustering(data, K))
+    return(matching(data, p = K, match_within = categories))
   }
   if (argument_exists(categories)) {
     return(merge_into_one_variable(categories))
