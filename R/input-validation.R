@@ -67,9 +67,9 @@ input_validation_anticlustering <- function(x, K, objective, method,
     if (objective == "variance" && method == "ilp") {
       stop("You cannot use integer linear programming method to maximize the variance criterion. ",
            "Use objective = 'distance', or method = 'exchange' instead")
-      if (objective == "variance" && is_distance_matrix(x)) {
+    }
+    if (objective == "variance" && is_distance_matrix(x)) {
         stop("You cannot use a distance matrix with the objective 'variance'.")
-      }
     }
   }
 
