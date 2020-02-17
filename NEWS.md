@@ -1,3 +1,17 @@
+# anticlust 0.4.1
+
+## Minor 
+
+- Some changes to documentation
+- There is now a package website at https://m-py.github.io/anticlust/
+- TODO: Additional error handling
+
+## Internal
+
+- Improved efficiency of k-means anticlustering: on each exchange 
+iteration, only recomutes distances from clusters whose elements
+have been swapped (mostly relevant for larger K)
+
 # anticlust 0.4.0
 
 ## Major changes
