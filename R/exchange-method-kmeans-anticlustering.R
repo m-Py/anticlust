@@ -106,6 +106,8 @@ fast_exchange_ <- function(data, clusters, categories, nearest_neighbors) {
   N <- nrow(data)
   best_total <- variance_objective_(clusters, data)
   centers <- cluster_centers(data, clusters)
+  distances <- dist_from_centers(data, centers, squared = TRUE)
+  
   ## frequencies of each cluster are required for updating cluster centers:
   tab <- c(table(clusters))
   for (i in 1:N) {
@@ -128,13 +130,10 @@ fast_exchange_ <- function(data, clusters, categories, nearest_neighbors) {
       tmp_clusters[tmp_swap] <- cluster_i
       # (b) Update centers
       tmp_centers <- update_centers(centers, data, i, tmp_swap, cluster_i, cluster_j, tab)
-      # (c) Compute distance from updated centers
-      distances <- dist_from_centers(data, tmp_centers, squared = TRUE)
-      # (d) Use two-column matrix to select distances that enter the
-      #     objective function
-      distances <- distances[cbind(1:nrow(distances), tmp_clusters)]
+      # (c) Update distances from centers
+      tmp_distances <- update_distances(data, tmp_centers, distances, cluster_i, cluster_j)
       # (e) Compute objective after exchange
-      comparison_objectives[j] <- sum(distances)
+      comparison_objectives[j] <- sum(tmp_distances[cbind(1:nrow(tmp_distances), tmp_clusters)])
     }
     ## Do the swap if an improvement occured
     best_this_round <- max(comparison_objectives)
@@ -146,6 +145,8 @@ fast_exchange_ <- function(data, clusters, categories, nearest_neighbors) {
       # swap the elements - update clusters
       clusters[i] <- clusters[swap]
       clusters[swap] <- cluster_i
+      # Update distances
+      distances <- update_distances(data, centers, distances, cluster_i, cluster_j)
       # update best solution
       best_total <- best_this_round
     }
@@ -153,6 +154,23 @@ fast_exchange_ <- function(data, clusters, categories, nearest_neighbors) {
   clusters
 }
 
+#' Recompute distances from cluster centers after swapping two elements
+#' @param distances distances from cluster centers per element (old)
+#' @param cluster_i the cluster of element i
+#' @param cluster_j the cluster of element j
+#' @return The new distances
+#' @noRd
+update_distances <- function(features, centers, distances, cluster_i, cluster_j) {
+  id_cl <- c(cluster_i, cluster_j)
+  for (k in id_cl) {
+    distances[,k] <- colSums((t(features) - centers[k,])^2)
+  }
+  distances
+}
+
+# Function to determine exchange partners for one element. All elements that are
+# (a) not in the same cluster already
+# (b) have the same category
 get_exchange_partners_kmeans <- function(clusters, i, nearest_neighbors, categories) {
   exchange_partners <- nearest_neighbors[i, -1]
   if (!is.null(categories)) {
