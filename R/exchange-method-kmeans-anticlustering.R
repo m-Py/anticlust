@@ -140,14 +140,14 @@ fast_exchange_ <- function(data, clusters, categories, nearest_neighbors) {
     if (best_this_round > best_total) {
       # which element has to be swapped
       swap <- exchange_partners[comparison_objectives == best_this_round][1]
-      ## Update centers
+      # Update cluster centers
       centers <- update_centers(centers, data, i, swap, clusters[i], clusters[swap], tab)
-      # swap the elements - update clusters
+      # Update distances
+      distances <- update_distances(data, centers, distances, cluster_i, clusters[swap])
+      # Actually swap the elements - i.e., update clusters
       clusters[i] <- clusters[swap]
       clusters[swap] <- cluster_i
-      # Update distances
-      distances <- update_distances(data, centers, distances, cluster_i, cluster_j)
-      # update best solution
+      # Update best solution
       best_total <- best_this_round
     }
   }
