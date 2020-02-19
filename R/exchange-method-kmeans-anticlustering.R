@@ -85,7 +85,7 @@ fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL) {
                    must_be_integer = TRUE, greater_than = 0, not_na = TRUE)
   }
   x <- as.matrix(x)
-  neighbours <- nearest_neighbours(x, k_neighbours)
+  neighbours <- nearest_neighbours(x, k_neighbours, categories)
   init <- initialize_clusters(nrow(x), K, categories)
   fast_exchange_(x, init, categories, neighbours)
 }
@@ -113,7 +113,7 @@ fast_exchange_ <- function(data, clusters, categories, nearest_neighbors) {
   for (i in 1:N) {
     # cluster of current item
     cluster_i <- clusters[i]
-    exchange_partners <- get_exchange_partners_kmeans(clusters, i, nearest_neighbors, categories)
+    exchange_partners <- get_exchange_partners_kmeans(clusters, i, nearest_neighbors)
     ## Sometimes an exchange cannot take place
     if (length(exchange_partners) == 0) {
       next
@@ -170,7 +170,7 @@ update_distances <- function(features, centers, distances, cluster_i, cluster_j)
 # Function to determine exchange partners for one element. All elements that are
 # (a) not in the same cluster already
 # (b) have the same category
-get_exchange_partners_kmeans <- function(clusters, i, nearest_neighbors, categories) {
+get_exchange_partners_kmeans <- function(clusters, i, nearest_neighbors) {
   exchange_partners <- nearest_neighbors[[i]]
   exchange_partners[clusters[exchange_partners] != clusters[i]]
 }
