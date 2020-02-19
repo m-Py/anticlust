@@ -79,7 +79,7 @@
 fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL) {
   input_validation_anticlustering(x, K, "variance",
                                 "exchange", FALSE, categories)
-
+  categories <- merge_into_one_variable(categories)
   if (!isTRUE(k_neighbours == Inf)) {
     validate_input(k_neighbours, "k_neighbours", objmode = "numeric", len = 1,
                    must_be_integer = TRUE, greater_than = 0, not_na = TRUE)
@@ -113,8 +113,10 @@ fast_exchange_ <- function(data, clusters, categories, nearest_neighbors) {
   for (i in 1:N) {
     # cluster of current item
     cluster_i <- clusters[i]
-    exchange_partners <- get_exchange_partners_kmeans(clusters, i, nearest_neighbors)
-    ## Sometimes an exchange cannot take place
+    # get exchange partners for item i
+    exchange_partners <- nearest_neighbors[[i]]
+    exchange_partners[clusters[exchange_partners] != clusters[i]]
+    # Sometimes an exchange cannot take place
     if (length(exchange_partners) == 0) {
       next
     }
@@ -167,14 +169,6 @@ update_distances <- function(features, centers, distances, cluster_i, cluster_j)
   distances
 }
 
-# Function to determine exchange partners for one element. All elements that are
-# (a) not in the same cluster already
-# (b) have the same category
-get_exchange_partners_kmeans <- function(clusters, i, nearest_neighbors) {
-  exchange_partners <- nearest_neighbors[[i]]
-  exchange_partners[clusters[exchange_partners] != clusters[i]]
-}
-
 #' Update a cluster center after swapping two elements
 #'
 #' @param centers The current cluster centers
@@ -206,14 +200,20 @@ update_centers <- function(centers, features, i, j, cluster_i, cluster_j, tab) {
 #' @details
 #'
 #' Computes the k nearest neighbours for each input element using
-#' RANN::nn2.
+#' RANN::nn2. If no nearest neighbours are required, argument 
+#' `k_neighbours` will be `Inf`. May compute nearest neighbors within
+#' categories. 
+#' 
+#' @return A list of length `N`. Each element is a vector
+#'    of nearest neighbors (i.e., exchange partners).
 #'
 #' @noRd
 
 
 nearest_neighbours <- function(features, k_neighbours, categories) {
+  # Case 1: no nearest neighbor search needed (k_neighbours == Inf)
   N <- nrow(features)
-  if (is.infinite(k_neighbours)) { # no nearest neighbor search needed
+  if (is.infinite(k_neighbours)) { 
     if (argument_exists(categories)) {
       category_ids <- lapply(1:max(categories), function(i) which(categories == i))
       nns <- category_ids[categories]
@@ -221,8 +221,31 @@ nearest_neighbours <- function(features, k_neighbours, categories) {
     }
     return(rep(list(1:N), N)) # everyone is exchange partner
   }
-  # generate a list that contains exchange partners
   
-  
-  RANN::nn2(features, k = min(k_neighbours, nrow(features)))$nn.idx
+  # Case 2: NN search needed
+  if (!argument_exists(categories)) {
+    idx <- matrix_to_list(RANN::nn2(features, k = min(k_neighbours + 1, nrow(features)))$nn.idx)
+  } else {
+    categories <- to_numeric(categories)
+    ncategories <- length(unique(categories))
+    # compute nearest neighbors within each category
+    nns <- list()
+    for (i in 1:max(categories)) {
+      tmp_features <- features[categories == i, , drop = FALSE]
+      tmp_nn <- RANN::nn2(tmp_features, k = min(k_neighbours + 1, nrow(tmp_features)))$nn.idx
+      # get original index per category
+      nns[[i]] <- which(categories == i)[tmp_nn]
+      # restore matrix structure, gets lost 
+      dim(nns[[i]]) <- dim(tmp_nn)
+    }
+    # per category, convert matrix to list, in the end, return 1 list
+    idx_list <- lapply(nns, matrix_to_list)
+    idx <- do.call(c, idx_list)
+  }
+  idx
+}
+
+# Convert a matrix to list - each row becomes list element
+matrix_to_list <- function(x) {
+  as.list(as.data.frame(t(x)))
 }

@@ -22,7 +22,12 @@ prevents sorting.
 
 - Improved efficiency of k-means anticlustering: on each exchange 
 iteration, only recomutes distances from clusters whose elements
-have been swapped (mostly relevant for larger K)
+have been swapped (mostly relevant for larger K).
+- In `fast_anticlustering()`, if `categories` were passed, there were only
+as many exchange partners per element as members in the least frequent category.
+Thus, for larger categories, not all elements were used as exchange partners,
+which was not actually desired. Now all member from a category may serve
+as exchange partners.
 
 # anticlust 0.4.0
 
