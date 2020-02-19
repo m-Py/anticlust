@@ -171,10 +171,7 @@ update_distances <- function(features, centers, distances, cluster_i, cluster_j)
 # (a) not in the same cluster already
 # (b) have the same category
 get_exchange_partners_kmeans <- function(clusters, i, nearest_neighbors, categories) {
-  exchange_partners <- nearest_neighbors[i, -1]
-  if (!is.null(categories)) {
-    exchange_partners <- exchange_partners[categories[exchange_partners] == categories[i]]
-  }
+  exchange_partners <- nearest_neighbors[[i]]
   exchange_partners[clusters[exchange_partners] != clusters[i]]
 }
 
@@ -214,6 +211,18 @@ update_centers <- function(centers, features, i, j, cluster_i, cluster_j, tab) {
 #' @noRd
 
 
-nearest_neighbours <- function(features, k_neighbours) {
+nearest_neighbours <- function(features, k_neighbours, categories) {
+  N <- nrow(features)
+  if (is.infinite(k_neighbours)) { # no nearest neighbor search needed
+    if (argument_exists(categories)) {
+      category_ids <- lapply(1:max(categories), function(i) which(categories == i))
+      nns <- category_ids[categories]
+      return(nns)
+    }
+    return(rep(list(1:N), N)) # everyone is exchange partner
+  }
+  # generate a list that contains exchange partners
+  
+  
   RANN::nn2(features, k = min(k_neighbours, nrow(features)))$nn.idx
 }
