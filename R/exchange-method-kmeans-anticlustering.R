@@ -114,8 +114,8 @@ fast_exchange_ <- function(data, clusters, categories, nearest_neighbors) {
     # cluster of current item
     cluster_i <- clusters[i]
     # get exchange partners for item i
-    exchange_partners <- nearest_neighbors[[i]]
-    exchange_partners[clusters[exchange_partners] != clusters[i]]
+    exchange_partners <- all_exchange_partners[[i]]
+    exchange_partners <- exchange_partners[clusters[exchange_partners] != clusters[i]]
     # Sometimes an exchange cannot take place
     if (length(exchange_partners) == 0) {
       next
