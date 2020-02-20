@@ -7,7 +7,7 @@ at the same time. In this case, exchange partners are clustered
 within the same category, using a call to `matching()` passing `categories` to 
 `match_within()`.
 - In `anticlustering()`, it is now possible to use `preclustering = TRUE` for
-unbalanced data size.
+unbalanced data size (e.g., if N = 9 and K = 2).
 - In `matching()`, it is now possible to prevent sorting the output by similarity
 using a new argument `sort_output`. Its default is `TRUE`, setting it to `FALSE` 
 prevents sorting.
@@ -23,11 +23,10 @@ prevents sorting.
 - Improved efficiency of k-means anticlustering: on each exchange 
 iteration, only recomutes distances from clusters whose elements
 have been swapped (mostly relevant for larger K).
-- In `fast_anticlustering()`, if `categories` were passed, there were only
-as many exchange partners per element as members in the least frequent category.
-Thus, for larger categories, not all elements were used as exchange partners,
-which was not actually desired. Now all member from a category may serve
-as exchange partners.
+- In k-means anticlustering (i.e., in `anticlustering()` with `objective == "variance"` 
+or in `fast_anticlustering()`), there were only as many exchange partners per 
+element as members in the least frequent category. This was not documented behavior and
+generall undesirable. Now all member from a category may serve as exchange partners.
 
 # anticlust 0.4.0
 
