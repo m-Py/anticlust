@@ -21,15 +21,14 @@ computation that is necessary to determine similarity for each cluster.
 
 ## Internal
 
-- Improved efficiency of k-means anticlustering: on each exchange 
-iteration, only recomutes distances from clusters whose elements have 
-been swapped (mostly relevant for larger K).
-- In k-means anticlustering (i.e., in `anticlustering()` with `objective 
-== "variance"` or in `fast_anticlustering()`), there were only as many 
-exchange partners per element as members in the least frequent category. 
-This was not documented behavior and generally undesirable. Now, all 
-members from a category may serve as exchange partners (even if the 
-categories have different size).
+- Improvements to implementation of k-means anticlustering (i.e., in `anticlustering()` 
+  with `objective == "variance"` or in `fast_anticlustering()`)
+  + on each exchange iteration, only recomutes distances from clusters whose elements have 
+  been swapped (improves run time relevant for larger K).
+  + Previously, there were only as many exchange partners per element as members 
+  in the least frequent category if argument `categories` was passed). This was
+  not documented behavior and is undesirable. Now, all members from a category
+  may serve as exchange partners, even if the categories have different size.
 
 # anticlust 0.4.0
 
