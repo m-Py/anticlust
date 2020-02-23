@@ -250,6 +250,8 @@ nearest_neighbours <- function(features, k_neighbours, categories) {
     idx_list <- lapply(nns, matrix_to_list)
     # in the end, merge all lists into 1 list
     idx <- merge_lists(idx_list)
+    # restore original order
+    idx <- sort_by_col(idx, 1)
   }
   idx
 }
