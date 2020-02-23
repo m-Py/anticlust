@@ -87,14 +87,13 @@ fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL) {
   x <- as.matrix(x)
   exchange_partners <- all_exchange_partners(x, k_neighbours, categories)
   init <- initialize_clusters(nrow(x), K, categories)
-  fast_exchange_(x, init, categories, exchange_partners)
+  fast_exchange_(x, init, exchange_partners)
 }
 
 #' Solve anticlustering using the fast exchange method
 #'
 #' @param data the data -- an N x M table of item features
 #' @param clusters An initial cluster assignment
-#' @param categories A vector representing categorical constraints
 #' @param all_exchange_partners A list of exchange partners
 #'
 #' @return The anticluster assignment
@@ -102,7 +101,7 @@ fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL) {
 #' @noRd
 #'
 
-fast_exchange_ <- function(data, clusters, categories, all_exchange_partners) {
+fast_exchange_ <- function(data, clusters, all_exchange_partners) {
   N <- nrow(data)
   best_total <- variance_objective_(clusters, data)
   centers <- cluster_centers(data, clusters)
