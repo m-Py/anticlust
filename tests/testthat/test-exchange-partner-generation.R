@@ -69,6 +69,8 @@ test_that("Exchange partners are generatede correctly for fast k-means method", 
     categories = categories
   )
   test_idx(partners, categories)
+  ## ensure correct order of the output 
+  expect_true(all(sapply(partners, function(x) x[1]) == 1:96))
   
   # Case 2: no restriction on number of exchange partners
   partners <- all_exchange_partners(
@@ -88,6 +90,8 @@ test_that("Exchange partners are generatede correctly for fast k-means method", 
     categories = NULL
   )
   expect_true(all(sapply(partners, length) == k_neighbours + 1))
+  ## ensure correct order of the output 
+  expect_true(all(sapply(partners, function(x) x[1]) == 1:96))
   
   # Case 2: no restriction on number of exchange partners
   partners <- all_exchange_partners(
