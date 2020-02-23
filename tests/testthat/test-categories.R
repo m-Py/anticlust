@@ -73,3 +73,76 @@ test_that("argument categories can be used to enforce preclustering constraints 
     expect_equal(all(tab == 1), TRUE)
   }
 })
+
+test_that("balanced categorical output for all anticlustering combinations", {
+  features <- schaper2019[, 3:6]
+  K <- 3
+  categories <- schaper2019$room
+  # Anticluster editing
+  ac <- anticlustering(
+    features,
+    K = K,
+    categories = categories
+  )
+  expect_true(all(table(ac, categories) == 16))
+  
+  # Anticluster editing, preclustering
+  ac <- anticlustering(
+    features,
+    K = K,
+    categories = categories,
+    preclustering = TRUE
+  )
+  expect_true(all(table(ac, categories) == 16))
+  
+  # Anticluster editing, distance input
+  ac <- anticlustering(
+    dist(features),
+    K = K,
+    categories = categories
+  )
+  expect_true(all(table(ac, categories) == 16))
+  
+  # Anticluster editing, distance input, preclustering
+  ac <- anticlustering(
+    dist(features),
+    K = K,
+    categories = categories,
+    preclustering = TRUE
+  )
+  expect_true(all(table(ac, categories) == 16))
+  
+  # K-means anticlustering 
+  ac <- anticlustering(
+    features,
+    K = K,
+    categories = categories
+  )
+  expect_true(all(table(ac, categories) == 16))
+  
+  # K-means anticlustering, preclustering
+  ac <- anticlustering(
+    features,
+    K = K,
+    categories = categories,
+    preclustering = TRUE
+  )
+  expect_true(all(table(ac, categories) == 16))
+  
+  # Fast k-means anticlustering 
+  ac <- fast_anticlustering(
+    features,
+    K = K,
+    categories = categories
+  )
+  expect_true(all(table(ac, categories) == 16))
+  
+  # Fast k-means anticlustering, reduced number of exchange partners
+  ac <- fast_anticlustering(
+    features,
+    K = K,
+    categories = categories,
+    k_neighbours = 10
+  )
+  expect_true(all(table(ac, categories) == 16))
+})
