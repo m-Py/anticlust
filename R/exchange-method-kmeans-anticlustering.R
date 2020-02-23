@@ -234,7 +234,7 @@ all_exchange_partners_ <- function(N, categories) {
 # Generate exchange partners via nearest neighbor search using RANN::nn2
 nearest_neighbours <- function(features, k_neighbours, categories) {
   if (!argument_exists(categories)) {
-    idx <- matrix_to_list(RANN::nn2(features, k = min(k_neighbours + 1, nrow(features)))$nn.idx)
+    idx <- RANN::nn2(features, k = min(k_neighbours + 1, nrow(features)))$nn.idx
   } else {
     # compute nearest neighbors within each category
     nns <- list()
@@ -246,22 +246,16 @@ nearest_neighbours <- function(features, k_neighbours, categories) {
       # restore matrix structure, gets lost 
       dim(nns[[i]]) <- dim(tmp_nn)
     }
-    # per category, convert matrix to list
-    idx_list <- lapply(nns, matrix_to_list)
-    # in the end, merge all lists into 1 list
-    idx <- merge_lists(idx_list)
+    # rbind all matrices across list elements
+    idx <- do.call(rbind, nns)
     # restore original order
     idx <- sort_by_col(idx, 1)
   }
-  idx
+  # return as list
+  matrix_to_list(idx)
 }
 
 # Convert a matrix to list - each row becomes list element
 matrix_to_list <- function(x) {
   as.list(as.data.frame(t(x)))
-}
-
-# Merge a list of lists into one list
-merge_lists <- function(list_of_lists) {
-  do.call(c, list_of_lists)
 }
