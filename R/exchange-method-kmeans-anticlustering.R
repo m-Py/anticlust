@@ -234,28 +234,43 @@ all_exchange_partners_ <- function(N, categories) {
 # Generate exchange partners via nearest neighbor search using RANN::nn2
 nearest_neighbours <- function(features, k_neighbours, categories) {
   if (!argument_exists(categories)) {
-    idx <- RANN::nn2(features, k = min(k_neighbours + 1, nrow(features)))$nn.idx
+    idx <- matrix_to_list(RANN::nn2(features, k = min(k_neighbours + 1, nrow(features)))$nn.idx)
   } else {
     # compute nearest neighbors within each category
     nns <- list()
+    # track the indices when dividing by category. problem is:
+    # in nearest neighbour search, there is no guarantee that 
+    # the nearest neighbour is the element itself; if it were, 
+    # restoring original order would be easy
+    new_order <- list()
     for (i in 1:max(categories)) {
-      tmp_features <- features[categories == i, , drop = FALSE]
+      tmp_indices <- which(categories == i)
+      new_order[[i]] <- tmp_indices
+      tmp_features <- features[tmp_indices, , drop = FALSE]
       tmp_nn <- RANN::nn2(tmp_features, k = min(k_neighbours + 1, nrow(tmp_features)))$nn.idx
       # get original index per category
       nns[[i]] <- which(categories == i)[tmp_nn]
       # restore matrix structure, gets lost 
       dim(nns[[i]]) <- dim(tmp_nn)
     }
-    # rbind all matrices across list elements
-    idx <- do.call(rbind, nns)
-    # restore original order
-    idx <- sort_by_col(idx, 1)
+    # per category, convert matrix to list
+    idx_list <- lapply(nns, matrix_to_list)
+    # in the end, merge all lists into 1 list
+    idx <- merge_lists(idx_list)
+    # restore original order after dividing by category
+    original_order <- order(unlist(new_order))
+    idx <- idx[original_order]
   }
   # return as list
-  matrix_to_list(idx)
+  idx
 }
 
 # Convert a matrix to list - each row becomes list element
 matrix_to_list <- function(x) {
   as.list(as.data.frame(t(x)))
+}
+
+# Merge a list of lists into one list
+merge_lists <- function(list_of_lists) {
+  do.call(c, list_of_lists)
 }
