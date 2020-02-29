@@ -55,8 +55,7 @@ This README contains some basic information on the `R` package
 `anticlust`. More information is available via the following 
 sources:
 
-- A preprint is available (»Using anticlustering to partition a 
-stimulus pool into equivalent parts«) describing the theoretical 
+- A preprint is available describing the theoretical 
 background of anticlustering and the `anticlust` package in detail. 
 It can be retrieved from [https://psyarxiv.com/3razc/](https://psyarxiv.com/3razc/).
 
