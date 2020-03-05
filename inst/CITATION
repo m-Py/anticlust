@@ -2,12 +2,12 @@ bibentry("Manual",
     title="anticlust: Subset Partitioning via Anticlustering",
     author="Martin Papenberg",
     year="2019",
-    note="(Version 0.4.0)",
+    note="(Version 0.4.1)",
     url="https://github.com/m-Py/anticlust",
 
     textVersion =
     paste("Papenberg, M. (2019). ",
-        "anticlust: Subset Partitioning via Anticlustering (Version 0.4.0). ",
+        "anticlust: Subset Partitioning via Anticlustering (Version 0.4.1). ",
         "Available from https://github.com/m-Py/anticlust",
         sep=""),
 
