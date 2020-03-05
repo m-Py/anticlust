@@ -59,13 +59,13 @@
 #' each element and its cluster center (see
 #' \code{\link{variance_objective}}). The cluster editing objective
 #' measures the sum of pairwise distances within anticlusters (see
-#' \code{\link{distance_objective}}). Maximizing either of these
-#' objectives will lead to similar groups (and this is what is
-#' actually done when using this function). Minimization of the same
-#' objectives would lead to a clustering, i.e., sets where elements
-#' are similar within a set and different between sets.  (Clustering
-#' is also possible using the function
-#' \code{\link{balanced_clustering}}.)
+#' \code{\link{distance_objective}}). Anticluster editing is also known 
+#' as the »maximum diverse grouping problem«. Maximizing either of these
+#' anticlustering objectives will partition the data set into similar groups. 
+#' Minimization of the same objectives would lead to a clustering, i.e., groups 
+#' with high within-group similarity but between-group dissimilarity 
+#' Balanced clustering is possible using the function
+#' \code{\link{balanced_clustering}}.
 #'
 #' If the argument \code{x} is a feature matrix and the option
 #' \code{objective = "distance"} is used, the Euclidean distance is
@@ -209,9 +209,8 @@
 #' Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
 #' for a clustering problem. Mathematical Programming, 45, 59-96.
 #'
-#' Papenberg, M., & Klau, G. W. (2019, October 30). Using anticlustering
-#' to partition a stimulus pool into equivalent parts.
-#' https://doi.org/10.31234/osf.io/3razc
+#' Papenberg, M., & Klau, G. W. (2019, October 30). Using anticlustering to partition 
+#' data sets into equivalent parts https://doi.org/10.31234/osf.io/3razc
 #'
 #' Späth, H. (1986). Anticlustering: Maximizing the variance criterion.
 #' Control and Cybernetics, 15, 213-218.

@@ -46,9 +46,8 @@ distance_objective(distances, anticlusters)
 
 }
 \references{
-Papenberg, M., & Klau, G. W. (2019, October 30). Using anticlustering
-to partition a stimulus pool into equivalent parts.
-https://doi.org/10.31234/osf.io/3razc
+Papenberg, M., & Klau, G. W. (2019, October 30). Using anticlustering to partition 
+data sets into equivalent parts https://doi.org/10.31234/osf.io/3razc
 }
 \author{
 Martin Papenberg \email{martin.papenberg@hhu.de}
