@@ -14,10 +14,15 @@ Authors@R:
              comment = "centroid based clustering algorithm"),
       person(given = c("Gunnar", "W."),
              family = "Klau",
-             role = "ths"))
+             role = "ths"),
+      person(given = c("Juliane", "V."),
+             family = "Tkotz",
+             role = "ctb",
+             comment = "package logo"))
 Author: Martin Papenberg [aut, cre]
     (<https://orcid.org/0000-0002-9900-4268>), Meik Michalke [ctb]
-    (centroid based clustering algorithm), Gunnar W. Klau [ths]
+    (centroid based clustering algorithm), Gunnar W. Klau [ths],
+    Juliane V. Tkotz [ctb] (package logo)
 Maintainer: Martin Papenberg <martin.papenberg@hhu.de>
 Description: Anticlustering partitions a pool of elements into
     subsets (i.e., anticlusters) in such a way that the subsets are as
