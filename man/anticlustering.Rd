@@ -159,7 +159,8 @@ be passed down to the user-defined function as second argument,
 however \strong{only after} \code{\link{as.matrix}} has been called
 on it. This implies that in the function body, columns of the data
 set cannot be accessed using \code{data.frame} operations such as
-\code{$}.
+\code{$}. This implies that data of class \code{dist} will be 
+converted to matrix as well.
 }
 \examples{
 
