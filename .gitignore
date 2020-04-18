@@ -7,3 +7,5 @@ inst/man
 README.html
 inst/README.md
 docs/*
+*.o
+*.so
