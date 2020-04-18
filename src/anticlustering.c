@@ -42,9 +42,7 @@ void c_anticlustering(
          * 2. required data structure:
          * 
          *     K Cluster lists + one array that points to the HEAD of each 
-         *     cluster list, respectively. Initialize HEAD pointers as NULL. 
-         *     Important because method that fills clusters relies on this 
-         *     property.
+         *     cluster list, respectively.
          * 
          */
         
@@ -64,7 +62,7 @@ void c_anticlustering(
         /* 3. required data structure: 
          *     Array of pointers to data points (i.e., to the nodes in the 
          *     cluster list). Used for iterating through data 
-         *     points during exchange method. (currently NOT YET USED!)
+         *     points during exchange method. 
          */
         struct node *PTR_NODES[n];
         
@@ -89,9 +87,9 @@ void c_anticlustering(
                 compute_center(m, CENTERS[i], PTR_CLUSTER_HEADS[i], frequencies[i]);
         }
         
-        // Get variance objective
-        double SUM_VAR_OBJECTIVE = 0; // total sum of squared errors
-        double VAR_OBJECTIVE[k]; // objective per cluster
+        /* Get variance objective of the initial cluster assignment */
+        double SUM_VAR_OBJECTIVE = 0; // initialize total objective
+        double VAR_OBJECTIVE[k]; // initialize objective per cluster
         for (size_t i = 0; i < k; i++) {
                 VAR_OBJECTIVE[i] = cluster_variance(
                         m, 
@@ -116,23 +114,26 @@ void c_anticlustering(
         /* 1. Level: Iterate through `n` data points */
         for (size_t i = 0; i < n; i++) {
                 size_t cl1 = PTR_NODES[i]->data->cluster;
-
-        // initialize `best` variable for the i'th item
-        best_objective = 0;
-        cp_matrix(k, m, CENTERS, best_centers);
-        cp_array(k, VAR_OBJECTIVE, best_objectives);
                 
+                // Initialize `best` variable for the i'th item
+                best_objective = 0;
+                cp_matrix(k, m, CENTERS, best_centers);
+                cp_array(k, VAR_OBJECTIVE, best_objectives);
+                
+                /* 2. Level: Iterate through `n` exchange partners */
                 for (size_t j = 0; j < n; j++) {
                         
                         size_t cl2 = PTR_NODES[j]->data->cluster;
-                        if (cl1 == cl2) {
+                        // no swapping attempt if in the same cluster:
+                        if (cl1 == cl2) { 
                                 continue;
                         }
 
-                        // Initialize `tmp` variables for the new exchange partner:
+                        // Initialize `tmp` variables for the exchange partner:
                         cp_matrix(k, m, CENTERS, tmp_centers);
                         cp_array(k, VAR_OBJECTIVE, tmp_objectives);
-                        update_centers( // only updates two centers
+                        
+                        update_centers(
                                 k, m, 
                                 tmp_centers, 
                                 PTR_NODES[i],
@@ -147,7 +148,7 @@ void c_anticlustering(
                                 k, m, 
                                 tmp_centers, cl1, cl2, 
                                 PTR_CLUSTER_HEADS, 
-                                tmp_objectives // is updated in this function
+                                tmp_objectives
                         );
                         
                         // Update `best` variables if objective was improved
