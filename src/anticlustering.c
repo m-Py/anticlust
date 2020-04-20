@@ -375,13 +375,13 @@ struct node* fill_list(struct node *HEAD, struct element *data, size_t i) {
                 }
                 // New element is right next to HEAD element:
                 HEAD->next->data = data;
-                HEAD->next->next = NULL; // `tmp` was next to HEAD before
+                HEAD->next->next = NULL; 
                 return HEAD->next;
         }
         // Case 2: List is not empty; new node is appended next to HEAD
-        struct node *tmp = HEAD->next;
+        struct node *tmp = HEAD->next; 
         HEAD->next = malloc(sizeof(struct node*));
-        if (HEAD->next == NULL) {
+        if (HEAD->next == NULL) {       
                 printf("NOT ENOUGH RAM\n");
                 return NULL;
         }
