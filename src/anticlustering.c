@@ -366,7 +366,7 @@ struct node* fill_list(struct node *HEAD, struct element *data, size_t i) {
         // Append new element at the beginning of the list. Temporarily hold 
         // NEXT element of HEAD, which the becomes NEXT element of the new element.
 
-        // Is list empty so far? It is if HEAD->next is NULL
+        // Case 1: Is list empty so far? It is if HEAD->next is NULL
         if (HEAD->next == NULL) {
                 HEAD->next = malloc(sizeof(struct node*));
                 if (HEAD->next == NULL) {
@@ -378,7 +378,7 @@ struct node* fill_list(struct node *HEAD, struct element *data, size_t i) {
                 HEAD->next->next = NULL; // `tmp` was next to HEAD before
                 return HEAD->next;
         }
-        // temporar shit
+        // Case 2: List is not empty; new node is appended next to HEAD
         struct node *tmp = HEAD->next;
         HEAD->next = malloc(sizeof(struct node*));
         if (HEAD->next == NULL) {
