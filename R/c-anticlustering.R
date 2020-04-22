@@ -6,7 +6,7 @@
 #' 
 #' @examples
 #' # Compare classical anticlustering implementation and C implementation
-#' N <- 500
+#' N <- 200
 #' M <- 3
 #' data <- matrix(rnorm(N * M), ncol = M)
 #' K <- 3
