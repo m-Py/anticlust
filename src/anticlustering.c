@@ -5,73 +5,80 @@
 #include "declarations.h"
 
 /* Exchange Method for Anticlustering
-        * param *data: vector of data points (in R, this is a data frame,
-        *          the matrix structure must be restored in C)
-        * param *N: The number of elements (i.e., number of "rows" in *data)
-        * param *M: The number of features (i.e., number of "cols" in *data)
-        * param *K: The number of clusters
-        * param *frequencies: The number of elements per cluster, i.e., an array
-        *          of length K.
-        * param *clusters: An initial assignment of elements to clusters,
-        *          array of length *N (has integers between 0 and (K-1) - this 
-        *          has to be guaranteed by the caller)
-        * 
-        * The return value is assigned to the argument `clusters`, via pointer
+ * param *data: vector of data points (in R, this is a data frame,
+ *          the matrix structure must be restored in C)
+ * param *N: The number of elements (i.e., number of "rows" in *data)
+ * param *M: The number of features (i.e., number of "cols" in *data)
+ * param *K: The number of clusters
+ * param *frequencies: The number of elements per cluster, i.e., an array
+ *          of length K.
+ * param *clusters: An initial assignment of elements to clusters,
+ *          array of length *N (has integers between 0 and (K-1) - this 
+ *          has to be guaranteed by the caller)
+ * 
+ * The return value is assigned to the argument `clusters`, via pointer
+ * 
+ * 
+ * ============================ Some explanations ============================
+ * 
+ * Throughout this method, some data structures are defined that are used
+ * throughout. The function works by first initializing the required data 
+ * structures on which an exchange optimization algorithm is concuted.
+ * 
+ * These are the data structures that are "global" throughout the function:
+ * 
+ * 1. `struct element POINTS[n]` - An array copy of the `n` data points in the 
+ *    same order as the input. Stores the `m` values per data point and the 
+ *    cluster assignment of the data point (initially passed via `*clusters`)
+ * 2. `struct node *PTR_CLUSTER_HEADS[k]` - An array of length `k` where each
+ *    entry points to the head of a list that represents a cluster. Each cluster
+ *    is implemented as a linked list where each node points to an `element` in 
+ *    `struct element POINTS[n]`. Thus, there are `k` cluster lists that are 
+ *    used during the algorithm to compute the variance by cluster. During
+ *    the exchange method, elements are swapped between cluster lists 
+ *    (implemented through the function `swap()`). 
+ *    The function `initialize_cluster_heads()` sets up the pointer array; the 
+ *    function `fill_cluster_lists()` fills the data points as nodes into the 
+ *    lists.
+ * 3. `struct node *PTR_NODES[n]` - Array of pointers to nodes, used for 
+ *    iterating during the exchange method. Points to elements in the cluster 
+ *    lists but can be used to iterate through the data in the original order
+ *    of the data (across cluster lists, this order is lost).
+ * 4. `double CENTERS[k][m]` - A matrix of cluster centers.
+ * 5. `double OBJECTIVE_BY_CLUSTER[k]` - The variance objective by cluster.
+ * 6. `double SUM_VAR_OBJECTIVE` - The total variance objective (i.e., sum 
+ *    of all entries in `OBJECTIVE_BY_CLUSTER`).
+ * 
+ * ===========================================================================
 */
 
-void c_anticlustering(
-        double *data, 
-        int *N, 
-        int *M,
-        int *K, 
-        int *frequencies,
+void c_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
         int *clusters) {
         
         const size_t n = (size_t) *N; // number of data points
         const size_t m = (size_t) *M; // number of variables per data point
         const size_t k = (size_t) *K; // number of clusters
         
-        /* 
-         * 1. required data structure:
-         *     Array of data points (i.e., array of struct `element`)
-         */
+        // Set up array of data points, fill it, return if memory runs out
         struct element POINTS[n];
         if (fill_data_points(data, n, m, POINTS, clusters) == 1) {
                 return;
         }
 
-        /* 
-         * 2. Required data structure:
-         * 
-         *     K Cluster lists + one array that points to the HEAD of each 
-         *     cluster list, respectively. The HEAD of each cluster list 
-         *     is not a data element, but just a pointer to the first
-         *     element.
-         * 
-         */
-        
+        // Set up array of pointer-to-cluster-heads, return if memory runs out
         struct node *PTR_CLUSTER_HEADS[k];
         if (initialize_cluster_heads(n, k, PTR_CLUSTER_HEADS, POINTS) == 1) {
                 return; 
         }
 
-        /* 3. Required data structure: 
-         *     Array of pointers to data points (i.e., to the nodes in the 
-         *     cluster lists). Used for iterating through data 
-         *     points during exchange method. 
-         */
+        // Set up array of pointers-to-nodes, return if memory runs out
         struct node *PTR_NODES[n];
-        /* (a) add the i'th data point to a cluster list,
-         * (b) store the pointer to its node in the cluster list */
         if (fill_cluster_lists(n, k, clusters, POINTS, PTR_NODES, 
                                PTR_CLUSTER_HEADS) == 1) {
                 return;
         }
-
-        /* 
-         * 4. required data structure: (K x M) matrix of cluster centers
-         */ 
         
+        // Set up matrix of cluster centers
         double CENTERS[k][m];
         for (size_t i = 0; i < k; i++) {
                 compute_center(m, CENTERS[i], PTR_CLUSTER_HEADS[i], frequencies[i]);
@@ -81,7 +88,6 @@ void c_anticlustering(
         double OBJECTIVE_BY_CLUSTER[k]; 
         objective_by_cluster(m, k, OBJECTIVE_BY_CLUSTER, CENTERS, PTR_CLUSTER_HEADS);
         double SUM_VAR_OBJECTIVE = array_sum(k, OBJECTIVE_BY_CLUSTER);
-
         
         /* Main iteration loop for exchange procedure */
         
@@ -180,8 +186,8 @@ void c_anticlustering(
  * Perform a swap between two elements.
  * 
  * param `size_t n`: Number of data points
- * param `size_t i`: Index of first element
- * param `size_t j`: Index of second element
+ * param `size_t i`: Index of first element to be swapped
+ * param `size_t j`: Index of second element to be swapped
  * param `struct node *PTR_NODES[n]`: pointer to nodes
  * 
  */
@@ -217,15 +223,7 @@ void swap(size_t n, size_t i, size_t j,
         
 }
 
-/* Update cluster centers after a swap
- * 
- * param `size_t k`: Number of clusters
- * param `size_t m`: Number of variables per data point
- * param `double centers[k][m]`: Matrix of cluster centers
- * param `struct node *head_array[k]`: Array of HEADs to the cluster lists
- * param `*frequencies`: Array of length k, number of elements per cluster
- * 
- */
+/* Update cluster centers after a swap between two nodes in two cluster lists */
 void update_centers(size_t k, size_t m, double CENTERS[k][m],
                     struct node *one, struct node *two,
                     int *frequencies) {
@@ -251,15 +249,16 @@ void update_centers(size_t k, size_t m, double CENTERS[k][m],
  * param `double CENTERS[k][m]`: Matrix of cluster centers
  * param `size_t cl1`: Index of the first cluster
  * param `size_t cl2`: Index of the second cluster
- * param `struct node *head_array[k]`: Array of HEADs to the cluster lists
+ * param `struct node *PTR_CLUSTER_HEADS[k]`: Array of HEADs to the cluster lists
  * param `double OBJECTIVE_BY_CLUSTER[k]`: objective by cluster
  * 
  */
-void update_objective_by_cluster(size_t k, size_t m, double CENTERS[k][m], size_t cl1, 
-                        size_t cl2, struct node *head_array[k], 
-                        double OBJECTIVE_BY_CLUSTER[k]) {
-        OBJECTIVE_BY_CLUSTER[cl1] = cluster_variance(m, head_array[cl1], CENTERS[cl1]);
-        OBJECTIVE_BY_CLUSTER[cl2] = cluster_variance(m, head_array[cl2], CENTERS[cl2]);
+void update_objective_by_cluster(size_t k, size_t m, double CENTERS[k][m], 
+                                 size_t cl1, size_t cl2, 
+                                 struct node *PTR_CLUSTER_HEADS[k], 
+                                 double OBJECTIVE_BY_CLUSTER[k]) {
+        OBJECTIVE_BY_CLUSTER[cl1] = cluster_variance(m, PTR_CLUSTER_HEADS[cl1], CENTERS[cl1]);
+        OBJECTIVE_BY_CLUSTER[cl2] = cluster_variance(m, PTR_CLUSTER_HEADS[cl2], CENTERS[cl2]);
 }
 
 
@@ -512,7 +511,11 @@ int initialize_cluster_heads(
         return 0;
 }
 
-/* After initialization, fill the cluster lists with data */
+/* After initialization, fill the cluster lists with data
+ * This function does two things at the same time:
+ * (a) add each data point as a node to a cluster list,
+ * (b) store the pointer to each node in the array `PTR_NODES`
+ */
 int fill_cluster_lists(
         size_t n, 
         size_t k,

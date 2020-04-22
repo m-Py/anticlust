@@ -70,7 +70,7 @@ void update_objective_by_cluster(
         double centers[k][m], 
         size_t cl1, 
         size_t cl2, 
-        struct node *head_array[k], 
+        struct node *PTR_CLUSTER_HEADS[k], 
         double VAR_OBJECTIVE[k]
 );
 void copy_array(
