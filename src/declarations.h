@@ -45,7 +45,7 @@ int fill_data_points(
         struct element points[n], 
         int *clusters
 );
-double cluster_variance(
+double cluster_var(
         size_t m, 
         struct node *HEAD, 
         double center[m]
