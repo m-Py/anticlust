@@ -36,7 +36,11 @@ void c_anticlustering(
          *     Array of data points (i.e., array of struct `element`)
          */
         struct element POINTS[n];
-        fill_data_points(data, n, m, POINTS, clusters);
+        if (fill_data_points(data, n, m, POINTS, clusters) == 1) {
+                free_points(n, POINTS);
+                print_memory_error();
+                return;
+        }
 
         /* 
          * 2. required data structure:
@@ -48,16 +52,12 @@ void c_anticlustering(
         
         // Initialize cluster list with empty HEAD
         struct node *PTR_CLUSTER_HEADS[k];
-        for (size_t i = 0; i < k; i++) {
-                PTR_CLUSTER_HEADS[i] = malloc(sizeof(struct node*));
-                if (PTR_CLUSTER_HEADS[i] == NULL) {
-                        printf("NOT ENOUGH RAM\n");
-                        return;
-                }
-                PTR_CLUSTER_HEADS[i]->next = NULL;
-                PTR_CLUSTER_HEADS[i]->data = NULL;
+        if (initialize_cluster_heads(k, PTR_CLUSTER_HEADS) == 1) {
+                free_points(n, POINTS);
+                free_nodes(k, PTR_CLUSTER_HEADS);
+                print_memory_error();
+                return; 
         }
-
 
         /* 3. required data structure: 
          *     Array of pointers to data points (i.e., to the nodes in the 
@@ -76,6 +76,12 @@ void c_anticlustering(
                         &POINTS[i],
                         i
                 );
+                if (PTR_NODES[i] == NULL) { // failed to allocate memory
+                        free_points(n, POINTS);
+                        free_nodes(k, PTR_CLUSTER_HEADS);
+                        print_memory_error();
+                        return; 
+                }
         }
 
         /* 
@@ -186,14 +192,9 @@ void c_anticlustering(
                 clusters[i] = PTR_NODES[i]->data->cluster;
         }
         
-        /* TODO in the end: free everything
-         * 
-         * - iterate through cluster lists
-         * - for each `node`, free `values` in the `element` of the `node`
-         * - then free the `node`
-         * 
-         */
-
+        // in the end, free allocated memory:
+        free_points(n, POINTS);
+        free_nodes(k, PTR_CLUSTER_HEADS);
 }
 
 /* 
@@ -370,7 +371,6 @@ struct node* fill_list(struct node *HEAD, struct element *data, size_t i) {
         if (HEAD->next == NULL) {
                 HEAD->next = malloc(sizeof(struct node*));
                 if (HEAD->next == NULL) {
-                        printf("NOT ENOUGH RAM\n");
                         return NULL;
                 }
                 // New element is right next to HEAD element:
@@ -382,7 +382,6 @@ struct node* fill_list(struct node *HEAD, struct element *data, size_t i) {
         struct node *tmp = HEAD->next; 
         HEAD->next = malloc(sizeof(struct node*));
         if (HEAD->next == NULL) {       
-                printf("NOT ENOUGH RAM\n");
                 return NULL;
         }
         // New element is right next to HEAD element:
@@ -428,8 +427,11 @@ void print_cluster(struct node *HEAD, size_t M) {
  * param `size_t m`: Number of variables per data point
  * param `struct element points[n]`: Array to be filled with data points
  * param `int *clusters`: Cluster affiliation of the n data points
+ * 
+ * return: `0` if all data points were successfully stored; `1` if not.
+ * 
  */
-void fill_data_points(
+int fill_data_points(
                 double *data, 
                 size_t n, 
                 size_t m, 
@@ -447,13 +449,14 @@ void fill_data_points(
                 // allocate memory for `m` data points
                 points[i].values = malloc(m * sizeof(points[i].values[0]));
                 if (points[i].values == NULL) {
-                        printf("NOT ENOUGH RAM\n");
-                        return;
-                }
+                        print_memory_error();
+                        return 1;
+                } 
                 for (size_t j = 0; j < m; j++) {
                         points[i].values[j] = data[m_ptr[j]++];
                 }
         }
+        return 0;
 }
 
 /* Squared Euclidean Distance between two arrays of same length
@@ -499,4 +502,46 @@ void print_elements(size_t n, size_t m, struct node **PTR_NODES) {
                 }
                 printf("%10zu \n", PTR_NODES[i]->data->cluster);
         }
+}
+
+int initialize_cluster_heads(size_t k, struct node *PTR_CLUSTER_HEADS[k]) {
+        for (size_t i = 0; i < k; i++) {
+                PTR_CLUSTER_HEADS[i] = malloc(sizeof(struct node*));
+                if (PTR_CLUSTER_HEADS[i] == NULL) {
+                        print_memory_error();
+                        return 1;
+                }
+                PTR_CLUSTER_HEADS[i]->next = NULL;
+                PTR_CLUSTER_HEADS[i]->data = NULL;
+        }
+        return 0;
+}
+
+// Functions for freeing the data points (`struct element->values`) and
+// the nodes (`struct node`)
+
+void free_nodes(size_t k, struct node *PTR_CLUSTER_HEADS[k]) {
+        struct node *ptr;
+        struct node *prev; // using temp pointer for freeing
+        for (size_t i = 0; i < k; i++) {
+                ptr = PTR_CLUSTER_HEADS[i];
+                while (ptr->next != NULL)
+                {  
+                        prev = ptr;
+                        ptr = ptr->next;
+                        free(prev);
+                }
+                free(ptr);
+        }
+        
+}
+
+void free_points(size_t n, struct element POINTS[n]) {
+        for (size_t i = 0; i < n; i++) {
+                free(POINTS[i].values);
+        }
+}
+
+void print_memory_error() {
+        fprintf(stderr, "Failed to allocate enough memory.");
 }

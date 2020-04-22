@@ -32,10 +32,6 @@ struct node* fill_list(
         struct element *data,
         size_t i
 );
-void print_cluster(
-        struct node *cluster, 
-        size_t M
-);
 void compute_center(
         size_t m, 
         double center[m], 
@@ -77,19 +73,30 @@ double update_objective(
         struct node *head_array[k], 
         double VAR_OBJECTIVE[k]
 );
-void print_elements(
-        size_t n, 
-        size_t m, 
-        struct node **ptr_to_nodes
-);
 void copy_array(
         size_t n, 
         double origin[n], 
         double target[n]
 );
-void copy_array(
+void copy_matrix(
         size_t n, 
         size_t m, 
         double origin[n][m],
         double target[n][m]
 );
+int initialize_cluster_heads(
+        size_t k, 
+        struct node *PTR_CLUSTER_HEADS[k]
+);
+
+/* Free functions */
+void free_points(
+        size_t n, 
+        struct element POINTS[n]
+);
+void free_nodes(
+        size_t k, 
+        struct node *PTR_CLUSTER_HEADS[k]
+);
+
+void print_memory_error();
