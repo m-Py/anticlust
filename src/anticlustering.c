@@ -314,37 +314,6 @@ struct node* append_element_to_cluster(
         return HEAD->next; 
 }
 
-/* Print a cluster list 
- * 
- * param struct node *cluster: pointer to cluster list 
- * param size_t M: The number of values per element
- * 
- */
-void print_cluster(struct node *HEAD, size_t M) {
-
-        if (HEAD->next == NULL) {
-                printf("Warning: Cluster list should be printed, but was empty.");
-                return;
-        }
-        
-        struct node *tmp = HEAD->next;
-
-        int j = 1;
-        
-        while (tmp != NULL) {
-                printf("%d: ", j);
-                for (size_t i = 0; i < M; i++) {
-                        printf("%10g, ", tmp->data->values[i]);
-                }
-                printf("\n");
-                if (tmp->next == NULL) {
-                        break;
-                }
-                tmp = tmp->next;
-                j++;
-        }  // iterate until we are back at the HEAD
-}
-
 /* Extracted method that fill data points into array of struct `element`
  * param `double *data` pointer to original data array of length n
  * param `size_t m`: Number of data points
@@ -415,17 +384,6 @@ void copy_matrix(size_t n, size_t m, double origin[n][m], double target[n][m]) {
                 for (int j = 0; j < m; j++) {
                         target[i][j] = origin[i][j];
                 }
-        }
-}
-
-/* Print out data points from nodes in original order (not from the cluster lists) */
-void print_elements(size_t n, size_t m, struct node **PTR_NODES) {
-        for (size_t i = 0; i < n; i++) {
-                printf("%zu: ", i);
-                for (size_t j = 0; j < m; j++) {
-                        printf("%10g, ", PTR_NODES[i]->data->values[j]);
-                }
-                printf("%10zu \n", PTR_NODES[i]->data->cluster);
         }
 }
 
