@@ -294,7 +294,7 @@ int fill_data_points(double *data, size_t n, size_t m, struct element POINTS[n],
                 // allocate memory for `m` data points
                 POINTS[i].values = malloc(m * sizeof(POINTS[i].values[0]));
                 if (POINTS[i].values == NULL) {
-                        free_points(n, POINTS);
+                        free_points(i, POINTS);
                         print_memory_error();
                         return 1;
                 } 
@@ -455,7 +455,7 @@ void free_nodes(size_t k, struct node *PTR_CLUSTER_HEADS[k]) {
 }
 
 /* Free memory in the data points
- * param `size_t n`: The number of data points
+ * param `size_t n`: The number of data points to be freed
  * param `struct element points[n]`: Array containing data points
  */
 void free_points(size_t n, struct element POINTS[n]) {
