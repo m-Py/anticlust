@@ -30,7 +30,7 @@
  * 1. `struct element POINTS[n]` - An array copy of the `n` data points in the 
  *    same order as the input. Stores the `m` values per data point and the 
  *    cluster assignment of the data point (initially passed via `*clusters`)
- * 2. `struct node *CL_HEADS[k]` - An array of length `k` where each
+ * 2. `struct node *HEADS[k]` - An array of length `k` where each
  *    entry points to the head of a list that represents a cluster. Each cluster
  *    is implemented as a linked list where each node points to an `element` in 
  *    `struct element POINTS[n]`. Thus, there are `k` cluster lists that are 
@@ -66,26 +66,26 @@ void c_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
         }
 
         // Set up array of pointer-to-cluster-heads, return if memory runs out
-        struct node *CL_HEADS[k];
-        if (initialize_cluster_heads(n, k, CL_HEADS, POINTS) == 1) {
+        struct node *HEADS[k];
+        if (initialize_cluster_heads(n, k, HEADS, POINTS) == 1) {
                 return; 
         }
 
         // Set up array of pointers-to-nodes, return if memory runs out
         struct node *PTR_NODES[n];
-        if (fill_cluster_lists(n, k, clusters, POINTS, PTR_NODES, CL_HEADS) == 1) {
+        if (fill_cluster_lists(n, k, clusters, POINTS, PTR_NODES, HEADS) == 1) {
                 return;
         }
         
         // Set up matrix of cluster centers
         double CENTERS[k][m];
         for (size_t i = 0; i < k; i++) {
-                compute_center(m, CENTERS[i], CL_HEADS[i], frequencies[i]);
+                compute_center(m, CENTERS[i], HEADS[i], frequencies[i]);
         }
         
         /* Get variance objective of the initial cluster assignment */
         double OBJ_BY_CLUSTER[k]; 
-        objective_by_cluster(m, k, OBJ_BY_CLUSTER, CENTERS, CL_HEADS);
+        objective_by_cluster(m, k, OBJ_BY_CLUSTER, CENTERS, HEADS);
         double SUM_VAR_OBJECTIVE = array_sum(k, OBJ_BY_CLUSTER);
         
         /* Main iteration loop for exchange procedure */
@@ -134,8 +134,8 @@ void c_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
                                 PTR_NODES
                         );
                         // Update objective
-                        tmp_objs[cl1] = cluster_variance(m, CL_HEADS[cl1], tmp_centers[cl1]);
-                        tmp_objs[cl2] = cluster_variance(m, CL_HEADS[cl2], tmp_centers[cl2]);
+                        tmp_objs[cl1] = cluster_variance(m, HEADS[cl1], tmp_centers[cl1]);
+                        tmp_objs[cl2] = cluster_variance(m, HEADS[cl2], tmp_centers[cl2]);
                         tmp_obj = array_sum(k, tmp_objs);
                         
                         // Update `best` variables if objective was improved
@@ -175,7 +175,7 @@ void c_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
         
         // in the end, free allocated memory:
         free_points(n, POINTS);
-        free_nodes(k, CL_HEADS);
+        free_nodes(k, HEADS);
 }
 
 /* 
