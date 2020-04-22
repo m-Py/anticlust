@@ -82,12 +82,12 @@ void print_elements(
         size_t m, 
         struct node **ptr_to_nodes
 );
-void cp_array(
+void copy_array(
         size_t n, 
         double origin[n], 
         double target[n]
 );
-void cp_matrix(
+void copy_array(
         size_t n, 
         size_t m, 
         double origin[n][m],

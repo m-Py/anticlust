@@ -117,8 +117,8 @@ void c_anticlustering(
                 
                 // Initialize `best` variable for the i'th item
                 best_objective = 0;
-                cp_matrix(k, m, CENTERS, best_centers);
-                cp_array(k, VAR_OBJECTIVE, best_objectives);
+                copy_matrix(k, m, CENTERS, best_centers);
+                copy_array(k, VAR_OBJECTIVE, best_objectives);
                 
                 /* 2. Level: Iterate through `n` exchange partners */
                 for (size_t j = 0; j < n; j++) {
@@ -130,8 +130,8 @@ void c_anticlustering(
                         }
 
                         // Initialize `tmp` variables for the exchange partner:
-                        cp_matrix(k, m, CENTERS, tmp_centers);
-                        cp_array(k, VAR_OBJECTIVE, tmp_objectives);
+                        copy_matrix(k, m, CENTERS, tmp_centers);
+                        copy_array(k, VAR_OBJECTIVE, tmp_objectives);
                         
                         update_centers(
                                 k, m, 
@@ -154,8 +154,8 @@ void c_anticlustering(
                         // Update `best` variables if objective was improved
                         if (tmp_objective > best_objective) {
                                 best_objective = tmp_objective;
-                                cp_matrix(k, m, tmp_centers, best_centers);
-                                cp_array(k, tmp_objectives, best_objectives);
+                                copy_matrix(k, m, tmp_centers, best_centers);
+                                copy_array(k, tmp_objectives, best_objectives);
                                 best_partner = j;
                         }
                         
@@ -176,8 +176,8 @@ void c_anticlustering(
 
                         // Update the "global" variables
                         SUM_VAR_OBJECTIVE = best_objective;
-                        cp_matrix(k, m, best_centers, CENTERS);
-                        cp_array(k, best_objectives, VAR_OBJECTIVE);
+                        copy_matrix(k, m, best_centers, CENTERS);
+                        copy_array(k, best_objectives, VAR_OBJECTIVE);
                 }
         }
 
@@ -475,14 +475,14 @@ double euclidean_squared(double *x, double *y, size_t m) {
 }
 
 /* Copy one array into another */
-void cp_array(size_t n, double origin[n], double target[n]) {
+void copy_array(size_t n, double origin[n], double target[n]) {
         for (int i = 0; i < n; i++) {
                 target[i] = origin[i];
         }
 }
 
 /* Copy one matrix into another */
-void cp_matrix(size_t n, size_t m, double origin[n][m], double target[n][m]) {
+void copy_matrix(size_t n, size_t m, double origin[n][m], double target[n][m]) {
         for (int i = 0; i < n; i++) {
                 for (int j = 0; j < m; j++) {
                         target[i][j] = origin[i][j];
