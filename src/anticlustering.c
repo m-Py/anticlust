@@ -30,7 +30,7 @@
  * 1. `struct element POINTS[n]` - An array copy of the `n` data points in the 
  *    same order as the input. Stores the `m` values per data point and the 
  *    cluster assignment of the data point (initially passed via `*clusters`)
- * 2. `struct node *PTR_CLUSTER_HEADS[k]` - An array of length `k` where each
+ * 2. `struct node *CL_HEADS[k]` - An array of length `k` where each
  *    entry points to the head of a list that represents a cluster. Each cluster
  *    is implemented as a linked list where each node points to an `element` in 
  *    `struct element POINTS[n]`. Thus, there are `k` cluster lists that are 
@@ -66,28 +66,27 @@ void c_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
         }
 
         // Set up array of pointer-to-cluster-heads, return if memory runs out
-        struct node *PTR_CLUSTER_HEADS[k];
-        if (initialize_cluster_heads(n, k, PTR_CLUSTER_HEADS, POINTS) == 1) {
+        struct node *CL_HEADS[k];
+        if (initialize_cluster_heads(n, k, CL_HEADS, POINTS) == 1) {
                 return; 
         }
 
         // Set up array of pointers-to-nodes, return if memory runs out
         struct node *PTR_NODES[n];
-        if (fill_cluster_lists(n, k, clusters, POINTS, PTR_NODES, 
-                               PTR_CLUSTER_HEADS) == 1) {
+        if (fill_cluster_lists(n, k, clusters, POINTS, PTR_NODES, CL_HEADS) == 1) {
                 return;
         }
         
         // Set up matrix of cluster centers
         double CENTERS[k][m];
         for (size_t i = 0; i < k; i++) {
-                compute_center(m, CENTERS[i], PTR_CLUSTER_HEADS[i], frequencies[i]);
+                compute_center(m, CENTERS[i], CL_HEADS[i], frequencies[i]);
         }
         
         /* Get variance objective of the initial cluster assignment */
-        double OBJECTIVE_BY_CLUSTER[k]; 
-        objective_by_cluster(m, k, OBJECTIVE_BY_CLUSTER, CENTERS, PTR_CLUSTER_HEADS);
-        double SUM_VAR_OBJECTIVE = array_sum(k, OBJECTIVE_BY_CLUSTER);
+        double OBJ_BY_CLUSTER[k]; 
+        objective_by_cluster(m, k, OBJ_BY_CLUSTER, CENTERS, CL_HEADS);
+        double SUM_VAR_OBJECTIVE = array_sum(k, OBJ_BY_CLUSTER);
         
         /* Main iteration loop for exchange procedure */
         
@@ -96,9 +95,9 @@ void c_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
         size_t best_partner;
         double tmp_centers[k][m];
         double best_centers[k][m];
-        double tmp_objectives[k];
+        double tmp_objs[k];
         double best_objectives[k];
-        double tmp_objective;
+        double tmp_obj;
         double best_objective;
         
         /* 1. Level: Iterate through `n` data points */
@@ -108,7 +107,7 @@ void c_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
                 // Initialize `best` variable for the i'th item
                 best_objective = 0;
                 copy_matrix(k, m, CENTERS, best_centers);
-                copy_array(k, OBJECTIVE_BY_CLUSTER, best_objectives);
+                copy_array(k, OBJ_BY_CLUSTER, best_objectives);
                 
                 /* 2. Level: Iterate through `n` exchange partners */
                 for (size_t j = 0; j < n; j++) {
@@ -121,7 +120,7 @@ void c_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
 
                         // Initialize `tmp` variables for the exchange partner:
                         copy_matrix(k, m, CENTERS, tmp_centers);
-                        copy_array(k, OBJECTIVE_BY_CLUSTER, tmp_objectives);
+                        copy_array(k, OBJ_BY_CLUSTER, tmp_objs);
                         
                         update_centers(
                                 k, m, 
@@ -134,19 +133,16 @@ void c_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
                                 n, i, j,
                                 PTR_NODES
                         );
-                        update_objective_by_cluster(
-                                k, m, 
-                                tmp_centers, cl1, cl2, 
-                                PTR_CLUSTER_HEADS, 
-                                tmp_objectives
-                        );
-                        tmp_objective = array_sum(k, tmp_objectives);
+                        // Update objective
+                        tmp_objs[cl1] = cluster_variance(m, CL_HEADS[cl1], tmp_centers[cl1]);
+                        tmp_objs[cl2] = cluster_variance(m, CL_HEADS[cl2], tmp_centers[cl2]);
+                        tmp_obj = array_sum(k, tmp_objs);
                         
                         // Update `best` variables if objective was improved
-                        if (tmp_objective > best_objective) {
-                                best_objective = tmp_objective;
+                        if (tmp_obj > best_objective) {
+                                best_objective = tmp_obj;
                                 copy_matrix(k, m, tmp_centers, best_centers);
-                                copy_array(k, tmp_objectives, best_objectives);
+                                copy_array(k, tmp_objs, best_objectives);
                                 best_partner = j;
                         }
                         
@@ -168,7 +164,7 @@ void c_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
                         // Update the "global" variables
                         SUM_VAR_OBJECTIVE = best_objective;
                         copy_matrix(k, m, best_centers, CENTERS);
-                        copy_array(k, best_objectives, OBJECTIVE_BY_CLUSTER);
+                        copy_array(k, best_objectives, OBJ_BY_CLUSTER);
                 }
         }
 
@@ -179,7 +175,7 @@ void c_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
         
         // in the end, free allocated memory:
         free_points(n, POINTS);
-        free_nodes(k, PTR_CLUSTER_HEADS);
+        free_nodes(k, CL_HEADS);
 }
 
 /* 
@@ -240,25 +236,6 @@ void update_centers(size_t k, size_t m, double CENTERS[k][m],
           CENTERS[cl2][i] = CENTERS[cl2][i] - change_cl2;
           CENTERS[cl2][i] = CENTERS[cl2][i] + change_cl1;
         }
-}
-
-/* Update the objective after the swap of two element
- *
- * param `size_t k`: Number of clusters
- * param `size_t m`: Number of variables per data point
- * param `double CENTERS[k][m]`: Matrix of cluster centers
- * param `size_t cl1`: Index of the first cluster
- * param `size_t cl2`: Index of the second cluster
- * param `struct node *HEADS[k]`: Array of HEADs to the cluster lists
- * param `double OBJ_BY_CLUSTER[k]`: objective by cluster
- * 
- */
-void update_objective_by_cluster(size_t k, size_t m, double CENTERS[k][m], 
-                                 size_t cl1, size_t cl2, 
-                                 struct node *HEADS[k], 
-                                 double OBJ_BY_CLUSTER[k]) {
-        OBJ_BY_CLUSTER[cl1] = cluster_variance(m, HEADS[cl1], CENTERS[cl1]);
-        OBJ_BY_CLUSTER[cl2] = cluster_variance(m, HEADS[cl2], CENTERS[cl2]);
 }
 
 /* Compute variance for a cluster
