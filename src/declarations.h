@@ -27,7 +27,7 @@ double euclidean_squared(
         double *y, 
         size_t m
 );
-struct node* fill_list(
+struct node* append_element_to_cluster(
         struct node *HEAD, 
         struct element *data,
         size_t i
@@ -64,7 +64,7 @@ void update_centers(
         struct node *two,
         int *frequencies
 );
-double update_objective(
+void update_objective_by_cluster(
         size_t k, 
         size_t m, 
         double centers[k][m], 
@@ -85,9 +85,32 @@ void copy_matrix(
         double target[n][m]
 );
 int initialize_cluster_heads(
+        size_t n, 
         size_t k, 
+        struct node *PTR_CLUSTER_HEADS[k],
+        struct element POINTS[n]
+);
+
+int fill_cluster_lists(
+        size_t n, 
+        size_t k,
+        int *clusters,
+        struct element POINTS[n],
+        struct node *PTR_NODES[n], 
         struct node *PTR_CLUSTER_HEADS[k]
 );
+void objective_by_cluster(
+        size_t m, 
+        size_t k, 
+        double VAR_OBJECTIVE[k], 
+        double CENTERS[k][m], 
+        struct node *PTR_CLUSTER_HEADS[k]
+);
+double array_sum(
+        size_t k, 
+        double ARRAY[k]
+);
+
 
 /* Free functions */
 void free_points(

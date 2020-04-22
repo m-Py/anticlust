@@ -37,13 +37,11 @@ void c_anticlustering(
          */
         struct element POINTS[n];
         if (fill_data_points(data, n, m, POINTS, clusters) == 1) {
-                free_points(n, POINTS);
-                print_memory_error();
                 return;
         }
 
         /* 
-         * 2. required data structure:
+         * 2. Required data structure:
          * 
          *     K Cluster lists + one array that points to the HEAD of each 
          *     cluster list, respectively. The HEAD of each cluster list 
@@ -53,36 +51,21 @@ void c_anticlustering(
          */
         
         struct node *PTR_CLUSTER_HEADS[k];
-        if (initialize_cluster_heads(k, PTR_CLUSTER_HEADS) == 1) {
-                free_points(n, POINTS);
-                free_nodes(k, PTR_CLUSTER_HEADS);
-                print_memory_error();
+        if (initialize_cluster_heads(n, k, PTR_CLUSTER_HEADS, POINTS) == 1) {
                 return; 
         }
 
-        /* 3. required data structure: 
+        /* 3. Required data structure: 
          *     Array of pointers to data points (i.e., to the nodes in the 
-         *     cluster list). Used for iterating through data 
+         *     cluster lists). Used for iterating through data 
          *     points during exchange method. 
          */
         struct node *PTR_NODES[n];
-        
-        // Fill the cluster lists with data points
-        for (size_t i = 0; i < n; i++) {
-                /* `fill_list()` (a) adds a data point to a cluster list and 
-                 * (b) returns the pointer to the data point's node in the 
-                 * cluster list */
-                PTR_NODES[i] = fill_list(
-                        PTR_CLUSTER_HEADS[clusters[i]], 
-                        &POINTS[i],
-                        i
-                );
-                if (PTR_NODES[i] == NULL) { // failed to allocate memory
-                        free_points(n, POINTS);
-                        free_nodes(k, PTR_CLUSTER_HEADS);
-                        print_memory_error();
-                        return; 
-                }
+        /* (a) add the i'th data point to a cluster list,
+         * (b) store the pointer to its node in the cluster list */
+        if (fill_cluster_lists(n, k, clusters, POINTS, PTR_NODES, 
+                               PTR_CLUSTER_HEADS) == 1) {
+                return;
         }
 
         /* 
@@ -95,17 +78,11 @@ void c_anticlustering(
         }
         
         /* Get variance objective of the initial cluster assignment */
-        double SUM_VAR_OBJECTIVE = 0; // initialize total objective
-        double VAR_OBJECTIVE[k]; // initialize objective per cluster
-        for (size_t i = 0; i < k; i++) {
-                VAR_OBJECTIVE[i] = cluster_variance(
-                        m, 
-                        PTR_CLUSTER_HEADS[i], 
-                        CENTERS[i]
-                );
-                SUM_VAR_OBJECTIVE += VAR_OBJECTIVE[i];
-        }
+        double OBJECTIVE_BY_CLUSTER[k]; 
+        objective_by_cluster(m, k, OBJECTIVE_BY_CLUSTER, CENTERS, PTR_CLUSTER_HEADS);
+        double SUM_VAR_OBJECTIVE = array_sum(k, OBJECTIVE_BY_CLUSTER);
 
+        
         /* Main iteration loop for exchange procedure */
         
         /* Some variables for bookkeeping during the optimization */
@@ -125,7 +102,7 @@ void c_anticlustering(
                 // Initialize `best` variable for the i'th item
                 best_objective = 0;
                 copy_matrix(k, m, CENTERS, best_centers);
-                copy_array(k, VAR_OBJECTIVE, best_objectives);
+                copy_array(k, OBJECTIVE_BY_CLUSTER, best_objectives);
                 
                 /* 2. Level: Iterate through `n` exchange partners */
                 for (size_t j = 0; j < n; j++) {
@@ -138,7 +115,7 @@ void c_anticlustering(
 
                         // Initialize `tmp` variables for the exchange partner:
                         copy_matrix(k, m, CENTERS, tmp_centers);
-                        copy_array(k, VAR_OBJECTIVE, tmp_objectives);
+                        copy_array(k, OBJECTIVE_BY_CLUSTER, tmp_objectives);
                         
                         update_centers(
                                 k, m, 
@@ -151,12 +128,13 @@ void c_anticlustering(
                                 n, i, j,
                                 PTR_NODES
                         );
-                        tmp_objective = update_objective(
+                        update_objective_by_cluster(
                                 k, m, 
                                 tmp_centers, cl1, cl2, 
                                 PTR_CLUSTER_HEADS, 
                                 tmp_objectives
                         );
+                        tmp_objective = array_sum(k, tmp_objectives);
                         
                         // Update `best` variables if objective was improved
                         if (tmp_objective > best_objective) {
@@ -184,7 +162,7 @@ void c_anticlustering(
                         // Update the "global" variables
                         SUM_VAR_OBJECTIVE = best_objective;
                         copy_matrix(k, m, best_centers, CENTERS);
-                        copy_array(k, best_objectives, VAR_OBJECTIVE);
+                        copy_array(k, best_objectives, OBJECTIVE_BY_CLUSTER);
                 }
         }
 
@@ -274,22 +252,14 @@ void update_centers(size_t k, size_t m, double CENTERS[k][m],
  * param `size_t cl1`: Index of the first cluster
  * param `size_t cl2`: Index of the second cluster
  * param `struct node *head_array[k]`: Array of HEADs to the cluster lists
- * param `double VAR_OBJECTIVE[k]`: objective by cluster
+ * param `double OBJECTIVE_BY_CLUSTER[k]`: objective by cluster
  * 
- * Returns the total variance objective. 
  */
-double update_objective(size_t k, size_t m, double CENTERS[k][m], size_t cl1, 
+void update_objective_by_cluster(size_t k, size_t m, double CENTERS[k][m], size_t cl1, 
                         size_t cl2, struct node *head_array[k], 
-                        double VAR_OBJECTIVE[k]) {
-        
-        VAR_OBJECTIVE[cl1] = cluster_variance(m, head_array[cl1], CENTERS[cl1]);
-        VAR_OBJECTIVE[cl2] = cluster_variance(m, head_array[cl2], CENTERS[cl2]);
-        
-        double sum = 0; 
-        for (size_t i = 0; i < k; i++) {
-                sum += VAR_OBJECTIVE[i];
-        }
-        return sum;
+                        double OBJECTIVE_BY_CLUSTER[k]) {
+        OBJECTIVE_BY_CLUSTER[cl1] = cluster_variance(m, head_array[cl1], CENTERS[cl1]);
+        OBJECTIVE_BY_CLUSTER[cl2] = cluster_variance(m, head_array[cl2], CENTERS[cl2]);
 }
 
 
@@ -363,7 +333,9 @@ void compute_center(size_t m,
  * 
  */
 
-struct node* fill_list(struct node *HEAD, struct element *data, size_t i) {
+struct node* append_element_to_cluster(
+        struct node *HEAD, 
+        struct element *data, size_t i) {
 
         // Append new element at the beginning of the list. Temporarily hold 
         // NEXT element of HEAD, which the becomes NEXT element of the new element.
@@ -436,7 +408,7 @@ int fill_data_points(
                 double *data, 
                 size_t n, 
                 size_t m, 
-                struct element points[n], 
+                struct element POINTS[n], 
                 int *clusters) {
         // Create offset variable to correctly read out data points from vector
         int m_ptr[m];
@@ -445,16 +417,17 @@ int fill_data_points(
         }
         
         for (size_t i = 0; i < n; i++) {
-                points[i].cluster = clusters[i];
-                points[i].ID = i;
+                POINTS[i].cluster = clusters[i];
+                POINTS[i].ID = i;
                 // allocate memory for `m` data points
-                points[i].values = malloc(m * sizeof(points[i].values[0]));
-                if (points[i].values == NULL) {
+                POINTS[i].values = malloc(m * sizeof(POINTS[i].values[0]));
+                if (POINTS[i].values == NULL) {
+                        free_points(n, POINTS);
                         print_memory_error();
                         return 1;
                 } 
                 for (size_t j = 0; j < m; j++) {
-                        points[i].values[j] = data[m_ptr[j]++];
+                        POINTS[i].values[j] = data[m_ptr[j]++];
                 }
         }
         return 0;
@@ -521,10 +494,15 @@ void print_elements(size_t n, size_t m, struct node **PTR_NODES) {
  * 
  */
 
-int initialize_cluster_heads(size_t k, struct node *PTR_CLUSTER_HEADS[k]) {
+int initialize_cluster_heads(
+        size_t n, size_t k, 
+        struct node *PTR_CLUSTER_HEADS[k],
+        struct element POINTS[n]) {
         for (size_t i = 0; i < k; i++) {
                 PTR_CLUSTER_HEADS[i] = malloc(sizeof(struct node*));
                 if (PTR_CLUSTER_HEADS[i] == NULL) {
+                        free_points(n, POINTS);
+                        free_nodes(k, PTR_CLUSTER_HEADS);
                         print_memory_error();
                         return 1;
                 }
@@ -532,6 +510,54 @@ int initialize_cluster_heads(size_t k, struct node *PTR_CLUSTER_HEADS[k]) {
                 PTR_CLUSTER_HEADS[i]->data = NULL;
         }
         return 0;
+}
+
+/* After initialization, fill the cluster lists with data */
+int fill_cluster_lists(
+        size_t n, 
+        size_t k,
+        int *clusters,
+        struct element POINTS[n],
+        struct node *PTR_NODES[n], 
+        struct node *PTR_CLUSTER_HEADS[k]) {
+        for (size_t i = 0; i < n; i++) {
+                PTR_NODES[i] = append_element_to_cluster(
+                        PTR_CLUSTER_HEADS[clusters[i]], 
+                        &POINTS[i], i
+                );
+                if (PTR_NODES[i] == NULL) { // failed to allocate memory
+                        free_points(n, POINTS);
+                        free_nodes(k, PTR_CLUSTER_HEADS);
+                        print_memory_error();
+                        return 1; 
+                }
+        }
+        return 0;
+}
+
+/* Compute sum of squared errors between cluster center and data points (i.e.
+ * variance) for each of the k clusters
+ */
+void objective_by_cluster(
+        size_t m, size_t k, 
+        double VAR_OBJECTIVE[k], 
+        double CENTERS[k][m], 
+        struct node *PTR_CLUSTER_HEADS[k]) {
+        for (size_t i = 0; i < k; i++) {
+                VAR_OBJECTIVE[i] = cluster_variance(
+                        m, 
+                        PTR_CLUSTER_HEADS[i], 
+                        CENTERS[i]
+                );
+        }
+}
+/* Compute the sum of an array */
+double array_sum(size_t k, double ARRAY[k]) {
+        double sum = 0;
+        for (size_t i = 0; i < k; i++) {
+                sum += ARRAY[i];
+        }
+        return sum;
 }
 
 /* Free memory in the cluster lists
