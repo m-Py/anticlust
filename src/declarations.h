@@ -84,10 +84,8 @@ void copy_matrix(
         double target[n][m]
 );
 int initialize_cluster_heads(
-        size_t n, 
         size_t k, 
-        struct node *PTR_CLUSTER_HEADS[k],
-        struct element POINTS[n]
+        struct node *PTR_CLUSTER_HEADS[k]
 );
 
 int fill_cluster_lists(

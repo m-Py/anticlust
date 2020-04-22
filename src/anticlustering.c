@@ -67,7 +67,8 @@ void c_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
 
         // Set up array of pointer-to-cluster-heads, return if memory runs out
         struct node *HEADS[k];
-        if (initialize_cluster_heads(n, k, HEADS, POINTS) == 1) {
+        if (initialize_cluster_heads(k, HEADS) == 1) {
+                free_points(n, POINTS);
                 return; 
         }
 
@@ -233,11 +234,7 @@ double cluster_var(size_t m, struct node *HEAD, double center[m]) {
         double sum = 0;
         struct node *tmp = HEAD->next;
         while (tmp != NULL) {
-                sum += euclidean_squared(
-                        center, 
-                        tmp->data->values, 
-                        m
-                );
+                sum += euclidean_squared(center, tmp->data->values, m);
                 tmp = tmp->next;
         }
         return sum;
@@ -283,12 +280,8 @@ void compute_center(size_t m, double center[m], struct node *HEAD, int freq) {
  * return: `0` if all data points were successfully stored; `1` if not.
  * 
  */
-int fill_data_points(
-                double *data, 
-                size_t n, 
-                size_t m, 
-                struct element POINTS[n], 
-                int *clusters) {
+int fill_data_points(double *data, size_t n, size_t m, struct element POINTS[n], 
+                     int *clusters) {
         // Create offset variable to correctly read out data points from vector
         int m_ptr[m];
         for (size_t i = 0; i < m; i++) {
@@ -362,20 +355,16 @@ void copy_matrix(size_t n, size_t m, double origin[n][m], double target[n][m]) {
  * 
  */
 
-int initialize_cluster_heads(
-        size_t n, size_t k, 
-        struct node *PTR_CLUSTER_HEADS[k],
-        struct element POINTS[n]) {
+int initialize_cluster_heads(size_t k, struct node *HEADS[k]) {
         for (size_t i = 0; i < k; i++) {
-                PTR_CLUSTER_HEADS[i] = malloc(sizeof(struct node*));
-                if (PTR_CLUSTER_HEADS[i] == NULL) {
-                        free_points(n, POINTS);
-                        free_nodes(k, PTR_CLUSTER_HEADS);
+                HEADS[i] = malloc(sizeof(struct node*));
+                if (HEADS[i] == NULL) {
+                        free_nodes(k, HEADS);
                         print_memory_error();
                         return 1;
                 }
-                PTR_CLUSTER_HEADS[i]->next = NULL;
-                PTR_CLUSTER_HEADS[i]->data = NULL;
+                HEADS[i]->next = NULL;
+                HEADS[i]->data = NULL;
         }
         return 0;
 }
@@ -385,13 +374,9 @@ int initialize_cluster_heads(
  * (a) add each data point as a node to a cluster list,
  * (b) store the pointer to each node in the array `PTR_NODES`
  */
-int fill_cluster_lists(
-        size_t n, 
-        size_t k,
-        int *clusters,
-        struct element POINTS[n],
-        struct node *PTR_NODES[n], 
-        struct node *PTR_CLUSTER_HEADS[k]) {
+int fill_cluster_lists(size_t n, size_t k, int *clusters,
+                       struct element POINTS[n], struct node *PTR_NODES[n],
+                       struct node *PTR_CLUSTER_HEADS[k]) {
         for (size_t i = 0; i < n; i++) {
                 struct node *current_cluster = PTR_CLUSTER_HEADS[clusters[i]];
                 PTR_NODES[i] = append_to_cluster(current_cluster, &POINTS[i]);
@@ -432,19 +417,13 @@ struct node* append_to_cluster(struct node *HEAD, struct element *data) {
  * variance) for each of the k clusters. The input array `VAR_OBJECTIVE` is 
  * changed through this function. 
  */
-void objective_by_cluster(
-        size_t m, size_t k, 
-        double VAR_OBJECTIVE[k], 
-        double CENTERS[k][m], 
-        struct node *PTR_CLUSTER_HEADS[k]) {
+void objective_by_cluster(size_t m, size_t k, double OBJ_BY_CLUSTER[k], 
+                          double CENTERS[k][m], struct node *HEADS[k]) {
         for (size_t i = 0; i < k; i++) {
-                VAR_OBJECTIVE[i] = cluster_var(
-                        m, 
-                        PTR_CLUSTER_HEADS[i], 
-                        CENTERS[i]
-                );
+                OBJ_BY_CLUSTER[i] = cluster_var(m, HEADS[i], CENTERS[i]);
         }
 }
+
 /* Compute the sum of an array */
 double array_sum(size_t k, double ARRAY[k]) {
         double sum = 0;
