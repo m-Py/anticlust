@@ -6,7 +6,7 @@ struct element
         double *values; // array of length M, element's data values
 };
 
-/* Define struct for nodes in linked circular list (representing a cluster) */
+/* Define struct for nodes in linked list (representing a cluster) */
 struct node
 {
         struct element *data; // Pointer to data point
