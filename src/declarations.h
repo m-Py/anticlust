@@ -112,7 +112,8 @@ double array_sum(
 /* Free functions */
 void free_points(
         size_t n, 
-        struct element POINTS[n]
+        struct element POINTS[n],
+        size_t i
 );
 void free_nodes(
         size_t k, 

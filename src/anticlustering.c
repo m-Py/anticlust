@@ -68,7 +68,7 @@ void c_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
         // Set up array of pointer-to-cluster-heads, return if memory runs out
         struct node *HEADS[k];
         if (initialize_cluster_heads(k, HEADS) == 1) {
-                free_points(n, POINTS);
+                free_points(n, POINTS, n);
                 return; 
         }
 
@@ -164,7 +164,7 @@ void c_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
         }
         
         // in the end, free allocated memory:
-        free_points(n, POINTS);
+        free_points(n, POINTS, n);
         free_nodes(k, HEADS);
 }
 
@@ -294,7 +294,7 @@ int fill_data_points(double *data, size_t n, size_t m, struct element POINTS[n],
                 // allocate memory for `m` data points
                 POINTS[i].values = malloc(m * sizeof(POINTS[i].values[0]));
                 if (POINTS[i].values == NULL) {
-                        free_points(i, POINTS);
+                        free_points(n, POINTS, i);
                         print_memory_error();
                         return 1;
                 } 
@@ -381,7 +381,7 @@ int fill_cluster_lists(size_t n, size_t k, int *clusters,
                 struct node *current_cluster = PTR_CLUSTER_HEADS[clusters[i]];
                 PTR_NODES[i] = append_to_cluster(current_cluster, &POINTS[i]);
                 if (PTR_NODES[i] == NULL) { // failed to allocate memory
-                        free_points(n, POINTS);
+                        free_points(n, POINTS, n);
                         free_nodes(k, PTR_CLUSTER_HEADS);
                         print_memory_error();
                         return 1; 
@@ -455,12 +455,13 @@ void free_nodes(size_t k, struct node *PTR_CLUSTER_HEADS[k]) {
 }
 
 /* Free memory in the data points
- * param `size_t n`: The number of data points to be freed
- * param `struct element points[n]`: Array containing data points
+ * param `size_t n`: length of array `POINTS`
+ * param `struct element POINTS[n]`: Array containing data points
+ * param `size_t i`: The index up to which data points are freed
  */
-void free_points(size_t n, struct element POINTS[n]) {
-        for (size_t i = 0; i < n; i++) {
-                free(POINTS[i].values);
+void free_points(size_t n, struct element POINTS[n], size_t i) {
+        for (size_t j = 0; j < i; j++) {
+                free(POINTS[j].values);
         }
 }
 
