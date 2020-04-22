@@ -249,19 +249,17 @@ void update_centers(size_t k, size_t m, double CENTERS[k][m],
  * param `double CENTERS[k][m]`: Matrix of cluster centers
  * param `size_t cl1`: Index of the first cluster
  * param `size_t cl2`: Index of the second cluster
- * param `struct node *PTR_CLUSTER_HEADS[k]`: Array of HEADs to the cluster lists
- * param `double OBJECTIVE_BY_CLUSTER[k]`: objective by cluster
+ * param `struct node *HEADS[k]`: Array of HEADs to the cluster lists
+ * param `double OBJ_BY_CLUSTER[k]`: objective by cluster
  * 
  */
 void update_objective_by_cluster(size_t k, size_t m, double CENTERS[k][m], 
                                  size_t cl1, size_t cl2, 
-                                 struct node *PTR_CLUSTER_HEADS[k], 
-                                 double OBJECTIVE_BY_CLUSTER[k]) {
-        OBJECTIVE_BY_CLUSTER[cl1] = cluster_variance(m, PTR_CLUSTER_HEADS[cl1], CENTERS[cl1]);
-        OBJECTIVE_BY_CLUSTER[cl2] = cluster_variance(m, PTR_CLUSTER_HEADS[cl2], CENTERS[cl2]);
+                                 struct node *HEADS[k], 
+                                 double OBJ_BY_CLUSTER[k]) {
+        OBJ_BY_CLUSTER[cl1] = cluster_variance(m, HEADS[cl1], CENTERS[cl1]);
+        OBJ_BY_CLUSTER[cl2] = cluster_variance(m, HEADS[cl2], CENTERS[cl2]);
 }
-
-
 
 /* Compute variance for a cluster
  * param `size_t m`: Number of variables per data point
