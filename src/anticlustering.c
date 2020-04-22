@@ -129,10 +129,7 @@ void c_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
                                 PTR_NODES[j],
                                 frequencies
                         );
-                        swap(
-                                n, i, j,
-                                PTR_NODES
-                        );
+                        swap(n, i, j, PTR_NODES);
                         // Update objective
                         tmp_objs[cl1] = cluster_var(m, HEADS[cl1], tmp_centers[cl1]);
                         tmp_objs[cl2] = cluster_var(m, HEADS[cl2], tmp_centers[cl2]);
@@ -147,18 +144,12 @@ void c_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
                         }
                         
                         // Swap back to test next exchange partner
-                        swap(
-                                n, i, j,
-                                PTR_NODES
-                        );
+                        swap(n, i, j, PTR_NODES);
                 }
                 
                 // Only if objective is improved: Do the swap
                 if (best_obj > SUM_VAR_OBJECTIVE) {
-                        swap(
-                                n, i, best_partner,
-                                PTR_NODES
-                        );
+                        swap(n, i, best_partner, PTR_NODES);
                         // Update the "global" variables
                         SUM_VAR_OBJECTIVE = best_obj;
                         copy_matrix(k, m, best_centers, CENTERS);
@@ -186,8 +177,7 @@ void c_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
  * 
  */
 
-void swap(size_t n, size_t i, size_t j, 
-          struct node *PTR_NODES[n]) {
+void swap(size_t n, size_t i, size_t j, struct node *PTR_NODES[n]) {
         
         struct node *one = PTR_NODES[i];
         struct node *two = PTR_NODES[j];
@@ -219,8 +209,7 @@ void swap(size_t n, size_t i, size_t j,
 
 /* Update cluster centers after a swap between two nodes in two cluster lists */
 void update_centers(size_t k, size_t m, double CENTERS[k][m],
-                    struct node *one, struct node *two,
-                    int *frequencies) {
+                    struct node *one, struct node *two, int *frequencies) {
         size_t cl1 = one->data->cluster;
         size_t cl2 = two->data->cluster;
         for (int i = 0; i < m; i++) {
