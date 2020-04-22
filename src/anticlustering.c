@@ -46,11 +46,12 @@ void c_anticlustering(
          * 2. required data structure:
          * 
          *     K Cluster lists + one array that points to the HEAD of each 
-         *     cluster list, respectively.
+         *     cluster list, respectively. The HEAD of each cluster list 
+         *     is not a data element, but just a pointer to the first
+         *     element.
          * 
          */
         
-        // Initialize cluster list with empty HEAD
         struct node *PTR_CLUSTER_HEADS[k];
         if (initialize_cluster_heads(k, PTR_CLUSTER_HEADS) == 1) {
                 free_points(n, POINTS);
@@ -504,6 +505,22 @@ void print_elements(size_t n, size_t m, struct node **PTR_NODES) {
         }
 }
 
+/* After creation, initialize the HEAD of each cluster list
+ * 
+ * We access the cluster list using an array of length `k` pointing
+ * to the `k` HEADs of the clusters. The first element pointed to 
+ * in the list (i.e., the HEAD) is "empty". It just points to the 
+ * first real element that is in that cluster.
+ * 
+ * param `size_t k`: The number of clusters
+ * param `struct node *PTR_CLUSTER_HEADS[k]`: The array of pointers to 
+ *     cluster HEADS.
+ * 
+ *  * return: `0` if the cluster list could be initialized successfully, `1` 
+ *      if not (in that case, there was no memory that could be allocated).
+ * 
+ */
+
 int initialize_cluster_heads(size_t k, struct node *PTR_CLUSTER_HEADS[k]) {
         for (size_t i = 0; i < k; i++) {
                 PTR_CLUSTER_HEADS[i] = malloc(sizeof(struct node*));
@@ -517,9 +534,11 @@ int initialize_cluster_heads(size_t k, struct node *PTR_CLUSTER_HEADS[k]) {
         return 0;
 }
 
-// Functions for freeing the data points (`struct element->values`) and
-// the nodes (`struct node`)
-
+/* Free memory in the cluster lists
+* param `size_t k`: The number of clusters
+* param `struct node *PTR_CLUSTER_HEADS[k]`: The array of pointers to 
+*     cluster HEADS
+*/
 void free_nodes(size_t k, struct node *PTR_CLUSTER_HEADS[k]) {
         struct node *ptr;
         struct node *prev; // using temp pointer for freeing
@@ -536,6 +555,10 @@ void free_nodes(size_t k, struct node *PTR_CLUSTER_HEADS[k]) {
         
 }
 
+/* Free memory in the data points
+ * param `size_t n`: The number of data points
+ * param `struct element points[n]`: Array containing data points
+ */
 void free_points(size_t n, struct element POINTS[n]) {
         for (size_t i = 0; i < n; i++) {
                 free(POINTS[i].values);
