@@ -273,47 +273,6 @@ void compute_center(size_t m, double center[m], struct node *HEAD, int freq) {
         }
 }
 
-/* Append data point to linked list
- * 
- * param `struct node *ptr_to_cluster` Pointer to start of linked list, representing a cluster
- * param `double *x`: Array / pointer to M data points
- * param `size_t i`: Index of the element in the original data
- * 
- * return: Pointer to the `node` of the element that was appended to the cluster list
- * 
- * side effect: Element is appended to linked list. As soon as the second element
- *      is appended to a list, the list becomes circular (last element points to 
- *      first element)
- * 
- */
-
-struct node* append_element_to_cluster(
-        struct node *HEAD, 
-        struct element *data, size_t i) {
-
-        // Case 1: Is list empty so far? It is if HEAD->next is NULL
-        if (HEAD->next == NULL) {
-                HEAD->next = malloc(sizeof(struct node*));
-                if (HEAD->next == NULL) {
-                        return NULL;
-                }
-                // New element is right next to HEAD element:
-                HEAD->next->data = data;
-                HEAD->next->next = NULL; 
-                return HEAD->next;
-        }
-        // Case 2: List is not empty; new node is appended next to HEAD
-        struct node *tmp = HEAD->next; 
-        HEAD->next = malloc(sizeof(struct node*));
-        if (HEAD->next == NULL) {       
-                return NULL;
-        }
-        // New element is right next to HEAD element:
-        HEAD->next->data = data;
-        HEAD->next->next = tmp; // tmp was next to HEAD before
-        return HEAD->next; 
-}
-
 /* Extracted method that fill data points into array of struct `element`
  * param `double *data` pointer to original data array of length n
  * param `size_t m`: Number of data points
@@ -434,10 +393,8 @@ int fill_cluster_lists(
         struct node *PTR_NODES[n], 
         struct node *PTR_CLUSTER_HEADS[k]) {
         for (size_t i = 0; i < n; i++) {
-                PTR_NODES[i] = append_element_to_cluster(
-                        PTR_CLUSTER_HEADS[clusters[i]], 
-                        &POINTS[i], i
-                );
+                struct node *current_cluster = PTR_CLUSTER_HEADS[clusters[i]];
+                PTR_NODES[i] = append_to_cluster(current_cluster, &POINTS[i]);
                 if (PTR_NODES[i] == NULL) { // failed to allocate memory
                         free_points(n, POINTS);
                         free_nodes(k, PTR_CLUSTER_HEADS);
@@ -446,6 +403,29 @@ int fill_cluster_lists(
                 }
         }
         return 0;
+}
+
+/* Append data point to linked list
+ * 
+ * param `struct node *HEAD` Pointer to HEAD of cluster list
+ * param `struct element *data`: Pointer to the data point 
+ *     that is appended to the list
+ * 
+ * return: Pointer to the `node` of the element that was appended to the
+ *     cluster list
+ * 
+ */
+
+struct node* append_to_cluster(struct node *HEAD, struct element *data) {
+        struct node *tmp = HEAD->next; // may be NULL if list is empty
+        HEAD->next = malloc(sizeof(struct node*));
+        if (HEAD->next == NULL) {
+                return NULL; // failed to allocate memory
+        }
+        // New element is right next to HEAD element:
+        HEAD->next->data = data;
+        HEAD->next->next = tmp; // tmp was next to HEAD before
+        return HEAD->next; 
 }
 
 /* Compute sum of squared errors between cluster center and data points (i.e.

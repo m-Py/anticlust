@@ -27,10 +27,9 @@ double euclidean_squared(
         double *y, 
         size_t m
 );
-struct node* append_element_to_cluster(
+struct node* append_to_cluster(
         struct node *HEAD, 
-        struct element *data,
-        size_t i
+        struct element *data
 );
 void compute_center(
         size_t m, 
