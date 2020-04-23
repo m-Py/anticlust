@@ -282,22 +282,25 @@ void compute_center(size_t m, double center[m], struct node *HEAD, int freq) {
  */
 int fill_data_points(double *data, size_t n, size_t m, struct element POINTS[n], 
                      int *clusters) {
-        // Create offset variable to correctly read out data points from vector
+        // Create offset variable to correctly read out data points
         int m_ptr[m];
         for (size_t i = 0; i < m; i++) {
                 m_ptr[i] = i * n;
         }
         
+        // Size of a data vector per element:
+        size_t data_size = m * sizeof(POINTS[0].values[0]);
+        
         for (size_t i = 0; i < n; i++) {
                 POINTS[i].cluster = clusters[i];
                 POINTS[i].ID = i;
-                // allocate memory for `m` data points
-                POINTS[i].values = malloc(m * sizeof(POINTS[i].values[0]));
+                POINTS[i].values = (double*) malloc(data_size);
                 if (POINTS[i].values == NULL) {
                         free_points(n, POINTS, i);
                         print_memory_error();
                         return 1;
                 } 
+                // Fill data into `element`:
                 for (size_t j = 0; j < m; j++) {
                         POINTS[i].values[j] = data[m_ptr[j]++];
                 }
@@ -357,7 +360,7 @@ void copy_matrix(size_t n, size_t m, double origin[n][m], double target[n][m]) {
 
 int initialize_cluster_heads(size_t k, struct node *HEADS[k]) {
         for (size_t i = 0; i < k; i++) {
-                HEADS[i] = malloc(sizeof(struct node*));
+                HEADS[i] = (struct node*) malloc(sizeof(struct node*));
                 if (HEADS[i] == NULL) {
                         free_nodes(k, HEADS);
                         print_memory_error();
@@ -403,7 +406,7 @@ int fill_cluster_lists(size_t n, size_t k, int *clusters,
 
 struct node* append_to_cluster(struct node *HEAD, struct element *data) {
         struct node *tmp = HEAD->next; // may be NULL if list is empty
-        HEAD->next = malloc(sizeof(struct node*));
+        HEAD->next = (struct node*) malloc(sizeof(struct node*));
         if (HEAD->next == NULL) {
                 return NULL; // failed to allocate memory
         }
