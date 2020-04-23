@@ -84,6 +84,22 @@ void c_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
         const size_t m = (size_t) *M; // number of variables per data point
         const size_t k = (size_t) *K; // number of clusters
         
+        // Set up array of exchange partners
+        if (*USE_CATS) {        
+                const size_t c = (size_t) *C; // number of categories 
+                size_t *C_HEADS[c]; // array of pointers to index arrays for each category
+                size_t n_cats;
+                for (size_t i = 0; i < c; i++) {
+                        n_cats = (size_t) CAT_frequencies[i];
+                        C_HEADS[i] = (size_t*) malloc(n_cats * sizeof(size_t));
+                        if (C_HEADS[i] == NULL) {
+                                print_memory_error();
+                                return;
+                        }
+                        printf("N-categories %zu: %zu\n", i, n_cats);
+                }
+        }
+        
         // Set up array of data points, fill it, return if memory runs out
         struct element POINTS[n];
         if (fill_data_points(data, n, m, POINTS, clusters) == 1) {

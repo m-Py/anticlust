@@ -3,14 +3,18 @@
 #' 
 #' @param data A N x M data matrix
 #' @param clusters An initial assignment of the elements to clusters 
+#' @param categories A vector, data.frame or matrix representing one
+#'     or several categorical constraints. 
 #' 
 #' @examples
 #' # Compare classical anticlustering implementation and C implementation
-#' N <- 200
+#' N <- 10
 #' M <- 3
 #' data <- matrix(rnorm(N * M), ncol = M)
 #' K <- 3
 #' clusters <- sample(rep_len(1:K, N))
+#' n_cats <- 3
+#' categories <- sample(n_cats, size = N, replace = TRUE)
 #' start <- Sys.time()
 #' cl1 <- fanticlust(data, clusters)
 #' Sys.time() - start
@@ -30,7 +34,7 @@
 #' 
 #' @export
 #' 
-fanticlust <- function(data, clusters) {
+fanticlust <- function(data, clusters, categories = NULL) {
   
   data <- as.matrix(data)
   if (mode(data) != "numeric") {
@@ -58,6 +62,14 @@ fanticlust <- function(data, clusters) {
     stop("No clusters with only one member allowed.")
   }
   
+  USE_FREQUENCIES <- FALSE
+  if (argument_exists(categories)) {
+    USE_FREQUENCIES <- TRUE
+    categories <- merge_into_one_variable(categories) - 1
+    N_CATS <- length(unique(categories))
+    CAT_frequencies <- table(categories)
+  }
+  
   # Call C implementation of anticlustering
   results <- .C(
     "c_anticlustering", 
@@ -67,6 +79,10 @@ fanticlust <- function(data, clusters) {
     as.integer(K),
     as.integer(frequencies),
     clusters = as.integer(clusters),
+    as.integer(USE_FREQUENCIES),
+    as.integer(N_CATS),
+    as.integer(CAT_frequencies),
+    as.integer(categories),
     PACKAGE = "anticlust"
   )
   results[["clusters"]] + 1
