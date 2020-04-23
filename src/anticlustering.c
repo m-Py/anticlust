@@ -87,19 +87,24 @@ void c_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
         // Set up array of data points, fill it, return if memory runs out
         struct element POINTS[n];
         if (fill_data_points(data, n, m, POINTS, clusters, USE_CATS, categories) == 1) {
+                print_memory_error();
                 return;
         }
         
-        // Set up array of exchange partners
+        // Deal with categorical restrictions
+        size_t c;
         if (*USE_CATS) {
-                const size_t c = (size_t) *C; // number of categories 
-                size_t *C_HEADS[c]; // describe above in general explanation 
-                // writes the indices into C_HEADS:
-                if (category_indices(n, c, POINTS, C_HEADS, 
-                                     categories, CAT_frequencies) == 1) {
-                        free_points(n, POINTS, n);
-                        return;
-                }
+                c = (size_t) *C; // number of categories 
+        } else {
+                c = 1;
+                *CAT_frequencies = n;
+        }
+        size_t *C_HEADS[c];
+        if (write_cheads(n, c, C_HEADS, USE_CATS, categories, 
+                         CAT_frequencies, POINTS) == 1) {
+                print_memory_error();
+                free_points(n, POINTS, n);
+                return; 
         }
         
         // Set up array of pointer-to-cluster-heads, return if memory runs out
@@ -147,8 +152,14 @@ void c_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
                 copy_matrix(k, m, CENTERS, best_centers);
                 copy_array(k, OBJ_BY_CLUSTER, best_objs);
                 
-                /* 2. Level: Iterate through `n` exchange partners */
-                for (size_t j = 0; j < n; j++) {
+                /* 2. Level: Iterate through the exchange partners */
+                size_t category_i = PTR_NODES[i]->data->category;
+                // `category_i = 0` if `USE_CATS == FALSE`.
+                size_t n_partners = CAT_frequencies[category_i];
+                // `CAT_frequencies[0] == n` if `USE_CATS == FALSE`
+                for (size_t u = 0; u < n_partners; u++) {
+                        // recode exchange partner index
+                        size_t j = C_HEADS[category_i][u];
                         
                         size_t cl2 = PTR_NODES[j]->data->cluster;
                         // no swapping attempt if in the same cluster:
@@ -479,6 +490,32 @@ double array_sum(size_t k, double ARRAY[k]) {
         return sum;
 }
 
+/* function that write a "global" variable `C_HEADS` that is used to determine
+ * which exchange partners are available for each element.
+ */
+int write_cheads(size_t n, size_t c, size_t *C_HEADS[c], int *USE_CATS, 
+             int *categories, int *CAT_frequencies, struct element POINTS[n]) {
+        // Set up array of exchange partners
+        if (*USE_CATS) {
+                if (category_indices(n, c, POINTS, C_HEADS, 
+                                     categories, CAT_frequencies) == 1) {
+                        return 1;
+                }
+                return 0;
+        }
+        // If no categorical constraints are induced, just allocate one index
+        // array that is used for all elements as 
+        // exchange partners. Contains *all* indices, because we 
+        // do not have categorical restrictions
+        C_HEADS[0] = (size_t*) malloc(n * sizeof(size_t));
+        if (C_HEADS[0] == NULL) {
+                return 1;
+        }
+        for (size_t i = 0; i < n; i++) {
+                C_HEADS[0][i] = i;
+        }
+        return 0;
+}
 
 /* Get a structure that has multiple arrays, pointed to by entries in another array; 
  * each of the arrays represents a category
@@ -506,7 +543,6 @@ int category_indices(size_t n, size_t c, struct element POINTS[n],
                 n_cats = (size_t) CAT_frequencies[i];
                 C_HEADS[i] = (size_t*) malloc(n_cats * sizeof(size_t));
                 if (C_HEADS[i] == NULL) {
-                        print_memory_error();
                         return 1;
                 }
                 // Now write `C_HEADS`! Fills all `c` arrays with indices, 
@@ -515,10 +551,9 @@ int category_indices(size_t n, size_t c, struct element POINTS[n],
                 j = 0;
                 while (tmp != NULL) {
                         C_HEADS[i][j] = tmp->data->ID;
-                        printf("%zu ", C_HEADS[i][j]);
+                        j++;
                         tmp = tmp->next;
                 } 
-                printf("\nmembers in category %zu: %zu\n", i, n_cats);
         }
 
         // free temporary category lists

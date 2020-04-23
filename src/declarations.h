@@ -111,6 +111,15 @@ double array_sum(
         double ARRAY[k]
 );
 
+int write_cheads(
+        size_t n, 
+        size_t c, 
+        size_t *C_HEADS[c], 
+        int *USE_CATS, 
+        int *categories, 
+        int *CAT_frequencies, 
+        struct element POINTS[n]
+);
 int category_indices(
         size_t n, 
         size_t c, 
