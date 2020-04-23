@@ -84,28 +84,24 @@ void c_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
         const size_t m = (size_t) *M; // number of variables per data point
         const size_t k = (size_t) *K; // number of clusters
         
+        // Set up array of data points, fill it, return if memory runs out
+        struct element POINTS[n];
+        if (fill_data_points(data, n, m, POINTS, clusters, USE_CATS, categories) == 1) {
+                return;
+        }
+        
         // Set up array of exchange partners
-        if (*USE_CATS) {        
+        if (*USE_CATS) {
                 const size_t c = (size_t) *C; // number of categories 
-                size_t *C_HEADS[c]; // array of pointers to index arrays for each category
-                size_t n_cats;
-                for (size_t i = 0; i < c; i++) {
-                        n_cats = (size_t) CAT_frequencies[i];
-                        C_HEADS[i] = (size_t*) malloc(n_cats * sizeof(size_t));
-                        if (C_HEADS[i] == NULL) {
-                                print_memory_error();
-                                return;
-                        }
-                        printf("N-categories %zu: %zu\n", i, n_cats);
+                size_t *C_HEADS[c]; // describe above in general explanation 
+                // writes the indices into C_HEADS:
+                if (category_indices(n, c, POINTS, C_HEADS, 
+                                     categories, CAT_frequencies) == 1) {
+                        free_points(n, POINTS, n);
+                        return;
                 }
         }
         
-        // Set up array of data points, fill it, return if memory runs out
-        struct element POINTS[n];
-        if (fill_data_points(data, n, m, POINTS, clusters) == 1) {
-                return;
-        }
-
         // Set up array of pointer-to-cluster-heads, return if memory runs out
         struct node *HEADS[k];
         if (initialize_cluster_heads(k, HEADS) == 1) {
@@ -207,6 +203,7 @@ void c_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
         // in the end, free allocated memory:
         free_points(n, POINTS, n);
         free_nodes(k, HEADS);
+        // TODO: Free memory allocated for category indexes!
 }
 
 /* 
@@ -322,7 +319,7 @@ void compute_center(size_t m, double center[m], struct node *HEAD, int freq) {
  * 
  */
 int fill_data_points(double *data, size_t n, size_t m, struct element POINTS[n], 
-                     int *clusters) {
+                     int *clusters, int *USE_CATS, int *categories) {
         // Create offset variable to correctly read out data points
         int m_ptr[m];
         for (size_t i = 0; i < m; i++) {
@@ -334,6 +331,11 @@ int fill_data_points(double *data, size_t n, size_t m, struct element POINTS[n],
         
         for (size_t i = 0; i < n; i++) {
                 POINTS[i].cluster = clusters[i];
+                if (*USE_CATS) {
+                        POINTS[i].category = categories[i];
+                } else {
+                        POINTS[i].category = 0;
+                }
                 POINTS[i].ID = i;
                 POINTS[i].values = (double*) malloc(data_size);
                 if (POINTS[i].values == NULL) {
@@ -477,6 +479,53 @@ double array_sum(size_t k, double ARRAY[k]) {
         return sum;
 }
 
+
+/* Get a structure that has multiple arrays, pointed to by entries in another array; 
+ * each of the arrays represents a category
+ */
+int category_indices(size_t n, size_t c, struct element POINTS[n], 
+                     size_t *C_HEADS[c], int *categories, 
+                     int *CAT_frequencies) {
+        
+        struct node *HEADS[c]; // used for filling `C_HEADS` - convert list into array
+        if (initialize_cluster_heads(c, HEADS) == 1) {
+                return 1; 
+        }
+        
+        // Set up array of pointers-to-nodes, return if memory runs out
+        struct node *PTR_NODES[n];
+        if (fill_cluster_lists(n, c, categories, POINTS, PTR_NODES, HEADS) == 1) {
+                return 1;
+        }
+        
+        // Initialize the index arrays
+        size_t n_cats;
+        struct node *tmp; 
+        size_t j;
+        for (size_t i = 0; i < c; i++) {
+                n_cats = (size_t) CAT_frequencies[i];
+                C_HEADS[i] = (size_t*) malloc(n_cats * sizeof(size_t));
+                if (C_HEADS[i] == NULL) {
+                        print_memory_error();
+                        return 1;
+                }
+                // Now write `C_HEADS`! Fills all `c` arrays with indices, 
+                // based on the category lists `HEAD[0], HEAD[1], ..., HEAD[c]`
+                tmp = HEADS[i]->next;
+                j = 0;
+                while (tmp != NULL) {
+                        C_HEADS[i][j] = tmp->data->ID;
+                        printf("%zu ", C_HEADS[i][j]);
+                        tmp = tmp->next;
+                } 
+                printf("\nmembers in category %zu: %zu\n", i, n_cats);
+        }
+
+        // free temporary category lists
+        free_nodes(c, HEADS);
+        return 0;
+}
+
 /* Free memory in the cluster lists
 * param `size_t k`: The number of clusters
 * param `struct node *PTR_CLUSTER_HEADS[k]`: The array of pointers to 
@@ -512,3 +561,4 @@ void free_points(size_t n, struct element POINTS[n], size_t i) {
 void print_memory_error() {
         fprintf(stderr, "Failed to allocate enough memory.");
 }
+

@@ -4,8 +4,7 @@ struct element
         size_t ID; // index of the node in original order of the data
         size_t cluster; // index of element's cluster
         double *values; // array of length M, element's data values
-        size_t **neighbours; // Pointer to array of indices of exchange partners
-        size_t n_neighbours; // number of exchange partners
+        size_t category; // index of element's category
 };
 
 /* Define struct for nodes in linked list (representing a cluster) */
@@ -44,7 +43,9 @@ int fill_data_points(
         size_t n, 
         size_t m, 
         struct element points[n], 
-        int *clusters
+        int *clusters,
+        int *USE_CATS,
+        int *categories
 );
 double cluster_var(
         size_t m, 
@@ -110,6 +111,14 @@ double array_sum(
         double ARRAY[k]
 );
 
+int category_indices(
+        size_t n, 
+        size_t c, 
+        struct element POINTS[n], 
+        size_t *C_HEADS[c], 
+        int *categories, 
+        int *CAT_frequencies
+);
 
 /* Free functions */
 void free_points(
