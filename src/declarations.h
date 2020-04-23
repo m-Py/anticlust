@@ -4,6 +4,8 @@ struct element
         size_t ID; // index of the node in original order of the data
         size_t cluster; // index of element's cluster
         double *values; // array of length M, element's data values
+        size_t **neighbours; // Pointer to array of indices of exchange partners
+        size_t n_neighbours; // number of exchange partners
 };
 
 /* Define struct for nodes in linked list (representing a cluster) */

@@ -6,15 +6,23 @@
 
 /* Exchange Method for Anticlustering
  * param *data: vector of data points (in R, this is a data frame,
- *          the matrix structure must be restored in C)
+ *         the matrix structure must be restored in C)
  * param *N: The number of elements (i.e., number of "rows" in *data)
  * param *M: The number of features (i.e., number of "cols" in *data)
  * param *K: The number of clusters
  * param *frequencies: The number of elements per cluster, i.e., an array
- *          of length K.
+ *         of length *K.
  * param *clusters: An initial assignment of elements to clusters,
- *          array of length *N (has integers between 0 and (K-1) - this 
- *          has to be guaranteed by the caller)
+ *         array of length *N (has to consists of integers between 0 and (K-1) 
+ *         - this has to be guaranteed by the caller)
+ * int *USE_CATS A boolean value (i.e., 1/0) indicating whether categorical 
+ *         constraints
+ * param *C: The number of categories
+ * param *CAT_frequencies: The number of elements per category, i.e., an array
+ *         of length *C.
+ * param *categories: An assignment of elements to categories,
+ *         array of length *N (has to consists of integers between 0 and (C-1) 
+ *         - this has to be guaranteed by the caller)
  * 
  * The return value is assigned to the argument `clusters`, via pointer
  * 
@@ -48,12 +56,29 @@
  * 5. `double OBJECTIVE_BY_CLUSTER[k]` - The variance objective by cluster.
  * 6. `double SUM_VAR_OBJECTIVE` - The total variance objective (i.e., sum 
  *    of all entries in `OBJECTIVE_BY_CLUSTER`).
+ *    
+ * Regarding the inclusion of categorical constraints: If the argument 
+ * `USE_CATS` is `TRUE` (i.e, `1`), the exchange method restricts the 
+ * exchange partners to elements of the same category. What elements are part 
+ * of the same category is specified via the input argument `categories`. 
+ * Generally, the arguments `C`, `CAT_frequencies`, `categories` have the same 
+ * semantic as `K`, `frequencies` and `clusters`, respectively. However, they 
+ * represent a fixed category and not a variable cluster affiliation (that is 
+ * changed in this function to maximize the k-means criterion). If `USE_CATS` is
+ * `FALSE` (i.e, `0`), the arguments `C`, `CAT_frequencies`, `categories` are 
+ * not used.
+ * 
+ * To balance a categorical variable that is represented by `categories` across
+ * clusters, it is necessary that these are already balanced when calling this
+ * function. `c_anticlustering` will not obtain an initial balanced partitioning
+ * itself - the caller is responsible.
  * 
  * ===========================================================================
 */
 
 void c_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
-        int *clusters) {
+        int *clusters, int *USE_CATS, int *C, int *CAT_frequencies,
+        int *categories) {
         
         const size_t n = (size_t) *N; // number of data points
         const size_t m = (size_t) *M; // number of variables per data point
