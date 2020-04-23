@@ -1,8 +1,9 @@
 
 #' C implementation of anticlustering
 #' 
-#' @param data A N x M data matrix
-#' @param clusters An initial assignment of the elements to clusters 
+#' @param data An N x M data matrix.
+#' @param K The number of clusters or an initial assignment of the elements 
+#'     to clusters.
 #' @param categories A vector, data.frame or matrix representing one
 #'     or several categorical constraints. 
 #' 
@@ -11,12 +12,11 @@
 #' N <- 100
 #' M <- 3
 #' data <- matrix(rnorm(N * M), ncol = M)
-#' K <- 2
-#' n_cats <- 2
-#' categories <- sample(n_cats, size = N, replace = TRUE)
-#' clusters <- anticlust:::categorical_sampling(categories, K)
+#' K <- 3
+#' C <- 3
+#' categories <- sample(C, size = N, replace = TRUE)
 #' start <- Sys.time()
-#' cl1 <- fanticlust(data, clusters, categories)
+#' cl1 <- fanticlust(data, K, categories)
 #' Sys.time() - start
 #' table(categories, cl1)
 #'
@@ -35,7 +35,9 @@
 #' 
 #' @export
 #' 
-fanticlust <- function(data, clusters, categories = NULL) {
+fanticlust <- function(data, K, categories = NULL) {
+  
+  clusters <- initialize_clusters(NROW(data), K, categories)
   
   data <- as.matrix(data)
   if (mode(data) != "numeric") {
@@ -52,11 +54,6 @@ fanticlust <- function(data, clusters, categories = NULL) {
   frequencies <- table(clusters)
   N <- NROW(data)
   M <- NCOL(data)
-  
-  # Are the arguments compatible?
-  if (N != length(clusters)) {
-    stop("The two arguments imply different length of the data.")
-  }
   
   # Each cluster must occur more than once
   if (any(frequencies <= 1)) {

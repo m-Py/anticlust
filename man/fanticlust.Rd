@@ -4,12 +4,13 @@
 \alias{fanticlust}
 \title{C implementation of anticlustering}
 \usage{
-fanticlust(data, clusters, categories = NULL)
+fanticlust(data, K, categories = NULL)
 }
 \arguments{
-\item{data}{A N x M data matrix}
+\item{data}{An N x M data matrix.}
 
-\item{clusters}{An initial assignment of the elements to clusters}
+\item{K}{The number of clusters or an initial assignment of the elements 
+to clusters.}
 
 \item{categories}{A vector, data.frame or matrix representing one
 or several categorical constraints.}
@@ -22,12 +23,11 @@ C implementation of anticlustering
 N <- 100
 M <- 3
 data <- matrix(rnorm(N * M), ncol = M)
-K <- 2
-n_cats <- 2
-categories <- sample(n_cats, size = N, replace = TRUE)
-clusters <- anticlust:::categorical_sampling(categories, K)
+K <- 3
+C <- 3
+categories <- sample(C, size = N, replace = TRUE)
 start <- Sys.time()
-cl1 <- fanticlust(data, clusters, categories)
+cl1 <- fanticlust(data, K, categories)
 Sys.time() - start
 table(categories, cl1)
 
