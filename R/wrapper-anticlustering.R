@@ -245,7 +245,7 @@ anticlustering <- function(x, K, objective = "distance", method = "exchange",
   # Redirect to specialized fast exchange methods for distance and 
   # variance objectives
   if (objective == "variance") {
-    return(fast_anticlustering(data, K, Inf, categories))
+    return(fanticlust(data, K, categories))
   } else if (objective == "distance") {
     return(fast_exchange_dist(data, K, categories))
   }
