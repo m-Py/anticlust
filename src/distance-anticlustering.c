@@ -135,10 +135,36 @@ void distance_anticlustering(double *data, int *N, int *K,
                                 continue;
                         }
                         
-                        // Initialize `tmp` objective for the current exchange partner:
-                        swap(n, i, j, PTR_NODES);
                         // Update objective
-                        distance_objective(n, k, distances, tmp_objs, HEADS);
+                        // Cluster 1: Loses distances to element 1
+                        tmp_objs[cl1] -= distances_one_element(
+                                n, distances, 
+                                HEADS[cl1],
+                                cl1
+                        );
+                        // Cluster 2: Loses distances to element 2
+                        tmp_objs[cl2] -= distances_one_element(
+                                n, distances, 
+                                HEADS[cl2],
+                                cl2
+                        );
+                        // Now swap the elements in the cluster list
+                        swap(n, i, j, PTR_NODES);
+                        // Cluster 1: Gains distances to element 2
+                        // (here, element 1 is no longer in cluster 1, so
+                        // we do not accidentally include d_12, and the 
+                        // self distance d_22 is 0)
+                        tmp_objs[cl1] += distances_one_element(
+                                n, distances, 
+                                HEADS[cl1],
+                                cl2
+                        );
+                        // Cluster 2: Gains distances to element 1
+                        tmp_objs[cl2] += distances_one_element(
+                                n, distances, 
+                                HEADS[cl2],
+                                cl1
+                        );
 
                         tmp_obj = array_sum(k, tmp_objs);
                         
@@ -201,7 +227,7 @@ double distances_one_element(size_t n, double distances[n][n],
                              struct node *start_node, size_t cl) {
         struct node *tmp = start_node->next;
         size_t cl2;
-        double sum;
+        double sum = 0;
         while (tmp != NULL) {
                 cl2 = tmp->data->ID;
                 sum += distances[cl][cl2];
