@@ -158,4 +158,9 @@ double distances_within(
         struct node *HEAD
 );
 
-double distances_one_element(size_t n, double distances[n][n], struct node *current);
+double distances_one_element(
+        size_t n, 
+        double distances[n][n], 
+        struct node *start_node, 
+        size_t cl
+);

@@ -134,11 +134,12 @@ void distance_anticlustering(double *data, int *N, int *K,
                         if (cl1 == cl2) { 
                                 continue;
                         }
-
+                        
                         // Initialize `tmp` objective for the current exchange partner:
                         swap(n, i, j, PTR_NODES);
                         // Update objective
                         distance_objective(n, k, distances, tmp_objs, HEADS);
+
                         tmp_obj = array_sum(k, tmp_objs);
                         
                         // Update `best` variables if objective was improved
@@ -147,7 +148,6 @@ void distance_anticlustering(double *data, int *N, int *K,
                                 copy_array(k, tmp_objs, best_objs);
                                 best_partner = j;
                         }
-                        
                         // Swap back to test next exchange partner
                         swap(n, i, j, PTR_NODES);
                 }
@@ -190,20 +190,21 @@ double distances_within(size_t n, double distances[n][n], struct node *HEAD) {
         // Iterate over quadratic number of distances
         struct node *current = HEAD->next;
         while (current != NULL) {
-                sum += distances_one_element(n, distances, current);
+                sum += distances_one_element(n, distances, current, current->data->ID);
                 current = current->next;
         }
         return sum;
 }
 
-double distances_one_element(size_t n, double distances[n][n], struct node *current) {
-        struct node *tmp = current->next;
-        size_t cl1 = current->data->ID;
+// compute sum of distances of one node to other nodes in the same cluster
+double distances_one_element(size_t n, double distances[n][n], 
+                             struct node *start_node, size_t cl) {
+        struct node *tmp = start_node->next;
         size_t cl2;
         double sum;
         while (tmp != NULL) {
                 cl2 = tmp->data->ID;
-                sum += distances[cl1][cl2];
+                sum += distances[cl][cl2];
                 tmp = tmp->next;
         }
         return sum;
