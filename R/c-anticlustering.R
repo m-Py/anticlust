@@ -1,5 +1,5 @@
 
-#' C implementation of anticlustering
+#' C implementation of k-means anticlustering
 #' 
 #' @param data An N x M data matrix.
 #' @param K The number of clusters or an initial assignment of the elements 
@@ -7,35 +7,11 @@
 #' @param categories A vector, data.frame or matrix representing one
 #'     or several categorical constraints. 
 #' 
-#' @examples
-#' # Compare classical anticlustering implementation and C implementation
-#' N <- 100
-#' M <- 3
-#' data <- matrix(rnorm(N * M), ncol = M)
-#' K <- 3
-#' C <- 3
-#' categories <- sample(C, size = N, replace = TRUE)
-#' start <- Sys.time()
-#' cl1 <- fanticlust(data, K, categories)
-#' Sys.time() - start
-#' table(categories, cl1)
-#'
-#' start <- Sys.time()
-#' cl2 <- anticlustering(
-#'   data,
-#'   K = clusters,
-#'   objective = "variance"
-#' )
-#' Sys.time() - start
-#' 
-#' all(cl1 == cl2) # Same algorithm in C and R
-#' 
-#' 
 #' @useDynLib anticlust c_anticlustering
 #' 
-#' @export
+#' @noRd
 #' 
-fanticlust <- function(data, K, categories = NULL) {
+kmeans_anticlustering <- function(data, K, categories = NULL) {
   
   clusters <- initialize_clusters(NROW(data), K, categories)
   

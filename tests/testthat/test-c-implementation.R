@@ -8,7 +8,7 @@ test_that("C implemenation has same output as R implementation", {
   K <- sample(2:5, size = 1)
   features <- matrix(rnorm(N * M), ncol = M)
   clusters <- initialize_clusters(N, K, NULL)
-  cl1 <- fanticlust(features, clusters)
+  cl1 <- kmeans_anticlustering(features, clusters)
   cl2 <- anticlustering(features, clusters, variance_objective_)
   expect_equal(
     variance_objective_(cl1, features),
@@ -20,7 +20,7 @@ test_that("C implemenation has same output as R implementation", {
   C <- sample(2:5, size = 1)
   categories <- sample(C, size = N, replace = TRUE)
   clusters <- initialize_clusters(N, K, categories)
-  cl1 <- fanticlust(features, clusters, categories)
+  cl1 <- kmeans_anticlustering(features, clusters, categories)
   cl2 <- anticlustering(
     features, 
     clusters, 

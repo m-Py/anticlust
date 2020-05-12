@@ -3,7 +3,6 @@
 export(anticlustering)
 export(balanced_clustering)
 export(distance_objective)
-export(fanticlust)
 export(fast_anticlustering)
 export(generate_partitions)
 export(matching)
