@@ -84,7 +84,7 @@ void distance_anticlustering(double *data, int *N, int *K,
         // Allocate memory for distance matrix in C
         double *distances[n];
         for (size_t i = 0; i < n; i++) {
-                distances[i] = malloc(sizeof(double) * n);
+                distances[i] = (double*) malloc(sizeof(double) * n);
                 if (distances[i] == NULL) {
                         print_memory_error();
                         return; // TODO: Free stuff
