@@ -2,7 +2,7 @@
 context("C implementation")
 library("anticlust")
 
-test_that("C implemenation has same output as R implementation", {
+test_that("C implemenation of Anticlustering has same output as R implementation", {
   set.seed(123)
   N <- sample(40:80, size = 1)
   M <- sample(1:5, size = 1)
