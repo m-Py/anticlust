@@ -97,8 +97,8 @@ void distance_anticlustering(double *data, int *N, int *K,
         }
         
         // Reconstruct the data points as N x N distance matrix
-        for(int i = 0; i < n; i++) {
-                for(int j = 0; j < n; j++) {
+        for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
                         distances[i][j] = data[offsets[j]++];
                 }
         }
