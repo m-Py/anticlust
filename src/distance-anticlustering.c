@@ -128,12 +128,14 @@ void distance_anticlustering(double *data, int *N, int *K,
                 for (size_t u = 0; u < n_partners; u++) {
                         // recode exchange partner index
                         size_t j = C_HEADS[category_i][u];
-                        
                         size_t cl2 = PTR_NODES[j]->data->cluster;
                         // no swapping attempt if in the same cluster:
                         if (cl1 == cl2) { 
                                 continue;
                         }
+                        
+                        // Initialize `tmp` variable for the exchange partner:
+                        copy_array(k, OBJ_BY_CLUSTER, tmp_objs);
                         
                         // Update objective
                         // Cluster 1: Loses distances to element 1
