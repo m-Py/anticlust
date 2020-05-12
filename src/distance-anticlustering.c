@@ -27,8 +27,6 @@
  * The return value is assigned to the argument `clusters`, via pointer
 */
 
-void print_matrix(size_t N, size_t M, double matrix[N][M]);
-
 void distance_anticlustering(double *data, int *N, int *K, 
                              int *frequencies, int *clusters, 
                              int *USE_CATS, int *C, int *CAT_frequencies,
@@ -83,7 +81,15 @@ void distance_anticlustering(double *data, int *N, int *K,
         // Restore distance matrix
         
         int offsets[n]; // index variable for indexing correct cols in data matrix
-        double distances[n][n];
+        // Allocate memory for distance matrix in C
+        double *distances[n];
+        for (size_t i = 0; i < n; i++) {
+                distances[i] = malloc(sizeof(double) * n);
+                if (distances[i] == NULL) {
+                        print_memory_error();
+                        return; // TODO: Free stuff
+                }
+        }
         
         // Column offsets (to convert one-dimensional array to Row/Col major)
         for(int i = 0; i < n; i++) {
@@ -201,7 +207,7 @@ void distance_anticlustering(double *data, int *N, int *K,
 }
 
 // Compute sum of distances by cluster
-void distance_objective(size_t n, size_t k, double distances[n][n], 
+void distance_objective(size_t n, size_t k, double *distances[n], 
                         double OBJ_BY_CLUSTER[k], struct node *HEADS[k]) {
         for (size_t i = 0; i < k; i++) {
                 OBJ_BY_CLUSTER[i] = distances_within(n, distances, HEADS[i]);
@@ -213,7 +219,7 @@ void distance_objective(size_t n, size_t k, double distances[n][n],
  * (if the summation starts at the beginning, this should be HEAD->next because
  * a cluster head is empty)
  */ 
-double distances_within(size_t n, double distances[n][n], struct node *HEAD) {
+double distances_within(size_t n, double *distances[n], struct node *HEAD) {
         double sum = 0;
         // Iterate over quadratic number of distances
         struct node *current = HEAD->next;
@@ -225,7 +231,7 @@ double distances_within(size_t n, double distances[n][n], struct node *HEAD) {
 }
 
 // compute sum of distances of one node to other nodes in the same cluster
-double distances_one_element(size_t n, double distances[n][n], 
+double distances_one_element(size_t n, double *distances[n], 
                              struct node *start_node, size_t ID) {
         struct node *tmp = start_node->next;
         double sum = 0;
@@ -234,22 +240,4 @@ double distances_one_element(size_t n, double distances[n][n],
                 tmp = tmp->next;
         }
         return sum;
-}
-
-
-/* Function to print a matrix
- * @param N Number of rows in `matrix`
- * @param M Number of columns in `matrix`
- * @param matrix The matrix to be transposed, has dimension N x M
- * @return VOID
- */ 
-void print_matrix(size_t N, size_t M, double matrix[N][M]) {
-        for (size_t i = 0; i < N; i++) {
-                for (size_t j = 0; j < M; j++) {
-                        printf(" %4g ", matrix[i][j]);
-                }
-                printf("\n");
-        }
-        printf("number of rows: %zu \nnumber of columns: %zu \n\n",
-               N, M);
 }
