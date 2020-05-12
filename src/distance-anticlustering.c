@@ -43,6 +43,7 @@ void distance_anticlustering(double *data, int *N, int *K,
         for (size_t i = 0; i < n; i++) {
                 POINTS[i].ID = i;
                 POINTS[i].cluster = clusters[i];
+                POINTS[i].values = malloc(sizeof(double)); // this is just a dummy malloc
                 if (*USE_CATS) {
                         POINTS[i].category = categories[i];
                 } else {
@@ -96,15 +97,11 @@ void distance_anticlustering(double *data, int *N, int *K,
                 }
         }
         
-        print_matrix(n, n, distances);
-        
-        // Compute objective
+        // Initialize objective
         double OBJ_BY_CLUSTER[k];
         distance_objective(n, k, distances, OBJ_BY_CLUSTER, HEADS);
-        double SUM_VAR_OBJECTIVE = array_sum(k, OBJ_BY_CLUSTER);
-        printf("Objective: %g\n", SUM_VAR_OBJECTIVE);
-        return;
-        
+        double SUM_OBJECTIVE = array_sum(k, OBJ_BY_CLUSTER);
+
         /* Some variables for bookkeeping during the optimization */
         
         size_t best_partner;
@@ -121,8 +118,7 @@ void distance_anticlustering(double *data, int *N, int *K,
                 
                 // Initialize `best` variable for the i'th item
                 best_obj = 0;
-                // copy_matrix(k, m, CENTERS, best_centers);
-                // copy_array(k, OBJ_BY_CLUSTER, best_objs);
+                copy_array(k, OBJ_BY_CLUSTER, best_objs);
                 
                 /* 2. Level: Iterate through the exchange partners */
                 size_t category_i = PTR_NODES[i]->data->category;
@@ -139,27 +135,15 @@ void distance_anticlustering(double *data, int *N, int *K,
                                 continue;
                         }
 
-                        // Initialize `tmp` variables for the exchange partner:
-                        // copy_matrix(k, m, CENTERS, tmp_centers);
-                        // copy_array(k, OBJ_BY_CLUSTER, tmp_objs);
-                        
-                        /* update_centers(
-                                k, m, 
-                                tmp_centers, 
-                                PTR_NODES[i],
-                                PTR_NODES[j],
-                                frequencies
-                        ); */
+                        // Initialize `tmp` objective for the current exchange partner:
                         swap(n, i, j, PTR_NODES);
                         // Update objective
-                        //tmp_objs[cl1] = cluster_var(m, HEADS[cl1], tmp_centers[cl1]);
-                        //tmp_objs[cl2] = cluster_var(m, HEADS[cl2], tmp_centers[cl2]);
+                        distance_objective(n, k, distances, tmp_objs, HEADS);
                         tmp_obj = array_sum(k, tmp_objs);
                         
                         // Update `best` variables if objective was improved
                         if (tmp_obj > best_obj) {
                                 best_obj = tmp_obj;
-                                // copy_matrix(k, m, tmp_centers, best_centers);
                                 copy_array(k, tmp_objs, best_objs);
                                 best_partner = j;
                         }
@@ -169,13 +153,12 @@ void distance_anticlustering(double *data, int *N, int *K,
                 }
                 
                 // Only if objective is improved: Do the swap
-                /*if (best_obj > SUM_VAR_OBJECTIVE) {
+                if (best_obj > SUM_OBJECTIVE) {
                         swap(n, i, best_partner, PTR_NODES);
                         // Update the "global" variables
-                        SUM_VAR_OBJECTIVE = best_obj;
-                        copy_matrix(k, m, best_centers, CENTERS);
+                        SUM_OBJECTIVE = best_obj;
                         copy_array(k, best_objs, OBJ_BY_CLUSTER);
-                }*/
+                }
         }
 
         // Write output
@@ -221,9 +204,6 @@ double distances_one_element(size_t n, double distances[n][n], struct node *curr
         while (tmp != NULL) {
                 cl2 = tmp->data->ID;
                 sum += distances[cl1][cl2];
-                printf("Objective: %g\n", sum);
-                printf("CL1: %zu\n", cl1);
-                printf("CL2: %zu\n", cl2);
                 tmp = tmp->next;
         }
         return sum;
