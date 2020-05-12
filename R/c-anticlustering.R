@@ -62,7 +62,7 @@ c_anticlustering <- function(data, K, categories = NULL, objective) {
   } else {
     results <- .C(
       "distance_anticlustering", 
-      as.double(data),
+      as.double(convert_to_distances(data)),
       as.integer(N),
       as.integer(K),
       as.integer(frequencies),
