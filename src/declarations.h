@@ -141,3 +141,21 @@ void free_nodes(
 );
 
 void print_memory_error();
+
+
+// For distance anticlustering, objective functions
+void distance_objective(
+        size_t n, 
+        size_t k, 
+        double distances[n][n], 
+        double OBJ_BY_CLUSTER[k], 
+        struct node *HEADS[k]
+);
+
+double distances_within(
+        size_t n, 
+        double distances[n][n], 
+        struct node *HEAD
+);
+
+double distances_one_element(size_t n, double distances[n][n], struct node *current);

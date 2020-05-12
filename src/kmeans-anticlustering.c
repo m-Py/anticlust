@@ -76,7 +76,7 @@
  * ===========================================================================
 */
 
-void c_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
+void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
         int *clusters, int *USE_CATS, int *C, int *CAT_frequencies,
         int *categories) {
         

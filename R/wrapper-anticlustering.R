@@ -244,11 +244,7 @@ anticlustering <- function(x, K, objective = "distance", method = "exchange",
 
   # Redirect to specialized fast exchange methods for distance and 
   # variance objectives
-  if (objective == "variance") {
-    return(kmeans_anticlustering(data, K, categories))
-  } else if (objective == "distance") {
-    return(fast_exchange_dist(data, K, categories))
-  }
+  c_anticlustering(data, K, categories, objective)
 }
 
 # Function that processes input and returns the data set that the

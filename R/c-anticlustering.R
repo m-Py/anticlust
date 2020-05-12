@@ -1,25 +1,20 @@
 
-#' C implementation of k-means anticlustering
+#' C implementation of anticlustering
 #' 
-#' @param data An N x M data matrix.
+#' @param data An N x M data matrix or N x N distance matrix.
 #' @param K The number of clusters or an initial assignment of the elements 
 #'     to clusters.
 #' @param categories A vector, data.frame or matrix representing one
 #'     or several categorical constraints. 
 #' 
-#' @useDynLib anticlust c_anticlustering
+#' @useDynLib anticlust kmeans_anticlustering distance_anticlustering
 #' 
 #' @noRd
 #' 
-kmeans_anticlustering <- function(data, K, categories = NULL) {
+c_anticlustering <- function(data, K, categories = NULL, objective) {
   
   clusters <- initialize_clusters(NROW(data), K, categories)
-  
-  data <- as.matrix(data)
-  if (mode(data) != "numeric") {
-    stop("The data must be numeric.")
-  }
-  
+
   # Ensure that `clusters` is a vector of integers between 0 and K-1
   clusters <- to_numeric(clusters) - 1
   # As convenience arguments for C, also pass 
@@ -49,19 +44,35 @@ kmeans_anticlustering <- function(data, K, categories = NULL) {
   }
   
   # Call C implementation of anticlustering
-  results <- .C(
-    "c_anticlustering", 
-    as.double(data),
-    as.integer(N),
-    as.integer(M),
-    as.integer(K),
-    as.integer(frequencies),
-    clusters = as.integer(clusters),
-    as.integer(USE_FREQUENCIES),
-    as.integer(N_CATS),
-    as.integer(CAT_frequencies),
-    as.integer(categories),
-    PACKAGE = "anticlust"
-  )
+  if (objective == "variance") {
+    results <- .C(
+      "kmeans_anticlustering", 
+      as.double(data),
+      as.integer(N),
+      as.integer(M),
+      as.integer(K),
+      as.integer(frequencies),
+      clusters = as.integer(clusters),
+      as.integer(USE_FREQUENCIES),
+      as.integer(N_CATS),
+      as.integer(CAT_frequencies),
+      as.integer(categories),
+      PACKAGE = "anticlust"
+    )
+  } else {
+    results <- .C(
+      "distance_anticlustering", 
+      as.double(data),
+      as.integer(N),
+      as.integer(K),
+      as.integer(frequencies),
+      clusters = as.integer(clusters),
+      as.integer(USE_FREQUENCIES),
+      as.integer(N_CATS),
+      as.integer(CAT_frequencies),
+      as.integer(categories),
+      PACKAGE = "anticlust"
+    )
+  }
   results[["clusters"]] + 1
 }
