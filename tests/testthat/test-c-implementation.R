@@ -59,5 +59,24 @@ test_that("C implemenation of Anticlustering has same output as R implementation
     categories = categories
   )
   expect_true(all(cl1 == cl2))
+  
+  # now also use preclustering
+  set.seed(71207)
+  C <- sample(2:5, size = 1)
+  categories <- sample(C, size = N, replace = TRUE)
+  clusters <- initialize_clusters(N, K, categories)
+  cl1 <- anticlustering(
+    features, 
+    clusters, 
+    objective = "distance", 
+    categories = categories
+  )
+  cl2 <- anticlustering(
+    features, 
+    clusters, 
+    objective = distance_objective_, 
+    categories = categories
+  )
+  expect_true(all(cl1 == cl2))
 
 })
