@@ -1,3 +1,10 @@
+# anticlust 0.4.2 (devel)
+
+## Internal changes
+
+- Improved running speed of generating constraints in integer linear
+programming variant of (anti)clustering, via [0a870240f8](https://github.com/m-Py/anticlust/commit/0a870240f8264f0e74f4cbf0b20d789cfa0d6469)
+
 # anticlust 0.4.1
 
 ## Major
