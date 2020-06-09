@@ -120,30 +120,26 @@ sparse_constraints <- function(n_items, pair_names) {
 # @return A list of indices to be used as input parameters of
 #     Matrix::sparseMatrix
 #
-vectorized_triangular <- function(n_items, pair_names) {
-  triangular_constraints <- choose(n_items, 3)
+vectorized_triangular <- function(n, pair_names) {
+  triangular_constraints <- choose(n, 3)
   coef_per_constraint <- 3
   # number of coefficients in constraint matrix:
   col_indices <- matrix(ncol = triangular_constraints, nrow = coef_per_constraint * 3)
   row_indices <- rep(1:(triangular_constraints*3), each = 3)
   xes <- rep(c(-1, 1, 1, 1, -1, 1, 1, 1, -1), triangular_constraints)
-  ## Fill columns for constraints
-  counter <- 1
-  for (i in 1:n_items) {
-    for (j in 2:n_items) {
-      for (k in 3:n_items) {
-        ## ensure that only legal constraints are inserted:
-        if (!(i < j) | !(j < k)) next
-        ## Construct indices
-        pairs <- c(paste0("x", i, "_", j), paste0("x", i, "_", k), paste0("x", j, "_", k))
-        indices <- match(pairs, pair_names)
-        col_indices[, counter] <- rep(indices, 3)
-        counter <- counter + 1
-      }
-    }
-  }
-  return(list(i = row_indices, j = c(col_indices), x = xes))
+  # generate all item triplets
+  triplets <- t(combn(1:n, 3))
+  # get the respective column indices in constraint matrix
+  ds <- c(t(data.frame(
+    paste0("x", triplets[, 1], "_", triplets[, 2]),
+    paste0("x", triplets[, 1], "_", triplets[, 3]),
+    paste0("x", triplets[, 2], "_", triplets[, 3])
+  )))
+  col_indices <- matrix(match(ds, pair_names), nrow = 3)
+  col_indices <- rbind(col_indices, col_indices, col_indices)
+  list(i = row_indices, j = c(col_indices), x = xes)
 }
+
 
 # Construct indices for a sparse matrix representation of group
 # constraints
