@@ -134,7 +134,6 @@ triangular_constraints <- function(n, pair_names) {
   list(i = row_indices, j = c(col_indices), x = xes)
 }
 
-
 # Indices for sparse matrix representation of group constraints
 group_constraints <- function(n, pair_names) {
   coef_per_constraint <- (n - 1)
@@ -142,12 +141,27 @@ group_constraints <- function(n, pair_names) {
   row_indices <- rep((1:n) + (3 * choose(n, 3)), each = coef_per_constraint)
   col_indices <- matrix(ncol = n, nrow = coef_per_constraint)
   xes         <- rep(1, length = group_coefficients)
-  # Generate column indices for each element in the constraint matrix
-  all_cons <- t(combn(1:n, 2))
   for (i in 1:n) {
-    connections <- all_cons[apply(all_cons, 1, function(x) i %in% x), ]
+    connections <- all_connections(i, n)
     pairs <- paste0("x", connections[, 1], "_", connections[, 2])
     col_indices[, i] <- match(pairs, pair_names)
   }
   return(list(i = row_indices, j = c(col_indices), x = xes))
+}
+
+# Find all connections of an element
+# @param i The point for which the connections are sought (must be in
+#     1...n)
+# @param n The number of points
+# @return A `data.frame` with two columns representing start and end
+#     point.  The second column always contains the "larger number"
+#     point.
+all_connections <- function(i, n) {
+  connections <- expand.grid(i, setdiff(1:n, i))
+  # put lower index in first column
+  wrongorder <- connections[, 1] > connections[, 2]
+  temp <- connections[, 2][wrongorder]
+  connections[, 2][wrongorder] <- connections[, 1][wrongorder]
+  connections[, 1][wrongorder] <- temp
+  return(connections)
 }
