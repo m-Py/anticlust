@@ -93,7 +93,7 @@ vectorize_weights <- function(distances) {
   costs$costs <- c(distances)
   # remove redundant or self distances:
   costs <- costs[costs$i < costs$j, ]
-  costs$pair <- paste0("x", paste0(costs$i, "_", costs$j))
+  costs$pair <- paste0("x", costs$i, "_", costs$j)
   rownames(costs) <- NULL
   return(costs)
 }
