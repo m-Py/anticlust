@@ -86,12 +86,12 @@ equality_identifiers <- function() {
 #     that is connected; `pair` A string of form "xi_j" identifying the
 #     item pair
 vectorize_weights <- function(distances) {
-  ## Problem: I have matrix of costs but need vector for ILP.
-  ## Make vector of costs in data.frame (makes each cost identifiable)
+  # Problem: I have matrix of costs but need vector for ILP.
+  # Make vector of costs in data.frame (makes each cost identifiable)
   costs <- expand.grid(1:ncol(distances), 1:nrow(distances))
   colnames(costs) <- c("i", "j")
   costs$costs <- c(distances)
-  ## remove redundant or self distances:
+  # remove redundant or self distances:
   costs <- costs[costs$i < costs$j, ]
   costs$pair <- paste0("x", paste0(costs$i, "_", costs$j))
   rownames(costs) <- NULL
@@ -99,28 +99,21 @@ vectorize_weights <- function(distances) {
 }
 
 # Construct a sparse matrix representing the ILP constraints
-# @param n_items How many items are there
+#
+# @param n The number of elements
 # @param pair_names A character vector of names representing the item
-#     pairs.  Must have the form that is contained in the ILP
-#     data.frame costs$pair.
+#     pairs (e.g.: "x1_2", ..., "x100_123"). Is read out from the data frame
+#     have `costs` (i.e., costs$pair is passed as pair_names)
 # @return A sparse matrix representing the left-hand side of the ILP (A
 #     in Ax ~ b)
 #
-sparse_constraints <- function(n_items, pair_names) {
-  tri <- triangular_constraints(n_items, pair_names)
-  gr  <- group_constraints(n_items, pair_names)
+sparse_constraints <- function(n, pair_names) {
+  tri <- triangular_constraints(n, pair_names)
+  gr  <- group_constraints(n, pair_names)
   Matrix::sparseMatrix(c(tri$i, gr$i), c(tri$j, gr$j), x = c(tri$x, gr$x))
 }
 
-# Construct indices for a sparse matrix representation of triangular
-# constraints
-# @param n_items How many items are there
-# @param pair_names A character vector of names representing the item
-#     pairs.  Must have the form that is contained in the ILP
-#     data.frame costs$pair.
-# @return A list of indices to be used as input parameters of
-#     Matrix::sparseMatrix
-#
+# Indices for sparse matrix representation of triangular constraints
 triangular_constraints <- function(n, pair_names) {
   triangular_constraints <- choose(n, 3)
   coef_per_constraint <- 3
@@ -142,14 +135,7 @@ triangular_constraints <- function(n, pair_names) {
 }
 
 
-# Construct indices for a sparse matrix representation of group
-# constraints
-# @param n_items How many items does the instance have
-# @param pair_names A character vector of names representing the item
-#     pairs.  Must have the form that is contained in the ILP
-#     data.frame costs$pair.
-# @return A list of indices to be used as input parameters of
-#     Matrix::sparseMatrix
+# Indices for sparse matrix representation of group constraints
 group_constraints <- function(n, pair_names) {
   coef_per_constraint <- (n - 1)
   group_coefficients <- coef_per_constraint * n
