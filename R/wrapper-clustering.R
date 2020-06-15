@@ -80,8 +80,9 @@
 #' Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
 #' for a clustering problem. Mathematical Programming, 45, 59–96.
 #'
-#' Papenberg, M., & Klau, G. W. (2019, October 30). Using anticlustering to partition 
-#' data sets into equivalent parts https://doi.org/10.31234/osf.io/3razc
+#' Papenberg, M., & Klau, G. W. (2020). Using anticlustering to partition 
+#' data sets into equivalent parts. Psychological Methods. Advance Online 
+#' Publication. https://doi.org/10.1037/met0000301.
 #'
 
 balanced_clustering <- function(x, K, method = "centroid") {

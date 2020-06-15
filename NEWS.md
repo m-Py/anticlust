@@ -1,9 +1,20 @@
 # anticlust 0.4.2 (devel)
 
+## Major
+
+- 
+
+## Minor
+
+- Changes to the documentation to highlight the publication
+of the manuscript "Using Anticlustering to Partition Data Sets Into 
+Equivalent Parts" (https://doi.org/10.1037/met0000301) describing the
+algorithms and criteria used in the package `anticlust` 
+
 ## Internal changes
 
 - Improved running speed of generating constraints in integer linear
-programming variant of (anti)clustering, via [0a870240f8](https://github.com/m-Py/anticlust/commit/0a870240f8264f0e74f4cbf0b20d789cfa0d6469)
+programming variant of (anti)clustering, via   [0a870240f8](https://github.com/m-Py/anticlust/commit/0a870240f8264f0e74f4cbf0b20d789cfa0d6469)
 
 # anticlust 0.4.1
 

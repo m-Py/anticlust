@@ -44,8 +44,9 @@
 #'
 #' @references
 #'
-#' Papenberg, M., & Klau, G. W. (2019, October 30). Using anticlustering to partition 
-#' data sets into equivalent parts https://doi.org/10.31234/osf.io/3razc
+#' Papenberg, M., & Klau, G. W. (2020). Using anticlustering to partition 
+#' data sets into equivalent parts. Psychological Methods. Advance Online 
+#' Publication. https://doi.org/10.1037/met0000301.
 #'
 
 distance_objective <- function(x, clusters) {
