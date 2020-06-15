@@ -12,14 +12,14 @@ also implemented the integer linear programming method.
 balanced_clustering(x, K, method = "centroid")
 }
 \arguments{
-\item{x}{The data input. Can be one of two structures: (1) A data
+\item{x}{The data input. Can be one of two structures: (1) A feature
 matrix where rows correspond to elements and columns correspond
-to features (a single numeric feature can be passed as a
+to variables (a single numeric variable can be passed as a
 vector). (2) An N x N matrix dissimilarity matrix; can be an
 object of class \code{dist} (e.g., returned by
 \code{\link{dist}} or \code{\link{as.dist}}) or a \code{matrix}
 where the entries of the upper and lower triangular matrix
-represent the pairwise dissimilarities.}
+represent pairwise dissimilarities.}
 
 \item{K}{How many clusters should be created.}
 

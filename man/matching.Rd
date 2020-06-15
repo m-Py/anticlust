@@ -15,14 +15,14 @@ matching(
 )
 }
 \arguments{
-\item{x}{The data input. Can be one of two structures: (1) A data
+\item{x}{The data input. Can be one of two structures: (1) A feature
 matrix where rows correspond to elements and columns correspond
-to features (a single numeric feature can be passed as a
+to variables (a single numeric variable can be passed as a
 vector). (2) An N x N matrix dissimilarity matrix; can be an
 object of class \code{dist} (e.g., returned by
 \code{\link{dist}} or \code{\link{as.dist}}) or a \code{matrix}
 where the entries of the upper and lower triangular matrix
-represent the pairwise dissimilarities.}
+represent pairwise dissimilarities.}
 
 \item{p}{The size of the groups; the default is 2, in which case
 the function returns pairs.}
