@@ -12,9 +12,9 @@ Equivalent Parts" (https://doi.org/10.1037/met0000301) describing the
 algorithms and criteria used in the package `anticlust` 
 - `anticlustering()` can no longer use an argument `K` of length > 1 with 
 `preclustering = TRUE` because this resulted in undocumented behaviour 
-(this is because it does not make sense to specify an assignment of elements 
-to groups via `K` and at the same time require that preclustering 
-assigns elements to groups)
+(this is a good change because it does not make sense to specify an initial assignment 
+of elements to groups via `K` and at the same time request that preclustering 
+handles the initials assignment)
 
 ## Internal changes
 
