@@ -6,34 +6,36 @@
 
 - A new function: `categorical_sampling()` (TODO)
 - The function `distance_objective()` was renamed into 
-`diversity_objective()` because there are (TODO)
+`diversity_objective()` because there are several clustering objectives 
+based on pairwise distances (TODO)
 - The order of the arguments in `diversity_objective()` and 
-`variance_objective()` were changed. They are now consistent with 
-the expectation of the `objective` argument in `anticlustering()` 
-in case a custom objective function has to be optimized (TODO)
-- `dispersion_objective()` is a new function to compute the dispersion
-anticlustering objective (i.e., the minimum distance between two elements
-within the same group) (TODO)
+`variance_objective()` were changed. They are now consistent with the 
+expectation of the `objective` argument in `anticlustering()` in case a 
+custom objective function has to be optimized (TODO)
+- `dispersion_objective()` is a new function to compute the dispersion 
+anticlustering objective (i.e., the minimum distance between two 
+elements within the same group) (TODO)
 
 ### Minor
 
-- Changes to the documentation to highlight the publication
-of the manuscript "Using Anticlustering to Partition Data Sets Into 
-Equivalent Parts" (https://doi.org/10.1037/met0000301) describing the
-algorithms and criteria used in the package `anticlust` 
-- In anticlustering, anticluster editing is now by default requested using 
-`objective = "diversity"` (but `objective = "distance"` is still supported
-and leads to the same behaviour)
-- `anticlustering()` can no longer use an argument `K` of length > 1 with 
-`preclustering = TRUE` because this resulted in undocumented behaviour 
-(this is a good change because it does not make sense to specify an initial assignment 
-of elements to groups via `K` and at the same time request that preclustering 
-handles the initials assignment)
+- Several changes to the documentation, in particular now highlighting 
+the publication of the manuscript "Using Anticlustering to Partition 
+Data Sets Into Equivalent Parts" (https://doi.org/10.1037/met0000301) 
+describing the algorithms and criteria used in the package `anticlust` 
+- In `anticlustering()`, anticluster editing is now by default requested 
+using `objective = "diversity"` (but `objective = "distance"` is still 
+supported and leads to the same behaviour)
+- `anticlustering()` can no longer use an argument `K` of length > 1 
+with `preclustering = TRUE` because this resulted in undocumented 
+behaviour (this is a good change because it does not make sense to 
+specify an initial assignment of elements to groups via `K` and at the 
+same time request that preclustering handles the initial assignment)
 
 ## Internal changes
 
 - Improved running speed of generating constraints in integer linear
-programming variant of (anti)clustering, via   [0a870240f8](https://github.com/m-Py/anticlust/commit/0a870240f8264f0e74f4cbf0b20d789cfa0d6469)
+programming variant of (anti)clustering, via 
+[0a870240f8](https://github.com/m-Py/anticlust/commit/0a870240f8264f0e74f4cbf0b20d789cfa0d6469)
 
 # anticlust 0.4.1
 
