@@ -7,7 +7,7 @@
 anticlustering(
   x,
   K,
-  objective = "distance",
+  objective = "diversity",
   method = "exchange",
   preclustering = FALSE,
   categories = NULL
@@ -28,7 +28,7 @@ vector of length \code{nrow(x)} describing how elements are
 assigned to anticlusters before the optimization starts.}
 
 \item{objective}{The objective to be maximized. The option
-"distance" (default) maximizes the cluster editing objective
+"diversity" (default) maximizes the cluster editing objective
 function; the option "variance" maximizes the k-means objective
 function. See Details.}
 
@@ -56,27 +56,36 @@ This function is used to solve anticlustering. That is, \code{K}
 groups are created in such a way that all groups are as similar as
 possible. This is accomplished by maximizing instead of minimizing
 a clustering objective function. This function natively supports
-the optimization of two clustering objective functions:
+the maximization of two clustering objective functions:
 
-- k-means `variance` objective, setting \code{objective = "variance"}
+\itemize{
+  \item{cluster editing `diversity` objective, setting \code{objective = "diversity"} (default)}
+  \item{k-means `variance` objective, setting \code{objective = "variance"}}
+}
 
-- cluster editing `distance` objective, setting \code{objective =
-  "distance"}
+The k-means objective is the variance within groups---that is, the
+sum of the squared distances between each element and its cluster
+center (see \code{\link{variance_objective}}). The cluster editing
+objective is the sum of pairwise distances within groups (see
+\code{\link{diversity_objective}}). Maximizing either of these
+clustering objectives (i.e., anticlustering) will partition the
+data set into similar groups, whereas traditional cluster analysis
+is used to obtain a low between-group similarity.
 
-The k-means objective measures the variance within
-anticlusters---that is, the sum of the squared distances between
-each element and its cluster center (see
-\code{\link{variance_objective}}). The cluster editing objective is
-the sum of pairwise distances within groups (see
-\code{\link{distance_objective}}). Anticluster editing is also
-known as the »maximum diverse grouping problem«. Maximizing either
-of these anticlustering objectives will partition the data set into
-similar groups.  That is, by maximizing within-group heterogeneity,
-between-group similarity is maximized simultaneously.
+Anticluster editing is also known as the »maximum diverse grouping
+problem« because it maximizes group diversity as measured by the
+sum of pairwise distances. Hence, anticlustering maximizes
+between-group similarity by maximizing within-group
+heterogeneity. In previous versions of this package, \code{method =
+"distance"} was used (and is still supported) to request
+anticluster editing, but now \code{method = "diversity"} is
+preferred because there are several clustering objectives based on
+pairwise distances (e.g., see
+\code{\link{dispersion_objective()}}).
 
 If the data input \code{x} is a feature matrix (that is: each row
 is a "case" and each column is a "variable") and the option
-\code{objective = "distance"} is used, the Euclidean distance is
+\code{objective = "diversity"} is used, the Euclidean distance is
 computed as the basic unit of the anticluster editing objective. If
 a different measure of dissimilarity is preferred, you may pass a
 self-generated dissimiliarity matrix via the argument \code{x}.
@@ -98,10 +107,9 @@ the argument \code{K} (in this case, \code{K} has length
 \code{nrow(x)}). The exchange procedure is repeated for each
 element. Because each possible swap is investigated for each
 element, the total number of exchanges grows quadratically with
-input size, rendering the exchange method unsuitable for large
-N.
+input size, rendering the exchange method unsuitable for large N.
 
-When setting \code{preclustering = TRUE} only the \code{K - 1} most
+When setting \code{preclustering = TRUE}, only the \code{K - 1} most
 similar elements serve as exchange partners, which can dramatically
 speed up the optimization (more information on the preclustering
 option is included below). This option is recommended for larger
@@ -118,8 +126,8 @@ be found in Papenberg & Klau, 2020, (8) - (12)). To this end, set
 source GNU linear programming kit (available from
 https://www.gnu.org/software/glpk/glpk.html) and the R package
 \code{Rglpk} must be installed. The optimal solution is retrieved
-by setting \code{objective = "distance"}, \code{method = "ilp"} and
-\code{preclustering = FALSE}. Use this combination of arguments
+by setting \code{objective = "diversity"}, \code{method = "ilp"}
+and \code{preclustering = FALSE}. Use this combination of arguments
 only for small problem sizes.
 
 To relax the optimality requirement, it is possible to set the
@@ -140,12 +148,12 @@ small problem instances.
 
 \strong{Preclustering}
 
-A useful heuristic for anticlustering is to cluster very similar
-elements and assign these to different groups. This logic is used
-as a preprocessing when setting \code{preclustering = TRUE}. That
-is, before the anticlustering objective is optimized, a cluster
-analysis identifies small groups of similar elements (pairs if
-\code{K = 2}, triplets if \code{K = 3}, and so forth). The
+A useful heuristic for anticlustering is to form small groups of
+very similar elements and assign these to different groups. This
+logic is used as a preprocessing when setting \code{preclustering =
+TRUE}. That is, before the anticlustering objective is optimized, a
+cluster analysis identifies small groups of similar elements (pairs
+if \code{K = 2}, triplets if \code{K = 3}, and so forth). The
 optimization of the anticlustering objective is then conducted
 under the constraint that these matched elements cannot be assigned
 to the same group. When using the exchange algorithm, preclustering
@@ -181,7 +189,7 @@ converted to matrix as well.
 }
 \examples{
 
-# Optimize the cluster editing (distance) criterion
+# Optimize the cluster editing (diversity) criterion
 anticlusters <- anticlustering(
   schaper2019[, 3:6],
   K = 3,
@@ -240,7 +248,7 @@ Control and Cybernetics, 15, 213-218.
 
 \code{\link{variance_objective}}
 
-\code{\link{distance_objective}}
+\code{\link{diversity_objective}}
 }
 \author{
 Martin Papenberg \email{martin.papenberg@hhu.de}
