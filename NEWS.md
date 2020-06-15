@@ -1,11 +1,10 @@
 # anticlust 0.4.2 (devel)
 
-## Major
+## User-visible changes
+
+### Major
 
 - A new function: `categorical_sampling()` (TODO)
-- In anticlustering, anticluster editing can now be requested using 
-`objective = "diversity"`, but `objective = "distance"` is still supported
-and leads to the same behaviour
 - The function `distance_objective()` was renamed into 
 `diversity_objective()` because there are (TODO)
 - The order of the arguments in `diversity_objective()` and 
@@ -16,12 +15,15 @@ in case a custom objective function has to be optimized (TODO)
 anticlustering objective (i.e., the minimum distance between two elements
 within the same group) (TODO)
 
-## Minor
+### Minor
 
 - Changes to the documentation to highlight the publication
 of the manuscript "Using Anticlustering to Partition Data Sets Into 
 Equivalent Parts" (https://doi.org/10.1037/met0000301) describing the
 algorithms and criteria used in the package `anticlust` 
+- In anticlustering, anticluster editing is now by default requested using 
+`objective = "diversity"` (but `objective = "distance"` is still supported
+and leads to the same behaviour)
 - `anticlustering()` can no longer use an argument `K` of length > 1 with 
 `preclustering = TRUE` because this resulted in undocumented behaviour 
 (this is a good change because it does not make sense to specify an initial assignment 
