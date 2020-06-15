@@ -53,10 +53,9 @@ test_that("fast exchange and exchange functions yield the same results - anticlu
 
   ## Test preclustering restrictions
   features <- schaper2019[, 3:6]
-  ac <- anticlustering(features, K = rep_len(1:2, nrow(schaper2019)),
-                       objective = distance_objective_, preclustering = TRUE)
-  ac_fast <- anticlustering(features, K = rep_len(1:2, nrow(schaper2019)),
-                            objective = "distance", preclustering = TRUE)
+  clusters <- categorical_sampling(matching(features, 2), K = 2)
+  ac <- anticlustering(features, K = clusters, objective = distance_objective_,)
+  ac_fast <- anticlustering(features, K = clusters, objective = "distance")
   expect_equal(all(ac == ac_fast), TRUE)
 
   ## Test categorical restrictions

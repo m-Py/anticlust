@@ -285,9 +285,6 @@ to_matrix <- function(data) {
 # have been passed, or NULL if none is required
 get_categorical_constraints <- function(data, K, preclustering, categories) {
   if (preclustering == TRUE) {
-    if (length(K) > 1) {
-      K <- length(unique(K))
-    }
     N <- nrow(data)
     matches <- matching(data, p = K, match_within = categories, sort_output = FALSE)
     # deal with NA in matches
