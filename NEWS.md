@@ -8,10 +8,6 @@
 - The function `distance_objective()` was renamed into 
 `diversity_objective()` because there are several clustering objectives 
 based on pairwise distances (TODO)
-- The order of the arguments in `diversity_objective()` and 
-`variance_objective()` were changed. They are now consistent with the 
-expectation of the `objective` argument in `anticlustering()` in case a 
-custom objective function has to be optimized (TODO)
 - `dispersion_objective()` is a new function to compute the dispersion 
 anticlustering objective (i.e., the minimum distance between two 
 elements within the same group) (TODO)
