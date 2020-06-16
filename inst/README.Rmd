@@ -20,7 +20,7 @@ anticlustering algorithms as described in Papenberg and Klau (2019). It
 was originally developed to assign items to experimental conditions in 
 experimental psychology, but it can be applied whenever a user requires 
 that a given set of elements has to be partitioned into similar 
-subsets. 
+subsets, or when the within-group heterogeneity should be high.
 
 ```{r setup, include = FALSE}
 library("anticlust")
@@ -49,15 +49,24 @@ library("remotes") # if not available: install.packages("remotes")
 install_github("m-Py/anticlust")
 ```
 
+## Citation
+
+If you use `anticlust` in your research, it would be courteous if you cite 
+the following reference:
+
+Papenberg, M., & Klau, G. W. (2020). Using anticlustering to partition data sets into
+equivalent parts. *Psychological Methods*. Advance Online Publication.
+https://doi.org/10.1037/met0000301.
+
 ## How do I learn about `anticlust`
 
 This README contains some basic information on the `R` package 
 `anticlust`. More information is available via the following 
 sources:
 
-- A preprint is available describing the theoretical 
-background of anticlustering and the `anticlust` package in detail. 
-It can be retrieved from [https://psyarxiv.com/3razc/](https://psyarxiv.com/3razc/).
+- A paper is available describing the theoretical 
+background of anticlustering and the `anticlust` package in detail (https://doi.org/10.1037/met0000301). The freely available preprint can 
+be retrieved from https://psyarxiv.com/3razc/.
 
 - The [package website](https://m-py.github.io/anticlust/) contains all 
 relevant documentation. This includes a
@@ -278,9 +287,3 @@ If you have any question on the `anticlust` package or any suggestions
 (martin.papenberg@hhu.de) or [Twitter](https://twitter.com/MPapenberg),
 or to open an 
 [issue on the Github repository](https://github.com/m-Py/anticlust/issues).
-
-## Reference
-
-Papenberg, M., & Klau, G. W. (2019, October 30). Using anticlustering to
-partition a stimulus pool into equivalent parts. 
-[https://doi.org/10.31234/osf.io/3razc](https://doi.org/10.31234/osf.io/3razc)
