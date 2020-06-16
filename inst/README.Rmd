@@ -110,7 +110,7 @@ To quantify set similarity, `anticlust` may employ one of two measures
 that have been developed in the context of cluster analysis:
 
 - the k-means "variance" objective
-- the cluster editing "distance" objective
+- the cluster editing "diversity" objective
 
 The k-means objective is given by the sum of the squared distances
 between cluster centers and individual data points. The
@@ -173,7 +173,7 @@ plot_clusters(
   features,
   max_dist,
   within_connection = TRUE,
-  main = "Maximum distance",
+  main = "Maximum diversity",
   show_axes = TRUE
 )
 plot_clusters(
@@ -187,7 +187,7 @@ plot_clusters(
   features,
   min_dist,
   within_connection = TRUE,
-  main = "Minimum distance",
+  main = "Minimum diversity",
   show_axes = TRUE
 )
 par(mfrow = c(1, 1))
@@ -195,7 +195,7 @@ par(mfrow = c(1, 1))
 ```
 
 The lines connecting the dots illustrate the values that enter the 
-objective functions. For (anti)cluster editing ("distance objective", 
+objective functions. For (anti)cluster editing ("diversity objective", 
 plots on the right side), lines are drawn between pairs of elements 
 within the same cluster, because the objective is the sum of the 
 pairwise distances between elements that are part of the same cluster. 
@@ -204,14 +204,14 @@ side ), lines are drawn connecting eech element and the centroid of the
 cluster to which the element is assigned, because the objective is the 
 sum of the squared distances between cluster centers and elements.
 
-Minimizing either the distance or the variance objective creates three
+Minimizing either the diversity or the variance objective creates three
 distinct clusters of elements (as shown in the lower plots), whereas
 maximization leads to a strong overlap of the three sets, i.e., three
 anticlusters (as shown in the upper plots). 
 
 To vary the objective function in the `anticlust` package, we can change
 the parameter `objective`. To use anticluster editing, use
-`objective = "distance"` (this is also the default). To maximize the
+`objective = "diversity"` (this is also the default). To maximize the
 k-means variance objective, set `objective = "variance"`.
 
 ## Categorical constraints

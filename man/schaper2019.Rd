@@ -54,12 +54,11 @@ by(features, anticlusters, function(x) round(apply(x, 2, sd), 2))
 # Room is balanced between the three sets:
 table(Room = schaper2019$room, Set = anticlusters)
 
-# Optimize the distance criterion
-# (tends to maximize similarity in feature means)
+# Maximize the diversity criterion
 ac_dist <- anticlustering(
   features,
   K = 3,
-  objective = "distance",
+  objective = "diversity",
   categories = schaper2019$room,
   method = "exchange"
 )
