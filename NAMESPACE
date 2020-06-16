@@ -2,6 +2,7 @@
 
 export(anticlustering)
 export(balanced_clustering)
+export(dispersion_objective)
 export(diversity_objective)
 export(fast_anticlustering)
 export(generate_partitions)
