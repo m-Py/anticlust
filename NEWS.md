@@ -30,6 +30,8 @@ specify an initial assignment of elements to groups via `K` and at the
 same time request that preclustering handles the initial assignment)
 - When using a custom objective function, the order of the required 
 arguments is now reversed: The data comes first, the clustering second.
+- Because the order of arguments in custom objective functions was reversed,
+the function `mean_sd_obj()` now has reversed arguments as well.
 
 ## Internal changes
 
