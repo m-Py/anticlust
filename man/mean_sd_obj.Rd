@@ -4,13 +4,13 @@
 \alias{mean_sd_obj}
 \title{An objective function measuring similarity of sets}
 \usage{
-mean_sd_obj(clusters, features)
+mean_sd_obj(features, clusters)
 }
 \arguments{
-\item{clusters}{A clustering vector}
-
 \item{features}{A matrix or data.frame of data points. Rows
 correspond to elements and columns correspond to features.}
+
+\item{clusters}{A clustering vector}
 }
 \value{
 A value quantifying similarity in means and standard deviations. 
