@@ -1,7 +1,7 @@
 
-#' Cluster editing distance objective
+#' (Anti)cluster editing "diversity" objective
 #'
-#' Compute the cluster editing objective for a given clustering.
+#' Compute the diversity for a given clustering.
 #'
 #' @param x The data input. Can be one of two structures: (1) A data matrix
 #'     where rows correspond to elements and columns correspond to
@@ -18,10 +18,11 @@
 #'
 #' @details
 #'
-#' The cluster editing objective objective is given by the sum of the
-#' pairwise distances between elements within the same (anti)clusters.
-#' When the input \code{x} is a feature matrix, the Euclidean distance
-#' is computed as the basic distance unit.
+#' The objective function used in (anti)cluster editing is the
+#' diversity, i.e., the sum of the pairwise distances between elements
+#' within the same groups. When the input \code{x} is a feature
+#' matrix, the Euclidean distance is computed as the basic distance
+#' unit of this objective.
 #'
 #'
 #' @examples
@@ -44,9 +45,16 @@
 #'
 #' @references
 #'
-#' Papenberg, M., & Klau, G. W. (2020). Using anticlustering to partition 
-#' data sets into equivalent parts. Psychological Methods. Advance Online 
-#' Publication. https://doi.org/10.1037/met0000301.
+#' Brusco, M. J., Cradit, J. D., & Steinley, D. (in press). Combining
+#' diversity and dispersion criteria for anticlustering: A bicriterion
+#' approach. British Journal of Mathematical and Statistical
+#' Psychology. https://doi.org/10.1111/bmsp.12186
+#' 
+#' Papenberg, M., & Klau, G. W. (2020). Using anticlustering to
+#' partition data sets into equivalent parts. Psychological
+#' Methods. Advance Online Publication. 
+#' https://doi.org/10.1037/met0000301.
+#'
 #'
 
 diversity_objective <- function(x, clusters) {
