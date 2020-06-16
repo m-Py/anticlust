@@ -7,10 +7,11 @@
 - A new function: `categorical_sampling()` (TODO)
 - The function `distance_objective()` was renamed into 
 `diversity_objective()` because there are several clustering objectives 
-based on pairwise distances (TODO)
+based on pairwise distances, e.g. see the new function `dispersion_objective()`.
 - `dispersion_objective()` is a new function to compute the dispersion 
-anticlustering objective (i.e., the minimum distance between two 
-elements within the same group) (TODO)
+of a given clustering, i.e., the minimum distance between two 
+elements within the same group. Maximizing the dispersion is an anticlustering
+task, see the docs of `dispersion_objective()` for an example.
 
 ### Minor
 
@@ -20,7 +21,8 @@ Data Sets Into Equivalent Parts" (https://doi.org/10.1037/met0000301)
 describing the algorithms and criteria used in the package `anticlust` 
 - In `anticlustering()`, anticluster editing is now by default requested 
 using `objective = "diversity"` (but `objective = "distance"` is still 
-supported and leads to the same behaviour)
+supported and leads to the same behaviour). This change was done because
+there are several anticlustering objectives based on pairwise distances.
 - `anticlustering()` can no longer use an argument `K` of length > 1 
 with `preclustering = TRUE` because this resulted in undocumented 
 behaviour (this is a good change because it does not make sense to 
