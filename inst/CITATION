@@ -2,9 +2,10 @@ bibentry(
   "Article",
   title="Using anticlustering to partition data sets into equivalent parts",
   author="Martin Papenberg and Gunnar W. Klau",
-  year="2020",
   doi="10.1037/met0000301",
+  pubstate = "in press",
   journal = "Psychological Methods",
+  year = "2020",
   textVersion = paste0(
     "Papenberg, M., & Klau, G. W. (2020). ",
     "Using anticlustering to partition data sets into equivalent parts. ",
