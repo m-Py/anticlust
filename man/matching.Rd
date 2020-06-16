@@ -90,7 +90,7 @@ elements with the grouping number »1« have the highest intra-group
 similarity, followed by 2 etc (groups having the same similarity
 index are still assigned a different grouping number,
 though). Similarity is measured as the sum of pairwise (Euclidean)
-distances within groups (see \code{\link{distance_objective}}). To 
+distances within groups (see \code{\link{diversity_objective}}). To 
 prevent sorting by similarity (this is some extra computational burden),
 set \code{sort_output = FALSE}. Some unmatched elements may be \code{NA}. 
 This happens if it is not

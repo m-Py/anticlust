@@ -17,12 +17,12 @@ test_that("distance input works for exact ILP", {
     ac_dist <- anticlustering(distances, K = K,
                               preclustering = FALSE,
                               method = "ilp")
-    expect_equal(distance_objective_(ac_feat, distances),
-                 distance_objective_(ac_feat, features))
-    expect_equal(distance_objective_(ac_dist, distances),
-                 distance_objective_(ac_dist, features))
-    expect_equal(distance_objective_(ac_feat, distances),
-                 distance_objective_(ac_dist, distances))
+    expect_equal(diversity_objective_(ac_feat, distances),
+                 diversity_objective_(ac_feat, features))
+    expect_equal(diversity_objective_(ac_dist, distances),
+                 diversity_objective_(ac_dist, features))
+    expect_equal(diversity_objective_(ac_feat, distances),
+                 diversity_objective_(ac_dist, distances))
   }
 })
 
@@ -41,12 +41,12 @@ test_that("distance input works for precluster ILP", {
     ac_dist <- anticlustering(distances, K = K,
                               preclustering = TRUE,
                               method = "ilp")
-    expect_equal(distance_objective_(ac_feat, distances),
-                 distance_objective_(ac_feat, features))
-    expect_equal(distance_objective_(ac_dist, distances),
-                 distance_objective_(ac_dist, features))
-    expect_equal(distance_objective_(ac_feat, distances),
-                 distance_objective_(ac_dist, distances))
+    expect_equal(diversity_objective_(ac_feat, distances),
+                 diversity_objective_(ac_feat, features))
+    expect_equal(diversity_objective_(ac_dist, distances),
+                 diversity_objective_(ac_dist, features))
+    expect_equal(diversity_objective_(ac_feat, distances),
+                 diversity_objective_(ac_dist, distances))
   }
 })
 
@@ -68,11 +68,11 @@ test_that("distance input works for exchange method", {
     set.seed(rnd_seed)
     ac_dist <- anticlustering(distances, K = K)
 
-    expect_equal(distance_objective_(ac_feat, distances),
-                 distance_objective_(ac_feat, features))
-    expect_equal(distance_objective_(ac_dist, distances),
-                 distance_objective_(ac_dist, features))
-    expect_equal(distance_objective_(ac_feat, distances),
-                 distance_objective_(ac_dist, distances))
+    expect_equal(diversity_objective_(ac_feat, distances),
+                 diversity_objective_(ac_feat, features))
+    expect_equal(diversity_objective_(ac_dist, distances),
+                 diversity_objective_(ac_dist, features))
+    expect_equal(diversity_objective_(ac_feat, distances),
+                 diversity_objective_(ac_dist, distances))
   }
 })

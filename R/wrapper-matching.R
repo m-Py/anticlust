@@ -71,7 +71,7 @@
 #' similarity, followed by 2 etc (groups having the same similarity
 #' index are still assigned a different grouping number,
 #' though). Similarity is measured as the sum of pairwise (Euclidean)
-#' distances within groups (see \code{\link{distance_objective}}). To 
+#' distances within groups (see \code{\link{diversity_objective}}). To 
 #' prevent sorting by similarity (this is some extra computational burden),
 #' set \code{sort_output = FALSE}. Some unmatched elements may be \code{NA}. 
 #' This happens if it is not
@@ -201,7 +201,7 @@ get_target_group <- function(data, match_between, target_group) {
   if (target_group == "smallest") {
     return(which.min(tab))
   } else if (target_group == "diverse") {
-    return(which.max(distance_objective_by_group(match_between, data)))
+    return(which.max(diversity_objective_by_group(match_between, data)))
   } else if (target_group == "none") {
     return(FALSE)
   } else {
@@ -236,7 +236,7 @@ sort_by_objective <- function(cl, data, N) {
   selected <- (1:N)[!is.na(cl)]
   cl_sub <- cl[selected]
   cl_sub <- order_cluster_vector(cl_sub)
-  objectives <- distance_objective_by_group(cl_sub, subset_data_matrix(data, selected))
+  objectives <- diversity_objective_by_group(cl_sub, subset_data_matrix(data, selected))
   # recode original matching labels according to objective
   N <- length(cl_sub)
   # sorry for this code, but it works and it was really complicated

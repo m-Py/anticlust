@@ -30,6 +30,6 @@ test_that("objective value for distance criterion is computed correctly", {
     ilp <- anticlustering_ilp(distances, p_anticlusters)
     solution <- solve_ilp(ilp, "min")
     anticlusters <- ilp_to_groups(solution, n_elements)
-    expect_equal(solution$obj, distance_objective_(anticlusters, features))
+    expect_equal(solution$obj, diversity_objective_(anticlusters, features))
   }
 })

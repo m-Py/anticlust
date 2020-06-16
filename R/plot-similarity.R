@@ -28,7 +28,7 @@
 #' 
 #' @seealso
 #'
-#' \code{\link{variance_objective}} \code{\link{distance_objective}}
+#' \code{\link{diversity_objective}}
 #'
 #' @author 
 #' Martin Papenberg \email{martin.papenberg@@hhu.de}
@@ -39,7 +39,7 @@ plot_similarity <- function(x, groups) {
   select <- !is.na(groups)
   x <- subset_data_matrix(x, select)
   groups <- groups[select]
-  diversity <- distance_objective_by_group(groups, x)
+  diversity <- diversity_objective_by_group(groups, x)
   plot(diversity, ylab = "Sum of distances", xlab = "Group")
   return(invisible(diversity))
 }

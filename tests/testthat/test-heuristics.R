@@ -39,11 +39,12 @@ test_that("heuristic anticlustering produces expected output", {
 
     ## Now anticlustering:
     obj_function <- ifelse(conditions$objective[i] == "distance",
-                           distance_objective_, variance_objective_)
+                           diversity_objective, variance_objective)
     anticlusters <- anticlustering(
       features,
       K = p_anticlusters,
-      categories = preclusters
+      categories = preclusters,
+      objective = obj_function
     )
     ## Legal number of anticlusters?
     expect_equal(legal_number_of_clusters(features, anticlusters), NULL)

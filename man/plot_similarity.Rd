@@ -38,7 +38,7 @@ plot_similarity(lds, pairs)
 
 }
 \seealso{
-\code{\link{variance_objective}} \code{\link{distance_objective}}
+\code{\link{diversity_objective}}
 }
 \author{
 Martin Papenberg \email{martin.papenberg@hhu.de}

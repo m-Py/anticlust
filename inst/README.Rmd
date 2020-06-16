@@ -137,7 +137,7 @@ var_obj <- function(clusters, features) {
 }
 
 dist_obj <- function(clusters, features) {
-  distance_objective(features, clusters = clusters)
+  diversity_objective(features, clusters = clusters)
 }
 
 var_objectives <- sapply(

@@ -81,7 +81,7 @@ heterogeneity. In previous versions of this package, \code{method =
 anticluster editing, but now \code{method = "diversity"} is
 preferred because there are several clustering objectives based on
 pairwise distances (e.g., see
-\code{\link{dispersion_objective()}}).
+\code{\link{dispersion_objective}}).
 
 If the data input \code{x} is a feature matrix (that is: each row
 is a "case" and each column is a "variable") and the option
@@ -170,22 +170,23 @@ balanced out across anticlusters. Currently, this functionality is
 only available in combination with the exchange method, but not
 with the integer linear programming approach.
 
-\strong{Custom objective function}
+\strong{Optimize a custom objective function}
 
 It is possible to pass a \code{function} to the argument
-\code{objective}. See \code{\link{mean_sd_obj}} for an example. If
-\code{objective} is a function, the exchange method assigns
-elements to anticlusters in such a way that the return value of the
-custom function is maximized (hence, the function should return
-larger values when anticlusters are more similar). It has to take
-two arguments: the first being the clustering assignment, the
-second being the data argument. That is, the argument \code{x} will
-be passed down to the user-defined function as second argument,
-however \strong{only after} \code{\link{as.matrix}} has been called
-on it. This implies that in the function body, columns of the data
-set cannot be accessed using \code{data.frame} operations such as
-\code{$}. This implies that data of class \code{dist} will be
-converted to matrix as well.
+\code{objective}. See \code{\link{dispersion_objective}} for an
+example. If \code{objective} is a function, the exchange method
+assigns elements to anticlusters in such a way that the return
+value of the custom function is maximized (hence, the function
+should return larger values when the between-group similarity is
+higher). The custom function has to take two arguments: the first
+is the data argument, the second is the clustering assignment. That
+is, the argument \code{x} will be passed down to the user-defined
+function as first argument. \strong{However, only after}
+\code{\link{as.matrix}} has been called on \code{x}. This implies
+that in the function body, columns of the data set cannot be
+accessed using \code{data.frame} operations such as
+\code{$}. Objects of class \code{dist} will be converted to matrix
+as well.
 }
 \examples{
 

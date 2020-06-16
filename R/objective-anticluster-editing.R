@@ -31,11 +31,11 @@
 #' ## Clustering
 #' clusters <- balanced_clustering(distances, K = 3)
 #' # This is low:
-#' distance_objective(distances, clusters)
+#' diversity_objective(distances, clusters)
 #' ## Anticlustering
 #' anticlusters <- anticlustering(distances, K = 3)
 #' # This is higher:
-#' distance_objective(distances, anticlusters)
+#' diversity_objective(distances, anticlusters)
 #'
 #' @export
 #'
@@ -49,22 +49,22 @@
 #' Publication. https://doi.org/10.1037/met0000301.
 #'
 
-distance_objective <- function(x, clusters) {
+diversity_objective <- function(x, clusters) {
   x <- as.matrix(x)
   validate_input(x, "x", objmode = "numeric")
   validate_input(clusters, "clusters", len = nrow(x), not_na = TRUE)
-  distance_objective_(clusters, x)
+  diversity_objective_(clusters, x)
 }
 
 # other order of the arguments, needed for some internal handling
-distance_objective_ <- function(clusters, x) {
-  sum(distance_objective_by_group(clusters, x))
+diversity_objective_ <- function(clusters, x) {
+  sum(diversity_objective_by_group(clusters, x))
 }
 
 # Compute distance objective by cluster
 # param data: distance matrix or feature matrix
 # param cl: cluster assignment
-distance_objective_by_group <- function(cl, data) {
+diversity_objective_by_group <- function(cl, data) {
   if (is_distance_matrix(data)) {
     objectives <- sapply(
       sort(unique(cl)), 
