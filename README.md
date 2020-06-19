@@ -1,18 +1,19 @@
 anticlust <a href='https://m-py.github.io/anticlust/'><img src='man/figures/anticlustStickerV1-0.svg' align="right" height="160" /></a>
 =======================================================================================================================================
 
-Anticlustering partitions a pool of elements into subsets (i.e.,
-anticlusters) in such a way that the subsets are as similar as possible.
-This is accomplished by maximizing instead of minimizing a clustering
-objective function, such as the intra-cluster variance (used in k-means
-clustering) or the sum of pairwise distances within clusters. Thus,
-anticlustering creates similar sets of elements by maximizing
-heterogeneity within anticlusters. The package `anticlust` implements
-anticlustering algorithms as described in Papenberg and Klau (2019). It
-was originally developed to assign items to experimental conditions in
-experimental psychology, but it can be applied whenever a user requires
-that a given set of elements has to be partitioned into similar subsets,
-or when the within-group heterogeneity should be high.
+Anticlustering partitions a pool of elements into subsets (i.e., 
+anticlusters) in such a way that the subsets are as similar as possible. 
+This is accomplished by maximizing instead of minimizing a clustering 
+objective function, such as the intra-cluster variance (used in k-means 
+clustering) or the sum of pairwise distances within clusters. Thus, 
+anticlustering creates similar sets of elements by maximizing 
+heterogeneity within anticlusters. The package `anticlust` implements 
+anticlustering algorithms as described in Papenberg and Klau (2020; 
+https://doi.org/10.1037/met0000301). It was originally developed to assign 
+items to experimental conditions in experimental psychology, but it 
+can be applied whenever a user requires that a given set of elements 
+has to be partitioned into similar subsets, or when the within-group 
+heterogeneity should be high.
 
 Installation
 ------------

@@ -16,11 +16,12 @@ objective function, such as the intra-cluster variance (used in k-means
 clustering) or the sum of pairwise distances within clusters. Thus, 
 anticlustering creates similar sets of elements by maximizing 
 heterogeneity within anticlusters. The package `anticlust` implements 
-anticlustering algorithms as described in Papenberg and Klau (2019). It 
-was originally developed to assign items to experimental conditions in 
-experimental psychology, but it can be applied whenever a user requires 
-that a given set of elements has to be partitioned into similar 
-subsets, or when the within-group heterogeneity should be high.
+anticlustering algorithms as described in Papenberg and Klau (2020; 
+https://doi.org/10.1037/met0000301). It was originally developed to assign 
+items to experimental conditions in experimental psychology, but it 
+can be applied whenever a user requires that a given set of elements 
+has to be partitioned into similar subsets, or when the within-group 
+heterogeneity should be high.
 
 ```{r setup, include = FALSE}
 library("anticlust")
