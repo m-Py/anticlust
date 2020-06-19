@@ -53,16 +53,11 @@ Imports:
     Matrix,
     RANN (>= 2.6.0)
 Suggests: 
-    knitr,
     Rglpk,
-    rmarkdown,
     testthat
-VignetteBuilder: 
-    knitr
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.0.2
-SystemRequirements: Two optional system requirements: (1) the
-    exact (anti)clustering algorithms require the GLPK library
-    (http://www.gnu.org/software/glpk/), (2) rendering the package
-    vignette requires pandoc (https://pandoc.org)
+SystemRequirements: The exact (anti)clustering algorithms require that 
+    the GNU linear programming kit (GLPK library) is installed 
+    (<http://www.gnu.org/software/glpk/>).
