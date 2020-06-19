@@ -1,4 +1,4 @@
-# anticlust 0.4.2 (devel)
+# anticlust 0.5.0
 
 ## User-visible changes
 
