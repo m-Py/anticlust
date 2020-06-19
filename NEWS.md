@@ -4,7 +4,12 @@
 
 ### Major
 
-* A new function: `categorical_sampling()` (TODO)
+* A new exported function: `categorical_sampling()`. Categorical sampling
+can be used to obtain a stratified split of a data set. Using this function
+is like calling `anticlustering()` with argument `categories`, but no 
+optimization is conducted; the categories are just evenly split between 
+samples. Apart from the restriction of balancing categories between samples,
+the split is random.
 
 * The function `distance_objective()` was renamed into 
 `diversity_objective()` because there are several clustering objectives 
