@@ -36,8 +36,8 @@ Description: Anticlustering partitions a pool of elements into
     package implements exact and heuristic anticlustering algorithms as
     described in Papenberg and Klau (2020; <doi:10.1037/met0000301>). The
     exact approach requires that the GNU linear programming kit
-    (https://www.gnu.org/software/glpk/glpk.html) and the R package
-    `Rglpk` (https://cran.R-project.org/package=Rglpk) are installed.
+    (<https://www.gnu.org/software/glpk/glpk.html>) and the R package
+    `Rglpk` (<https://cran.R-project.org/package=Rglpk>) are installed.
     Other functions are available to solve classical clustering problems
     under size constraints (i.e., creating equal-sized clusters), or
     methods for (unrestricted, bipartite, or K-partite) matching. One
