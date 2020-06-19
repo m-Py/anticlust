@@ -7,7 +7,7 @@
 categorical_sampling(categories, K)
 }
 \arguments{
-\item{categories}{A vector of a categorical variable.}
+\item{categories}{A matrix or vector of one or more categorical variables.}
 
 \item{K}{The number of groups that are returned.}
 }

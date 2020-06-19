@@ -3,7 +3,7 @@
 #' 
 #' This function can be used to obtain a stratified split of a data set.
 #'
-#' @param categories A vector of a categorical variable.
+#' @param categories A matrix or vector of one or more categorical variables.
 #' @param K The number of groups that are returned. 
 #'
 #' @return A vector representing the sample each element was assigned to.
@@ -19,6 +19,9 @@
 #' @export
 
 categorical_sampling <- function(categories, K) {
+  categories <- merge_into_one_variable(categories)
+  validate_input(K, "K", objmode = "numeric", len = 1, 
+                 greater_than = 1, must_be_integer = TRUE, not_na = TRUE)
   N <- length(categories)
   cats <- data.frame(
     categories = categories,
