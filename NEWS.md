@@ -44,6 +44,12 @@ arguments is now reversed: The data comes first, the clustering second.
 * Because the order of arguments in custom objective functions was reversed,
 the function `mean_sd_obj()` now has reversed arguments as well.
 
+* The package vignettes are no longer distributed with the package itself
+because rendering R Markdown resulted in an error with the development 
+version of R. This may change again in the future when R Markdown no longer
+throws an error with R devel. The vignette is currently available via 
+the package website (https://m-py.github.io/anticlust/).
+
 ## Internal changes
 
 * Improved running speed of generating constraints in integer linear
