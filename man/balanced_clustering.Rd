@@ -52,9 +52,10 @@ repeated until all elements are part of a cluster.
 
 An exact method (\code{method = "ilp"}) can be used to solve
 equal-sized weighted cluster editing optimally (implements the
-integer linear program described in Papenberg & Klau, Appendix
-B). The cluster editing objective is the sum of pairwise distances
-within clusters, clustering is accomplished by minimizing this
+integer linear program described in Papenberg and Klau, 2020; 
+(8) - (10), (12) - (13)). The cluster editing objective is the 
+sum of pairwise distances
+within clusters; clustering is accomplished by minimizing this
 objective. If the argument \code{x} is a features matrix, the
 Euclidean distance is computed as the basic unit of the cluster
 editing objective. If another distance measure is preferred, users
