@@ -17,6 +17,14 @@
 #' are balanced between samples, the split is random.
 #'
 #' @export
+#' 
+#' @examples 
+#' 
+#' data(schaper2019)
+#' categories <- schaper2019$room
+#' groups <- categorical_sampling(categories, K = 6)
+#' table(groups, categories)
+#' 
 
 categorical_sampling <- function(categories, K) {
   categories <- merge_into_one_variable(categories)

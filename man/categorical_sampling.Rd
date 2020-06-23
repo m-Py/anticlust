@@ -24,3 +24,11 @@ argument `categories` where no optimization is conducted; the categories are
 just evenly split between samples. Apart from the restriction that categories 
 are balanced between samples, the split is random.
 }
+\examples{
+
+data(schaper2019)
+categories <- schaper2019$room
+groups <- categorical_sampling(categories, K = 6)
+table(groups, categories)
+
+}
