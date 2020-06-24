@@ -19,7 +19,7 @@ exchange_method <- function(data, K, obj_function, categories) {
 
   clusters <- initialize_clusters(NROW(data), K, categories)
   N <- nrow(data)
-  best_total <- obj_function(clusters, data)
+  best_total <- obj_function(data, clusters)
   for (i in 1:N) {
     # cluster of current item
     exchange_partners <- get_exchange_partners(clusters, i, categories)
@@ -61,7 +61,7 @@ exchange_method <- function(data, K, obj_function, categories) {
 # return: The objective after a hypothetical swap
 update_objective_generic <- function(data, clusters, i, j, obj_function) {
   tmp_clusters <- cluster_swap(clusters, i, j)
-  obj_function(tmp_clusters, data)
+  obj_function(data, tmp_clusters)
 }
 
 # Swap two items and return new arranged clusters

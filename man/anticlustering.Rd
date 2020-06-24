@@ -7,28 +7,28 @@
 anticlustering(
   x,
   K,
-  objective = "distance",
+  objective = "diversity",
   method = "exchange",
   preclustering = FALSE,
   categories = NULL
 )
 }
 \arguments{
-\item{x}{The data input. Can be one of two structures: (1) A data
+\item{x}{The data input. Can be one of two structures: (1) A feature
 matrix where rows correspond to elements and columns correspond
-to features (a single numeric feature can be passed as a
+to variables (a single numeric variable can be passed as a
 vector). (2) An N x N matrix dissimilarity matrix; can be an
 object of class \code{dist} (e.g., returned by
 \code{\link{dist}} or \code{\link{as.dist}}) or a \code{matrix}
 where the entries of the upper and lower triangular matrix
-represent the pairwise dissimilarities.}
+represent pairwise dissimilarities.}
 
 \item{K}{How many anticlusters should be created. Alternatively: A
 vector of length \code{nrow(x)} describing how elements are
 assigned to anticlusters before the optimization starts.}
 
 \item{objective}{The objective to be maximized. The option
-"distance" (default) maximizes the cluster editing objective
+"diversity" (default) maximizes the cluster editing objective
 function; the option "variance" maximizes the k-means objective
 function. See Details.}
 
@@ -46,43 +46,52 @@ A vector of length N that assigns a group (i.e, a number
     between 1 and \code{K}) to each input element.
 }
 \description{
-Create sets of elements (anticlusters) that are as similar as
+Create groups of elements (anticlusters) that are as similar as
 possible to each other, by maximizing the heterogeneity within
-anticlusters.  Implements anticlustering algorithms as described in
-Papenberg and Klau (2019).
+groups. Implements anticlustering algorithms as described in
+Papenberg and Klau (2020; <doi:10.1037/met0000301>).
 }
 \details{
-This function is used to solve »K anticlustering«. That is, K
+This function is used to solve anticlustering. That is, \code{K}
 groups are created in such a way that all groups are as similar as
-possible. In the standard case, groups of equal size are
-returned. Adjust the \code{K} argument to create groups of
-different size.
+possible. This is accomplished by maximizing instead of minimizing
+a clustering objective function. This function natively supports
+the maximization of two clustering objective functions:
 
-Set similarity is assessed using one of two objective functions:
+\itemize{
+  \item{cluster editing `diversity` objective, setting \code{objective = "diversity"} (default)}
+  \item{k-means `variance` objective, setting \code{objective = "variance"}}
+}
 
-- k-means `variance` objective, setting \code{objective = "variance"}
+The k-means objective is the variance within groups---that is, the
+sum of the squared distances between each element and its cluster
+center (see \code{\link{variance_objective}}). The cluster editing
+objective is the sum of pairwise distances within groups (see
+\code{\link{diversity_objective}}). Maximizing either of these
+clustering objectives (i.e., anticlustering) will partition the
+data set into similar groups, whereas traditional cluster analysis
+is used to obtain a low between-group similarity.
 
-- cluster editing `distance` objective, setting \code{objective =
-  "distance"}
+Anticluster editing is also known as the »maximum diverse grouping
+problem« because it maximizes group diversity as measured by the
+sum of pairwise distances. Hence, anticlustering maximizes
+between-group similarity by maximizing within-group
+heterogeneity. In previous versions of this package, \code{method =
+"distance"} was used (and is still supported) to request
+anticluster editing, but now \code{method = "diversity"} is
+preferred because there are several clustering objectives based on
+pairwise distances (e.g., see
+\code{\link{dispersion_objective}}).
 
-The k-means objective measures the variance within
-anticlusters---that is, the sum of the squared distances between
-each element and its cluster center (see
-\code{\link{variance_objective}}). The cluster editing objective
-measures the sum of pairwise distances within anticlusters (see
-\code{\link{distance_objective}}). Anticluster editing is also known 
-as the »maximum diverse grouping problem«. Maximizing either of these
-anticlustering objectives will partition the data set into similar groups. 
-Minimization of the same objectives would lead to a clustering, i.e., groups 
-with high within-group similarity but between-group dissimilarity 
-Balanced clustering is possible using the function
-\code{\link{balanced_clustering}}.
-
-If the argument \code{x} is a feature matrix and the option
-\code{objective = "distance"} is used, the Euclidean distance is
+If the data input \code{x} is a feature matrix (that is: each row
+is a "case" and each column is a "variable") and the option
+\code{objective = "diversity"} is used, the Euclidean distance is
 computed as the basic unit of the anticluster editing objective. If
 a different measure of dissimilarity is preferred, you may pass a
 self-generated dissimiliarity matrix via the argument \code{x}.
+
+In the standard case, groups of equal size are generated. Adjust
+the argument \code{K} to create groups of different size.
 
 \strong{Heuristic anticlustering}
 
@@ -98,44 +107,60 @@ the argument \code{K} (in this case, \code{K} has length
 \code{nrow(x)}). The exchange procedure is repeated for each
 element. Because each possible swap is investigated for each
 element, the total number of exchanges grows quadratically with
-input size, rendering the exchange method unsuitable for large
-N. Setting \code{preclustering = TRUE} will limit the legal
-exchange partners to very similar elements, resulting in improved
-run time while preserving a rather good solution. This option is
-recommended for larger N. For very large N, check out the function
+input size, rendering the exchange method unsuitable for large N.
+
+When setting \code{preclustering = TRUE}, only the \code{K - 1} most
+similar elements serve as exchange partners, which can dramatically
+speed up the optimization (more information on the preclustering
+option is included below). This option is recommended for larger
+N. For very large N, check out the function
 \code{\link{fast_anticlustering}} that was specifically implemented
-for large data sets.
+to process very large data sets.
 
 \strong{Exact anticlustering}
 
 An optimal anticluster editing objective can be found via integer
 linear programming (the integer linear program implemented here can
-be found in Papenberg & Klau, 2019, Appendix B). To this end, set
+be found in Papenberg & Klau, 2020, (8) - (12)). To this end, set
 \code{method = "ilp"}. To obtain an optimal solution, the open
 source GNU linear programming kit (available from
 https://www.gnu.org/software/glpk/glpk.html) and the R package
 \code{Rglpk} must be installed. The optimal solution is retrieved
-by setting \code{objective = "distance"}, \code{method = "ilp"} and
-\code{preclustering = FALSE}. Use this combination of arguments
+by setting \code{objective = "diversity"}, \code{method = "ilp"}
+and \code{preclustering = FALSE}. Use this combination of arguments
 only for small problem sizes.
 
 To relax the optimality requirement, it is possible to set the
 argument \code{preclustering = TRUE}. In this case, the anticluster
 editing objective is still optimized using integer linear
 programming, but a preprocessing forbids very similar elements to
-be assigned to the same anticluster. Thus, before the
-anticlustering objective is optimized, a cluster analysis
-identifies small groups of similar elements (pairs if \code{K = 2},
-triplets if \code{K = 3}, and so forth). The preclustering reduces
-the size of the solution space, making the ILP approach applicable
-for larger problem instances. With preclustering, optimality is no
-longer guaranteed, but the solution is usually optimal or very
-close to optimal.
+be assigned to the same anticluster. The preclustering reduces the
+size of the solution space, making the integer linear programming
+approach applicable for larger problem instances. With
+preclustering, optimality is no longer guaranteed, but the solution
+is usually optimal or very close to optimal.
 
 The variance criterion cannot be optimized to optimality using
-integer linear programming. However, it is possible to employ the
-function \code{\link{generate_partitions}} to obtain optimal
-solutions for small problem instances.
+integer linear programming because the k-means objective function
+is not linear. However, it is possible to employ the function
+\code{\link{generate_partitions}} to obtain optimal solutions for
+small problem instances.
+
+\strong{Preclustering}
+
+A useful heuristic for anticlustering is to form small groups of
+very similar elements and assign these to different groups. This
+logic is used as a preprocessing when setting \code{preclustering =
+TRUE}. That is, before the anticlustering objective is optimized, a
+cluster analysis identifies small groups of similar elements (pairs
+if \code{K = 2}, triplets if \code{K = 3}, and so forth). The
+optimization of the anticlustering objective is then conducted
+under the constraint that these matched elements cannot be assigned
+to the same group. When using the exchange algorithm, preclustering
+is conducted using a call to \code{\link{matching}}. When using
+\code{method = "ilp"}, the preclustering optimally finds groups of
+minimum pairwise distance by solving the integer linear program
+described in Papenberg and Klau (2020; (8) - (10), (12) - (13)).
 
 \strong{Categorical constraints}
 
@@ -143,28 +168,29 @@ The argument \code{categories} may induce categorical constraints.
 The grouping variables indicated by \code{categories} will be
 balanced out across anticlusters. Currently, this functionality is
 only available in combination with the exchange method, but not
-with the exact ILP approach. 
+with the integer linear programming approach.
 
-\strong{Custom objective function}
+\strong{Optimize a custom objective function}
 
 It is possible to pass a \code{function} to the argument
-\code{objective}. See \code{\link{mean_sd_obj}} for an example. If
-\code{objective} is a function, the exchange method assigns
-elements to anticlusters in such a way that the return value of the
-custom function is maximized (hence, the function should return
-larger values when anticlusters are more similar). It has to take
-two arguments: the first being the clustering assignment, the
-second being the data argument. That is, the argument \code{x} will
-be passed down to the user-defined function as second argument,
-however \strong{only after} \code{\link{as.matrix}} has been called
-on it. This implies that in the function body, columns of the data
-set cannot be accessed using \code{data.frame} operations such as
-\code{$}. This implies that data of class \code{dist} will be 
-converted to matrix as well.
+\code{objective}. See \code{\link{dispersion_objective}} for an
+example. If \code{objective} is a function, the exchange method
+assigns elements to anticlusters in such a way that the return
+value of the custom function is maximized (hence, the function
+should return larger values when the between-group similarity is
+higher). The custom function has to take two arguments: the first
+is the data argument, the second is the clustering assignment. That
+is, the argument \code{x} will be passed down to the user-defined
+function as first argument. \strong{However, only after}
+\code{\link{as.matrix}} has been called on \code{x}. This implies
+that in the function body, columns of the data set cannot be
+accessed using \code{data.frame} operations such as
+\code{$}. Objects of class \code{dist} will be converted to matrix
+as well.
 }
 \examples{
 
-# Optimize the cluster editing (distance) criterion
+# Optimize the cluster editing (diversity) criterion
 anticlusters <- anticlustering(
   schaper2019[, 3:6],
   K = 3,
@@ -211,8 +237,9 @@ ac <- anticlustering(
 Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
 for a clustering problem. Mathematical Programming, 45, 59-96.
 
-Papenberg, M., & Klau, G. W. (2019, October 30). Using anticlustering to partition 
-data sets into equivalent parts https://doi.org/10.31234/osf.io/3razc
+Papenberg, M., & Klau, G. W. (2020). Using anticlustering to partition 
+data sets into equivalent parts. Psychological Methods. Advance Online 
+Publication. https://doi.org/10.1037/met0000301.
 
 Späth, H. (1986). Anticlustering: Maximizing the variance criterion.
 Control and Cybernetics, 15, 213-218.
@@ -222,7 +249,7 @@ Control and Cybernetics, 15, 213-218.
 
 \code{\link{variance_objective}}
 
-\code{\link{distance_objective}}
+\code{\link{diversity_objective}}
 }
 \author{
 Martin Papenberg \email{martin.papenberg@hhu.de}

@@ -14,7 +14,7 @@
 fast_exchange_dist <- function(data, K, categories) {
   distances <- convert_to_distances(data)  
   clusters <- initialize_clusters(nrow(distances), K, categories)
-  best_total <- distance_objective_(clusters, distances)
+  best_total <- diversity_objective_(clusters, distances)
   distances[upper.tri(distances)] <- 0
   diag(distances) <- 0
   ## Matrix for indexing the elements in the distance matrix

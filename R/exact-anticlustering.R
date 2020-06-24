@@ -11,6 +11,7 @@
 #'
 #' @return A vector representing the anticluster affiliation of
 #'     elements.
+#' @importFrom utils combn
 #'
 #' @noRd
 

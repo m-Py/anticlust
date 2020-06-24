@@ -35,8 +35,8 @@ test_that("computation of cluster centers and distances to centers is correct", 
       features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
       anticlusters <- rep(1:p_anticlusters, n_elements/p_anticlusters)
       centers  <- cluster_centers(features, anticlusters)
-      ## Chech output of cluster_centers
-      expect_equal(class(centers), "matrix")
+      ## Check output of cluster_centers
+      expect_equal(inherits(centers, "matrix"), TRUE)
       # Matrix of distances should have p rows
       expect_equal(dim(centers)[1], p_anticlusters)
       # Matrix of distances should have m columns
@@ -49,7 +49,7 @@ test_that("computation of cluster centers and distances to centers is correct", 
 
       ## Now also check if distances to cluster centers are computed correctly
       distances <- dist_from_centers(features, centers, squared = FALSE)
-      expect_equal(class(distances), "matrix")
+      expect_equal(inherits(centers, "matrix"), TRUE)
       expect_equal(dim(distances)[1], n_elements)
       expect_equal(dim(distances)[2], p_anticlusters)
       ## Check distance output for all points

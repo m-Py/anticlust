@@ -1,34 +1,104 @@
+# anticlust 0.5.0
+
+## User-visible changes
+
+### Major
+
+* A new exported function: `categorical_sampling()`. Categorical 
+sampling can be used to obtain a stratified split of a data set. Using 
+this function is like calling `anticlustering()` with argument 
+`categories`, but no clustering objective is maximized. The categories 
+are just evenly split between samples, which is very fast (in contrast 
+to the exchange optimization that may take some time for large data 
+sets). Apart from the categorical restriction that balances the 
+frequency of categories between samples, the split is random.
+
+* The function `distance_objective()` was renamed into 
+`diversity_objective()` because there are several clustering objectives 
+based on pairwise distances, e.g. see the new function 
+`dispersion_objective()`.
+
+* `dispersion_objective()` is a new function to compute the dispersion 
+of a given clustering, i.e., the minimum distance between two elements 
+within the same group. Maximizing the dispersion is an anticlustering 
+task, see the help page of `dispersion_objective()` for an example.
+
+### Minor
+
+* Several changes to the documentation, in particular now highlighting 
+the publication of the paper "Using Anticlustering to Partition 
+Data Sets Into Equivalent Parts" (https://doi.org/10.1037/met0000301) 
+describing the algorithms and criteria used in the package `anticlust` 
+
+* In `anticlustering()`, anticluster editing is now by default requested 
+using `objective = "diversity"` (but `objective = "distance"` is still 
+supported and leads to the same behaviour). This change was done because
+there are several anticlustering objectives based on pairwise distances.
+
+* `anticlustering()` can no longer use an argument `K` of length > 1 
+with `preclustering = TRUE` because this resulted in undocumented 
+behaviour (this is a good change because it does not make sense to 
+specify an initial assignment of elements to groups via `K` and at the 
+same time request that preclustering handles the initial assignment)
+
+* When using a custom objective function, the order of the required 
+arguments is now reversed: The data comes first, the clustering second.
+
+* Because the order of arguments in custom objective functions was 
+reversed, the function `mean_sd_obj()` now has reversed arguments as 
+well.
+
+* The package vignettes are no longer distributed with the package 
+itself because rendering R Markdown resulted in an error with the 
+development version of R. This may change again in the future when R 
+Markdown no longer throws an error with R devel. The vignette is 
+currently available via the package website 
+(https://m-py.github.io/anticlust/).
+
+## Internal changes
+
+* Improved running speed of generating constraints in integer linear
+programming variant of (anti)clustering, via 
+[0a870240f8](https://github.com/m-Py/anticlust/commit/0a870240f8264f0e74f4cbf0b20d789cfa0d6469)
+
 # anticlust 0.4.1
 
-## Major
+## User-visible changes
 
-- In `anticlustering()`, preclustering and categorical constraints can 
+* In `anticlustering()`, preclustering and categorical constraints can 
 now be used at the same time. In this case, exchange partners are 
 clustered within the same category, using a call to `matching()` passing 
 `categories` to argument `match_within`.
-- In `anticlustering()`, it is now possible to use `preclustering = 
+
+* In `anticlustering()`, it is now possible to use `preclustering = 
 TRUE` for unbalanced data size (e.g., if N = 9 and K = 2).
-- In `matching()`, it is now possible to prevent sorting the output by 
+
+* In `matching()`, it is now possible to prevent sorting the output by 
 similarity using a new argument `sort_output`. Its default is `TRUE`, 
 setting it to `FALSE` prevents sorting. This prevents some extra 
 computation that is necessary to determine similarity for each cluster.
 
 ## Minor 
 
-- Some changes to documentation
-- There is now a package website at https://m-py.github.io/anticlust/
-- Additional error handling
+* Some changes to documentation
+
+* There is now a package website at https://m-py.github.io/anticlust/
+
+* Additional error handling
 
 ## Internal
 
-- Improvements to implementation of k-means anticlustering (i.e., in `anticlustering()` 
-  with `objective == "variance"` or in `fast_anticlustering()`)
-  + on each exchange iteration, only recomutes distances from clusters whose elements have 
-  been swapped (improves run time relevant for larger K).
-  + Previously, there were only as many exchange partners per element as members 
-  in the least frequent category if argument `categories` was passed). This was
-  not documented behavior and is undesirable. Now, all members from a category
-  may serve as exchange partners, even if the categories have different size.
+* Improvements to implementation of k-means anticlustering (i.e., in 
+`anticlustering()` with `objective == "variance"` or in 
+`fast_anticlustering()`)
+  * on each exchange iteration, only recomputes distances from clusters 
+whose elements have been swapped (improves run time relevant for larger 
+K).
+  * Previously, there were only as many exchange partners per element as 
+members in the least frequent category if argument `categories` was 
+passed). This was not documented behavior and is undesirable. Now, all 
+members from a category may serve as exchange partners, even if the 
+categories have different size.
 
 # anticlust 0.4.0
 

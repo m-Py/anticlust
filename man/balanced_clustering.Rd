@@ -12,14 +12,14 @@ also implemented the integer linear programming method.
 balanced_clustering(x, K, method = "centroid")
 }
 \arguments{
-\item{x}{The data input. Can be one of two structures: (1) A data
+\item{x}{The data input. Can be one of two structures: (1) A feature
 matrix where rows correspond to elements and columns correspond
-to features (a single numeric feature can be passed as a
+to variables (a single numeric variable can be passed as a
 vector). (2) An N x N matrix dissimilarity matrix; can be an
 object of class \code{dist} (e.g., returned by
 \code{\link{dist}} or \code{\link{as.dist}}) or a \code{matrix}
 where the entries of the upper and lower triangular matrix
-represent the pairwise dissimilarities.}
+represent pairwise dissimilarities.}
 
 \item{K}{How many clusters should be created.}
 
@@ -52,9 +52,10 @@ repeated until all elements are part of a cluster.
 
 An exact method (\code{method = "ilp"}) can be used to solve
 equal-sized weighted cluster editing optimally (implements the
-integer linear program described in Papenberg & Klau, Appendix
-B). The cluster editing objective is the sum of pairwise distances
-within clusters, clustering is accomplished by minimizing this
+integer linear program described in Papenberg and Klau, 2020; 
+(8) - (10), (12) - (13)). The cluster editing objective is the 
+sum of pairwise distances
+within clusters; clustering is accomplished by minimizing this
 objective. If the argument \code{x} is a features matrix, the
 Euclidean distance is computed as the basic unit of the cluster
 editing objective. If another distance measure is preferred, users
@@ -82,8 +83,9 @@ plot_clusters(lds, clusters = cl2)
 Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
 for a clustering problem. Mathematical Programming, 45, 59–96.
 
-Papenberg, M., & Klau, G. W. (2019, October 30). Using anticlustering to partition 
-data sets into equivalent parts https://doi.org/10.31234/osf.io/3razc
+Papenberg, M., & Klau, G. W. (2020). Using anticlustering to partition 
+data sets into equivalent parts. Psychological Methods. Advance Online 
+Publication. https://doi.org/10.1037/met0000301.
 }
 \author{
 Martin Papenberg \email{martin.papenberg@hhu.de}
