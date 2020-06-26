@@ -92,10 +92,11 @@ features <- matrix(runif(N * 2), ncol = 2)
 K <- 3
 clusters <- balanced_clustering(features, K = K)
 anticlusters <- anticlustering(features, K = K)
+user_par <- par("mfrow")
 par(mfrow = c(1, 2))
 plot_clusters(features, clusters, main = "Cluster editing", within_connection = TRUE)
 plot_clusters(features, anticlusters, main = "Anticluster editing", within_connection = TRUE)
-par(mfrow = c(1, 1))
+par(mfrow = user_par)
 
 }
 \author{

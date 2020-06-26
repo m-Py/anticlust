@@ -79,6 +79,7 @@ sum(all_objectives == min_obj)
 best_clustering <- partitions[all_objectives == min_obj][[1]]
 
 ## Plot minimum and maximum objectives:
+user_par <- par("mfrow")
 par(mfrow = c(1, 2))
 plot_clusters(
   features,
@@ -92,7 +93,7 @@ plot_clusters(
   illustrate_variance = TRUE,
   main = "Minimum variance"
 )
-par(mfrow = c(1, 1))
+par(mfrow = user_par)
 
 }
 \references{

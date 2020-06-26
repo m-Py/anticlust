@@ -147,6 +147,7 @@ matched2 <- matching(
   match_extreme_first = FALSE
 )
 # Plot the matching results
+user_par <- par("mfrow")
 par(mfrow = c(1, 2))
 data <- data.frame(
   Species = as.numeric(iris[species, 5]),
@@ -164,7 +165,7 @@ plot_clusters(
   within_connection = TRUE,
   main = "Central elements matched first"
 )
-par(mfrow = c(1, 1))
+par(mfrow = user_par)
 
 
 }
