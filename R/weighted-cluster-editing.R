@@ -11,7 +11,7 @@
 #' 
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' features <- swiss
 #' distances <- dist(scale(swiss))
 #' hist(distances)
