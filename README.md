@@ -1,25 +1,37 @@
 anticlust <a href='https://m-py.github.io/anticlust/'><img src='man/figures/anticlustStickerV1-0.svg' align="right" height="160" /></a>
 =======================================================================================================================================
 
-Anticlustering partitions a pool of elements into subsets (i.e., 
-anticlusters) in such a way that the subsets are as similar as possible. 
-This is accomplished by maximizing instead of minimizing a clustering 
-objective function, such as the intra-cluster variance (used in k-means 
-clustering) or the sum of pairwise distances within clusters. Thus, 
-anticlustering creates similar sets of elements by maximizing 
-heterogeneity within anticlusters. The package `anticlust` implements 
-anticlustering algorithms as described in Papenberg and Klau (2020; 
-https://doi.org/10.1037/met0000301). It was originally developed to assign 
-items to experimental conditions in experimental psychology, but it 
-can be applied whenever a user requires that a given set of elements 
-has to be partitioned into similar subsets, or when the within-group 
-heterogeneity should be high.
+Anticlustering partitions a pool of elements into subsets (i.e.,
+anticlusters) in such a way that the subsets are as similar as possible.
+This is accomplished by maximizing instead of minimizing a clustering
+objective function, such as the intra-cluster variance (used in k-means
+clustering) or the sum of pairwise distances within clusters. Thus,
+anticlustering creates similar sets of elements by maximizing
+heterogeneity within anticlusters. The package `anticlust` implements
+anticlustering algorithms as described in Papenberg and Klau (2020;
+<a href="https://doi.org/10.1037/met0000301" class="uri">https://doi.org/10.1037/met0000301</a>).
+It was originally developed to assign items to experimental conditions
+in experimental psychology, but it can be applied whenever a user
+requires that a given set of elements has to be partitioned into similar
+subsets, or when the within-group heterogeneity should be high.
 
 Installation
 ------------
 
+The stable release of `anticlust` is available from
+[CRAN](https://CRAN.R-project.org/package=anticlust) and can be
+installed via:
+
+    install.packages("anticlust")
+
+If you like, you can also install the current (unstable) development
+version directly via Github:
+
     library("remotes") # if not available: install.packages("remotes")
-    install_github("m-Py/anticlust")
+    install_github("m-Py/anticlust", ref = "devel")
+
+[Here](https://github.com/m-Py/anticlust/blob/devel/NEWS.md) you may
+find some hints on the most recent additions to the development version.
 
 Citation
 --------
