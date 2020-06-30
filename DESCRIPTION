@@ -57,7 +57,12 @@ Imports:
     RANN (>= 2.6.0)
 Suggests: 
     Rglpk,
-    testthat
+    testthat,
+    knitr,
+    rmarkdown
+VignetteBuilder: 
+    knitr,
+    rmarkdown
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.0.2
