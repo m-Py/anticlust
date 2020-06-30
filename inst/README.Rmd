@@ -45,10 +45,24 @@ knitr::opts_chunk$set(
 
 ## Installation
 
+The stable release of `anticlust` is available from
+[CRAN](https://CRAN.R-project.org/package=anticlust) and can be 
+installed via:
+
+```R
+install.packages("anticlust")
+```
+
+If you like, you can also install the current (unstable) development version 
+directly via Github:
+
 ```R
 library("remotes") # if not available: install.packages("remotes")
-install_github("m-Py/anticlust")
+install_github("m-Py/anticlust", ref = "devel")
 ```
+
+[Here](https://github.com/m-Py/anticlust/blob/devel/NEWS.md) you may find some
+hints on the most recent additions to the development version.
 
 ## Citation
 
