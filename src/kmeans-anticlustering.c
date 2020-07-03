@@ -1,7 +1,6 @@
 
-#include <stdlib.h> 
 #include <stdio.h>
-#include <math.h>
+#include <stdlib.h> 
 #include "declarations.h"
 
 /* Exchange Method for Anticlustering
@@ -86,50 +85,50 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         
         // Set up array of data points, fill it, return if memory runs out
         struct element POINTS[n];
-        if (fill_data_points(data, n, m, POINTS, clusters, USE_CATS, categories) == 1) {
+        if (fill_data_points(data, n, m, POINTS, clusters, 
+                             USE_CATS, categories) == 1) {
                 print_memory_error();
                 return;
         }
         
-        // Deal with categorical restrictions
-        size_t c;
-        if (*USE_CATS) {
-                c = (size_t) *C; // number of categories 
-        } else {
-                c = 1;
-                *CAT_frequencies = n;
-        }
-        size_t *C_HEADS[c];
-        if (write_cheads(n, c, C_HEADS, USE_CATS, categories, 
-                         CAT_frequencies, POINTS) == 1) {
+        /* CATEGORICAL RESTRICTIONS */
+        
+        size_t c = number_of_categories(USE_CATS, C);
+        *CAT_frequencies = get_cat_frequencies(USE_CATS, CAT_frequencies, n);
+        
+        size_t *CATEGORY_HEADS[c];
+        if (get_indices_by_category(n, c, CATEGORY_HEADS, USE_CATS, 
+                                    categories, CAT_frequencies, POINTS) == 1) {
                 print_memory_error();
                 free_points(n, POINTS, n);
                 return; 
         }
         
+        /* SET UP CLUSTER STRUCTURE */
+        
         // Set up array of pointer-to-cluster-heads, return if memory runs out
-        struct node *HEADS[k];
-        if (initialize_cluster_heads(k, HEADS) == 1) {
+        struct node *CLUSTER_HEADS[k];
+        if (initialize_cluster_heads(k, CLUSTER_HEADS) == 1) {
                 free_points(n, POINTS, n);
                 return; 
         }
 
         // Set up array of pointers-to-nodes, return if memory runs out
         struct node *PTR_NODES[n];
-        if (fill_cluster_lists(n, k, clusters, POINTS, PTR_NODES, HEADS) == 1) {
+        if (fill_cluster_lists(n, k, clusters, POINTS, PTR_NODES, CLUSTER_HEADS) == 1) {
                 return;
         }
         
         // Set up matrix of cluster centers
         double CENTERS[k][m];
         for (size_t i = 0; i < k; i++) {
-                compute_center(m, CENTERS[i], HEADS[i], frequencies[i]);
+                compute_center(m, CENTERS[i], CLUSTER_HEADS[i], frequencies[i]);
         }
         
         // Get variance objective of the initial cluster assignment
         double OBJ_BY_CLUSTER[k]; 
-        objective_by_cluster(m, k, OBJ_BY_CLUSTER, CENTERS, HEADS);
-        double SUM_VAR_OBJECTIVE = array_sum(k, OBJ_BY_CLUSTER);
+        objective_by_cluster(m, k, OBJ_BY_CLUSTER, CENTERS, CLUSTER_HEADS);
+        double SUM_OBJECTIVE = array_sum(k, OBJ_BY_CLUSTER);
         
         /* Some variables for bookkeeping during the optimization */
         
@@ -154,12 +153,10 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
                 
                 /* 2. Level: Iterate through the exchange partners */
                 size_t category_i = PTR_NODES[i]->data->category;
-                // `category_i = 0` if `USE_CATS == FALSE`.
                 size_t n_partners = CAT_frequencies[category_i];
-                // `CAT_frequencies[0] == n` if `USE_CATS == FALSE`
                 for (size_t u = 0; u < n_partners; u++) {
-                        // recode exchange partner index
-                        size_t j = C_HEADS[category_i][u];
+                        // Get index of current exchange partner from `CATEGORY_HEADS`
+                        size_t j = CATEGORY_HEADS[category_i][u];
                         
                         size_t cl2 = PTR_NODES[j]->data->cluster;
                         // no swapping attempt if in the same cluster:
@@ -180,8 +177,10 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
                         );
                         swap(n, i, j, PTR_NODES);
                         // Update objective
-                        tmp_objs[cl1] = cluster_var(m, HEADS[cl1], tmp_centers[cl1]);
-                        tmp_objs[cl2] = cluster_var(m, HEADS[cl2], tmp_centers[cl2]);
+                        tmp_objs[cl1] = cluster_var(m, CLUSTER_HEADS[cl1],
+                                                    tmp_centers[cl1]);
+                        tmp_objs[cl2] = cluster_var(m, CLUSTER_HEADS[cl2],
+                                                    tmp_centers[cl2]);
                         tmp_obj = array_sum(k, tmp_objs);
                         
                         // Update `best` variables if objective was improved
@@ -197,10 +196,10 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
                 }
                 
                 // Only if objective is improved: Do the swap
-                if (best_obj > SUM_VAR_OBJECTIVE) {
+                if (best_obj > SUM_OBJECTIVE) {
                         swap(n, i, best_partner, PTR_NODES);
                         // Update the "global" variables
-                        SUM_VAR_OBJECTIVE = best_obj;
+                        SUM_OBJECTIVE = best_obj;
                         copy_matrix(k, m, best_centers, CENTERS);
                         copy_array(k, best_objs, OBJ_BY_CLUSTER);
                 }
@@ -213,7 +212,7 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         
         // in the end, free allocated memory:
         free_points(n, POINTS, n);
-        free_nodes(k, HEADS);
+        free_nodes(k, CLUSTER_HEADS);
         // TODO: Free memory allocated for category indexes!
 }
 
@@ -256,344 +255,3 @@ void swap(size_t n, size_t i, size_t j, struct node *PTR_NODES[n]) {
         two->data = tmp;
         
 }
-
-/* Update cluster centers after a swap between two nodes in two cluster lists */
-void update_centers(size_t k, size_t m, double CENTERS[k][m],
-                    struct node *one, struct node *two, int *frequencies) {
-        size_t cl1 = one->data->cluster;
-        size_t cl2 = two->data->cluster;
-        for (int i = 0; i < m; i++) {
-                double change_cl1 = one->data->values[i] / frequencies[cl1];
-                double change_cl2 = two->data->values[i] / frequencies[cl2];
-                // Update first cluster center
-                CENTERS[cl1][i] = CENTERS[cl1][i] + change_cl2;
-                CENTERS[cl1][i] = CENTERS[cl1][i] - change_cl1;
-                // Update second cluster center
-                CENTERS[cl2][i] = CENTERS[cl2][i] - change_cl2;
-                CENTERS[cl2][i] = CENTERS[cl2][i] + change_cl1;
-        }
-}
-
-/* Compute variance for a cluster
- * param `size_t m`: Number of variables per data point
- * param `struct node *HEAD`: Pointer to a cluster list HEAD
- * param `double center[m]`: Array of mean feature values in the cluster
- */
-double cluster_var(size_t m, struct node *HEAD, double center[m]) {
-        double sum = 0;
-        struct node *tmp = HEAD->next;
-        while (tmp != NULL) {
-                sum += euclidean_squared(center, tmp->data->values, m);
-                tmp = tmp->next;
-        }
-        return sum;
-}
-
-/* Compute cluster center for one cluster
- * 
- * param `size_t m`: Number of variables per data point
- * param `double center[m]`: Empty array of cluster centers
- * param `struct node *HEAD`: Pointer to a cluster list HEAD
- * param `int freq`: Number of elements in the cluster
- * 
- * The input array `center` is changed through this function to represent
- * one cluster center.
- * 
- */
-void compute_center(size_t m, double center[m], struct node *HEAD, int freq) {
-        // Initialize center matrix as 0:
-        for (size_t i = 0; i < m; i++) {
-                center[i] = 0; 
-        }
-        
-        struct node *tmp = HEAD->next; 
-        while (tmp != NULL) {
-                for (size_t i = 0; i < m; i++) {
-                        center[i] = center[i] + tmp->data->values[i];
-                }
-                tmp = tmp->next;
-        } 
-        // To get cluster centers: Divide by number of elements 
-        for (size_t i = 0; i < m; i++) {
-                center[i] = center[i] / freq;
-        }
-}
-
-/* Extracted method that fill data points into array of struct `element`
- * param `double *data` pointer to original data array of length n
- * param `size_t m`: Number of data points
- * param `size_t m`: Number of variables per data point
- * param `struct element points[n]`: Array to be filled with data points
- * param `int *clusters`: Cluster affiliation of the n data points
- * 
- * return: `0` if all data points were successfully stored; `1` if not.
- * 
- */
-int fill_data_points(double *data, size_t n, size_t m, struct element POINTS[n], 
-                     int *clusters, int *USE_CATS, int *categories) {
-        // Create offset variable to correctly read out data points
-        int m_ptr[m];
-        for (size_t i = 0; i < m; i++) {
-                m_ptr[i] = i * n;
-        }
-        
-        // Size of a data vector per element:
-        size_t data_size = m * sizeof(POINTS[0].values[0]);
-        
-        for (size_t i = 0; i < n; i++) {
-                POINTS[i].cluster = clusters[i];
-                if (*USE_CATS) {
-                        POINTS[i].category = categories[i];
-                } else {
-                        POINTS[i].category = 0;
-                }
-                POINTS[i].ID = i;
-                POINTS[i].values = (double*) malloc(data_size);
-                if (POINTS[i].values == NULL) {
-                        free_points(n, POINTS, i);
-                        print_memory_error();
-                        return 1;
-                } 
-                // Fill data into `element`:
-                for (size_t j = 0; j < m; j++) {
-                        POINTS[i].values[j] = data[m_ptr[j]++];
-                }
-        }
-        return 0;
-}
-
-/* Squared Euclidean Distance between two arrays of same length
- * 
- * param *x: Array / pointer to first element
- * param *y: Array / pointer to second element
- * param m: length of the two arrays
- * 
- * return: The squared euclidean distance
- * 
- */
-
-double euclidean_squared(double *x, double *y, size_t m) {
-        double sum = 0;
-        for (size_t i = 0; i < m; i++) {
-                sum = sum + pow(x[i] - y[i], 2);
-        }
-        return sum;
-}
-
-/* Copy one array into another */
-void copy_array(size_t n, double origin[n], double target[n]) {
-        for (int i = 0; i < n; i++) {
-                target[i] = origin[i];
-        }
-}
-
-/* Copy one matrix into another */
-void copy_matrix(size_t n, size_t m, double origin[n][m], double target[n][m]) {
-        for (int i = 0; i < n; i++) {
-                for (int j = 0; j < m; j++) {
-                        target[i][j] = origin[i][j];
-                }
-        }
-}
-
-/* After creation, initialize the HEAD of each cluster list
- * 
- * We access the cluster list using an array of length `k` pointing
- * to the `k` HEADs of the clusters. The first element pointed to 
- * in the list (i.e., the HEAD) is "empty". It just points to the 
- * first real element that is in that cluster.
- * 
- * param `size_t k`: The number of clusters
- * param `struct node *PTR_CLUSTER_HEADS[k]`: The array of pointers to 
- *     cluster HEADS.
- * 
- *  * return: `0` if the cluster list could be initialized successfully, `1` 
- *      if not (in that case, there was no memory that could be allocated).
- * 
- */
-
-int initialize_cluster_heads(size_t k, struct node *HEADS[k]) {
-        for (size_t i = 0; i < k; i++) {
-                HEADS[i] = (struct node*) malloc(sizeof(struct node*));
-                if (HEADS[i] == NULL) {
-                        free_nodes(k, HEADS);
-                        print_memory_error();
-                        return 1;
-                }
-                HEADS[i]->next = NULL;
-                HEADS[i]->data = NULL;
-        }
-        return 0;
-}
-
-/* After initialization, fill the cluster lists with data
- * This function does two things at the same time:
- * (a) add each data point as a node to a cluster list,
- * (b) store the pointer to each node in the array `PTR_NODES`
- */
-int fill_cluster_lists(size_t n, size_t k, int *clusters,
-                       struct element POINTS[n], struct node *PTR_NODES[n],
-                       struct node *PTR_CLUSTER_HEADS[k]) {
-        for (size_t i = 0; i < n; i++) {
-                struct node *current_cluster = PTR_CLUSTER_HEADS[clusters[i]];
-                PTR_NODES[i] = append_to_cluster(current_cluster, &POINTS[i]);
-                if (PTR_NODES[i] == NULL) { // failed to allocate memory
-                        free_points(n, POINTS, n);
-                        free_nodes(k, PTR_CLUSTER_HEADS);
-                        print_memory_error();
-                        return 1; 
-                }
-        }
-        return 0;
-}
-
-/* Append data point to linked list
- * 
- * param `struct node *HEAD` Pointer to HEAD of cluster list
- * param `struct element *data`: Pointer to the data point 
- *     that is appended to the list
- * 
- * return: Pointer to the `node` of the element that was appended to the
- *     cluster list
- * 
- */
-
-struct node* append_to_cluster(struct node *HEAD, struct element *data) {
-        struct node *tmp = HEAD->next; // may be NULL if list is empty
-        HEAD->next = (struct node*) malloc(sizeof(struct node*));
-        if (HEAD->next == NULL) {
-                return NULL; // failed to allocate memory
-        }
-        // New element is right next to HEAD element:
-        HEAD->next->data = data;
-        HEAD->next->next = tmp; // tmp was next to HEAD before
-        return HEAD->next; 
-}
-
-/* Compute sum of squared errors between cluster center and data points (i.e.
- * variance) for each of the k clusters. The input array `VAR_OBJECTIVE` is 
- * changed through this function. 
- */
-void objective_by_cluster(size_t m, size_t k, double OBJ_BY_CLUSTER[k], 
-                          double CENTERS[k][m], struct node *HEADS[k]) {
-        for (size_t i = 0; i < k; i++) {
-                OBJ_BY_CLUSTER[i] = cluster_var(m, HEADS[i], CENTERS[i]);
-        }
-}
-
-/* Compute the sum of an array */
-double array_sum(size_t k, double ARRAY[k]) {
-        double sum = 0;
-        for (size_t i = 0; i < k; i++) {
-                sum += ARRAY[i];
-        }
-        return sum;
-}
-
-/* function that write a "global" variable `C_HEADS` that is used to determine
- * which exchange partners are available for each element.
- */
-int write_cheads(size_t n, size_t c, size_t *C_HEADS[c], int *USE_CATS, 
-             int *categories, int *CAT_frequencies, struct element POINTS[n]) {
-        // Set up array of exchange partners
-        if (*USE_CATS) {
-                if (category_indices(n, c, POINTS, C_HEADS, 
-                                     categories, CAT_frequencies) == 1) {
-                        return 1;
-                }
-                return 0;
-        }
-        // If no categorical constraints are induced, just allocate one index
-        // array that is used for all elements as 
-        // exchange partners. Contains *all* indices, because we 
-        // do not have categorical restrictions
-        C_HEADS[0] = (size_t*) malloc(n * sizeof(size_t));
-        if (C_HEADS[0] == NULL) {
-                return 1;
-        }
-        for (size_t i = 0; i < n; i++) {
-                C_HEADS[0][i] = i;
-        }
-        return 0;
-}
-
-/* Get a structure that has multiple arrays, pointed to by entries in another array; 
- * each of the arrays represents a category
- */
-int category_indices(size_t n, size_t c, struct element POINTS[n], 
-                     size_t *C_HEADS[c], int *categories, 
-                     int *CAT_frequencies) {
-        
-        struct node *HEADS[c]; // used for filling `C_HEADS` - convert list into array
-        if (initialize_cluster_heads(c, HEADS) == 1) {
-                return 1; 
-        }
-        
-        // Set up array of pointers-to-nodes, return if memory runs out
-        struct node *PTR_NODES[n];
-        if (fill_cluster_lists(n, c, categories, POINTS, PTR_NODES, HEADS) == 1) {
-                return 1;
-        }
-        
-        // Initialize the index arrays
-        size_t n_cats;
-        struct node *tmp; 
-        size_t j;
-        for (size_t i = 0; i < c; i++) {
-                n_cats = (size_t) CAT_frequencies[i];
-                C_HEADS[i] = (size_t*) malloc(n_cats * sizeof(size_t));
-                if (C_HEADS[i] == NULL) {
-                        return 1;
-                }
-                // Now write `C_HEADS`! Fills all `c` arrays with indices, 
-                // based on the category lists `HEAD[0], HEAD[1], ..., HEAD[c]`
-                tmp = HEADS[i]->next;
-                j = 0;
-                while (tmp != NULL) {
-                        C_HEADS[i][j] = tmp->data->ID;
-                        j++;
-                        tmp = tmp->next;
-                } 
-        }
-
-        // free temporary category lists
-        free_nodes(c, HEADS);
-        return 0;
-}
-
-/* Free memory in the cluster lists
-* param `size_t k`: The number of clusters
-* param `struct node *PTR_CLUSTER_HEADS[k]`: The array of pointers to 
-*     cluster HEADS
-*/
-void free_nodes(size_t k, struct node *PTR_CLUSTER_HEADS[k]) {
-        struct node *ptr;
-        struct node *prev; // using temp pointer for freeing
-        for (size_t i = 0; i < k; i++) {
-                ptr = PTR_CLUSTER_HEADS[i];
-                while (ptr->next != NULL)
-                {  
-                        prev = ptr;
-                        ptr = ptr->next;
-                        free(prev);
-                }
-                free(ptr);
-        }
-        
-}
-
-/* Free memory in the data points
- * param `size_t n`: length of array `POINTS`
- * param `struct element POINTS[n]`: Array containing data points
- * param `size_t i`: The index up to which data points are freed
- */
-void free_points(size_t n, struct element POINTS[n], size_t i) {
-        for (size_t j = 0; j < i; j++) {
-                free(POINTS[j].values);
-        }
-}
-
-void print_memory_error() {
-        fprintf(stderr, "Failed to allocate enough memory.");
-}
-

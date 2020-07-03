@@ -50,15 +50,11 @@ void distance_anticlustering(double *data, int *N, int *K,
         }
         
         // Deal with categorical restrictions
-        size_t c;
-        if (*USE_CATS) {
-                c = (size_t) *C; // number of categories 
-        } else {
-                c = 1;
-                *CAT_frequencies = n;
-        }
+        size_t c = number_of_categories(USE_CATS, C);
+        *CAT_frequencies = get_cat_frequencies(USE_CATS, CAT_frequencies, n);
+        
         size_t *C_HEADS[c];
-        if (write_cheads(n, c, C_HEADS, USE_CATS, categories, 
+        if (get_indices_by_category(n, c, C_HEADS, USE_CATS, categories, 
                          CAT_frequencies, POINTS) == 1) {
                 print_memory_error();
                 free_points(n, POINTS, n);
@@ -82,10 +78,10 @@ void distance_anticlustering(double *data, int *N, int *K,
         
         int offsets[n]; // index variable for indexing correct cols in data matrix
         // Allocate memory for distance matrix in C
-        double *distances[n];
+        double *DISTANCES[n];
         for (size_t i = 0; i < n; i++) {
-                distances[i] = (double*) malloc(sizeof(double) * n);
-                if (distances[i] == NULL) {
+                DISTANCES[i] = (double*) malloc(sizeof(double) * n);
+                if (DISTANCES[i] == NULL) {
                         print_memory_error();
                         return; // TODO: Free stuff
                 }
@@ -99,13 +95,13 @@ void distance_anticlustering(double *data, int *N, int *K,
         // Reconstruct the data points as N x N distance matrix
         for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
-                        distances[i][j] = data[offsets[j]++];
+                        DISTANCES[i][j] = data[offsets[j]++];
                 }
         }
         
         // Initialize objective
         double OBJ_BY_CLUSTER[k];
-        distance_objective(n, k, distances, OBJ_BY_CLUSTER, HEADS);
+        distance_objective(n, k, DISTANCES, OBJ_BY_CLUSTER, HEADS);
         double SUM_OBJECTIVE = array_sum(k, OBJ_BY_CLUSTER);
 
         /* Some variables for bookkeeping during the optimization */
@@ -146,13 +142,13 @@ void distance_anticlustering(double *data, int *N, int *K,
                         // Update objective
                         // Cluster 1: Loses distances to element i
                         tmp_objs[cl1] -= distances_one_element(
-                                n, distances, 
+                                n, DISTANCES, 
                                 HEADS[cl1],
                                 i
                         );
                         // Cluster 2: Loses distances to element j
                         tmp_objs[cl2] -= distances_one_element(
-                                n, distances, 
+                                n, DISTANCES, 
                                 HEADS[cl2],
                                 j
                         );
@@ -163,13 +159,13 @@ void distance_anticlustering(double *data, int *N, int *K,
                         // we do not accidentally include d_ij, and the 
                         // self distance d_jj is 0)
                         tmp_objs[cl1] += distances_one_element(
-                                n, distances, 
+                                n, DISTANCES, 
                                 HEADS[cl1],
                                 j
                         );
                         // Cluster 2: Gains distances to element 1
                         tmp_objs[cl2] += distances_one_element(
-                                n, distances, 
+                                n, DISTANCES, 
                                 HEADS[cl2],
                                 i
                         );

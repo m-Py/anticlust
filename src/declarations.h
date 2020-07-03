@@ -1,3 +1,6 @@
+#pragma once
+#include <stdlib.h> 
+
 /* Define struct containing data points */
 struct element
 {
@@ -15,14 +18,22 @@ struct node
 };
 
 // Declare Functions
-void anticlustering(
+void kmeans_anticlustering(
         double *data, 
         int *N, 
         int *M, 
         int *K, 
-        int *frequencies, 
-        int *clusters
+        int *frequencies,
+        int *clusters, 
+        int *USE_CATS, 
+        int *C, 
+        int *CAT_frequencies,
+        int *categories
 );
+
+size_t number_of_categories(int *USE_CATS, int *C);
+int get_cat_frequencies(int *USE_CATS, int *CAT_frequencies, size_t n);
+
 double euclidean_squared(
         double *x, 
         double *y, 
@@ -111,20 +122,20 @@ double array_sum(
         double ARRAY[k]
 );
 
-int write_cheads(
+int get_indices_by_category(
         size_t n, 
         size_t c, 
-        size_t *C_HEADS[c], 
+        size_t *CATEGORY_HEADS[c], 
         int *USE_CATS, 
         int *categories, 
         int *CAT_frequencies, 
         struct element POINTS[n]
 );
-int category_indices(
+int set_up_categories_list(
         size_t n, 
         size_t c, 
         struct element POINTS[n], 
-        size_t *C_HEADS[c], 
+        size_t *CATEGORY_HEADS[c], 
         int *categories, 
         int *CAT_frequencies
 );
@@ -141,7 +152,6 @@ void free_nodes(
 );
 
 void print_memory_error();
-
 
 // For distance anticlustering, objective functions
 void distance_objective(
