@@ -10,7 +10,7 @@ test_that("C implemenation of Anticlustering has same output as R implementation
   features <- matrix(rnorm(N * M), ncol = M)
   clusters <- initialize_clusters(N, K, NULL)
   cl1 <- anticlustering(features, clusters, objective = "variance")
-  cl2 <- anticlustering(features, clusters, variance_objective_)
+  cl2 <- anticlustering(features, clusters, variance_objective)
   expect_true(all(cl1 == cl2))
 
   # now also use a categorical constraint
@@ -27,7 +27,7 @@ test_that("C implemenation of Anticlustering has same output as R implementation
   cl2 <- anticlustering(
     features, 
     clusters, 
-    objective = variance_objective_, 
+    objective = variance_objective, 
     categories = categories
   )
   expect_true(all(cl1 == cl2))
@@ -37,8 +37,8 @@ test_that("C implemenation of Anticlustering has same output as R implementation
   # Use diversity objective
   set.seed(123)
   clusters <- initialize_clusters(N, K, NULL)
-  cl1 <- anticlustering(features, clusters, objective = "distance")
-  cl2 <- anticlustering(features, clusters, distance_objective_)
+  cl1 <- anticlustering(features, clusters, objective = "diversity")
+  cl2 <- anticlustering(features, clusters, diversity_objective)
   expect_true(all(cl1 == cl2))
   
   # now also use a categorical constraint
@@ -49,13 +49,13 @@ test_that("C implemenation of Anticlustering has same output as R implementation
   cl1 <- anticlustering(
     features, 
     clusters, 
-    objective = "distance", 
+    objective = "diversity", 
     categories = categories
   )
   cl2 <- anticlustering(
     features, 
     clusters, 
-    objective = distance_objective_, 
+    objective = diversity_objective, 
     categories = categories
   )
   expect_true(all(cl1 == cl2))
@@ -68,13 +68,13 @@ test_that("C implemenation of Anticlustering has same output as R implementation
   cl1 <- anticlustering(
     features, 
     clusters, 
-    objective = "distance", 
+    objective = "diversity", 
     categories = categories
   )
   cl2 <- anticlustering(
     features, 
     clusters, 
-    objective = distance_objective_, 
+    objective = diversity_objective, 
     categories = categories
   )
   expect_true(all(cl1 == cl2))
