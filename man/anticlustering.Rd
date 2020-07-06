@@ -10,7 +10,8 @@ anticlustering(
   objective = "diversity",
   method = "exchange",
   preclustering = FALSE,
-  categories = NULL
+  categories = NULL,
+  repetitions = NULL
 )
 }
 \arguments{
@@ -32,7 +33,8 @@ assigned to anticlusters before the optimization starts.}
 function; the option "variance" maximizes the k-means objective
 function. See Details.}
 
-\item{method}{One of "exchange" (default) or "ilp". See Details.}
+\item{method}{One of "exchange" (default) , "local-maximum", or "ilp". 
+See Details.}
 
 \item{preclustering}{Boolean. Should a preclustering be conducted
 before anticlusters are created? Defaults to \code{FALSE}. See
@@ -40,6 +42,11 @@ Details.}
 
 \item{categories}{A vector, data.frame or matrix representing one
 or several categorical constraints. See Details.}
+
+\item{repetitions}{The number of times a new exchange procedure is 
+initiated when \code{method = "exchange"} or \code{method = "local-maximum"}.
+In the end, the best objective found across the repetitions is returned.
+If unchanged, only one repetitition is conducted.}
 }
 \value{
 A vector of length N that assigns a group (i.e, a number
@@ -108,6 +115,11 @@ the argument \code{K} (in this case, \code{K} has length
 element. Because each possible swap is investigated for each
 element, the total number of exchanges grows quadratically with
 input size, rendering the exchange method unsuitable for large N.
+When using \code{method = "local-maximum"}, the exchange method 
+is repeated until an local maximum is reached. That means after the 
+exchange process has been conducted for each data point, the algorithm 
+restarts with the first element and proceeds to conduct exchanges
+until the objective cannot be improved.
 
 When setting \code{preclustering = TRUE}, only the \code{K - 1} most
 similar elements serve as exchange partners, which can dramatically
@@ -203,13 +215,18 @@ by(schaper2019[, 3:6], anticlusters, function(x) round(apply(x, 2, sd), 2))
 # check that the "room" is balanced across anticlusters:
 table(anticlusters, schaper2019$room)
 
-# You can try to improve the solution using the old output as 
-# the new K argument:
-new_anticlusters <- anticlustering(
+# Use multiple starts of the algorithm to improve the objective
+# Optimize the k-means "variance" criterion
+anticlusters <- anticlustering(
   schaper2019[, 3:6],
-  K = anticlusters,
-  categories = schaper2019$room
+  objective = "variance",
+  K = 3,
+  categories = schaper2019$room,
+  method = "local-maximum",
+  repetitions = 10
 )
+# Compare feature means by anticluster
+by(schaper2019[, 3:6], anticlusters, function(x) round(colMeans(x), 2))
 
 
 ## Use preclustering and variance (k-means) criterion on large data set

@@ -88,7 +88,7 @@
 
 balanced_clustering <- function(x, K, method = "centroid") {
 
-  input_validation_anticlustering(x, K, "distance", method, TRUE, NULL)
+  input_validation_anticlustering(x, K, "distance", method, TRUE, NULL, NULL)
   data <- to_matrix(x)
   
   if (method == "ilp") {

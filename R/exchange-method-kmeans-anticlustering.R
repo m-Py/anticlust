@@ -78,7 +78,7 @@
 
 fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL) {
   input_validation_anticlustering(x, K, "variance",
-                                "exchange", FALSE, categories)
+                                "exchange", FALSE, categories, NULL)
   categories <- merge_into_one_variable(categories)
   if (!isTRUE(k_neighbours == Inf)) {
     validate_input(k_neighbours, "k_neighbours", objmode = "numeric", len = 1,

@@ -1,5 +1,19 @@
 # Development version
 
+## User-visible changes
+
+* In `anticlustering()`, there is a new option for the argument `method`:
+  "local-maximum". When using method = "local-maximum", the exchange method is 
+  repeated until an local maximum is reached. That means after the exchange 
+  process has been conducted for each data point, the algorithm restarts with 
+  the first element and proceeds to conduct exchanges until the objective cannot 
+  be improved. This procedure is more in line with classical neighbourhood search
+  that only terminates when a local optimum is reached.
+
+* In `anticlustering()`, there is now a new argument `repetitions`. It can be used
+  to specify the number of times the exchange procedure is called. The function
+  then returns the best partitioning found across all repetitions.
+
 ## Internal changes 
 
 - The exchange algorithm for optimizing the diversity and variance

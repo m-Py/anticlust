@@ -6,7 +6,13 @@
 #'
 #' @noRd
 input_validation_anticlustering <- function(x, K, objective, method,
-                                          preclustering, categories) {
+                                          preclustering, categories,
+                                          repetitions) {
+  
+  if (argument_exists(repetitions)) {
+    validate_input(repetitions, "repetitions", objmode = "numeric", len = 1, 
+                   greater_than = 1, must_be_integer = TRUE, not_na = TRUE)
+  }
 
   ## Merge categories variable so that `length` can be applied:
   categories <- merge_into_one_variable(categories)
@@ -57,10 +63,14 @@ input_validation_anticlustering <- function(x, K, objective, method,
   }
 
   validate_input(method, "method", len = 1,
-                 input_set = c("ilp", "exchange", "heuristic", "centroid"), not_na = TRUE)
+                 input_set = c("ilp", "exchange", "heuristic", "centroid", "local-maximum"), 
+                 not_na = TRUE)
 
   if (method == "ilp") {
     check_if_solver_is_available()
+    if (argument_exists(repetitions)) {
+      stop("Do not use argument `repetitions` when using the ILP method.")
+    }
   }
 
   if (!inherits(objective, "function")) {
