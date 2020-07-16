@@ -5,8 +5,7 @@ repeat_anticlustering <- function(x, K, objective, categories, preclustering,
   
   if (inherits(objective, "function")) {
     obj_function <- objective
-  }
-  if (objective == "variance") {
+  } else if (objective == "variance") {
     obj_function <- variance_objective
   } else if (objective == "diversity" || objective == "distance") {
     obj_function <- diversity_objective
