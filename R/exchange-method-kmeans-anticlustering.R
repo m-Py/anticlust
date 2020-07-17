@@ -190,9 +190,9 @@ update_distances <- function(features, centers, distances, cluster_i, cluster_j)
 
 update_centers <- function(centers, features, i, j, cluster_i, cluster_j, tab) {
   ## First cluster: item i is removed, item j is added
-  centers[cluster_i, ] <- centers[cluster_i, ] - (features[i, ] / tab[cluster_i]) + (features[j, ] / tab[cluster_j])
+  centers[cluster_i, ] <- centers[cluster_i, ] - (features[i, ] / tab[cluster_i]) + (features[j, ] / tab[cluster_i])
   ## Other cluster: item j is removed, item i is added
-  centers[cluster_j, ] <- centers[cluster_j, ] + (features[i, ] / tab[cluster_i]) - (features[j, ] / tab[cluster_j])
+  centers[cluster_j, ] <- centers[cluster_j, ] + (features[i, ] / tab[cluster_j]) - (features[j, ] / tab[cluster_j])
   centers
 }
 

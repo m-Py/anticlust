@@ -24,8 +24,14 @@ installed via:
 
     install.packages("anticlust")
 
+A (potentially more recent) version of anticlust can also be installed
+directly via Github:
+
+    library("remotes") # if not available: install.packages("remotes")
+    install_github("m-Py/anticlust")
+
 If you like, you can also install the current (unstable) development
-version directly via Github:
+version:
 
     library("remotes") # if not available: install.packages("remotes")
     install_github("m-Py/anticlust", ref = "devel")
