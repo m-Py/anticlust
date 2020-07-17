@@ -1,3 +1,10 @@
+# anticlust 0.5.1
+
+- Fixes a bug in `anticlustering()`, that led to an incorrect 
+computation of cluster centers with option `objective = "variance"` 
+for unequal cluster sizes, see
+[2ef6547](https://github.com/m-Py/anticlust/commit/2ef65475d9516d93f7a1950f3e3af30a561e52da)
+
 # anticlust 0.5.0
 
 ## User-visible changes
