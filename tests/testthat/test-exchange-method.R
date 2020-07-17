@@ -71,7 +71,7 @@ test_that("fast exchange and exchange functions yield the same results - anticlu
 })
 
 
-test_that("same results for k-means local updating and recomputing - different group sizes", {
+test_that("same results for local updating and recomputing - different group sizes", {
   N <- 60 
   M <- 2
   clusters <- rep(1:3, c(30, 15, 15))
@@ -79,4 +79,9 @@ test_that("same results for k-means local updating and recomputing - different g
   ac <- anticlustering(features, K = clusters, objective = variance_objective)
   ac_fast <- fast_anticlustering(features, clusters)
   expect_equal(all(ac == ac_fast), TRUE)
+  
+  ac <- anticlustering(features, K = clusters, objective = diversity_objective)
+  ac_fast <- anticlustering(features, clusters)
+  expect_equal(all(ac == ac_fast), TRUE)
+  
 })
