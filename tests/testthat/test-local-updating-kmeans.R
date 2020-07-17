@@ -35,6 +35,6 @@ test_that("local updating works correctly for k-means anticlustering", {
   
   centers_after_swap <- cluster_centers(features, clusters)
   
-  expect_true(all(local_update_centers == centers_after_swap))
+  expect_equal(local_update_centers, centers_after_swap)
   
 })
