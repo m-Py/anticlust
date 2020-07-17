@@ -11,8 +11,9 @@
   that only terminates when a local optimum is reached.
 
 * In `anticlustering()`, there is now a new argument `repetitions`. It can be used
-  to specify the number of times the exchange procedure is called. The function
-  then returns the best partitioning found across all repetitions.
+  to specify the number of times the exchange procedure (either `method = 
+  "exchange"` or `method = "local-maximum"`) is called. `anticlustering()`
+  returns the best partitioning found across all repetitions.
 
 ## Internal changes 
 
