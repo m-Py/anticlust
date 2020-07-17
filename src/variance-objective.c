@@ -86,13 +86,17 @@ void update_centers(size_t k, size_t m, double CENTERS[k][m],
         size_t cl1 = one->data->cluster;
         size_t cl2 = two->data->cluster;
         for (int i = 0; i < m; i++) {
-                double change_cl1 = one->data->values[i] / frequencies[cl1];
-                double change_cl2 = two->data->values[i] / frequencies[cl2];
+                double added_to_cl1 = two->data->values[i] / frequencies[cl1];
+                double removed_from_cl1 = one->data->values[i] / frequencies[cl1];
+                
+                double added_to_cl2 = one->data->values[i] / frequencies[cl2];
+                double removed_from_cl2 = two->data->values[i] / frequencies[cl2];
+                
                 // Update first cluster center
-                CENTERS[cl1][i] = CENTERS[cl1][i] + change_cl2;
-                CENTERS[cl1][i] = CENTERS[cl1][i] - change_cl1;
+                CENTERS[cl1][i] = CENTERS[cl1][i] + added_to_cl1;
+                CENTERS[cl1][i] = CENTERS[cl1][i] - removed_from_cl1;
                 // Update second cluster center
-                CENTERS[cl2][i] = CENTERS[cl2][i] - change_cl2;
-                CENTERS[cl2][i] = CENTERS[cl2][i] + change_cl1;
+                CENTERS[cl2][i] = CENTERS[cl2][i] - removed_from_cl2;
+                CENTERS[cl2][i] = CENTERS[cl2][i] + added_to_cl2;
         }
 }
