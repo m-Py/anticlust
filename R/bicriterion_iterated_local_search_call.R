@@ -52,7 +52,8 @@ bicriterion_iterated_local_search_call <- function(data, G, R, W = c(0.000001, 0
   return(result_matrix)
 }
 
-
+#verify input
+#############
 checkweights <- function(weights){
   for(i in weights){
     if(i < 0 | i > 1){
@@ -91,7 +92,7 @@ vector_to_matrix <- function(vector, matrix, upper_bound, size){
   return(matrix[1:row-1,1:size])
 }
 
-
+#represents partitions as diversity and dispersion value
 plot_partition_matrix <- function(matrix, data, restarts){
   
   distances <- convert_to_distances(data)
@@ -156,3 +157,4 @@ get_dispersion <- function(partition, distances){
   
   return(min);
 }
+

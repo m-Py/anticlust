@@ -3,6 +3,7 @@
 #include <math.h>
 #include <stdbool.h>
 #include <string.h>
+#include "header.h"
 
 //datastructure to store a linked-list of partitions
 struct Pareto_element { 
@@ -28,28 +29,6 @@ void printList(size_t N, struct Pareto_element* n) {
   } 
   printf("\n \n");
 }   
-
-
-// Declare Functions
-void bicriterion_iterated_local_search_call(double *distances, int *N, int *G, int *R,int *upper_bound, int *WL, double *W, double *Xi, double *result);
-struct Pareto_element* multistart_bicriterion_pairwise_interchange(size_t N, double matrix[N][N], int G, int R, int WL, double weights[WL]);
-struct Pareto_element* bicriterion_iterated_local_search(struct Pareto_element* head, size_t N, double matrix[N][N],int G, int R, int WL, double weights[WL], double neighbor_percent[2]);
-double sample(size_t array_size,double array[array_size]);
-void random_partition(size_t N, int G, int random[N]);
-double get_diversity(size_t N, int partition[N], double matrix[N][N]);
-double get_dispersion(size_t N, int partition[N], double matrix[N][N]);
-void cluster_swap(size_t N, int i, int j, int partition[N]);
-void update_pareto(struct Pareto_element** head_ref, size_t N, int partition[N], double diversity, double dispersion);
-void compress(size_t N, int partition[N]);
-bool paretodominated(struct Pareto_element* head, double diversity, double dispersion);
-bool paretoincluded(struct Pareto_element* head, size_t N, int partition[N]);
-void push(struct Pareto_element** head_ref, double diversity, double dispersion, size_t N, int partition[N]);
-void delete_outdated(struct Pareto_element** head_ref, double diversity, double dispersion);
-void linked_list_sample(struct Pareto_element* head, size_t N, int* partition);
-int linked_list_length(struct Pareto_element* head);
-double random_in_range(double min, double max);
-double get_diversity_fast(double diversity, int x,int y, size_t N, int partition[N], double matrix[N][N]);
-double get_dispersion_fast(double dispersion, int x,int y, size_t N, int partition[N], double matrix[N][N], int *counter1, int *counter2, int *counter3,int *counter4, int *counter);
 
 
 //receive data from r, call bils algorithm, save results for r
@@ -157,7 +136,8 @@ struct Pareto_element* multistart_bicriterion_pairwise_interchange(size_t N, dou
       }
     }
   }
-  printf("%d  %d  %d  %d  %d \n", counter1,counter2, counter3, counter4, counter);
+//printing case occurrence rates 
+//printf("%d  %d  %d  %d  %d \n", counter1,counter2, counter3, counter4, counter);
   return (head);
 }  
 
@@ -221,7 +201,8 @@ struct Pareto_element* bicriterion_iterated_local_search(struct Pareto_element* 
       }
     }
   }
-  printf("%d  %d  %d  %d  %d \n", bcounter1,bcounter2, bcounter3, bcounter4, bcounter);
+  //printing case occurrence rates
+  //printf("%d  %d  %d  %d  %d \n", bcounter1,bcounter2, bcounter3, bcounter4, bcounter);
   //printList(N, head);
   return (head);
 }     
@@ -500,7 +481,7 @@ double get_diversity_fast(double diversity, int x,int y, size_t N, int partition
 
 double get_dispersion_fast(double dispersion, int x,int y, size_t N, int partition[N], double matrix[N][N], int *counter1, int *counter2, int *counter3,int *counter4, int *counter){
   
-  *counter = *counter + 1;
+  //*counter = *counter + 1;
 
   int cluster_x = partition[x];
   int cluster_y = partition[y];
@@ -545,22 +526,22 @@ double get_dispersion_fast(double dispersion, int x,int y, size_t N, int partiti
   
   
   if(!before && !after){
-    *counter1 = *counter1 + 1;
+    //*counter1 = *counter1 + 1;
     return(dispersion);
   }
   
   if(!before && after){
-    *counter2 = *counter2 + 1;
+    //*counter2 = *counter2 + 1;
     return(dispersion);
   }
   
   if(before && after){
-    *counter3 = *counter3 + 1;
+    //*counter3 = *counter3 + 1;
     return(dispersion);
   }
   
   if(before && !after){
-    *counter4 = *counter4 + 1;
+    //*counter4 = *counter4 + 1;
     dispersion = get_dispersion(N, partition, matrix);
     return(dispersion);
   }
