@@ -3,7 +3,7 @@
 ## User-visible changes
 
 * In `anticlustering()`, there is a new option for the argument `method`:
-  "local-maximum". When using method = "local-maximum", the exchange method is 
+  "local-maximum". When using `method = "local-maximum"`, the exchange method is 
   repeated until an local maximum is reached. That means after the exchange 
   process has been conducted for each data point, the algorithm restarts with 
   the first element and proceeds to conduct exchanges until the objective cannot 
@@ -14,6 +14,13 @@
   to specify the number of times the exchange procedure (either `method = 
   "exchange"` or `method = "local-maximum"`) is called. `anticlustering()`
   returns the best partitioning found across all repetitions.
+  
+* `anticlustering()` now implements a new objective function, extending the classical
+  k-means criterion, given by `objective = "best"` (`"best"` is the temporary 
+  code name used in the development version). Using `objective = "best"` will 
+  minimize differences with regard to both means and standard deviations of the 
+  input variables, whereas k-means only focuses on the means. Details on this 
+  objective will follow.  
 
 ## Internal changes 
 

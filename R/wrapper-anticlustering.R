@@ -55,16 +55,21 @@
 #' \itemize{
 #'   \item{cluster editing `diversity` objective, setting \code{objective = "diversity"} (default)}
 #'   \item{k-means `variance` objective, setting \code{objective = "variance"}}
+#'   \item{`best`, an extension of k-means anticlustering}
 #' }
 #'
 #' The k-means objective is the variance within groups---that is, the
 #' sum of the squared distances between each element and its cluster
-#' center (see \code{\link{variance_objective}}). The cluster editing
-#' objective is the sum of pairwise distances within groups (see
+#' center (see \code{\link{variance_objective}}). K-means anticlustering
+#' focuses on minimizing differences with regard to the means of the input 
+#' variables \code{x}; \code{objective = "best"} is an extension of this 
+#' criterion that also tries to minimize differences with regard to the 
+#' standard deviations. The cluster editing "diversity" objective is the 
+#' sum of pairwise distances within groups (see 
 #' \code{\link{diversity_objective}}). Maximizing either of these
 #' clustering objectives (i.e., anticlustering) will partition the
 #' data set into similar groups, whereas traditional cluster analysis
-#' is used to obtain a low between-group similarity.
+#' is used to obtain a low between-group similarity. 
 #'
 #' Anticluster editing is also known as the »maximum diverse grouping
 #' problem« because it maximizes group diversity as measured by the
@@ -212,18 +217,19 @@
 #' # check that the "room" is balanced across anticlusters:
 #' table(anticlusters, schaper2019$room)
 #' 
-#' # Use multiple starts of the algorithm to improve the objective
-#' # Optimize the k-means "variance" criterion
+#' # Use multiple starts of the algorithm to improve the objective and
+#' # optimize the extended k-means criterion ("best")
 #' anticlusters <- anticlustering(
 #'   schaper2019[, 3:6],
-#'   objective = "variance",
+#'   objective = "best",
 #'   K = 3,
 #'   categories = schaper2019$room,
 #'   method = "local-maximum",
-#'   repetitions = 10
+#'   repetitions = 20
 #' )
-#' # Compare feature means by anticluster
+#' # Compare means and standard deviations by anticluster
 #' by(schaper2019[, 3:6], anticlusters, function(x) round(colMeans(x), 2))
+#' by(schaper2019[, 3:6], anticlusters, function(x) round(apply(x, 2, sd), 2))
 #'
 #' 
 #' ## Use preclustering and variance (k-means) criterion on large data set
@@ -263,6 +269,14 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
                            preclustering = FALSE, categories = NULL, 
                            repetitions = NULL) {
 
+  data <- to_matrix(x)
+  
+  # extend data for k-means extension objective
+  if (objective == "best") {
+    x <- cbind(x, squared_from_mean(x))
+    objective <- "variance"
+  }
+  
   # In some cases, `anticlustering()` has to be called repeatedly - 
   # redirect to `repeat_anticlustering()` in this case, which then
   # again calls anticlustering with method "exchange" and 
@@ -278,7 +292,6 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   ## Get data into required format
   input_validation_anticlustering(x, K, objective, method, preclustering, 
                                   categories, repetitions)
-  data <- to_matrix(x)
 
   ## Exact method using ILP
   if (method == "ilp") {
@@ -339,4 +352,8 @@ replace_na_by_index <- function(matches) {
   max_group <- max(matches, na.rm = TRUE)
   matches[na_matches] <- max_group + 1:NAs 
   matches
+}
+
+squared_from_mean <- function(data) {
+  apply(data, 2, function(x) (x - mean(x))^2)
 }
