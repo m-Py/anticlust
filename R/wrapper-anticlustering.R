@@ -279,8 +279,10 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
       input_set = c("distance", "diversity", "variance", "best"), 
       len = 1, not_na = TRUE
     )
-    x <- cbind(x, squared_from_mean(x))
-    objective <- "variance"
+    if (objective == "best") {
+      x <- cbind(x, squared_from_mean(x))
+      objective <- "variance"
+    }
   }
   
   # In some cases, `anticlustering()` has to be called repeatedly - 
