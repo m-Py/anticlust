@@ -272,7 +272,13 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   data <- to_matrix(x)
   
   # extend data for k-means extension objective
-  if (objective == "best") {
+  if (!inherits(objective, "function")) {
+    validate_input(
+      objective, "objective", 
+      objmode = "character",
+      input_set = c("distance", "diversity", "variance", "best"), 
+      len = 1, not_na = TRUE
+    )
     x <- cbind(x, squared_from_mean(x))
     objective <- "variance"
   }
