@@ -28,7 +28,8 @@ void kmeans_anticlustering(
         int *USE_CATS, 
         int *C, 
         int *CAT_frequencies,
-        int *categories
+        int *categories,
+        int *mem_error
 );
 
 size_t number_of_categories(int *USE_CATS, int *C);
@@ -146,12 +147,21 @@ void free_points(
         struct element POINTS[n],
         size_t i
 );
-void free_nodes(
+
+void free_cluster_list(
         size_t k, 
         struct node *PTR_CLUSTER_HEADS[k]
 );
 
-void print_memory_error();
+void free_category_indices(
+        size_t c, 
+        size_t *CATEGORY_HEADS[c]
+);
+
+void free_distances(
+        size_t n, 
+        double *DISTANCES[n]
+);
 
 // For distance anticlustering, objective functions
 void distance_objective(

@@ -57,6 +57,7 @@ c_anticlustering <- function(data, K, categories = NULL, objective) {
       as.integer(N_CATS),
       as.integer(CAT_frequencies),
       as.integer(categories),
+      mem_error = as.integer(0),
       PACKAGE = "anticlust"
     )
   } else {
@@ -65,14 +66,17 @@ c_anticlustering <- function(data, K, categories = NULL, objective) {
       as.double(convert_to_distances(data)),
       as.integer(N),
       as.integer(K),
-      as.integer(frequencies),
       clusters = as.integer(clusters),
       as.integer(USE_FREQUENCIES),
       as.integer(N_CATS),
       as.integer(CAT_frequencies),
       as.integer(categories),
+      mem_error = as.integer(0),
       PACKAGE = "anticlust"
     )
+  }
+  if (results[["mem_error"]] == 1) {
+    stop("Could not allocate enough memory.")
   }
   results[["clusters"]] + 1
 }

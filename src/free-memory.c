@@ -8,7 +8,7 @@
 * param `struct node *PTR_CLUSTER_HEADS[k]`: The array of pointers to 
 *     cluster HEADS
 */
-void free_nodes(size_t k, struct node *PTR_CLUSTER_HEADS[k]) {
+void free_cluster_list(size_t k, struct node *PTR_CLUSTER_HEADS[k]) {
         struct node *ptr;
         struct node *prev; // using temp pointer for freeing
         for (size_t i = 0; i < k; i++) {
@@ -24,6 +24,19 @@ void free_nodes(size_t k, struct node *PTR_CLUSTER_HEADS[k]) {
         
 }
 
+/* Free index array for categories */
+void free_category_indices(size_t c, size_t *CATEGORY_HEADS[c]) {
+    for (size_t i = 0; i < c; i++) {
+        free(CATEGORY_HEADS[i]);
+    }
+}
+
+void free_distances(size_t n, double *DISTANCES[n]) {
+        for (size_t i = 0; i < n; i++) {
+            free(DISTANCES[i]);
+        }
+}
+
 /* Free memory in the data points
  * param `size_t n`: length of array `POINTS`
  * param `struct element POINTS[n]`: Array containing data points
@@ -34,9 +47,3 @@ void free_points(size_t n, struct element POINTS[n], size_t i) {
                 free(POINTS[j].values);
         }
 }
-
-void print_memory_error() {
-        fprintf(stderr, "Failed to allocate enough memory.");
-}
-
- 

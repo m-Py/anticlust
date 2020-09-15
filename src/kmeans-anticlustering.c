@@ -22,6 +22,9 @@
  * param *categories: An assignment of elements to categories,
  *         array of length *N (has to consists of integers between 0 and (C-1) 
  *         - this has to be guaranteed by the caller)
+ * param *mem_error: This is passed with value 0 and only receives the value 1 
+ *       if a memory error occurs when executing this function. The caller needs
+ *       to test if this value is 1 after execution.
  * 
  * The return value is assigned to the argument `clusters`, via pointer
  * 
@@ -37,7 +40,7 @@
  * 1. `struct element POINTS[n]` - An array copy of the `n` data points in the 
  *    same order as the input. Stores the `m` values per data point and the 
  *    cluster assignment of the data point (initially passed via `*clusters`)
- * 2. `struct node *HEADS[k]` - An array of length `k` where each
+ * 2. `struct node *CLUSTER_HEADS[k]` - An array of length `k` where each
  *    entry points to the head of a list that represents a cluster. Each cluster
  *    is implemented as a linked list where each node points to an `element` in 
  *    `struct element POINTS[n]`. Thus, there are `k` cluster lists that are 
@@ -80,25 +83,36 @@
 
 void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
         int *clusters, int *USE_CATS, int *C, int *CAT_frequencies,
-        int *categories) {
+        int *categories, int *mem_error) {
         
         /* 
-        * - Free strategy, to be implemented 
+        * - Free strategy, to be implemented: each function cleans its own mess
         *   + use safe-free in pointer book
-        *   + do not free in low level function, only in upper-most function
-        *   + use booleans to keep track which data structures exist
-        *   + pass these booleans to custom free function which frees ex. structures
+        *   + free in low-level function when possible (i.e., when the error occurs
+        *     within this function)
+        *   + only free in high-level function when low-level function passed
+        *     correctly previously
         */ 
     
         const size_t n = (size_t) *N; // number of data points
         const size_t m = (size_t) *M; // number of variables per data point
         const size_t k = (size_t) *K; // number of clusters
         
+        // Some book-keeping variables to track memory error
+        int mem_error_points = 0;
+        int mem_error_categories = 0;
+        int mem_error_cluster_heads = 0;
+        int mem_error_cluster_lists = 0;
+        
         // Set up array of data points, fill it, return if memory runs out
         struct element POINTS[n];
-        if (fill_data_points(data, n, m, POINTS, clusters, 
-                             USE_CATS, categories) == 1) {
-                print_memory_error();
+        mem_error_points = fill_data_points(
+                data, n, m, POINTS, clusters, 
+                USE_CATS, categories
+        );
+        
+        if (mem_error_points == 1) {
+                *mem_error = 1;
                 return;
         }
         
@@ -108,27 +122,43 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         
         size_t c = number_of_categories(USE_CATS, C);
         *CAT_frequencies = get_cat_frequencies(USE_CATS, CAT_frequencies, n);
-        
         size_t *CATEGORY_HEADS[c];
-        if (get_indices_by_category(n, c, CATEGORY_HEADS, USE_CATS, 
-                                    categories, CAT_frequencies, POINTS) == 1) {
-                print_memory_error();
+        
+        mem_error_categories = get_indices_by_category(
+                n, c, CATEGORY_HEADS, USE_CATS,                                     categories, CAT_frequencies, POINTS
+        );
+        
+        if (mem_error_categories == 1) {
                 free_points(n, POINTS, n);
+                *mem_error = 1;
                 return; 
         }
         
         /* SET UP CLUSTER STRUCTURE */
         
-        // Set up array of pointer-to-cluster-heads, return if memory runs out
+        // Set up array of pointer-to-cluster-heads
         struct node *CLUSTER_HEADS[k];
-        if (initialize_cluster_heads(k, CLUSTER_HEADS) == 1) {
+        mem_error_cluster_heads = initialize_cluster_heads(k, CLUSTER_HEADS);
+        
+        if (mem_error_cluster_heads == 1) {
                 free_points(n, POINTS, n);
+                free_category_indices(c, CATEGORY_HEADS);
+                *mem_error = 1;
                 return; 
         }
 
         // Set up array of pointers-to-nodes, return if memory runs out
         struct node *PTR_NODES[n];
-        if (fill_cluster_lists(n, k, clusters, POINTS, PTR_NODES, CLUSTER_HEADS) == 1) {
+        mem_error_cluster_lists = fill_cluster_lists(
+            n, k, clusters, 
+            POINTS, PTR_NODES, CLUSTER_HEADS
+        );
+        
+        if (mem_error_cluster_lists == 1) {
+                free_points(n, POINTS, n);
+                free_category_indices(c, CATEGORY_HEADS);
+                free_cluster_list(k, CLUSTER_HEADS);
+                *mem_error = 1;
                 return;
         }
         
@@ -144,7 +174,6 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         double SUM_OBJECTIVE = array_sum(k, OBJ_BY_CLUSTER);
         
         /* Some variables for bookkeeping during the optimization */
-        
         size_t best_partner;
         double tmp_centers[k][m];
         double best_centers[k][m];
@@ -168,7 +197,7 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
                 size_t category_i = PTR_NODES[i]->data->category;
                 size_t n_partners = CAT_frequencies[category_i];
                 for (size_t u = 0; u < n_partners; u++) {
-                        // Get index of current exchange partner from `CATEGORY_HEADS`
+                        // Get index of current exchange partner
                         size_t j = CATEGORY_HEADS[category_i][u];
                         
                         size_t cl2 = PTR_NODES[j]->data->cluster;
@@ -225,8 +254,8 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         
         // in the end, free allocated memory:
         free_points(n, POINTS, n);
-        free_nodes(k, CLUSTER_HEADS);
-        // TODO: Free memory allocated for category indexes!
+        free_category_indices(c, CATEGORY_HEADS);
+        free_cluster_list(k, CLUSTER_HEADS);
 }
 
 /* 

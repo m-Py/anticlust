@@ -75,6 +75,7 @@ int set_up_categories_list(size_t n, size_t c, struct element POINTS[n],
         // Set up array of pointers-to-nodes, return if memory runs out
         struct node *PTR_NODES[n];
         if (fill_cluster_lists(n, c, categories, POINTS, PTR_NODES, HEADS) == 1) {
+                free_cluster_list(c, HEADS);
                 return 1;
         }
         
@@ -86,6 +87,8 @@ int set_up_categories_list(size_t n, size_t c, struct element POINTS[n],
                 n_cats = (size_t) CAT_frequencies[i];
                 CATEGORY_HEADS[i] = (size_t*) malloc(n_cats * sizeof(size_t));
                 if (CATEGORY_HEADS[i] == NULL) {
+                        free_category_indices(i, CATEGORY_HEADS);
+                        free_cluster_list(c, HEADS);
                         return 1;
                 }
                 // Now write `CATEGORY_HEADS`! Fills all `c` arrays with indices, 
@@ -100,6 +103,6 @@ int set_up_categories_list(size_t n, size_t c, struct element POINTS[n],
         }
 
         // free temporary category lists
-        free_nodes(c, HEADS);
+        free_cluster_list(c, HEADS);
         return 0;
 }

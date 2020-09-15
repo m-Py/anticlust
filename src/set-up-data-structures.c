@@ -34,7 +34,6 @@ int fill_data_points(double *data, size_t n, size_t m, struct element POINTS[n],
                 POINTS[i].values = (double*) malloc(data_size);
                 if (POINTS[i].values == NULL) {
                         free_points(n, POINTS, i);
-                        print_memory_error();
                         return 1;
                 } 
                 // Fill data into `element`:
@@ -66,8 +65,7 @@ int initialize_cluster_heads(size_t k, struct node *HEADS[k]) {
         for (size_t i = 0; i < k; i++) {
                 HEADS[i] = (struct node*) malloc(sizeof(struct node*));
                 if (HEADS[i] == NULL) {
-                        free_nodes(k, HEADS);
-                        print_memory_error();
+                        free_cluster_list(k, HEADS);
                         return 1;
                 }
                 HEADS[i]->next = NULL;
@@ -89,8 +87,7 @@ int fill_cluster_lists(size_t n, size_t k, int *clusters,
                 PTR_NODES[i] = append_to_cluster(current_cluster, &POINTS[i]);
                 if (PTR_NODES[i] == NULL) { // failed to allocate memory
                         free_points(n, POINTS, n);
-                        free_nodes(k, PTR_CLUSTER_HEADS);
-                        print_memory_error();
+                        free_cluster_list(k, PTR_CLUSTER_HEADS);
                         return 1; 
                 }
         }
