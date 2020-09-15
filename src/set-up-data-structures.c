@@ -65,7 +65,7 @@ int initialize_cluster_heads(size_t k, struct node *HEADS[k]) {
         for (size_t i = 0; i < k; i++) {
                 HEADS[i] = (struct node*) malloc(sizeof(struct node*));
                 if (HEADS[i] == NULL) {
-                        free_cluster_list(k, HEADS);
+                        free_cluster_list(k, HEADS, i);
                         return 1;
                 }
                 HEADS[i]->next = NULL;
@@ -83,12 +83,10 @@ int fill_cluster_lists(size_t n, size_t k, int *clusters,
                        struct element POINTS[n], struct node *PTR_NODES[n],
                        struct node *PTR_CLUSTER_HEADS[k]) {
         for (size_t i = 0; i < n; i++) {
-                struct node *current_cluster = PTR_CLUSTER_HEADS[clusters[i]];
-                PTR_NODES[i] = append_to_cluster(current_cluster, &POINTS[i]);
+                struct node *CLUSTER_HEAD = PTR_CLUSTER_HEADS[clusters[i]];
+                PTR_NODES[i] = append_to_cluster(CLUSTER_HEAD, &POINTS[i]);
                 if (PTR_NODES[i] == NULL) { // failed to allocate memory
-                        free_points(n, POINTS, n);
-                        free_cluster_list(k, PTR_CLUSTER_HEADS);
-                        return 1; 
+                        return 1;
                 }
         }
         return 0;

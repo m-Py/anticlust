@@ -4,15 +4,19 @@
 #include <stdio.h>
 
 /* Free memory in the cluster lists
-* param `size_t k`: The number of clusters
+* param `size_t k`: The maximum number of clusters
 * param `struct node *PTR_CLUSTER_HEADS[k]`: The array of pointers to 
 *     cluster HEADS
+* param size_t i: The actual number of clusters; usually the same 
+*     as `k`, but may be different if setting up the cluster list 
+*     fails during setup. (the same logic holds for the below free 
+*     functions that target different data structures)
 */
-void free_cluster_list(size_t k, struct node *PTR_CLUSTER_HEADS[k]) {
+void free_cluster_list(size_t k, struct node *PTR_CLUSTER_HEADS[k], size_t i) {
         struct node *ptr;
         struct node *prev; // using temp pointer for freeing
-        for (size_t i = 0; i < k; i++) {
-                ptr = PTR_CLUSTER_HEADS[i];
+        for (size_t j = 0; j < i; j++) {
+                ptr = PTR_CLUSTER_HEADS[j];
                 while (ptr->next != NULL)
                 {  
                         prev = ptr;
@@ -21,19 +25,18 @@ void free_cluster_list(size_t k, struct node *PTR_CLUSTER_HEADS[k]) {
                 }
                 free(ptr);
         }
-        
 }
 
 /* Free index array for categories */
-void free_category_indices(size_t c, size_t *CATEGORY_HEADS[c]) {
-    for (size_t i = 0; i < c; i++) {
-        free(CATEGORY_HEADS[i]);
+void free_category_indices(size_t c, size_t *CATEGORY_HEADS[c], size_t i) {
+    for (size_t j = 0; j < i; j++) {
+        free(CATEGORY_HEADS[j]);
     }
 }
 
-void free_distances(size_t n, double *DISTANCES[n]) {
-        for (size_t i = 0; i < n; i++) {
-            free(DISTANCES[i]);
+void free_distances(size_t n, double *DISTANCES[n], size_t i) {
+        for (size_t j = 0; j < i; j++) {
+            free(DISTANCES[j]);
         }
 }
 

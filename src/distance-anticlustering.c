@@ -23,22 +23,19 @@
  * param *categories: An assignment of elements to categories,
  *         array of length *N (has to consists of integers between 0 and (C-1) 
  *         - this has to be guaranteed by the caller)
+ * param *mem_error: This is passed with value 0 and only receives the value 1 
+ *       if a memory error occurs when executing this function. The caller needs
+ *       to test if this value is 1 after execution.
  * 
  * The return value is assigned to the argument `clusters`, via pointer
 */
 
-void distance_anticlustering(double *data, int *N, int *K, 
-                             int *clusters, int *USE_CATS, int *C, 
-                             int *CAT_frequencies,
+void distance_anticlustering(double *data, int *N, int *K, int *clusters, 
+                             int *USE_CATS, int *C, int *CAT_frequencies,
                              int *categories, int *mem_error) {
         
         const size_t n = (size_t) *N; // number of data points
         const size_t k = (size_t) *K; // number of clusters
-        
-        // Some book-keeping variables to track memory error
-        int mem_error_categories = 0;
-        int mem_error_cluster_heads = 0;
-        int mem_error_cluster_lists = 0;
         
         // Per data point, store ID, cluster, and category
         struct element POINTS[n]; 
@@ -46,9 +43,9 @@ void distance_anticlustering(double *data, int *N, int *K,
         for (size_t i = 0; i < n; i++) {
                 POINTS[i].ID = i;
                 POINTS[i].cluster = clusters[i];
-                POINTS[i].values = malloc(sizeof(double)); // dummy malloc
+                POINTS[i].values = malloc(sizeof(double)); // this is just a dummy malloc
                 if (POINTS[i].values == NULL) {
-                        *mem_error = 1; 
+                        *mem_error = 1;
                         return;
                 }
                 if (*USE_CATS) {
@@ -58,18 +55,19 @@ void distance_anticlustering(double *data, int *N, int *K,
                 }
         }
         
-        /* CATEGORICAL RESTRICTIONS 
-         * Write the pointer of arrays `CATEGORY_HEADS`
-        */
+        // Some book-keeping variables to track memory error
+        int mem_error_categories = 0;
+        int mem_error_cluster_heads = 0;
+        int mem_error_cluster_lists = 0;
         
+        // Deal with categorical restrictions
         size_t c = number_of_categories(USE_CATS, C);
         *CAT_frequencies = get_cat_frequencies(USE_CATS, CAT_frequencies, n);
-        size_t *CATEGORY_HEADS[c];
         
+        size_t *CATEGORY_HEADS[c];
         mem_error_categories = get_indices_by_category(
                 n, c, CATEGORY_HEADS, USE_CATS,                                     categories, CAT_frequencies, POINTS
         );
-        
         if (mem_error_categories == 1) {
                 free_points(n, POINTS, n);
                 *mem_error = 1;
@@ -77,14 +75,12 @@ void distance_anticlustering(double *data, int *N, int *K,
         }
         
         /* SET UP CLUSTER STRUCTURE */
-        
-        // Set up array of pointer-to-cluster-heads
         struct node *CLUSTER_HEADS[k];
         mem_error_cluster_heads = initialize_cluster_heads(k, CLUSTER_HEADS);
         
         if (mem_error_cluster_heads == 1) {
                 free_points(n, POINTS, n);
-                free_category_indices(c, CATEGORY_HEADS);
+                free_category_indices(c, CATEGORY_HEADS, c);
                 *mem_error = 1;
                 return; 
         }
@@ -92,14 +88,12 @@ void distance_anticlustering(double *data, int *N, int *K,
         // Set up array of pointers-to-nodes, return if memory runs out
         struct node *PTR_NODES[n];
         mem_error_cluster_lists = fill_cluster_lists(
-            n, k, clusters, 
-            POINTS, PTR_NODES, CLUSTER_HEADS
+                n, k, clusters, 
+                POINTS, PTR_NODES, CLUSTER_HEADS
         );
-        
         if (mem_error_cluster_lists == 1) {
                 free_points(n, POINTS, n);
-                free_category_indices(c, CATEGORY_HEADS);
-                free_cluster_list(k, CLUSTER_HEADS);
+                free_category_indices(c, CATEGORY_HEADS, c);
                 *mem_error = 1;
                 return;
         }
@@ -112,20 +106,18 @@ void distance_anticlustering(double *data, int *N, int *K,
         for (size_t i = 0; i < n; i++) {
                 DISTANCES[i] = (double*) malloc(sizeof(double) * n);
                 if (DISTANCES[i] == NULL) {
-                        *mem_error = 1;
-                        free_distances(i, DISTANCES);
-                        return;
+                        free_distances(n, DISTANCES, i);
                 }
         }
         
         // Column offsets (to convert one-dimensional array to Row/Col major)
-        for(int i = 0; i < n; i++) {
+        for(size_t i = 0; i < n; i++) {
                 offsets[i] = i * n;
         }
         
         // Reconstruct the data points as N x N distance matrix
-        for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
+        for (size_t i = 0; i < n; i++) {
+                for (size_t j = 0; j < n; j++) {
                         DISTANCES[i][j] = data[offsets[j]++];
                 }
         }
@@ -229,8 +221,8 @@ void distance_anticlustering(double *data, int *N, int *K,
         
         // in the end, free allocated memory:
         free_points(n, POINTS, n);
-        free_cluster_list(k, CLUSTER_HEADS);
-        free_category_indices(c, CATEGORY_HEADS);
+        free_category_indices(c, CATEGORY_HEADS, c);
+        free_cluster_list(k, CLUSTER_HEADS, k);
 }
 
 // Compute sum of distances by cluster

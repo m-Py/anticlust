@@ -75,8 +75,8 @@
  * 
  * To balance a categorical variable that is represented by `categories` across
  * clusters, it is necessary that these are already balanced when calling this
- * function. `c_anticlustering` will not obtain an initial balanced partitioning
- * itself - the caller is responsible.
+ * function. It will not obtain an initial balanced partitioning itself - 
+ * the caller is responsible.
  * 
  * ===========================================================================
 */
@@ -142,7 +142,7 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         
         if (mem_error_cluster_heads == 1) {
                 free_points(n, POINTS, n);
-                free_category_indices(c, CATEGORY_HEADS);
+                free_category_indices(c, CATEGORY_HEADS, c);
                 *mem_error = 1;
                 return; 
         }
@@ -156,8 +156,8 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         
         if (mem_error_cluster_lists == 1) {
                 free_points(n, POINTS, n);
-                free_category_indices(c, CATEGORY_HEADS);
-                free_cluster_list(k, CLUSTER_HEADS);
+                free_category_indices(c, CATEGORY_HEADS, c);
+                free_cluster_list(k, CLUSTER_HEADS, k);
                 *mem_error = 1;
                 return;
         }
@@ -254,8 +254,8 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         
         // in the end, free allocated memory:
         free_points(n, POINTS, n);
-        free_category_indices(c, CATEGORY_HEADS);
-        free_cluster_list(k, CLUSTER_HEADS);
+        free_category_indices(c, CATEGORY_HEADS, c);
+        free_cluster_list(k, CLUSTER_HEADS, k);
 }
 
 /* 
