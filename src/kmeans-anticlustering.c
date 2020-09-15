@@ -51,9 +51,12 @@
  *    iterating during the exchange method. Points to elements in the cluster 
  *    lists but can be used to iterate through the data in the original order
  *    of the data (across cluster lists, this order is lost).
- * 4. `double CENTERS[k][m]` - A matrix of cluster centers.
- * 5. `double OBJECTIVE_BY_CLUSTER[k]` - The variance objective by cluster.
- * 6. `double SUM_VAR_OBJECTIVE` - The total variance objective (i.e., sum 
+ * 4. `size_t *CATEGORY_HEADS[c]` - Array of pointers to indices. 
+ *    The i'th element of `C_HEADS` contains an array of all 
+ *    indices of the elements that have the i'th category.
+ * 5. `double CENTERS[k][m]` - A matrix of cluster centers.
+ * 6. `double OBJECTIVE_BY_CLUSTER[k]` - The variance objective by cluster.
+ * 7. `double SUM_VAR_OBJECTIVE` - The total variance objective (i.e., sum 
  *    of all entries in `OBJECTIVE_BY_CLUSTER`).
  *    
  * Regarding the inclusion of categorical constraints: If the argument 
@@ -79,6 +82,14 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         int *clusters, int *USE_CATS, int *C, int *CAT_frequencies,
         int *categories) {
         
+        /* 
+        * - Free strategy, to be implemented 
+        *   + use safe-free in pointer book
+        *   + do not free in low level function, only in upper-most function
+        *   + use booleans to keep track which data structures exist
+        *   + pass these booleans to custom free function which frees ex. structures
+        */ 
+    
         const size_t n = (size_t) *N; // number of data points
         const size_t m = (size_t) *M; // number of variables per data point
         const size_t k = (size_t) *K; // number of clusters
@@ -91,7 +102,9 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
                 return;
         }
         
-        /* CATEGORICAL RESTRICTIONS */
+        /* CATEGORICAL RESTRICTIONS 
+         * Write the pointer of arrays `CATEGORY_HEADS`
+        */
         
         size_t c = number_of_categories(USE_CATS, C);
         *CAT_frequencies = get_cat_frequencies(USE_CATS, CAT_frequencies, n);

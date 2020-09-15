@@ -7,7 +7,7 @@
  */
 size_t number_of_categories(int *USE_CATS, int *C) {
         if (*USE_CATS) {
-                return (size_t) *C; // number of categories 
+                return (size_t) *C;
         }
         return 1;
 }
@@ -26,17 +26,19 @@ int get_cat_frequencies(int *USE_CATS, int *CAT_frequencies, size_t n) {
 
 /* Function that writes to a "global" variable `CATEGORY_HEADS`
  *   
- *   `CATEGORY_HEADS` is an array of pointers to arrays, an each pointer points 
- *   to an array. The i'th element of `C_HEADS` contains an array of all 
- *   indices of the elements that have this category.
+ *   `CATEGORY_HEADS` is an array of pointers to arrays (each entry points 
+ *   to an array). The i'th element of `C_HEADS` contains an array of all 
+ *   indices of the elements that have the i'th category.
  *
  * If no categorical constraints are induced (that is, *USE_CATS = FALSE), 
  * `CATEGORY_HEADS` points to a single array that contains all indices 1, ..., n.
  * This indicates that all elements serve as exchange partners in the exchange
  * algorithm (in general, only elements within the same array of `CATEGORY_HEADS`
- * serve as exchange partners.
+ * serve as exchange partners).
+ * 
  */
-int get_indices_by_category(size_t n, size_t c, size_t *CATEGORY_HEADS[c], int *USE_CATS, 
+int get_indices_by_category(size_t n, size_t c, size_t *CATEGORY_HEADS[c], 
+                            int *USE_CATS, 
                             int *categories, int *CAT_frequencies, 
                             struct element POINTS[n]) {
         // Set up array of exchange partners
