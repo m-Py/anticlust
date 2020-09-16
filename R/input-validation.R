@@ -74,7 +74,7 @@ input_validation_anticlustering <- function(x, K, objective, method,
   }
 
   if (!inherits(objective, "function")) {
-    validate_input(objective, "objective", input_set = c("distance", "diversity", "variance", "best"), 
+    validate_input(objective, "objective", input_set = c("distance", "diversity", "variance", "kplus"), 
                    len = 1, not_na = TRUE)
     if (objective == "variance" && method == "ilp") {
       stop("You cannot use integer linear programming method to maximize the variance criterion. ",

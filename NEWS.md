@@ -16,10 +16,10 @@
   returns the best partitioning found across all repetitions.
   
 * `anticlustering()` now implements a new objective function, extending the classical
-  k-means criterion, given by `objective = "best"` (`"best"` is the temporary 
-  code name used in the development version). Using `objective = "best"` will 
-  minimize differences with regard to both means and standard deviations of the 
-  input variables, whereas k-means only focuses on the means. Details on this 
+  k-means criterion, given by `objective = "kplus"` (`"kplus"` is the temporary 
+  code name used in the development version and may change). Using `objective = 
+  "kplus"` will minimize differences with regard to both means and standard deviations 
+  of the input variables, whereas k-means only focuses on the means. Details on this 
   objective will follow.  
 
 ## Internal changes 

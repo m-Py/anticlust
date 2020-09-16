@@ -62,7 +62,7 @@
 #' sum of the squared distances between each element and its cluster
 #' center (see \code{\link{variance_objective}}). K-means anticlustering
 #' focuses on minimizing differences with regard to the means of the input 
-#' variables \code{x}; \code{objective = "best"} is an extension of this 
+#' variables \code{x}; \code{objective = "kplus"} is an extension of this 
 #' criterion that also tries to minimize differences with regard to the 
 #' standard deviations. The cluster editing "diversity" objective is the 
 #' sum of pairwise distances within groups (see 
@@ -218,10 +218,10 @@
 #' table(anticlusters, schaper2019$room)
 #' 
 #' # Use multiple starts of the algorithm to improve the objective and
-#' # optimize the extended k-means criterion ("best")
+#' # optimize the extended k-means criterion ("kplus")
 #' anticlusters <- anticlustering(
 #'   schaper2019[, 3:6],
-#'   objective = "best",
+#'   objective = "kplus",
 #'   K = 3,
 #'   categories = schaper2019$room,
 #'   method = "local-maximum",
@@ -276,10 +276,10 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
     validate_input(
       objective, "objective", 
       objmode = "character",
-      input_set = c("distance", "diversity", "variance", "best"), 
+      input_set = c("distance", "diversity", "variance", "kplus"), 
       len = 1, not_na = TRUE
     )
-    if (objective == "best") {
+    if (objective == "kplus") {
       x <- cbind(x, squared_from_mean(x))
       objective <- "variance"
     }
