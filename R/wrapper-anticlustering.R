@@ -6,11 +6,11 @@
 #' groups. Implements anticlustering algorithms as described in
 #' Papenberg and Klau (2020; <doi:10.1037/met0000301>).
 #'
-#' @param x The data input. Can be one of two structures: (1) A feature
-#'     matrix where rows correspond to elements and columns correspond
-#'     to variables (a single numeric variable can be passed as a
-#'     vector). (2) An N x N matrix dissimilarity matrix; can be an
-#'     object of class \code{dist} (e.g., returned by
+#' @param x The data input. Can be one of two structures: (1) A
+#'     feature matrix where rows correspond to elements and columns
+#'     correspond to variables (a single numeric variable can be
+#'     passed as a vector). (2) An N x N matrix dissimilarity matrix;
+#'     can be an object of class \code{dist} (e.g., returned by
 #'     \code{\link{dist}} or \code{\link{as.dist}}) or a \code{matrix}
 #'     where the entries of the upper and lower triangular matrix
 #'     represent pairwise dissimilarities.
@@ -18,20 +18,23 @@
 #'     vector of length \code{nrow(x)} describing how elements are
 #'     assigned to anticlusters before the optimization starts.
 #' @param objective The objective to be maximized. The option
-#'     "diversity" (default) maximizes the cluster editing objective
+#'     "diversity" (default; previously called "distance", which is
+#'     still supported) maximizes the cluster editing objective
 #'     function; the option "variance" maximizes the k-means objective
-#'     function. See Details.
-#' @param method One of "exchange" (default) , "local-maximum", or "ilp". 
-#'     See Details.
+#'     function; "kplus" is an extension of k-means
+#'     anticlustering. See Details.
+#' @param method One of "exchange" (default) , "local-maximum", or
+#'     "ilp".  See Details.
 #' @param preclustering Boolean. Should a preclustering be conducted
 #'     before anticlusters are created? Defaults to \code{FALSE}. See
 #'     Details.
 #' @param categories A vector, data.frame or matrix representing one
 #'     or several categorical constraints. See Details.
-#' @param repetitions The number of times a new exchange procedure is 
-#'     initiated when \code{method = "exchange"} or \code{method = "local-maximum"}.
-#'     In the end, the best objective found across the repetitions is returned.
-#'     If unchanged, only one repetitition is conducted.
+#' @param repetitions The number of times a new exchange procedure is
+#'     initiated when \code{method = "exchange"} or \code{method =
+#'     "local-maximum"}.  In the end, the best objective found across
+#'     the repetitions is returned. If this argument is not passed,
+#'     only one repetitition is conducted.
 #'
 #' @return A vector of length N that assigns a group (i.e, a number
 #'     between 1 and \code{K}) to each input element.
@@ -48,38 +51,38 @@
 #'
 #' This function is used to solve anticlustering. That is, \code{K}
 #' groups are created in such a way that all groups are as similar as
-#' possible. This is accomplished by maximizing instead of minimizing
-#' a clustering objective function. This function natively supports
-#' the maximization of two clustering objective functions:
+#' possible (this usually corresponds to creating groups with high
+#' within-group heterogeneity). This is accomplished by maximizing
+#' instead of minimizing a clustering objective function. The
+#' maximization of three clustering objective functions is natively
+#' supported, while other functions can also defined by the user:
 #' 
 #' \itemize{
 #'   \item{cluster editing `diversity` objective, setting \code{objective = "diversity"} (default)}
 #'   \item{k-means `variance` objective, setting \code{objective = "variance"}}
-#'   \item{`best`, an extension of k-means anticlustering}
+#'   \item{`kplus` anticlustering, an extension of k-means anticlustering}
 #' }
 #'
 #' The k-means objective is the variance within groups---that is, the
 #' sum of the squared distances between each element and its cluster
-#' center (see \code{\link{variance_objective}}). K-means anticlustering
-#' focuses on minimizing differences with regard to the means of the input 
-#' variables \code{x}; \code{objective = "kplus"} is an extension of this 
-#' criterion that also tries to minimize differences with regard to the 
-#' standard deviations. The cluster editing "diversity" objective is the 
-#' sum of pairwise distances within groups (see 
-#' \code{\link{diversity_objective}}). Maximizing either of these
-#' clustering objectives (i.e., anticlustering) will partition the
-#' data set into similar groups, whereas traditional cluster analysis
-#' is used to obtain a low between-group similarity. 
-#'
-#' Anticluster editing is also known as the »maximum diverse grouping
-#' problem« because it maximizes group diversity as measured by the
-#' sum of pairwise distances. Hence, anticlustering maximizes
-#' between-group similarity by maximizing within-group
-#' heterogeneity. In previous versions of this package, \code{method =
-#' "distance"} was used (and is still supported) to request
-#' anticluster editing, but now \code{method = "diversity"} is
-#' preferred because there are several clustering objectives based on
-#' pairwise distances (e.g., see
+#' center (see \code{\link{variance_objective}}). K-means
+#' anticlustering focuses on minimizing differences with regard to the
+#' means of the input variables \code{x}; \code{objective = "kplus"}
+#' anticlustering is an extension of this criterion that also tries to
+#' minimize differences with regard to the standard deviations between
+#' groups.
+#' 
+#' The cluster editing "diversity" objective is the sum of pairwise
+#' distances within groups (see
+#' \code{\link{diversity_objective}}). Anticluster editing is also
+#' known as the »maximum diverse grouping problem« because it
+#' maximizes group diversity as measured by the sum of pairwise
+#' distances. Hence, anticlustering maximizes between-group similarity
+#' by maximizing within-group heterogeneity. In previous versions of
+#' this package, \code{method = "distance"} was used (and is still
+#' supported) to request anticluster editing, but now \code{method =
+#' "diversity"} is preferred because there are several clustering
+#' objectives based on pairwise distances (e.g., see
 #' \code{\link{dispersion_objective}}).
 #'
 #' If the data input \code{x} is a feature matrix (that is: each row
@@ -107,17 +110,17 @@
 #' element. Because each possible swap is investigated for each
 #' element, the total number of exchanges grows quadratically with
 #' input size, rendering the exchange method unsuitable for large N.
-#' When using \code{method = "local-maximum"}, the exchange method 
-#' is repeated until an local maximum is reached. That means after the 
-#' exchange process has been conducted for each data point, the algorithm 
-#' restarts with the first element and proceeds to conduct exchanges
-#' until the objective cannot be improved.
+#' When using \code{method = "local-maximum"}, the exchange method is
+#' repeated until an local maximum is reached. That means after the
+#' exchange process has been conducted once for each data point, the
+#' algorithm restarts with the first element and proceeds to conduct
+#' exchanges until the objective cannot be improved.
 #'
-#' When setting \code{preclustering = TRUE}, only the \code{K - 1} most
-#' similar elements serve as exchange partners, which can dramatically
-#' speed up the optimization (more information on the preclustering
-#' option is included below). This option is recommended for larger
-#' N. For very large N, check out the function
+#' When setting \code{preclustering = TRUE}, only the \code{K - 1}
+#' most similar elements serve as exchange partners, which can
+#' dramatically speed up the optimization (more information on the
+#' preclustering option is included below). This option is recommended
+#' for larger N. For very large N, check out the function
 #' \code{\link{fast_anticlustering}} that was specifically implemented
 #' to process very large data sets.
 #'
@@ -171,8 +174,8 @@
 #' The argument \code{categories} may induce categorical constraints.
 #' The grouping variables indicated by \code{categories} will be
 #' balanced out across anticlusters. Currently, this functionality is
-#' only available in combination with the exchange method, but not
-#' with the integer linear programming approach.
+#' only available in combination with the heuristic methods, but not
+#' with the exact integer linear programming approach.
 #' 
 #' \strong{Optimize a custom objective function}
 #' 
@@ -190,7 +193,7 @@
 #' that in the function body, columns of the data set cannot be
 #' accessed using \code{data.frame} operations such as
 #' \code{$}. Objects of class \code{dist} will be converted to matrix
-#' as well.
+#' as well. 
 #' 
 #' 
 #' @seealso
