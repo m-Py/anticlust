@@ -32,12 +32,12 @@ c_anticlustering <- function(data, K, categories = NULL, objective) {
   }
   
   if (argument_exists(categories)) {
-    USE_FREQUENCIES <- TRUE
+    USE_CATEGORIES <- TRUE
     categories <- merge_into_one_variable(categories) - 1
     N_CATS <- length(unique(categories))
     CAT_frequencies <- table(categories)
   } else {
-    USE_FREQUENCIES <- FALSE
+    USE_CATEGORIES <- FALSE
     categories <- 0
     N_CATS <- 0
     CAT_frequencies <- 0
@@ -53,7 +53,7 @@ c_anticlustering <- function(data, K, categories = NULL, objective) {
       as.integer(K),
       as.integer(frequencies),
       clusters = as.integer(clusters),
-      as.integer(USE_FREQUENCIES),
+      as.integer(USE_CATEGORIES),
       as.integer(N_CATS),
       as.integer(CAT_frequencies),
       as.integer(categories),
@@ -67,7 +67,7 @@ c_anticlustering <- function(data, K, categories = NULL, objective) {
       as.integer(N),
       as.integer(K),
       clusters = as.integer(clusters),
-      as.integer(USE_FREQUENCIES),
+      as.integer(USE_CATEGORIES),
       as.integer(N_CATS),
       as.integer(CAT_frequencies),
       as.integer(categories),
