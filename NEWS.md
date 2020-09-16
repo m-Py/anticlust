@@ -1,4 +1,4 @@
-# Development version
+# anticlust 0.5.2
 
 ## User-visible changes
 
@@ -16,17 +16,10 @@
   returns the best partitioning found across all repetitions.
   
 * `anticlustering()` now implements a new objective function, extending the classical
-  k-means criterion, given by `objective = "kplus"` (`"kplus"` is the temporary 
-  code name used in the development version and may change). Using `objective = 
+  k-means criterion, given by `objective = "kplus"`. Using `objective = 
   "kplus"` will minimize differences with regard to both means and standard deviations 
   of the input variables, whereas k-means only focuses on the means. Details on this 
   objective will follow.  
-
-## Internal changes 
-
-- The exchange algorithm for optimizing the diversity and variance
- objectives has been reimplemented in C, leading to a substantial 
- boost in performance
 
 # anticlust 0.5.1
 
