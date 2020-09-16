@@ -228,7 +228,7 @@
 #'   K = 3,
 #'   categories = schaper2019$room,
 #'   method = "local-maximum",
-#'   repetitions = 20
+#'   repetitions = 2
 #' )
 #' # Compare means and standard deviations by anticluster
 #' by(schaper2019[, 3:6], anticlusters, function(x) round(colMeans(x), 2))
