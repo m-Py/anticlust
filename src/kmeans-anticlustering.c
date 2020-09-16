@@ -125,7 +125,7 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         size_t *CATEGORY_HEADS[c];
         
         mem_error_categories = get_indices_by_category(
-                n, c, CATEGORY_HEADS, USE_CATS,                                     categories, CAT_frequencies, POINTS
+                n, c, CATEGORY_HEADS, USE_CATS, categories, CAT_frequencies, POINTS
         );
         
         if (mem_error_categories == 1) {
