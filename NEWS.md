@@ -1,3 +1,11 @@
+# Development version (0.5.2.9000)
+
+## Internal changes 
+
+- The exchange algorithm for optimizing diversity and variance
+ objectives has been reimplemented in C, leading to a substantial 
+ boost in performance
+
 # anticlust 0.5.2
 
 ## User-visible changes
