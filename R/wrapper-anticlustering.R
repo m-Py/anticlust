@@ -324,11 +324,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
 
   # Redirect to specialized fast exchange methods for diversity and 
   # variance objectives
-  if (objective == "variance") {
-    return(fast_anticlustering(data, K, Inf, categories))
-  } else if (objective == "diversity" || objective == "distance") {
-    return(fast_exchange_dist(data, K, categories))
-  }
+  c_anticlustering(data, K, categories, objective)
 }
 
 # Function that processes input and returns the data set that the
