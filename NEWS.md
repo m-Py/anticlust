@@ -4,7 +4,8 @@
 
 - The exchange algorithm for optimizing diversity and variance
  objectives has been reimplemented in C, leading to a substantial 
- boost in performance
+ boost in performance. **Known problem: Does not seem to work
+ under windows.**
 
 # anticlust 0.5.2
 
