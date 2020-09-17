@@ -7,8 +7,6 @@
 #' @param categories A vector, data.frame or matrix representing one
 #'     or several categorical constraints. 
 #' 
-#' @useDynLib anticlust kmeans_anticlustering distance_anticlustering
-#' 
 #' @noRd
 #' 
 c_anticlustering <- function(data, K, categories = NULL, objective) {
