@@ -69,7 +69,6 @@ int initialize_cluster_heads(size_t k, struct node *HEADS[k]) {
                         return 1;
                 }
                 HEADS[i]->next = NULL;
-                HEADS[i]->data = NULL;
         }
         return 0;
 }
