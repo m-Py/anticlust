@@ -1,8 +1,8 @@
-# anticlust 0.5.2-1
+# anticlust 0.5.2-1 / 0.5.2-2
 
-- Fixes a bug that prevented the correct transformation of class `dist` to 
+- Fixes two minor bugs that prevented the correct transformation of class `dist` to 
   class `matrix` when using the repeated exchange (or "local-maximum") method, 
-  see c42e1367ec
+  see c42e1367ec and e6fdae5096.
 
 # anticlust 0.5.2
 
