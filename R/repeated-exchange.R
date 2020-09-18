@@ -9,6 +9,8 @@ repeat_anticlustering <- function(x, K, objective, categories, preclustering,
     obj_function <- variance_objective
   } else if (objective == "diversity" || objective == "distance") {
     obj_function <- diversity_objective
+  } else if (objective == "dispersion") {
+    obj_function <- dispersion_objective
   }
   
   if (method == "local-maximum") {
