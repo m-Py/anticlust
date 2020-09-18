@@ -1,3 +1,9 @@
+# anticlust 0.5.2-1
+
+- Fixes a bug that prevented the correct transformation of class `dist` to 
+  class `matrix` when using the repeated exchange (or "local-maximum") method, 
+  see c42e1367ec
+
 # anticlust 0.5.2
 
 ## User-visible changes
