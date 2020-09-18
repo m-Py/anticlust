@@ -58,9 +58,24 @@ c_anticlustering <- function(data, K, categories = NULL, objective) {
       mem_error = as.integer(0),
       PACKAGE = "anticlust"
     )
-  } else {
+  } else if (objective == "diversity" || objective == "distance") {
     results <- .C(
       "distance_anticlustering", 
+      as.double(convert_to_distances(data)),
+      as.integer(N),
+      as.integer(K),
+      clusters = as.integer(clusters),
+      as.integer(USE_CATEGORIES),
+      as.integer(N_CATS),
+      as.integer(CAT_frequencies),
+      as.integer(categories),
+      mem_error = as.integer(0),
+      PACKAGE = "anticlust"
+    )
+  }
+  else if (objective == "dispersion") {
+    results <- .C(
+      "dispersion_anticlustering", 
       as.double(convert_to_distances(data)),
       as.integer(N),
       as.integer(K),
