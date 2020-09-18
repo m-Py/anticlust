@@ -277,7 +277,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
                            preclustering = FALSE, categories = NULL, 
                            repetitions = NULL) {
 
-  data <- to_matrix(x)
+  x <- to_matrix(x)
   
   # extend data for k-means extension objective
   if (!inherits(objective, "function")) {
@@ -312,7 +312,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   ## Exact method using ILP
   if (method == "ilp") {
     return(exact_anticlustering(
-      data,
+      x,
       K,
       preclustering)
     )
@@ -320,16 +320,16 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   
   # Preclustering and categorical constraints are both processed in the
   # variable `categories` after this step:
-  categories <- get_categorical_constraints(data, K, preclustering, categories)
+  categories <- get_categorical_constraints(x, K, preclustering, categories)
   
   if (class(objective) == "function") {
     # most generic exchange method, deals with any objective function
-    return(exchange_method(data, K, objective, categories))
+    return(exchange_method(x, K, objective, categories))
   }
 
   # Redirect to specialized fast exchange methods for diversity and 
   # variance objectives
-  c_anticlustering(data, K, categories, objective)
+  c_anticlustering(x, K, categories, objective)
 }
 
 # Function that processes input and returns the data set that the
