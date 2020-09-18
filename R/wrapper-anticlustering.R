@@ -61,6 +61,7 @@
 #'   \item{cluster editing `diversity` objective, setting \code{objective = "diversity"} (default)}
 #'   \item{k-means `variance` objective, setting \code{objective = "variance"}}
 #'   \item{`kplus` anticlustering, an extension of k-means anticlustering}
+#'   \item{`dispersion` is the minimum distance between any two elements within the same cluster.}
 #' }
 #'
 #' The k-means objective is the variance within groups---that is, the
@@ -84,6 +85,10 @@
 #' "diversity"} is preferred because there are several clustering
 #' objectives based on pairwise distances (e.g., see
 #' \code{\link{dispersion_objective}}).
+#' 
+#' The "dispersion" is the minimum distance between any two elements within 
+#' the same cluster; applications that require high within-group heterogeneity
+#' often require to maximize the dispersion.
 #'
 #' If the data input \code{x} is a feature matrix (that is: each row
 #' is a "case" and each column is a "variable") and the option
@@ -279,7 +284,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
     validate_input(
       objective, "objective", 
       objmode = "character",
-      input_set = c("distance", "diversity", "variance", "kplus"), 
+      input_set = c("distance", "diversity", "dispersion", "variance", "kplus"), 
       len = 1, not_na = TRUE
     )
     if (objective == "kplus") {

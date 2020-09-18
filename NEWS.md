@@ -1,5 +1,13 @@
 # Development version (0.5.2.9000)
 
+## User-visible changes
+
+- In `anticlustering()`, added native support for new anticlustering 
+ objective, the dispersion (using `objective = "dispersion"`).
+ The dispersion is the minimum distance between any two elements within 
+ the same cluster; applications that require high within-group heterogeneity
+ often require to maximize the dispersion.
+
 ## Internal changes 
 
 - The exchange algorithm for optimizing diversity and variance

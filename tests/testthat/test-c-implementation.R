@@ -78,5 +78,28 @@ test_that("C implemenation of Anticlustering has same output as R implementation
     categories = categories
   )
   expect_true(all(cl1 == cl2))
+  
+  # test dispersion objective
+  set.seed(123)
+  N <- 50 # number of elements
+  M <- 2  # number of variables per element
+  K <- 2  # number of clusters
+  random_data <- matrix(rnorm(N * M), ncol = M)
+  random_clusters <- sample(rep_len(1:K, N))
+
+  # Maximize the dispersion 
+  optimized_clusters <- anticlustering(
+    random_data,
+    K = random_clusters, 
+    objective = dispersion_objective
+  )
+  dispersion_objective(random_data, optimized_clusters)
+
+  optimized_clusters2 <- anticlustering(
+    random_data,
+    K = random_clusters, 
+    objective = "dispersion"
+  )
+  expect_true(all(optimized_clusters == optimized_clusters2))
 
 })

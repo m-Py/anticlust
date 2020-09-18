@@ -187,3 +187,24 @@ double distances_one_element(
         struct node *start_node, 
         size_t cl
 );
+
+// For distance anticlustering, objective functions
+double dispersion_objective(
+        size_t n, 
+        size_t k, 
+        double *distances[n], 
+        struct node *HEADS[k]
+);
+
+double minimun_distance_cluster(
+        size_t n, 
+        double *distances[n], 
+        struct node *HEAD
+);
+
+double minimin_distance_element(
+        size_t n, 
+        double *distances[n], 
+        struct node *start_node, 
+        size_t cl
+);
