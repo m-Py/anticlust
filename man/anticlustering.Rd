@@ -24,7 +24,8 @@ can be an object of class \code{dist} (e.g., returned by
 where the entries of the upper and lower triangular matrix
 represent pairwise dissimilarities.}
 
-\item{K}{How many anticlusters should be created. Alternatively: A
+\item{K}{How many anticlusters should be created. Alternatively: (a) 
+A vector describing the size of each group, or (b) a
 vector of length \code{nrow(x)} describing how elements are
 assigned to anticlusters before the optimization starts.}
 
@@ -224,7 +225,7 @@ by(schaper2019[, 3:6], anticlusters, function(x) round(apply(x, 2, sd), 2))
 table(anticlusters, schaper2019$room)
 
 # Use multiple starts of the algorithm to improve the objective and
-# optimize the extended k-means criterion ("kplus")
+# optimize the k-means criterion ("variance")
 anticlusters <- anticlustering(
   schaper2019[, 3:6],
   objective = "kplus",
@@ -233,6 +234,22 @@ anticlusters <- anticlustering(
   method = "local-maximum",
   repetitions = 2
 )
+# Compare means and standard deviations by anticluster
+by(schaper2019[, 3:6], anticlusters, function(x) round(colMeans(x), 2))
+by(schaper2019[, 3:6], anticlusters, function(x) round(apply(x, 2, sd), 2))
+
+# Use different group sizes and optimize the extended k-means
+# criterion ("kplus")
+anticlusters <- anticlustering(
+  schaper2019[, 3:6],
+  objective = "kplus",
+  K = c(24, 24, 48),
+  categories = schaper2019$room,
+  repetitions = 2,
+  method = "local-maximum"
+)
+
+table(anticlusters, schaper2019$room)
 # Compare means and standard deviations by anticluster
 by(schaper2019[, 3:6], anticlusters, function(x) round(colMeans(x), 2))
 by(schaper2019[, 3:6], anticlusters, function(x) round(apply(x, 2, sd), 2))
