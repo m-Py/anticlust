@@ -277,8 +277,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   # extend data for k-means extension objective
   if (!inherits(objective, "function")) {
     validate_input(
-      objective, "objective", 
-      objmode = "character",
+      objective, "objective",
       input_set = c("distance", "diversity", "variance", "kplus"), 
       len = 1, not_na = TRUE
     )
