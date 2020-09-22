@@ -17,7 +17,7 @@ repeat_anticlustering <- function(x, K, objective, categories, preclustering,
         stop("If `K` is of length `nrow(x)` and `repetitions` is given, you cannot use `preclustering = TRUE` or `categories`, sorry.")
       }
       clusters_repetitions <- as.list(data.frame(as.matrix(
-        replicate(repetitions - 1, categorical_sampling(K, categories))
+        replicate(repetitions - 1, categorical_sampling(categories, K))
       )))
     } else {
       clusters_repetitions <- as.list(data.frame(as.matrix(

@@ -27,11 +27,13 @@ input_validation_anticlustering <- function(x, K, objective, method,
                  input_set = c(TRUE, FALSE), not_na = TRUE)
 
   # Allow that K is an initial assignment of elements to clusters
+  validate_input(K, "K", objmode = "numeric", must_be_integer = TRUE)
   if (length(K) == 1) {
-    validate_input(K, "K", objmode = "numeric", len = 1, 
-                   greater_than = 1, must_be_integer = TRUE, not_na = TRUE)
+    validate_input(K, "K", len = 1, greater_than = 1, must_be_integer = TRUE, not_na = TRUE)
   } else {
-    validate_input(K, "K", objmode = "numeric", len = N, not_na = TRUE)
+    if (length(K) != N && sum(K) != N) {
+      stop("Argument `K` is mis-specified.")
+    }
     if (method != "exchange") {
       stop("Passing an initial cluster assignment via the argument `K` ",
            "only works with method = 'exchange'")
@@ -44,9 +46,8 @@ input_validation_anticlustering <- function(x, K, objective, method,
       stop("The argument `K` should indicate the number of groups when using `method = 'ilp'`.")
     }
     if (argument_exists(categories)) {
-      if (length(categories) != length(K)) {
-        stop("Length of arguments `categories` and `K` differ, but ",
-             "should be of same length (K can also be of length 1)")
+      if (length(categories) != length(K) && sum(K) != N) {
+        stop("Length of arguments `categories` and `K` differ.")
       }
     }
   }
