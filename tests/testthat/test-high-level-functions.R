@@ -19,8 +19,8 @@ test_that("high level equal sized clustering function runs through", {
 
     ## Assert that exact solution has lowest objective (for distance
     ## criterion), allowing for numeric imprecision of ILP solver
-    obj_exact     <- distance_objective_(clusters_exact, features)
-    obj_heuristic <- distance_objective_(clusters_heuristic, features)
+    obj_exact     <- diversity_objective_(clusters_exact, features)
+    obj_heuristic <- diversity_objective_(clusters_heuristic, features)
     expect_equal(round(obj_exact, 10) <= round(obj_heuristic, 10), TRUE)
   }
 })
@@ -44,8 +44,8 @@ test_that("high level anticlustering function runs through", {
     expect_equal(legal_number_of_clusters(features, anticlusters_heuristic), NULL)
     ## Assert that exact solution has highest objective (for distance
     ## criterion), allowing for numeric imprecision of ILP solver
-    obj_exact     <- distance_objective_(anticlusters_exact, features)
-    obj_heuristic <- distance_objective_(anticlusters_heuristic, features)
+    obj_exact     <- diversity_objective_(anticlusters_exact, features)
+    obj_heuristic <- diversity_objective_(anticlusters_heuristic, features)
     expect_equal(round(obj_exact, 10) >= round(obj_heuristic, 10), TRUE)
   }
 })
@@ -72,7 +72,7 @@ test_that("all argument combinations run through", {
                                    objective = criterion,
                                    method = method,
                                    preclustering = preclustering)
-    obj <- distance_objective_(anticlusters, features)
+    obj <- diversity_objective_(anticlusters, features)
     rowname <- ifelse(preclustering, "preclustering", "no_preclustering")
     storage[rowname, method] <- obj
   }

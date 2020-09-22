@@ -6,7 +6,13 @@
 #'
 #' @noRd
 input_validation_anticlustering <- function(x, K, objective, method,
-                                          preclustering, categories) {
+                                          preclustering, categories,
+                                          repetitions) {
+  
+  if (argument_exists(repetitions)) {
+    validate_input(repetitions, "repetitions", objmode = "numeric", len = 1, 
+                   greater_than = 1, must_be_integer = TRUE, not_na = TRUE)
+  }
 
   ## Merge categories variable so that `length` can be applied:
   categories <- merge_into_one_variable(categories)
@@ -22,16 +28,25 @@ input_validation_anticlustering <- function(x, K, objective, method,
 
   # Allow that K is an initial assignment of elements to clusters
   if (length(K) == 1) {
-    validate_input(K, "K", objmode = "numeric", len = 1, greater_than = 1, must_be_integer = TRUE, not_na = TRUE)
+    validate_input(K, "K", objmode = "numeric", len = 1, 
+                   greater_than = 1, must_be_integer = TRUE, not_na = TRUE)
   } else {
     validate_input(K, "K", objmode = "numeric", len = N, not_na = TRUE)
     if (method != "exchange") {
       stop("Passing an initial cluster assignment via the argument `K` ",
            "only works with method = 'exchange'")
     }
+    if (preclustering == TRUE) {
+      stop("Cannot use preclustering because elements have already been assigned ",
+           "to groups via argument `K`.")
+    }
+    if (method == "ilp") {
+      stop("The argument `K` should indicate the number of groups when using `method = 'ilp'`.")
+    }
     if (argument_exists(categories)) {
       if (length(categories) != length(K)) {
-        stop("Length of arguments `categories` and `K` differ, but should be of same length (K can also be of length 1)")
+        stop("Length of arguments `categories` and `K` differ, but ",
+             "should be of same length (K can also be of length 1)")
       }
     }
   }
@@ -48,14 +63,19 @@ input_validation_anticlustering <- function(x, K, objective, method,
   }
 
   validate_input(method, "method", len = 1,
-                 input_set = c("ilp", "exchange", "heuristic", "centroid"), not_na = TRUE)
+                 input_set = c("ilp", "exchange", "heuristic", "centroid", "local-maximum"), 
+                 not_na = TRUE)
 
   if (method == "ilp") {
     check_if_solver_is_available()
+    if (argument_exists(repetitions)) {
+      stop("Do not use argument `repetitions` when using the ILP method.")
+    }
   }
 
   if (!inherits(objective, "function")) {
-    validate_input(objective, "objective", input_set = c("distance", "variance"), len = 1, not_na = TRUE)
+    validate_input(objective, "objective", input_set = c("distance", "diversity", "variance", "kplus"), 
+                   len = 1, not_na = TRUE)
     if (objective == "variance" && method == "ilp") {
       stop("You cannot use integer linear programming method to maximize the variance criterion. ",
            "Use objective = 'distance', or method = 'exchange' instead")

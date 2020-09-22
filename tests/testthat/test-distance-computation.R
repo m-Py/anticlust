@@ -12,8 +12,8 @@ test_that("computing distance objectives in specialized exchange method is equal
         distances <- as.matrix(dist(features))
         clusters <- sample(rep(1:K, N/K))
 
-        objective <- distance_objective_(clusters, distances)
-        objective2 <- distance_objective_(clusters, features)
+        objective <- diversity_objective_(clusters, distances)
+        objective2 <- diversity_objective_(clusters, features)
         expect_equal(objective, objective2)
 
         # Swap two items and check objective
@@ -26,7 +26,7 @@ test_that("computing distance objectives in specialized exchange method is equal
         obj1 <- update_objective_distance(distances, selected, swap1, swap2, objective)
 
         # Method 2: As in generic exchange method
-        obj2 <- update_objective_generic(distances, clusters, swap1, swap2, distance_objective_)
+        obj2 <- update_objective_generic(distances, clusters, swap1, swap2, diversity_objective)
         expect_equal(obj1, obj2)
         # note, this DOES NOT always work:
         # expect_true(obj1 == obj2) # floating points =/

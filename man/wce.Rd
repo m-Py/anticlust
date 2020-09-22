@@ -28,7 +28,7 @@ This function requires the R package \code{Rglpk} and the GNU linear
 programming kit.
 }
 \examples{
-\dontrun{
+\donttest{
 features <- swiss
 distances <- dist(scale(swiss))
 hist(distances)

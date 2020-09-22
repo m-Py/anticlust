@@ -1,7 +1,7 @@
 
-#' Cluster editing distance objective
+#' (Anti)cluster editing "diversity" objective
 #'
-#' Compute the cluster editing objective for a given clustering.
+#' Compute the diversity for a given clustering.
 #'
 #' @param x The data input. Can be one of two structures: (1) A data matrix
 #'     where rows correspond to elements and columns correspond to
@@ -18,10 +18,11 @@
 #'
 #' @details
 #'
-#' The cluster editing objective objective is given by the sum of the
-#' pairwise distances between elements within the same (anti)clusters.
-#' When the input \code{x} is a feature matrix, the Euclidean distance
-#' is computed as the basic distance unit.
+#' The objective function used in (anti)cluster editing is the
+#' diversity, i.e., the sum of the pairwise distances between elements
+#' within the same groups. When the input \code{x} is a feature
+#' matrix, the Euclidean distance is computed as the basic distance
+#' unit of this objective.
 #'
 #'
 #' @examples
@@ -31,11 +32,11 @@
 #' ## Clustering
 #' clusters <- balanced_clustering(distances, K = 3)
 #' # This is low:
-#' distance_objective(distances, clusters)
+#' diversity_objective(distances, clusters)
 #' ## Anticlustering
 #' anticlusters <- anticlustering(distances, K = 3)
 #' # This is higher:
-#' distance_objective(distances, anticlusters)
+#' diversity_objective(distances, anticlusters)
 #'
 #' @export
 #'
@@ -44,26 +45,34 @@
 #'
 #' @references
 #'
-#' Papenberg, M., & Klau, G. W. (2019, October 30). Using anticlustering to partition 
-#' data sets into equivalent parts https://doi.org/10.31234/osf.io/3razc
+#' Brusco, M. J., Cradit, J. D., & Steinley, D. (in press). Combining
+#' diversity and dispersion criteria for anticlustering: A bicriterion
+#' approach. British Journal of Mathematical and Statistical
+#' Psychology. https://doi.org/10.1111/bmsp.12186
+#' 
+#' Papenberg, M., & Klau, G. W. (2020). Using anticlustering to
+#' partition data sets into equivalent parts. Psychological
+#' Methods. Advance Online Publication. 
+#' https://doi.org/10.1037/met0000301.
+#'
 #'
 
-distance_objective <- function(x, clusters) {
+diversity_objective <- function(x, clusters) {
   x <- as.matrix(x)
   validate_input(x, "x", objmode = "numeric")
   validate_input(clusters, "clusters", len = nrow(x), not_na = TRUE)
-  distance_objective_(clusters, x)
+  diversity_objective_(clusters, x)
 }
 
 # other order of the arguments, needed for some internal handling
-distance_objective_ <- function(clusters, x) {
-  sum(distance_objective_by_group(clusters, x))
+diversity_objective_ <- function(clusters, x) {
+  sum(diversity_objective_by_group(clusters, x))
 }
 
 # Compute distance objective by cluster
 # param data: distance matrix or feature matrix
 # param cl: cluster assignment
-distance_objective_by_group <- function(cl, data) {
+diversity_objective_by_group <- function(cl, data) {
   if (is_distance_matrix(data)) {
     objectives <- sapply(
       sort(unique(cl)), 

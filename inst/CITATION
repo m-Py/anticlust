@@ -1,14 +1,17 @@
-bibentry("Manual",
-    title="anticlust: Subset Partitioning via Anticlustering",
-    author="Martin Papenberg",
-    year="2019",
-    note="(Version 0.4.1)",
-    url="https://github.com/m-Py/anticlust",
-
-    textVersion =
-    paste("Papenberg, M. (2019). ",
-        "anticlust: Subset Partitioning via Anticlustering (Version 0.4.1). ",
-        "Available from https://github.com/m-Py/anticlust",
-        sep=""),
-
-    mheader = "To cite anticlust in publications use:")
+bibentry(
+  "Article",
+  title="Using anticlustering to partition data sets into equivalent parts",
+  author="Martin Papenberg and Gunnar W. Klau",
+  doi="10.1037/met0000301",
+  pubstate = "in press",
+  journal = "Psychological Methods",
+  year = "2020",
+  textVersion = paste0(
+    "Papenberg, M., & Klau, G. W. (2020). ",
+    "Using anticlustering to partition data sets into equivalent parts. ",
+    "Psychological Methods. Advance Online Publication. ",
+    "https://doi.org/10.1037/met0000301. ",
+    "\n\n A preprint is available from https://doi.org/10.31234/osf.io/3razc."
+  ),
+  mheader = "To cite anticlust in publications use:"
+)

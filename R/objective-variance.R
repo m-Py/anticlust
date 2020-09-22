@@ -25,8 +25,9 @@
 #' Jain, A. K. (2010). Data clustering: 50 years beyond k-means.
 #' Pattern Recognition Letters, 31, 651–666.
 #'
-#' Papenberg, M., & Klau, G. W. (2019, October 30). Using anticlustering to partition 
-#' data sets into equivalent parts https://doi.org/10.31234/osf.io/3razc
+#' Papenberg, M., & Klau, G. W. (2020). Using anticlustering to partition 
+#' data sets into equivalent parts. Psychological Methods. Advance Online 
+#' Publication. https://doi.org/10.1037/met0000301.
 #'
 #' Späth, H. (1986). Anticlustering: Maximizing the variance criterion.
 #' Control and Cybernetics, 15, 213–218.

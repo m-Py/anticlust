@@ -4,7 +4,8 @@
 \name{schaper2019}
 \alias{schaper2019}
 \title{Ratings for 96 words}
-\format{A data frame with 96 rows and 7 variables
+\format{
+A data frame with 96 rows and 7 variables
 \describe{
   \item{item}{The name of an object (in German)}
   \item{room}{The room in which the item is typically found; can be
@@ -19,7 +20,8 @@
       frequency)}
   \item{list}{Represents the set affiliation of the \code{item} as
       realized in experiments by Schaper et al.}
-}}
+}
+}
 \source{
 Courteously provided by Marie Lusia Schaper and Ute Bayen.
 }
@@ -54,12 +56,11 @@ by(features, anticlusters, function(x) round(apply(x, 2, sd), 2))
 # Room is balanced between the three sets:
 table(Room = schaper2019$room, Set = anticlusters)
 
-# Optimize the distance criterion
-# (tends to maximize similarity in feature means)
+# Maximize the diversity criterion
 ac_dist <- anticlustering(
   features,
   K = 3,
-  objective = "distance",
+  objective = "diversity",
   categories = schaper2019$room,
   method = "exchange"
 )

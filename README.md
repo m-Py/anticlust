@@ -8,16 +8,47 @@ objective function, such as the intra-cluster variance (used in k-means
 clustering) or the sum of pairwise distances within clusters. Thus,
 anticlustering creates similar sets of elements by maximizing
 heterogeneity within anticlusters. The package `anticlust` implements
-anticlustering algorithms as described in Papenberg and Klau (2019). It
-was originally developed to assign items to experimental conditions in
-experimental psychology, but it can be applied whenever a user requires
-that a given set of elements has to be partitioned into similar subsets.
+anticlustering algorithms as described in Papenberg and Klau (2020;
+<a href="https://doi.org/10.1037/met0000301" class="uri">https://doi.org/10.1037/met0000301</a>).
+It was originally developed to assign items to experimental conditions
+in experimental psychology, but it can be applied whenever a user
+requires that a given set of elements has to be partitioned into similar
+subsets, or when the within-group heterogeneity should be high.
 
 Installation
 ------------
 
+The stable release of `anticlust` is available from
+[CRAN](https://CRAN.R-project.org/package=anticlust) and can be
+installed via:
+
+    install.packages("anticlust")
+
+A (potentially more recent) version of anticlust can also be installed
+directly via Github:
+
     library("remotes") # if not available: install.packages("remotes")
     install_github("m-Py/anticlust")
+
+If you like, you can also install the current (unstable) development
+version:
+
+    library("remotes") # if not available: install.packages("remotes")
+    install_github("m-Py/anticlust", ref = "devel")
+
+[Here](https://github.com/m-Py/anticlust/blob/devel/NEWS.md) you may
+find some hints on the most recent additions to the development version.
+
+Citation
+--------
+
+If you use `anticlust` in your research, it would be courteous if you
+cite the following reference:
+
+Papenberg, M., & Klau, G. W. (2020). Using anticlustering to partition
+data sets into equivalent parts. *Psychological Methods*. Advance Online
+Publication.
+<a href="https://doi.org/10.1037/met0000301" class="uri">https://doi.org/10.1037/met0000301</a>.
 
 How do I learn about `anticlust`
 --------------------------------
@@ -25,9 +56,11 @@ How do I learn about `anticlust`
 This README contains some basic information on the `R` package
 `anticlust`. More information is available via the following sources:
 
--   A preprint is available describing the theoretical
-    background of anticlustering and the `anticlust` package in detail.
-    It can be retrieved from <https://psyarxiv.com/3razc/>.
+-   A paper is available describing the theoretical background of
+    anticlustering and the `anticlust` package in detail
+    (<a href="https://doi.org/10.1037/met0000301" class="uri">https://doi.org/10.1037/met0000301</a>).
+    The freely available preprint can be retrieved from
+    <a href="https://psyarxiv.com/3razc/" class="uri">https://psyarxiv.com/3razc/</a>.
 
 -   The [package website](https://m-py.github.io/anticlust/) contains
     all relevant documentation. This includes a
@@ -98,7 +131,7 @@ To quantify set similarity, `anticlust` may employ one of two measures
 that have been developed in the context of cluster analysis:
 
 -   the k-means “variance” objective
--   the cluster editing “distance” objective
+-   the cluster editing “diversity” objective
 
 The k-means objective is given by the sum of the squared distances
 between cluster centers and individual data points. The cluster editing
@@ -110,7 +143,7 @@ features, displayed as the *x* and *y* axis:
 <img src="man/figures/objectives-1.png" style="display: block; margin: auto;" />
 
 The lines connecting the dots illustrate the values that enter the
-objective functions. For (anti)cluster editing (“distance objective”,
+objective functions. For (anti)cluster editing (“diversity objective”,
 plots on the right side), lines are drawn between pairs of elements
 within the same cluster, because the objective is the sum of the
 pairwise distances between elements that are part of the same cluster.
@@ -119,14 +152,14 @@ side ), lines are drawn connecting eech element and the centroid of the
 cluster to which the element is assigned, because the objective is the
 sum of the squared distances between cluster centers and elements.
 
-Minimizing either the distance or the variance objective creates three
+Minimizing either the diversity or the variance objective creates three
 distinct clusters of elements (as shown in the lower plots), whereas
 maximization leads to a strong overlap of the three sets, i.e., three
 anticlusters (as shown in the upper plots).
 
 To vary the objective function in the `anticlust` package, we can change
 the parameter `objective`. To use anticluster editing, use
-`objective = "distance"` (this is also the default). To maximize the
+`objective = "diversity"` (this is also the default). To maximize the
 k-means variance objective, set `objective = "variance"`.
 
 Categorical constraints
@@ -198,10 +231,3 @@ If you have any question on the `anticlust` package or any suggestions
 (<a href="mailto:martin.papenberg@hhu.de" class="email">martin.papenberg@hhu.de</a>)
 or [Twitter](https://twitter.com/MPapenberg), or to open an [issue on
 the Github repository](https://github.com/m-Py/anticlust/issues).
-
-Reference
----------
-
-Papenberg, M., & Klau, G. W. (2019, October 30). Using anticlustering to
-partition a stimulus pool into equivalent parts.
-<https://doi.org/10.31234/osf.io/3razc>

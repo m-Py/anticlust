@@ -1,7 +1,7 @@
 Type: Package
 Package: anticlust
 Title: Subset Partitioning via Anticlustering
-Version: 0.4.1
+Version: 0.5.2-2
 Authors@R: 
     c(person(given = "Martin",
              family = "Papenberg",
@@ -21,43 +21,51 @@ Authors@R:
              comment = "package logo"))
 Author: Martin Papenberg [aut, cre]
     (<https://orcid.org/0000-0002-9900-4268>), Meik Michalke [ctb]
-    (centroid based clustering algorithm), Gunnar W. Klau [ths],
-    Juliane V. Tkotz [ctb] (package logo)
+    (centroid based clustering algorithm), Gunnar W. Klau [ths], Juliane
+    V. Tkotz [ctb] (package logo)
 Maintainer: Martin Papenberg <martin.papenberg@hhu.de>
-Description: Anticlustering partitions a pool of elements into
-    subsets (i.e., anticlusters) in such a way that the subsets are as
-    similar as possible. This is accomplished by maximizing instead of
-    minimizing a clustering objective function, such as the intra-cluster
-    variance (used in k-means clustering) or the sum of pairwise distances
-    within clusters. Thus, anticlustering creates similar sets of elements
-    by maximizing heterogeneity within anticlusters. This package
-    implements exact and heuristic anticlustering algorithms as described
-    in Papenberg and Klau (2019; <doi:10.31234/osf.io/3razc>). The exact
-    approach requires that the GNU linear programming kit
-    (https://www.gnu.org/software/glpk/glpk.html) and the R package
-    `Rglpk` (https://cran.R-project.org/package=Rglpk) are installed.
-    Also includes methods for classical clustering problems under size
-    constraints (i.e., creating equal-sized clusters), as well as methods
-    for (unrestricted or K-partite) matching.
+Description: The method of anticlustering partitions a pool of
+    elements into groups (i.e., anticlusters) in such a way that the
+    between-group similarity is maximized and -- at the same time -- the
+    within-group heterogeneity is maximized. This reverses the logic of
+    cluster analysis that strives for high within-group homogeneity and
+    low similarity of the different groups. Computationally,
+    anticlustering is accomplished by maximizing instead of minimizing a
+    clustering objective function, such as the intra-cluster variance
+    (used in k-means clustering) or the sum of pairwise distances within
+    clusters.  The function anticlustering() implements exact and
+    heuristic anticlustering algorithms as described in Papenberg and Klau
+    (2020; <doi:10.1037/met0000301>). The exact approach requires that the
+    GNU linear programming kit
+    (<https://www.gnu.org/software/glpk/glpk.html>) is available and the R
+    package 'Rglpk' (<https://cran.R-project.org/package=Rglpk>) is
+    installed. Some other functions are available to solve classical
+    clustering problems. The function balanced_clustering() applies a
+    cluster analysis under size constraints, i.e., creates equal-sized
+    clusters. The function matching() can be used for (unrestricted,
+    bipartite, or K-partite) matching. The function wce() can be used
+    optimally solve the (weighted) cluster editing problem, also known as
+    correlation clustering, clique partitioning problem or transitivity
+    clustering.
 License: MIT + file LICENSE
 URL: https://github.com/m-Py/anticlust
 BugReports: https://github.com/m-Py/anticlust/issues
 Depends: 
-    R (>= 3.4.0)
+    R (>= 3.6.0)
 Imports: 
     Matrix,
     RANN (>= 2.6.0)
 Suggests: 
-    knitr,
     Rglpk,
-    rmarkdown,
-    testthat
+    testthat,
+    knitr,
+    rmarkdown
 VignetteBuilder: 
-    knitr
+    knitr,
+    rmarkdown
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.0.2
-SystemRequirements: Two optional system requirements: (1) the
-    exact (anti)clustering algorithms require the GLPK library
-    (http://www.gnu.org/software/glpk/), (2) rendering the package
-    vignette requires pandoc (https://pandoc.org)
+RoxygenNote: 7.1.1
+SystemRequirements: The exact (anti)clustering algorithms
+    require that the GNU linear programming kit (GLPK library) is
+    installed (<http://www.gnu.org/software/glpk/>).

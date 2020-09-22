@@ -79,6 +79,7 @@ sum(all_objectives == min_obj)
 best_clustering <- partitions[all_objectives == min_obj][[1]]
 
 ## Plot minimum and maximum objectives:
+user_par <- par("mfrow")
 par(mfrow = c(1, 2))
 plot_clusters(
   features,
@@ -92,12 +93,13 @@ plot_clusters(
   illustrate_variance = TRUE,
   main = "Minimum variance"
 )
-par(mfrow = c(1, 1))
+par(mfrow = user_par)
 
 }
 \references{
-Papenberg, M., & Klau, G. W. (2019, October 30). Using anticlustering to partition 
-data sets into equivalent parts https://doi.org/10.31234/osf.io/3razc
+Papenberg, M., & Klau, G. W. (2020). Using anticlustering to partition 
+data sets into equivalent parts. Psychological Methods. Advance Online 
+Publication. https://doi.org/10.1037/met0000301.
 }
 \author{
 Martin Papenberg \email{martin.papenberg@hhu.de}

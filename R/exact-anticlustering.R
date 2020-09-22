@@ -11,6 +11,7 @@
 #'
 #' @return A vector representing the anticluster affiliation of
 #'     elements.
+#' @importFrom utils combn
 #'
 #' @noRd
 
@@ -48,7 +49,7 @@ convert_to_distances <- function(data) {
   if (!is_distance_matrix(data)) {
     distances <- as.matrix(dist(data))
   } else {
-    distances <- data
+    distances <- as.matrix(data)
   }
   distances
 }

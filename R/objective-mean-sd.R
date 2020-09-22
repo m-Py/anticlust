@@ -5,9 +5,9 @@
 #'
 #' @importFrom stats sd var
 #'
-#' @param clusters A clustering vector
 #' @param features A matrix or data.frame of data points. Rows
 #'     correspond to elements and columns correspond to features.
+#' @param clusters A clustering vector
 #'
 #' @return A value quantifying similarity in means and standard deviations. 
 #'     Higher values indicate that means and standard deviations are more
@@ -38,7 +38,7 @@
 #'
 #'
 
-mean_sd_obj <- function(clusters, features) {
+mean_sd_obj <- function(features, clusters) {
    K <- length(unique(clusters))
    mean_min  <- featurewise_diff(by(features, clusters, colMeans, na.rm = TRUE), K)
    SD_min <- featurewise_diff(by(features, clusters, function(x) apply(x, 2, var, na.rm = TRUE)), K)

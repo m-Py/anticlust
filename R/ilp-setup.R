@@ -1,5 +1,7 @@
 
-#' Construct the ILP represenation of a anticlustering problem
+#' Construct the ILP represenation of a cluster editing instance
+#' 
+#' (Can be used to solve anticlustering and clustering problems)
 #'
 #' @param distances An n x n matrix representing the
 #'     distances between items
@@ -14,33 +16,33 @@
 
 anticlustering_ilp <- function(distances, K, group_restriction = TRUE) {
 
-  ## Initialize some constant variables:
+  # Initialize some constant variables:
   equality_signs <- equality_identifiers()
-  n_items        <- nrow(distances)
-  group_size     <- n_items / K
+  n        <- nrow(distances)
+  group_size     <- n / K
   costs          <- vectorize_weights(distances)
 
-  ## Specify the number of triangular constraints:
-  n_tris <- choose(n_items, 3) * 3
+  # Specify the number of triangular constraints:
+  n_tris <- choose(n, 3) * 3
 
-  ## Construct ILP constraint matrix
-  constraints <- sparse_constraints(n_items, costs$pair)
+  # Construct ILP constraint matrix
+  constraints <- sparse_constraints(n, costs$pair)
   colnames(constraints) <- costs$pair
 
   ## Directions of the constraints:
   equalities <- c(rep(equality_signs$l, n_tris),
-                  rep(equality_signs$e, n_items))
+                  rep(equality_signs$e, n))
 
   # Right-hand-side of ILP
-  rhs <- c(rep(1, n_tris), rep(group_size - 1, n_items)) #  p = number of clusters
+  rhs <- c(rep(1, n_tris), rep(group_size - 1, n))
 
   # Objective function of the ILP
   obj_function <- costs$costs
 
-  ## Give names to all objects for inspection purposes
+  # Give names to all objects for inspection purposes
   names(obj_function) <- colnames(constraints)
 
-  ## normal cluster editing:
+  # For normal cluster editing, remove group constraints:
   if (group_restriction == FALSE) {
     rhs <- rhs[1:n_tris]
     equalities <- equalities[1:n_tris]
@@ -84,95 +86,67 @@ equality_identifiers <- function() {
 #     that is connected; `pair` A string of form "xi_j" identifying the
 #     item pair
 vectorize_weights <- function(distances) {
-  ## Problem: I have matrix of costs but need vector for ILP.
-  ## Make vector of costs in data.frame (makes each cost identifiable)
+  # Problem: I have matrix of costs but need vector for ILP.
+  # Make vector of costs in data.frame (makes each cost identifiable)
   costs <- expand.grid(1:ncol(distances), 1:nrow(distances))
   colnames(costs) <- c("i", "j")
   costs$costs <- c(distances)
-  ## remove redundant or self distances:
+  # remove redundant or self distances:
   costs <- costs[costs$i < costs$j, ]
-  costs$pair <- paste0("x", paste0(costs$i, "_", costs$j))
+  costs$pair <- paste0("x", costs$i, "_", costs$j)
   rownames(costs) <- NULL
   return(costs)
 }
 
 # Construct a sparse matrix representing the ILP constraints
-# @param n_items How many items are there
+#
+# @param n The number of elements
 # @param pair_names A character vector of names representing the item
-#     pairs.  Must have the form that is contained in the ILP
-#     data.frame costs$pair.
+#     pairs (e.g.: "x1_2", ..., "x100_123"). Is read out from the data frame
+#     have `costs` (i.e., costs$pair is passed as pair_names)
 # @return A sparse matrix representing the left-hand side of the ILP (A
 #     in Ax ~ b)
 #
-sparse_constraints <- function(n_items, pair_names) {
-  ## Generate indices for sparse matrix matrix
-  tri <- vectorized_triangular(n_items, pair_names)
-  gr  <- vectorized_group(n_items, pair_names)
-  return(Matrix::sparseMatrix(c(tri$i, gr$i), c(tri$j, gr$j), x = c(tri$x, gr$x)))
+sparse_constraints <- function(n, pair_names) {
+  tri <- triangular_constraints(n, pair_names)
+  gr  <- group_constraints(n, pair_names)
+  Matrix::sparseMatrix(c(tri$i, gr$i), c(tri$j, gr$j), x = c(tri$x, gr$x))
 }
 
-# Construct indices for a sparse matrix representation of triangular
-# constraints
-# @param n_items How many items are there
-# @param pair_names A character vector of names representing the item
-#     pairs.  Must have the form that is contained in the ILP
-#     data.frame costs$pair.
-# @return A list of indices to be used as input parameters of
-#     Matrix::sparseMatrix
-#
-vectorized_triangular <- function(n_items, pair_names) {
-  triangular_constraints <- choose(n_items, 3)
+# Indices for sparse matrix representation of triangular constraints
+triangular_constraints <- function(n, pair_names) {
+  triangular_constraints <- choose(n, 3)
   coef_per_constraint <- 3
   # number of coefficients in constraint matrix:
   col_indices <- matrix(ncol = triangular_constraints, nrow = coef_per_constraint * 3)
   row_indices <- rep(1:(triangular_constraints*3), each = 3)
   xes <- rep(c(-1, 1, 1, 1, -1, 1, 1, 1, -1), triangular_constraints)
-  ## Fill columns for constraints
-  counter <- 1
-  for (i in 1:n_items) {
-    for (j in 2:n_items) {
-      for (k in 3:n_items) {
-        ## ensure that only legal constraints are inserted:
-        if (!(i < j) | !(j < k)) next
-        ## Construct indices
-        pairs <- c(paste0("x", i, "_", j), paste0("x", i, "_", k), paste0("x", j, "_", k))
-        indices <- match(pairs, pair_names)
-        col_indices[, counter] <- rep(indices, 3)
-        counter <- counter + 1
-      }
-    }
-  }
-  return(list(i = row_indices, j = c(col_indices), x = xes))
+  # generate all item triplets
+  triplets <- t(combn(1:n, 3))
+  # get the respective column indices in constraint matrix
+  ds <- c(t(data.frame(
+    paste0("x", triplets[, 1], "_", triplets[, 2]),
+    paste0("x", triplets[, 1], "_", triplets[, 3]),
+    paste0("x", triplets[, 2], "_", triplets[, 3])
+  )))
+  col_indices <- matrix(match(ds, pair_names), nrow = 3)
+  col_indices <- rbind(col_indices, col_indices, col_indices)
+  list(i = row_indices, j = c(col_indices), x = xes)
 }
 
-# Construct indices for a sparse matrix representation of group
-# constraints
-# @param n_items How many items does the instance have
-# @param pair_names A character vector of names representing the item
-#     pairs.  Must have the form that is contained in the ILP
-#     data.frame costs$pair.
-# @return A list of indices to be used as input parameters of
-#     Matrix::sparseMatrix
-vectorized_group <- function(n_items, pair_names) {
-  coef_per_constraint <- (n_items - 1)
-  group_coefficients <- coef_per_constraint * n_items
-  row_indices <- rep((1:n_items) + (3 * choose(n_items, 3)), each = coef_per_constraint)
-  col_indices <- matrix(ncol = n_items, nrow = coef_per_constraint)
+# Indices for sparse matrix representation of group constraints
+group_constraints <- function(n, pair_names) {
+  coef_per_constraint <- (n - 1)
+  group_coefficients <- coef_per_constraint * n
+  row_indices <- rep((1:n) + (3 * choose(n, 3)), each = coef_per_constraint)
+  col_indices <- matrix(ncol = n, nrow = coef_per_constraint)
   xes         <- rep(1, length = group_coefficients)
-
-  for (i in 1:n_items) {
-    connections <- all_connections(i, n_items)
-    pairs <- connections_to_pair(connections)
+  for (i in 1:n) {
+    connections <- all_connections(i, n)
+    pairs <- paste0("x", connections[, 1], "_", connections[, 2])
     col_indices[, i] <- match(pairs, pair_names)
   }
   return(list(i = row_indices, j = c(col_indices), x = xes))
-}
-
-# Get character representation of item connections
-# @param connections a data.frame returned by `all_connections`
-# @return A character vector representing item connections.
-connections_to_pair <- function(connections) {
-  apply(connections, 1, function(x) paste0("x", paste0(x, collapse = "_")))
 }
 
 # Find all connections of an element
@@ -183,8 +157,6 @@ connections_to_pair <- function(connections) {
 #     point.  The second column always contains the "larger number"
 #     point.
 all_connections <- function(i, n) {
-  if (i > n | i <= 0)
-    stop("Error in function `all_connections`: cannot find connections for element that is outside of legal range")
   connections <- expand.grid(i, setdiff(1:n, i))
   # put lower index in first column
   wrongorder <- connections[, 1] > connections[, 2]
