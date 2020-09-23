@@ -12,6 +12,10 @@ test_that("argument combinations run through (no preclustering / categories)", {
   )
   illegal_conditions <- conditions$objective == "variance" & conditions$input == "distance"
   conditions <- conditions[!illegal_conditions, ]
+  # for several repetitions, we cannot expect that local maximum always outperforms
+  # exchange method (latter may have better initial state)
+  illegal_conditions <- conditions$repetitions > 1 & conditions$method == "local-maximum"
+  conditions <- conditions[!illegal_conditions, ]
   
   # Set up matrix to store the objective values obtained by different methods
   K <- sample(2:6, size = 1)
@@ -50,21 +54,21 @@ test_that("argument combinations run through (no preclustering / categories)", {
   conditions$obj_value <- objs
   # make wide format
   wide1 <- reshape(
-    conditions, 
+    conditions[conditions$method != "local-maximum", ], 
     direction = "wide", 
     timevar = "repetitions",
     idvar = colnames(conditions)[c(1, 3, 4)]
   )
-  # test that local maximum search improves results
+  # test that repetitions improves results
   expect_true(all(wide1[, 5] >= wide1[, 4]))
   
   wide2 <- reshape(
-    conditions, 
+    conditions[conditions$repetitions == 1, ], 
     direction = "wide", 
     timevar = "method",
     idvar = colnames(conditions)[2:4]
   )
-  # test that repetitions improve results
+  # test that local maximum search tend to improve results
   expect_true(all(wide2[, 5] >= wide2[, 4]))
 
 })
