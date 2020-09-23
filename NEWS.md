@@ -1,3 +1,9 @@
+# anticlust 0.5.3
+
+- In `anticlustering()` and `categorical_sampling()`, the argument 
+  `K` can now be used to specify the size of the expected groups,
+  see the help page `?anticlustering` for an example.
+
 # anticlust 0.5.2-1 / 0.5.2-2
 
 - Fixes two minor bugs that prevented the correct transformation of class `dist` to 
