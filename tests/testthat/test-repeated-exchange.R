@@ -6,7 +6,7 @@ test_that("argument combinations run through (no preclustering / categories)", {
   methods <- c("exchange", "local-maximum")
   conditions <- expand.grid(
     method = methods,
-    repetitions = c(1, 10),
+    repetitions = c(1, 5),
     objective = c("variance", "diversity"),
     input = c("distance", "features")
   )
@@ -15,8 +15,8 @@ test_that("argument combinations run through (no preclustering / categories)", {
   
   # Set up matrix to store the objective values obtained by different methods
   K <- sample(2:6, size = 1)
-  N <- K * sample(7:14, size = 1)
-  M <- sample(1:10, size = 1)
+  N <- K * sample(5:10, size = 1)
+  M <- sample(1:4, size = 1)
   features <- matrix(rnorm(N * M), ncol = M)
   distances <- dist(features)
   objs <- rep(NA, nrow(conditions)) # store objectives
