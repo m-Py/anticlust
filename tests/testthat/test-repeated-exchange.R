@@ -132,3 +132,7 @@ test_that("repeated exchange method works with preclustering / categories", {
   expect_true(all(table(anticlusters, matches)))
 
 })
+
+test_that("repeated exchange method works with different sized groups", {
+  TRUE
+})
