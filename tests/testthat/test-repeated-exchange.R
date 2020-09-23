@@ -72,3 +72,63 @@ test_that("argument combinations run through (no preclustering / categories)", {
   expect_true(all(wide2[, 5] >= wide2[, 4]))
 
 })
+
+test_that("repeated exchange method works with preclustering / categories", {
+  anticlusters <- anticlustering(
+    schaper2019[, 3:6],
+    K = 3,
+    categories = schaper2019$room,
+    repetitions = 2,
+    method = "local-maximum"
+  )
+  expect_true(all(table(anticlusters, schaper2019$room) == 16))
+  
+  # Preclustering
+  anticlusters <- anticlustering(
+    schaper2019[, 3:6],
+    K = 4,
+    preclustering = TRUE,
+    categories = schaper2019$room,
+    repetitions = 2,
+    method = "local-maximum"
+  )
+  expect_true(all(table(anticlusters, schaper2019$room) == 12))
+  
+  # Test that matched preclusters are assigned to different anticlusters
+  anticlusters <- anticlustering(
+    schaper2019[, 3:6],
+    K = 4,
+    preclustering = TRUE,
+    method = "local-maximum"
+  )
+  matches <- matching(schaper2019[, 3:6], p = 4)
+  expect_true(all(table(matches, anticlusters) == 1))
+
+  anticlusters <- anticlustering(
+    schaper2019[, 3:6],
+    K = 4,
+    preclustering = TRUE,
+    method = "local-maximum",
+    repetitions = 3
+  )
+  matches <- matching(schaper2019[, 3:6], p = 4)
+  expect_true(all(table(matches, anticlusters) == 1))
+  
+  # Test that matched preclusters are assigned to different anticlusters
+  # even when a categorical constraint is induced
+  anticlusters <- anticlustering(
+    schaper2019[, 3:6],
+    K = 2,
+    preclustering = TRUE,
+    method = "local-maximum",
+    repetitions = 5,
+    categories = schaper2019$room
+  )
+  matches <- matching(
+    schaper2019[, 3:6], 
+    p = 2, 
+    match_within = schaper2019$room
+  )
+  expect_true(all(table(anticlusters, matches)))
+
+})
