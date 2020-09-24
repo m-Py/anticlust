@@ -77,7 +77,7 @@ test_that("repeated exchange method works with preclustering / categories", {
   anticlusters <- anticlustering(
     schaper2019[, 3:6],
     K = 3,
-    objetive = "variance",
+    objective = "variance",
     categories = schaper2019$room,
     repetitions = 2,
     method = "local-maximum"
@@ -88,7 +88,7 @@ test_that("repeated exchange method works with preclustering / categories", {
   anticlusters <- anticlustering(
     schaper2019[, 3:6],
     K = 4,
-    objetive = "variance",
+    objective = "variance",
     preclustering = TRUE,
     categories = schaper2019$room,
     repetitions = 2,
@@ -100,7 +100,7 @@ test_that("repeated exchange method works with preclustering / categories", {
   anticlusters <- anticlustering(
     schaper2019[, 3:6],
     K = 4,
-    objetive = "variance",
+    objective = "variance",
     preclustering = TRUE,
     method = "local-maximum"
   )
@@ -110,7 +110,7 @@ test_that("repeated exchange method works with preclustering / categories", {
   anticlusters <- anticlustering(
     schaper2019[, 3:6],
     K = 4,
-    objetive = "variance",
+    objective = "variance",
     preclustering = TRUE,
     method = "local-maximum",
     repetitions = 3
@@ -122,7 +122,7 @@ test_that("repeated exchange method works with preclustering / categories", {
   # even when a categorical constraint is induced
   anticlusters <- anticlustering(
     schaper2019[, 3:6],
-    objetive = "variance",
+    objective = "variance",
     K = 2,
     preclustering = TRUE,
     method = "local-maximum",
@@ -139,5 +139,52 @@ test_that("repeated exchange method works with preclustering / categories", {
 })
 
 test_that("repeated exchange method works with different sized groups", {
-  TRUE
+  N <- nrow(schaper2019)
+  n1 <- sample(seq(20, 40, 2), size = 1)
+  n2 <- sample(seq(20, 40, 2), size = 1)
+  n3 <- N - n2 - n1
+  stopifnot((n1 + n2 + n3) == N)
+  
+  # no repetitions:
+  anticlusters <- anticlustering(
+    schaper2019[, 3:6],
+    K = c(n1, n2, n3),
+    categories = schaper2019$room,
+    objective = "variance"
+  )
+  tab <- table(anticlusters, schaper2019$room)
+  expect_true(all(tab[, 1] == tab[, 2]))
+  
+  # only local maximum:
+  anticlusters <- anticlustering(
+    schaper2019[, 3:6],
+    K = c(n1, n2, n3),
+    categories = schaper2019$room,
+    method = "local-maximum",
+    objective = "variance"
+  )
+  tab <- table(anticlusters, schaper2019$room)
+  expect_true(all(tab[, 1] == tab[, 2]))
+  
+  # only repetitions:
+  anticlusters <- anticlustering(
+    schaper2019[, 3:6],
+    K = c(n1, n2, n3),
+    categories = schaper2019$room,
+    repetitions = 5,
+    objective = "variance"
+  )
+  tab <- table(anticlusters, schaper2019$room)
+  expect_true(all(tab[, 1] == tab[, 2]))
+  
+  # repetitions and local-maximum search:
+  anticlusters <- anticlustering(
+    dist(schaper2019[, 3:6]), # use distances as input at least once here
+    K = c(n1, n2, n3),
+    categories = schaper2019$room,
+    repetitions = 5,
+    method = "local-maximum"
+  )
+  tab <- table(anticlusters, schaper2019$room)
+  expect_true(all(tab[, 1] == tab[, 2]))
 })
