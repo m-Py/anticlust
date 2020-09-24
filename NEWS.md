@@ -4,7 +4,7 @@
   `K` can now be used to specify the size of the groups, not just the 
   number of groups. This way, it is easy to request groups of different
   size. See the help pages `?anticlustering` and `?categorical_sampling`
-  examples.
+  for examples.
 
 # anticlust 0.5.2-1 / 0.5.2-2
 
