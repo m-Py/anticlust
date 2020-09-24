@@ -225,7 +225,7 @@
 #' # optimize the k-means criterion ("variance")
 #' anticlusters <- anticlustering(
 #'   schaper2019[, 3:6],
-#'   objective = "kplus",
+#'   objective = "variance",
 #'   K = 3,
 #'   categories = schaper2019$room,
 #'   method = "local-maximum",
