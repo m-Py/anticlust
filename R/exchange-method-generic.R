@@ -113,7 +113,7 @@ get_exchange_partners <- function(clusters, i, categories) {
 # param categories: A vector of categories
 # return: The initialized clusters
 initialize_clusters <- function(N, K, categories) {
-  if (length(K) > 1) {
+  if (length(K) == N) {
     K <- to_numeric(K)
     return(K) # K is already an anticluster assignment
   }
@@ -123,5 +123,8 @@ initialize_clusters <- function(N, K, categories) {
     return(categorical_sampling(categories, K))
   }
   ## Initial random assignment unrestricted:
+  if (sum(K) == N) {
+    return(sample(rep(1:length(K), K)))
+  }
   sample(rep_len(1:K, length.out = N))
 }

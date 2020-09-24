@@ -27,26 +27,25 @@ input_validation_anticlustering <- function(x, K, objective, method,
                  input_set = c(TRUE, FALSE), not_na = TRUE)
 
   # Allow that K is an initial assignment of elements to clusters
+  validate_input(K, "K", objmode = "numeric", must_be_integer = TRUE, not_na = TRUE)
   if (length(K) == 1) {
-    validate_input(K, "K", objmode = "numeric", len = 1, 
-                   greater_than = 1, must_be_integer = TRUE, not_na = TRUE)
+    validate_input(K, "K", greater_than = 1, smaller_than = N)
   } else {
-    validate_input(K, "K", objmode = "numeric", len = N, not_na = TRUE)
-    if (method != "exchange") {
-      stop("Passing an initial cluster assignment via the argument `K` ",
-           "only works with method = 'exchange'")
+    if (length(K) != N && sum(K) != N) {
+      stop("Argument `K` is misspecified.")
+    }
+    if (method == "ilp") {
+      stop("Pass the number of groups via argument `K` when using method = 'ilp'.")
     }
     if (preclustering == TRUE) {
-      stop("Cannot use preclustering because elements have already been assigned ",
-           "to groups via argument `K`.")
+      stop("Cannot only use preclustering when argument `K` is the number of groups.")
     }
     if (method == "ilp") {
       stop("The argument `K` should indicate the number of groups when using `method = 'ilp'`.")
     }
     if (argument_exists(categories)) {
-      if (length(categories) != length(K)) {
-        stop("Length of arguments `categories` and `K` differ, but ",
-             "should be of same length (K can also be of length 1)")
+      if (length(categories) != length(K) && sum(K) != N) {
+        stop("Length of arguments `categories` and `K` differ.")
       }
     }
   }
@@ -62,9 +61,11 @@ input_validation_anticlustering <- function(x, K, objective, method,
     }
   }
 
-  validate_input(method, "method", len = 1,
-                 input_set = c("ilp", "exchange", "heuristic", "centroid", "local-maximum"), 
-                 not_na = TRUE)
+  validate_input(
+    method, "method", len = 1,
+    input_set = c("ilp", "exchange", "heuristic", "centroid", "local-maximum"), 
+    not_na = TRUE
+  )
 
   if (method == "ilp") {
     check_if_solver_is_available()
@@ -83,8 +84,7 @@ input_validation_anticlustering <- function(x, K, objective, method,
       ), 
       len = 1, not_na = TRUE)
     if (objective == "variance" && method == "ilp") {
-      stop("You cannot use integer linear programming method to maximize the variance criterion. ",
-           "Use objective = 'distance', or method = 'exchange' instead")
+      stop("You cannot use integer linear programming method to maximize the variance criterion.")
     }
     if (objective == "variance" && is_distance_matrix(x)) {
         stop("You cannot use a distance matrix with the objective 'variance'.")
@@ -118,6 +118,7 @@ input_validation_anticlustering <- function(x, K, objective, method,
 #' @param objmode The required mode of \code{obj}
 #' @param not_na Boolean to indicate whether NA input is forbidden
 #'   (TRUE means that NA is not allowed)
+#' @param smaller_than A value for numeric input that must not be exceeded
 #'
 #' @return NULL
 #'
@@ -125,7 +126,7 @@ input_validation_anticlustering <- function(x, K, objective, method,
 
 validate_input <- function(obj, argument_name, len = NULL, greater_than = NULL,
                            must_be_integer = FALSE, groupsize = NULL, input_set = NULL, 
-                           objmode = NULL, not_na = FALSE) {
+                           objmode = NULL, not_na = FALSE, smaller_than = NULL) {
 
   self_validation(argument_name, len, greater_than,
                   must_be_integer, groupsize, input_set,
@@ -144,6 +145,13 @@ validate_input <- function(obj, argument_name, len = NULL, greater_than = NULL,
   if (argument_exists(greater_than)) {
     if (any(obj <= greater_than)) {
       stop(argument_name, " must be greater than ", greater_than)
+    }
+  }
+  
+  ## - Check if input has to be greater than some value
+  if (argument_exists(smaller_than)) {
+    if (any(obj >= smaller_than)) {
+      stop(argument_name, " must be smaller than ", smaller_than)
     }
   }
   

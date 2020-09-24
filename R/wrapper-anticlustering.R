@@ -14,7 +14,8 @@
 #'     \code{\link{dist}} or \code{\link{as.dist}}) or a \code{matrix}
 #'     where the entries of the upper and lower triangular matrix
 #'     represent pairwise dissimilarities.
-#' @param K How many anticlusters should be created. Alternatively: A
+#' @param K How many anticlusters should be created. Alternatively: (a) 
+#'     A vector describing the size of each group, or (b) a
 #'     vector of length \code{nrow(x)} describing how elements are
 #'     assigned to anticlusters before the optimization starts.
 #' @param objective The objective to be maximized. The option
@@ -226,7 +227,7 @@
 #' table(anticlusters, schaper2019$room)
 #' 
 #' # Use multiple starts of the algorithm to improve the objective and
-#' # optimize the extended k-means criterion ("kplus")
+#' # optimize the k-means criterion ("variance")
 #' anticlusters <- anticlustering(
 #'   schaper2019[, 3:6],
 #'   objective = "kplus",
@@ -235,6 +236,22 @@
 #'   method = "local-maximum",
 #'   repetitions = 2
 #' )
+#' # Compare means and standard deviations by anticluster
+#' by(schaper2019[, 3:6], anticlusters, function(x) round(colMeans(x), 2))
+#' by(schaper2019[, 3:6], anticlusters, function(x) round(apply(x, 2, sd), 2))
+#' 
+#' # Use different group sizes and optimize the extended k-means
+#' # criterion ("kplus")
+#' anticlusters <- anticlustering(
+#'   schaper2019[, 3:6],
+#'   objective = "kplus",
+#'   K = c(24, 24, 48),
+#'   categories = schaper2019$room,
+#'   repetitions = 2,
+#'   method = "local-maximum"
+#' )
+#' 
+#' table(anticlusters, schaper2019$room)
 #' # Compare means and standard deviations by anticluster
 #' by(schaper2019[, 3:6], anticlusters, function(x) round(colMeans(x), 2))
 #' by(schaper2019[, 3:6], anticlusters, function(x) round(apply(x, 2, sd), 2))
@@ -282,8 +299,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   # extend data for k-means extension objective
   if (!inherits(objective, "function")) {
     validate_input(
-      objective, "objective", 
-      objmode = "character",
+      objective, "objective",
       input_set = c("distance", "diversity", "dispersion", "variance", "kplus"), 
       len = 1, not_na = TRUE
     )
