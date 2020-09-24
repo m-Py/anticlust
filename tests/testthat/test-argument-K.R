@@ -69,7 +69,7 @@ test_that("only intended usage of argument K works", {
   expect_error(
     anticlustering(
       schaper2019[, 3:6],
-      K = nrow(schaper2019) + 1
+      K = nrow(schaper2019)
     ), 
     regexp = "smaller than"
   )

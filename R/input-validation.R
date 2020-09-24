@@ -147,7 +147,7 @@ validate_input <- function(obj, argument_name, len = NULL, greater_than = NULL,
   
   ## - Check if input has to be greater than some value
   if (argument_exists(smaller_than)) {
-    if (any(obj > smaller_than)) {
+    if (any(obj >= smaller_than)) {
       stop(argument_name, " must be smaller than ", smaller_than)
     }
   }
