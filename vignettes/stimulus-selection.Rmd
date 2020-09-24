@@ -5,7 +5,7 @@ output:
     number_sections: false
     df_print: kable
 vignette: >
-  %\VignetteIndexEntry{my-vignette}
+  %\VignetteIndexEntry{Using the R package anticlust for stimulus selection in experiments}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
