@@ -1,14 +1,16 @@
 # anticlust 0.5.3
 
-- In `anticlustering()` and `categorical_sampling()`, the argument 
-  `K` can now be used to specify the size of the expected groups,
-  see the help page `?anticlustering` for an example.
+* In `anticlustering()` and `categorical_sampling()`, the argument 
+  `K` can now be used to specify the size of the groups, not just the 
+  number of groups. This way, it is easy to require groups of different
+  size. See the help page `?anticlustering` for an example.
 
 # anticlust 0.5.2-1 / 0.5.2-2
 
-- Fixes two minor bugs that prevented the correct transformation of class `dist` to 
+* Fixed two minor bugs that prevented the correct transformation of class `dist` to 
   class `matrix` when using the repeated exchange (or "local-maximum") method, 
-  see c42e1367ec and e6fdae5096.
+  see [c42e136](https://github.com/m-Py/anticlust/commit/c42e1367ec371dc054a5dd51916b45e1424d6274)   
+  and [e6fdae5](https://github.com/m-Py/anticlust/commit/e6fdae50965150781d1f4621844f24c63167364a).
 
 # anticlust 0.5.2
 
