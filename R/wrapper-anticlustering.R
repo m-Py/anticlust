@@ -69,10 +69,10 @@
 #' sum of the squared distances between each element and its cluster
 #' center (see \code{\link{variance_objective}}). K-means
 #' anticlustering focuses on minimizing differences with regard to the
-#' means of the input variables \code{x}; \code{objective = "kplus"}
+#' means of the input variables \code{x}; k-plus \code{objective = "kplus"}
 #' anticlustering is an extension of this criterion that also tries to
 #' minimize differences with regard to the standard deviations between
-#' groups.
+#' groups  (see \code{\link{kplus_objective}}).
 #' 
 #' The cluster editing "diversity" objective is the sum of pairwise
 #' distances within groups (see
@@ -384,8 +384,4 @@ replace_na_by_index <- function(matches) {
   max_group <- max(matches, na.rm = TRUE)
   matches[na_matches] <- max_group + 1:NAs 
   matches
-}
-
-squared_from_mean <- function(data) {
-  apply(data, 2, function(x) (x - mean(x))^2)
 }
