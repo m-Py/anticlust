@@ -74,4 +74,14 @@ test_that("only intended usage of argument K works", {
     regexp = "smaller than"
   )
   
+  # preclustering not possible
+  expect_error(
+    anticlustering(
+      schaper2019[, 3:6],
+      K = c(24, 24, 48),
+      preclustering = TRUE
+    ), 
+    regexp = "preclustering"
+  )
+  
 })
