@@ -77,6 +77,7 @@ test_that("repeated exchange method works with preclustering / categories", {
   anticlusters <- anticlustering(
     schaper2019[, 3:6],
     K = 3,
+    objetive = "variance",
     categories = schaper2019$room,
     repetitions = 2,
     method = "local-maximum"
@@ -87,6 +88,7 @@ test_that("repeated exchange method works with preclustering / categories", {
   anticlusters <- anticlustering(
     schaper2019[, 3:6],
     K = 4,
+    objetive = "variance",
     preclustering = TRUE,
     categories = schaper2019$room,
     repetitions = 2,
@@ -98,6 +100,7 @@ test_that("repeated exchange method works with preclustering / categories", {
   anticlusters <- anticlustering(
     schaper2019[, 3:6],
     K = 4,
+    objetive = "variance",
     preclustering = TRUE,
     method = "local-maximum"
   )
@@ -107,6 +110,7 @@ test_that("repeated exchange method works with preclustering / categories", {
   anticlusters <- anticlustering(
     schaper2019[, 3:6],
     K = 4,
+    objetive = "variance",
     preclustering = TRUE,
     method = "local-maximum",
     repetitions = 3
@@ -118,6 +122,7 @@ test_that("repeated exchange method works with preclustering / categories", {
   # even when a categorical constraint is induced
   anticlusters <- anticlustering(
     schaper2019[, 3:6],
+    objetive = "variance",
     K = 2,
     preclustering = TRUE,
     method = "local-maximum",
