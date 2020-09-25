@@ -1,21 +1,22 @@
-  #' Solve anticlsuter editing by using the BILS algorithm by Brusco implemented in c
+#' Solve anticlustering by using the BILS algorithm by Brusco et al.
 #' 
 #' @param data A N x N dissimilarity matrix or N x M features matrix.
 #' @param G The number of clusters 
 #' @param R The desired number of restarts for the algorithm
-#' @param (optional) W list of possible weights for dispersion in the bicriterion (0 <= W <= 1)
-#' @param (optional) Xi a vector for the neighborhood size range [xi1,xi2] in percent 
-#' (for example c(0.05, 0.1) can be interpreted as 5%-10%)
+#' @param W Optional argument, a vector of possible weights for dispersion 
+#'     in the bicriterion (0 <= W <= 1)
+#' @param Xi Optional argument, a vector for the neighborhood size range
+#'     [xi1, xi2] in percent (for example c(0.05, 0.1) can be interpreted as 
+#'     5%-10%)
 #' 
-#' @return list of useful partitions (paretoset)
-#' 
-#' @useDynLib anticlust
+#' @return List of useful partitions (approximated pareto set)
 #' 
 #' @export
-  
-
-
-bicriterion_iterated_local_search_call <- function(data, G, R, W = c(0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 0.5, 0.99, 0.999, 0.999999), Xi = c(0.05,0.1)) {
+#'
+bicriterion_iterated_local_search_call <- function(
+  data, G, R, 
+  W = c(0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 0.5, 0.99, 0.999, 0.999999), 
+  Xi = c(0.05,0.1)) {
   
   distances <- convert_to_distances(data) 
   N <- NROW(distances)
@@ -48,8 +49,8 @@ bicriterion_iterated_local_search_call <- function(data, G, R, W = c(0.000001, 0
 
   #c returns the list of partitions as one vector, that we turn back into a matrix
   result_matrix <- vector_to_matrix(bicriterion[["result"]],result_matrix, upper_bound, N)
-
-  return(result_matrix)
+  result_matrix <- rbind(result_matrix)
+  as.matrix(apply(result_matrix, 1, function(x) order_cluster_vector(to_numeric(x))))
 }
 
 #verify input
@@ -157,4 +158,3 @@ get_dispersion <- function(partition, distances){
   
   return(min);
 }
-
