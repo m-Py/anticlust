@@ -1,5 +1,8 @@
 # anticlust 0.5.3
 
+* `kplus_objective()` is a new function to compute the value of the k-plus
+  criterion given a clustering. See `?kplus_objective` for details.
+
 * In `anticlustering()` and `categorical_sampling()`, the argument 
   `K` can now be used to specify the size of the groups, not just the 
   number of groups. This way, it is easy to request groups of different
