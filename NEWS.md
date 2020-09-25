@@ -2,17 +2,18 @@
 
 ## User-visible changes
 
-- In `anticlustering()`, added native support for new anticlustering 
- objective, the dispersion (using `objective = "dispersion"`).
- The dispersion is the minimum distance between any two elements within 
- the same cluster; applications that require high within-group heterogeneity
- often require to maximize the dispersion.
+- `anticlustering()` now has native support for the maximizing the dispersion
+  objective, setting `objective = "dispersion"`. The dispersion is the minimum 
+  distance between any two elements within the same cluster, see 
+  `?dispersion_objective`.
 
 ## Internal changes 
 
-- The exchange algorithm for optimizing diversity and variance
- objectives has been reimplemented in C, leading to a substantial 
- boost in performance.
+- The exchange optimization algorithm for anticlustering has been reimplemented 
+  in C, leading to a substantial boost in performance when using one of the 
+  supported objectives "diversity", "variance", "dispersion", or "kplus".
+  (Optimizing user-defined objective functions still has to be done in plain 
+  R and therefore has not been sped up.)
 
 # anticlust 0.5.3
 

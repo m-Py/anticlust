@@ -18,12 +18,11 @@
 #'     A vector describing the size of each group, or (b) a
 #'     vector of length \code{nrow(x)} describing how elements are
 #'     assigned to anticlusters before the optimization starts.
-#' @param objective The objective to be maximized. The option
+#' @param objective The objective to be maximized. The options
 #'     "diversity" (default; previously called "distance", which is
-#'     still supported) maximizes the cluster editing objective
-#'     function; the option "variance" maximizes the k-means objective
-#'     function; "kplus" is an extension of k-means
-#'     anticlustering. See Details.
+#'     still supported), "variance", "kplus" and "dispersion" are natively
+#'     supported. May also be a user-defined function object that computes
+#'     an objective value given a clustering. See Details.
 #' @param method One of "exchange" (default) , "local-maximum", or
 #'     "ilp".  See Details.
 #' @param preclustering Boolean. Should a preclustering be conducted
@@ -35,7 +34,7 @@
 #'     initiated when \code{method = "exchange"} or \code{method =
 #'     "local-maximum"}.  In the end, the best objective found across
 #'     the repetitions is returned. If this argument is not passed,
-#'     only one repetitition is conducted.
+#'     only one repetition is conducted.
 #'
 #' @return A vector of length N that assigns a group (i.e, a number
 #'     between 1 and \code{K}) to each input element.
@@ -55,7 +54,7 @@
 #' possible (this usually corresponds to creating groups with high
 #' within-group heterogeneity). This is accomplished by maximizing
 #' instead of minimizing a clustering objective function. The
-#' maximization of three clustering objective functions is natively
+#' maximization of four clustering objective functions is natively
 #' supported (other functions can also defined by the user as
 #' described below):
 #' 
