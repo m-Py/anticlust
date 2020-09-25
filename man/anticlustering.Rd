@@ -69,22 +69,24 @@ possible (this usually corresponds to creating groups with high
 within-group heterogeneity). This is accomplished by maximizing
 instead of minimizing a clustering objective function. The
 maximization of three clustering objective functions is natively
-supported, while other functions can also defined by the user:
+supported (other functions can also defined by the user as
+described below):
 
 \itemize{
   \item{cluster editing `diversity` objective, setting \code{objective = "diversity"} (default)}
   \item{k-means `variance` objective, setting \code{objective = "variance"}}
-  \item{`kplus` anticlustering, an extension of k-means anticlustering}
+  \item{k-plus objective, an extension of the k-means variance criterion,
+        setting \code{objective = "kplus"}}
 }
 
-The k-means objective is the variance within groups---that is, the
+The k-means objective is the within-group variance---that is, the
 sum of the squared distances between each element and its cluster
 center (see \code{\link{variance_objective}}). K-means
 anticlustering focuses on minimizing differences with regard to the
 means of the input variables \code{x}; k-plus \code{objective = "kplus"}
 anticlustering is an extension of this criterion that also tries to
 minimize differences with regard to the standard deviations between
-groups  (see \code{\link{kplus_objective}}).
+groups (see \code{\link{kplus_objective}}).
 
 The cluster editing "diversity" objective is the sum of pairwise
 distances within groups (see
@@ -107,7 +109,8 @@ a different measure of dissimilarity is preferred, you may pass a
 self-generated dissimiliarity matrix via the argument \code{x}.
 
 In the standard case, groups of equal size are generated. Adjust
-the argument \code{K} to create groups of different size.
+the argument \code{K} to create groups of different size (see
+examples).
 
 \strong{Heuristic anticlustering}
 
