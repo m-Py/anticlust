@@ -4,6 +4,8 @@ library("anticlust")
 context("K-plus anticlustering")
 
 test_that("Test that k-plus criterion is computed correctly", {
+  set.seed(123)
+  
   init <- initialize_clusters(96, 3, NULL)
   
   df <- schaper2019[, 3:6]
