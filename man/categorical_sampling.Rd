@@ -31,4 +31,8 @@ categories <- schaper2019$room
 groups <- categorical_sampling(categories, K = 6)
 table(groups, categories)
 
+# Unequal sized groups
+groups <- categorical_sampling(categories, K = c(24, 24, 48))
+table(groups, categories)
+
 }

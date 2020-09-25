@@ -1,8 +1,37 @@
+# Development version (0.5.3.9000)
+
+## User-visible changes
+
+- `anticlustering()` now has native support for the maximizing the dispersion
+  objective, setting `objective = "dispersion"`. The dispersion is the minimum 
+  distance between any two elements within the same cluster, see 
+  `?dispersion_objective`.
+
+## Internal changes 
+
+- The exchange optimization algorithm for anticlustering has been reimplemented 
+  in C, leading to a substantial boost in performance when using one of the 
+  supported objectives "diversity", "variance", "dispersion", or "kplus".
+  (Optimizing user-defined objective functions still has to be done in plain 
+  R and therefore has not been sped up.)
+
+# anticlust 0.5.3
+
+* `kplus_objective()` is a new function to compute the value of the k-plus
+  criterion given a clustering. See `?kplus_objective` for details.
+
+* In `anticlustering()` and `categorical_sampling()`, the argument 
+  `K` can now be used to specify the size of the groups, not just the 
+  number of groups. This way, it is easy to request groups of different
+  size. See the help pages `?anticlustering` and `?categorical_sampling`
+  for examples.
+
 # anticlust 0.5.2-1 / 0.5.2-2
 
-- Fixes two minor bugs that prevented the correct transformation of class `dist` to 
+* Fixed two minor bugs that prevented the correct transformation of class `dist` to 
   class `matrix` when using the repeated exchange (or "local-maximum") method, 
-  see c42e1367ec and e6fdae5096.
+  see [c42e136](https://github.com/m-Py/anticlust/commit/c42e1367ec371dc054a5dd51916b45e1424d6274) 
+  and [e6fdae5](https://github.com/m-Py/anticlust/commit/e6fdae50965150781d1f4621844f24c63167364a).
 
 # anticlust 0.5.2
 

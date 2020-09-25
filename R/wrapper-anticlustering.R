@@ -14,15 +14,15 @@
 #'     \code{\link{dist}} or \code{\link{as.dist}}) or a \code{matrix}
 #'     where the entries of the upper and lower triangular matrix
 #'     represent pairwise dissimilarities.
-#' @param K How many anticlusters should be created. Alternatively: A
+#' @param K How many anticlusters should be created. Alternatively: (a) 
+#'     A vector describing the size of each group, or (b) a
 #'     vector of length \code{nrow(x)} describing how elements are
 #'     assigned to anticlusters before the optimization starts.
-#' @param objective The objective to be maximized. The option
+#' @param objective The objective to be maximized. The options
 #'     "diversity" (default; previously called "distance", which is
-#'     still supported) maximizes the cluster editing objective
-#'     function; the option "variance" maximizes the k-means objective
-#'     function; "kplus" is an extension of k-means
-#'     anticlustering. See Details.
+#'     still supported), "variance", "kplus" and "dispersion" are natively
+#'     supported. May also be a user-defined function object that computes
+#'     an objective value given a clustering. See Details.
 #' @param method One of "exchange" (default) , "local-maximum", or
 #'     "ilp".  See Details.
 #' @param preclustering Boolean. Should a preclustering be conducted
@@ -34,7 +34,7 @@
 #'     initiated when \code{method = "exchange"} or \code{method =
 #'     "local-maximum"}.  In the end, the best objective found across
 #'     the repetitions is returned. If this argument is not passed,
-#'     only one repetitition is conducted.
+#'     only one repetition is conducted.
 #'
 #' @return A vector of length N that assigns a group (i.e, a number
 #'     between 1 and \code{K}) to each input element.
@@ -54,23 +54,27 @@
 #' possible (this usually corresponds to creating groups with high
 #' within-group heterogeneity). This is accomplished by maximizing
 #' instead of minimizing a clustering objective function. The
-#' maximization of three clustering objective functions is natively
-#' supported, while other functions can also defined by the user:
+#' maximization of four clustering objective functions is natively
+#' supported (other functions can also defined by the user as
+#' described below):
 #' 
 #' \itemize{
 #'   \item{cluster editing `diversity` objective, setting \code{objective = "diversity"} (default)}
 #'   \item{k-means `variance` objective, setting \code{objective = "variance"}}
-#'   \item{`kplus` anticlustering, an extension of k-means anticlustering}
+#'   \item{k-plus objective, an extension of the k-means variance criterion,
+#'         setting \code{objective = "kplus"}}
+#'   \item{`dispersion` objective, the minimum distance between any two 
+#'         elements within the same cluster.}
 #' }
 #'
-#' The k-means objective is the variance within groups---that is, the
+#' The k-means objective is the within-group variance---that is, the
 #' sum of the squared distances between each element and its cluster
 #' center (see \code{\link{variance_objective}}). K-means
 #' anticlustering focuses on minimizing differences with regard to the
-#' means of the input variables \code{x}; \code{objective = "kplus"}
+#' means of the input variables \code{x}; k-plus \code{objective = "kplus"}
 #' anticlustering is an extension of this criterion that also tries to
 #' minimize differences with regard to the standard deviations between
-#' groups.
+#' groups (see \code{\link{kplus_objective}}).
 #' 
 #' The cluster editing "diversity" objective is the sum of pairwise
 #' distances within groups (see
@@ -84,6 +88,10 @@
 #' "diversity"} is preferred because there are several clustering
 #' objectives based on pairwise distances (e.g., see
 #' \code{\link{dispersion_objective}}).
+#' 
+#' The "dispersion" is the minimum distance between any two elements within 
+#' the same cluster; applications that require high within-group heterogeneity
+#' often require to maximize the dispersion.
 #'
 #' If the data input \code{x} is a feature matrix (that is: each row
 #' is a "case" and each column is a "variable") and the option
@@ -93,7 +101,8 @@
 #' self-generated dissimiliarity matrix via the argument \code{x}.
 #'
 #' In the standard case, groups of equal size are generated. Adjust
-#' the argument \code{K} to create groups of different size.
+#' the argument \code{K} to create groups of different size (see
+#' examples).
 #'
 #' \strong{Heuristic anticlustering}
 #'
@@ -221,15 +230,31 @@
 #' table(anticlusters, schaper2019$room)
 #' 
 #' # Use multiple starts of the algorithm to improve the objective and
-#' # optimize the extended k-means criterion ("kplus")
+#' # optimize the k-means criterion ("variance")
 #' anticlusters <- anticlustering(
 #'   schaper2019[, 3:6],
-#'   objective = "kplus",
+#'   objective = "variance",
 #'   K = 3,
 #'   categories = schaper2019$room,
 #'   method = "local-maximum",
 #'   repetitions = 2
 #' )
+#' # Compare means and standard deviations by anticluster
+#' by(schaper2019[, 3:6], anticlusters, function(x) round(colMeans(x), 2))
+#' by(schaper2019[, 3:6], anticlusters, function(x) round(apply(x, 2, sd), 2))
+#' 
+#' # Use different group sizes and optimize the extended k-means
+#' # criterion ("kplus")
+#' anticlusters <- anticlustering(
+#'   schaper2019[, 3:6],
+#'   objective = "kplus",
+#'   K = c(24, 24, 48),
+#'   categories = schaper2019$room,
+#'   repetitions = 2,
+#'   method = "local-maximum"
+#' )
+#' 
+#' table(anticlusters, schaper2019$room)
 #' # Compare means and standard deviations by anticluster
 #' by(schaper2019[, 3:6], anticlusters, function(x) round(colMeans(x), 2))
 #' by(schaper2019[, 3:6], anticlusters, function(x) round(apply(x, 2, sd), 2))
@@ -277,9 +302,8 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   # extend data for k-means extension objective
   if (!inherits(objective, "function")) {
     validate_input(
-      objective, "objective", 
-      objmode = "character",
-      input_set = c("distance", "diversity", "variance", "kplus"), 
+      objective, "objective",
+      input_set = c("distance", "diversity", "dispersion", "variance", "kplus"), 
       len = 1, not_na = TRUE
     )
     if (objective == "kplus") {
@@ -324,11 +348,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
 
   # Redirect to specialized fast exchange methods for diversity and 
   # variance objectives
-  if (objective == "variance") {
-    return(fast_anticlustering(x, K, Inf, categories))
-  } else if (objective == "diversity" || objective == "distance") {
-    return(fast_exchange_dist(x, K, categories))
-  }
+  c_anticlustering(x, K, categories, objective)
 }
 
 # Function that processes input and returns the data set that the
@@ -367,8 +387,4 @@ replace_na_by_index <- function(matches) {
   max_group <- max(matches, na.rm = TRUE)
   matches[na_matches] <- max_group + 1:NAs 
   matches
-}
-
-squared_from_mean <- function(data) {
-  apply(data, 2, function(x) (x - mean(x))^2)
 }

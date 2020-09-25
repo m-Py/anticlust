@@ -1,7 +1,7 @@
 Type: Package
 Package: anticlust
 Title: Subset Partitioning via Anticlustering
-Version: 0.5.2-2
+Version: 0.5.3.9000
 Authors@R: 
     c(person(given = "Martin",
              family = "Papenberg",
@@ -68,4 +68,5 @@ LazyData: true
 RoxygenNote: 7.1.1
 SystemRequirements: The exact (anti)clustering algorithms
     require that the GNU linear programming kit (GLPK library) is
-    installed (<http://www.gnu.org/software/glpk/>).
+    installed (<http://www.gnu.org/software/glpk/>). Rendering the
+    vignette requires pandoc.
