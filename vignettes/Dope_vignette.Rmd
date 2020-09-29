@@ -1,0 +1,76 @@
+---
+title: "Usage and technical details of categorical sampling"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Technical details of categorical sampling}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(anticlust)
+```
+
+This vignette documents the algorithm that the function `categorical_sampling()` 
+uses to assign cases to groups. I am including it as a vignette in the package 
+`anticlust` because this algorithm is not documented anywhere else.
+
+The basic usage of `categorical_sampling()` is as follows: 
+
+```{r, eval = FALSE}
+categorical_sampling(categories, K)
+```
+
+In the most simple case `categories` is a single categorical variable where each 
+element describes what category this case belongs to. Consider, for example, the 
+classical iris data set, containing class labels (i.e., the species) for each of 
+150 plants:
+
+```{r}
+iris$Species
+```
+
+`categorical_sampling()` can for example be used to assign these plants into 
+five groups in such a way that each group has the same number of plants of 
+each species:
+
+```{r}
+groups <- categorical_sampling(iris$Species, K = 5)
+groups
+```
+
+The output variable `groups` is itself a vector, describing the new set where 
+each plant was placed. Let's make this more obvious by appending the `groups` 
+variable to the iris data set:
+
+```{r}
+iris$group <- groups
+head(iris, n = 12)
+```
+
+Let's verify that across the five groups, the frequency of plants is the same:
+
+```{r}
+table(iris$group, iris$Species)
+```
+
+Each time I repeat the above call to `categorical_sampling()` I obtain a 
+different result; apart from the restriction that the plant species are 
+balanced between groups, the split is random. In terminology of machine learning 
+(or cross validation), `categorical_sampling()` corresponds to a stratified 
+split.
+
+# Several categories
+
+# Different group sizes 
+
+# Algorithm
+
+
