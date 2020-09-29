@@ -9,3 +9,4 @@ inst/README.md
 docs/*
 *.o
 *.so
+*rkward_preview.Rmd
