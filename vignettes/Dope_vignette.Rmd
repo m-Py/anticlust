@@ -18,9 +18,11 @@ knitr::opts_chunk$set(
 library(anticlust)
 ```
 
-This vignette documents the algorithm that the function `categorical_sampling()` 
-uses to assign cases to groups. I am including it as a vignette in the package 
-`anticlust` because this algorithm is not documented anywhere else.
+This vignette documents the usage of the function `categorical_sampling()` and 
+the algorithm it uses to assign cases to groups.[^1] 
+
+[^1]: I am including the explanation of the algorithm in this vignette in the 
+package as it is not documented anywhere else.
 
 The basic usage of `categorical_sampling()` is as follows: 
 
@@ -28,46 +30,59 @@ The basic usage of `categorical_sampling()` is as follows:
 categorical_sampling(categories, K)
 ```
 
-In the most simple case `categories` is a single categorical variable where each 
-element describes what category this case belongs to. Consider, for example, the 
-classical iris data set, containing class labels (i.e., the species) for each of 
-150 plants:
+The argument `K` is usually used to describe the number of groups that should be 
+returned. The argument `categories` contains the categorical variable(s) that 
+should be balanced across groups. In the most simple case, `categories` is a 
+vector where each entry describes the category a case belongs to. Consider, for 
+example, the classical iris data set that contains a class labels (i.e., the 
+species) for each of 150 plants:
 
 ```{r}
+data(iris)
+head(iris)
 iris$Species
 ```
 
-`categorical_sampling()` can for example be used to assign these plants into 
-five groups in such a way that each group has the same number of plants of 
-each species:
+Each species occurs exactly 50 times: 
+
+```{r}
+table(iris$Species)
+```
+
+`categorical_sampling()` can be used to assign these plants into five groups in 
+such a way that each group has the same number of plants of each species:
 
 ```{r}
 groups <- categorical_sampling(iris$Species, K = 5)
 groups
 ```
 
-The output variable `groups` is itself a vector, describing the new set where 
-each plant was placed. Let's make this more obvious by appending the `groups` 
-variable to the iris data set:
+The output, stored in the variable `groups`, is a vector encoding the set to 
+which each plant was assigned. Let's make this more obvious by appending the 
+`groups` variable to the iris data set:
 
 ```{r}
 iris$group <- groups
 head(iris, n = 12)
 ```
 
-Let's verify that across the five groups, the frequency of plants is the same:
+Each case has been assigned one group. Let's verify that across the five groups, 
+the frequency of the different species is the same:
 
 ```{r}
 table(iris$group, iris$Species)
 ```
 
-Each time I repeat the above call to `categorical_sampling()` I obtain a 
-different result; apart from the restriction that the plant species are 
-balanced between groups, the split is random. In terminology of machine learning 
-(or cross validation), `categorical_sampling()` corresponds to a stratified 
-split.
+This is basically what `categorical_sampling()` does; a categorical variable is 
+evenly balanced across a user-specified number of groups. Note that each time I 
+repeat the above call to `categorical_sampling()` I obtain a different result; 
+apart from the restriction that the plant species are balanced between groups, 
+the split is random. In terminology of cross validation, 
+`categorical_sampling()` corresponds to a stratified random split.
 
 # Several categories
+
+
 
 # Different group sizes 
 
