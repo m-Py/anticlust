@@ -276,15 +276,11 @@ void swap(size_t n, size_t i, size_t j, struct node *PTR_NODES[n]) {
         size_t cl1 = one->data->cluster;
         size_t cl2 = two->data->cluster;
         
-        // Update pointer in `PTR_NODES`
+        // Update pointers to elements
         size_t ID1 = one->data->ID;
         size_t ID2 = two->data->ID;
         PTR_NODES[ID1] = two;
         PTR_NODES[ID2] = one;
-        
-        // Update ID of the elements
-        one->data->ID = ID2;
-        one->data->ID = ID1;
         
         // Update the cluster affiliation
         one->data->cluster = cl2;
