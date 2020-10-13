@@ -104,7 +104,7 @@ int fill_cluster_lists(size_t n, size_t k, int *clusters,
 
 struct node* append_to_cluster(struct node *HEAD, struct element *data) {
         struct node *tmp = HEAD->next; // may be NULL if list is empty
-        HEAD->next = (struct node*) malloc(sizeof(struct node*));
+        HEAD->next = (struct node*) malloc(sizeof(struct node));
         if (HEAD->next == NULL) {
                 return NULL; // failed to allocate memory
         }
