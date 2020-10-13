@@ -180,7 +180,6 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         double tmp_objs[k];
         double best_objs[k];
         double tmp_obj;
-        double best_obj;
         
         /* Start main iteration loop for exchange procedure */
         
@@ -189,7 +188,7 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
                 size_t cl1 = PTR_NODES[i]->data->cluster;
                 
                 // Initialize `best` variable for the i'th item
-                best_obj = 0;
+                double best_obj = 0;
                 copy_matrix(k, m, CENTERS, best_centers);
                 copy_array(k, OBJ_BY_CLUSTER, best_objs);
                 

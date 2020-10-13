@@ -80,11 +80,9 @@ int set_up_categories_list(size_t n, size_t c, struct element POINTS[n],
         }
         
         // Initialize the index arrays
-        size_t n_cats;
         struct node *tmp; 
-        size_t j;
         for (size_t i = 0; i < c; i++) {
-                n_cats = (size_t) CAT_frequencies[i];
+                size_t n_cats = (size_t) CAT_frequencies[i];
                 CATEGORY_HEADS[i] = (size_t*) malloc(n_cats * sizeof(size_t));
                 if (CATEGORY_HEADS[i] == NULL) {
                         free_category_indices(c, CATEGORY_HEADS, i);
@@ -94,7 +92,7 @@ int set_up_categories_list(size_t n, size_t c, struct element POINTS[n],
                 // Now write `CATEGORY_HEADS`! Fills all `c` arrays with indices, 
                 // based on the category lists `HEAD[0], HEAD[1], ..., HEAD[c]`
                 tmp = HEADS[i]->next;
-                j = 0;
+                size_t j = 0;
                 while (tmp != NULL) {
                         CATEGORY_HEADS[i][j] = tmp->data->ID;
                         j++;

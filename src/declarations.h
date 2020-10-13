@@ -54,7 +54,7 @@ int fill_data_points(
         double *data, 
         size_t n, 
         size_t m, 
-        struct element points[n], 
+        struct element POINTS[n], 
         int *clusters,
         int *USE_CATS,
         int *categories
@@ -100,7 +100,7 @@ void copy_matrix(
 );
 int initialize_cluster_heads(
         size_t k, 
-        struct node *PTR_CLUSTER_HEADS[k]
+        struct node *HEADS[k]
 );
 
 int fill_cluster_lists(
@@ -114,9 +114,9 @@ int fill_cluster_lists(
 void objective_by_cluster(
         size_t m, 
         size_t k, 
-        double VAR_OBJECTIVE[k], 
+        double OBJ_BY_CLUSTER[k], 
         double CENTERS[k][m], 
-        struct node *PTR_CLUSTER_HEADS[k]
+        struct node *HEADS[k]
 );
 double array_sum(
         size_t k, 
@@ -185,7 +185,7 @@ double distances_one_element(
         size_t n, 
         double *distances[n], 
         struct node *start_node, 
-        size_t cl
+        size_t ID
 );
 
 // For distance anticlustering, objective functions
@@ -206,5 +206,5 @@ double minimin_distance_element(
         size_t n, 
         double *distances[n], 
         struct node *start_node, 
-        size_t cl
+        size_t ID
 );
