@@ -63,7 +63,7 @@ int fill_data_points(double *data, size_t n, size_t m, struct element POINTS[n],
 
 int initialize_cluster_heads(size_t k, struct node *HEADS[k]) {
         for (size_t i = 0; i < k; i++) {
-                HEADS[i] = (struct node*) malloc(sizeof(struct node*));
+                HEADS[i] = (struct node*) malloc(sizeof(struct node));
                 if (HEADS[i] == NULL) {
                         free_cluster_list(k, HEADS, i);
                         return 1;
