@@ -1,7 +1,7 @@
 Type: Package
 Package: anticlust
 Title: Subset Partitioning via Anticlustering
-Version: 0.5.3.9000
+Version: 0.5.4
 Authors@R: 
     c(person(given = "Martin",
              family = "Papenberg",
@@ -56,15 +56,16 @@ Imports:
     Matrix,
     RANN (>= 2.6.0)
 Suggests: 
-    Rglpk,
-    testthat,
     knitr,
-    rmarkdown
+    Rglpk,
+    rmarkdown,
+    testthat
 VignetteBuilder: 
     knitr,
     rmarkdown
 Encoding: UTF-8
 LazyData: true
+NeedsCompilation: yes
 RoxygenNote: 7.1.1
 SystemRequirements: The exact (anti)clustering algorithms
     require that the GNU linear programming kit (GLPK library) is
