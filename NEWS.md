@@ -1,3 +1,11 @@
+# anticlust 0.5.4.9000 (development version)
+
+## User-visible changes
+
+- `anticlust` now includes the bicriterion algorithm for simultaneously 
+maximizing diversity and dispersion, created by Brusco et al. 
+(<doi:10.1111/bmsp.12186>). Contributed by Martin Breuer (see [his thesis](https://www.cs.hhu.de/fileadmin/redaktion/Fakultaeten/Mathematisch-Naturwissenschaftliche_Fakultaet/Informatik/Algorithmische_Bioinformatik/Bachelorarbeiten/2516084_ba_ifo_AbschlArbeit_klau_mapap102_mabre121_20200820_2320.pdf) for more details)
+
 # anticlust 0.5.4
 
 ## User-visible changes
