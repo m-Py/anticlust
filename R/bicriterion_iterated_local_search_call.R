@@ -30,7 +30,8 @@ bicriterion_iterated_local_search_call <- function(
   }
   
   upper_bound = 500 # limits number of resulting partitions 
-  result_matrix = matrix(data = -1, nrow = upper_bound , ncol = N) # create empty matrix for results to use in c
+  # create empty matrix for results to use in C
+  result_matrix = matrix(data = -1, nrow = upper_bound , ncol = N) 
   
   # Call C function
   bicriterion <- .C(
@@ -47,8 +48,13 @@ bicriterion_iterated_local_search_call <- function(
     PACKAGE = "anticlust" # important to call C
   )
 
-  #c returns the list of partitions as one vector, that we turn back into a matrix
-  result_matrix <- vector_to_matrix(bicriterion[["result"]],result_matrix, upper_bound, N)
+  # C returns the list of partitions as one vector, 
+  # that we turn back into a matrix
+  result_matrix <- vector_to_matrix(
+    bicriterion[["result"]], 
+    result_matrix, 
+    upper_bound, N
+  )
   result_matrix <- rbind(result_matrix)
   as.matrix(apply(result_matrix, 1, function(x) order_cluster_vector(to_numeric(x))))
 }
@@ -63,25 +69,25 @@ checkweights <- function(weights){
   }  
 }
 
-checkneighborhood <- function(Xi){
-  for(i in Xi){
-    if(i < 0 | i > 1){
-      stop("Both neighorhoodindexes must be a percentage. Only values between 0 and 1 are allowed.")
+checkneighborhood <- function(Xi) {
+  for (i in Xi) {
+    if (i < 0 | i > 1) {
+      stop("Both neighorhood indexes must be a percentage. Only values between 0 and 1 are allowed.")
     }
   } 
-  if(Xi[1] > Xi[2]){
-    stop("First neighborhoodpercentage needs to be smaller than the second.")
+  if (Xi[1] > Xi[2]) {
+    stop("First neighborhood percentage needs to be smaller than the second.")
   }
 }
 
 
-#fill matrix with results and delete unnecessary columns 
+# fill matrix with results and delete unnecessary columns 
 vector_to_matrix <- function(vector, matrix, upper_bound, size){
   row <- 1
   column <- 1
   pos <- 1
-  while(vector[pos] != -1 & row <= upper_bound ){
-    while(column<= size){
+  while (vector[pos] != -1 & row <= upper_bound) {
+    while (column<= size) {
       matrix[row, column] <- vector[pos]
       pos <- pos + 1
       column <- column + 1
@@ -89,28 +95,25 @@ vector_to_matrix <- function(vector, matrix, upper_bound, size){
     column <- 1
     row <- row + 1
   }
-  
-  return(matrix[1:row-1,1:size])
+  matrix[1:row-1, 1:size]
 }
 
 #represents partitions as diversity and dispersion value
-plot_partition_matrix <- function(matrix, data, restarts){
+plot_partition_matrix <- function(matrix, data, restarts) {
   
   distances <- convert_to_distances(data)
   
-  if(NCOL(matrix) == 1){
+  if (NCOL(matrix) == 1) {
     diversity <- get_diversity(matrix, distances)
     dispersion <- get_dispersion(matrix, distances)
     matrix <- cbind(diversity, dispersion, restarts)
-    return(matrix)
-    
-  }else{
+  } else {
     rows <- NROW(matrix)
     diversity <- c()
     dispersion <- c()
     restart <- c()
 
-    for(i in 1:rows){
+    for (i in 1:rows) {
       current_div <- get_diversity(matrix[i,], distances)
       diversity <- c(diversity, current_div)
       current_dis <- get_dispersion(matrix[i,], distances)
@@ -118,8 +121,8 @@ plot_partition_matrix <- function(matrix, data, restarts){
       restart <- c(restart, restarts)
     }
     matrix <- cbind(diversity, dispersion, restarts)
-    return(matrix)
   }
+  matrix
 }
 
 
@@ -128,33 +131,33 @@ get_diversity <- function(partition, distances){
   sum = 0
   n = length(partition)
   
-  for(i in 1:(n-1)){
-    for(j in (i+1):n){
-      if(partition[i] == partition[j]){
+  for (i in 1:(n-1)) {
+    for (j in (i+1):n) {
+      if (partition[i] == partition[j]) {
         sum = sum + distances[i,j]
       }
     }
   }
   
-  return(sum);
+  return(sum)
 }
 
 
-get_dispersion <- function(partition, distances){
+get_dispersion <- function(partition, distances) {
   
   min = Inf
   n = length(partition)
   
-  for(i in 1:(n-1)){
-    for(j in (i+1):n){
-      if(partition[i] == partition[j]){
-        distance = distances[i,j];
-        if(distance < min){
-          min = distance;
+  for (i in 1:(n-1)) {
+    for (j in (i+1):n) {
+      if (partition[i] == partition[j]) {
+        distance = distances[i,j]
+        if (distance < min) {
+          min = distance
         }
       }
     }
   }
   
-  return(min);
+  return(min)
 }
