@@ -129,7 +129,6 @@ void dispersion_anticlustering(double *data, int *N, int *K, int *clusters,
         
         size_t best_partner;
         double tmp_obj;
-        double best_obj;
         
         /* Start main iteration loop for exchange procedure */
         
@@ -138,7 +137,7 @@ void dispersion_anticlustering(double *data, int *N, int *K, int *clusters,
                 size_t cl1 = PTR_NODES[i]->data->cluster;
                 
                 // Initialize `best` variable for the i'th item
-                best_obj = 0;
+                double best_obj = 0;
                 
                 /* 2. Level: Iterate through the exchange partners */
                 size_t category_i = PTR_NODES[i]->data->category;
@@ -191,9 +190,8 @@ void dispersion_anticlustering(double *data, int *N, int *K, int *clusters,
 double dispersion_objective(size_t n, size_t k, double *distances[n], 
                           struct node *HEADS[k]) {
         double min = INFINITY;
-        double distance;
         for (size_t i = 0; i < k; i++) {
-                distance = minimun_distance_cluster(n, distances, HEADS[i]);
+                double distance = minimun_distance_cluster(n, distances, HEADS[i]);
                 if (distance < min) {
                         min = distance;
                 }
@@ -204,10 +202,9 @@ double dispersion_objective(size_t n, size_t k, double *distances[n],
 // Compute minimum distance within a cluster
 double minimun_distance_cluster(size_t n, double *distances[n], struct node *HEAD) {
         double min = INFINITY;
-        double distance;
         struct node *current = HEAD->next;
         while (current != NULL) {
-                distance = minimin_distance_element(n, distances, current, current->data->ID);
+                double distance = minimin_distance_element(n, distances, current, current->data->ID);
                 if (distance < min) {
                         min = distance;
                 }
@@ -221,9 +218,8 @@ double minimin_distance_element(size_t n, double *distances[n],
                                 struct node *start_node, size_t ID) {
         struct node *tmp = start_node->next;
         double min = INFINITY;
-        double distance;
         while (tmp != NULL) {
-                distance = distances[ID][tmp->data->ID];
+                double distance = distances[ID][tmp->data->ID];
                 if (distance < min) {
                         min = distance;
                 }

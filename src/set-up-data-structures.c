@@ -63,7 +63,7 @@ int fill_data_points(double *data, size_t n, size_t m, struct element POINTS[n],
 
 int initialize_cluster_heads(size_t k, struct node *HEADS[k]) {
         for (size_t i = 0; i < k; i++) {
-                HEADS[i] = (struct node*) malloc(sizeof(struct node*));
+                HEADS[i] = (struct node*) malloc(sizeof(struct node));
                 if (HEADS[i] == NULL) {
                         free_cluster_list(k, HEADS, i);
                         return 1;
@@ -104,7 +104,7 @@ int fill_cluster_lists(size_t n, size_t k, int *clusters,
 
 struct node* append_to_cluster(struct node *HEAD, struct element *data) {
         struct node *tmp = HEAD->next; // may be NULL if list is empty
-        HEAD->next = (struct node*) malloc(sizeof(struct node*));
+        HEAD->next = (struct node*) malloc(sizeof(struct node));
         if (HEAD->next == NULL) {
                 return NULL; // failed to allocate memory
         }

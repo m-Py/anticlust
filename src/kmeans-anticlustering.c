@@ -180,7 +180,6 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         double tmp_objs[k];
         double best_objs[k];
         double tmp_obj;
-        double best_obj;
         
         /* Start main iteration loop for exchange procedure */
         
@@ -189,7 +188,7 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
                 size_t cl1 = PTR_NODES[i]->data->cluster;
                 
                 // Initialize `best` variable for the i'th item
-                best_obj = 0;
+                double best_obj = 0;
                 copy_matrix(k, m, CENTERS, best_centers);
                 copy_array(k, OBJ_BY_CLUSTER, best_objs);
                 
@@ -277,15 +276,11 @@ void swap(size_t n, size_t i, size_t j, struct node *PTR_NODES[n]) {
         size_t cl1 = one->data->cluster;
         size_t cl2 = two->data->cluster;
         
-        // Update pointer in `PTR_NODES`
+        // Update pointers to elements
         size_t ID1 = one->data->ID;
         size_t ID2 = two->data->ID;
         PTR_NODES[ID1] = two;
         PTR_NODES[ID2] = one;
-        
-        // Update ID of the elements
-        one->data->ID = ID2;
-        one->data->ID = ID1;
         
         // Update the cluster affiliation
         one->data->cluster = cl2;

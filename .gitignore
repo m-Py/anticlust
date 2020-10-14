@@ -9,3 +9,5 @@ inst/README.md
 docs/*
 *.o
 *.so
+anticlust.kdev4
+.kdev4/

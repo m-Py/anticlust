@@ -10,3 +10,6 @@ inst/README.md
 docs/*
 README.md
 NEWS.md
+anticlust.kdev4
+.kdev4/*
+LICENSE.md

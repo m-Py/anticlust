@@ -41,7 +41,7 @@ double cluster_var(size_t m, struct node *HEAD, double center[m]) {
  * one cluster center.
  * 
  */
-void compute_center(size_t m, double center[m], struct node *HEAD, int freq) {
+void compute_center(size_t m, double center[m], struct node *HEAD, int frequency) {
         // Initialize center matrix as 0:
         for (size_t i = 0; i < m; i++) {
                 center[i] = 0; 
@@ -56,7 +56,7 @@ void compute_center(size_t m, double center[m], struct node *HEAD, int freq) {
         } 
         // To get cluster centers: Divide by number of elements 
         for (size_t i = 0; i < m; i++) {
-                center[i] = center[i] / freq;
+                center[i] = center[i] / frequency;
         }
 }
 

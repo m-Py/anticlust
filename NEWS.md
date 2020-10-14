@@ -1,4 +1,4 @@
-# Development version (0.5.3.9000)
+# anticlust 0.5.4
 
 ## User-visible changes
 
