@@ -1,3 +1,4 @@
+
 #' Solve anticlustering by using the BILS algorithm by Brusco et al.
 #' 
 #' @param data A N x N dissimilarity matrix or N x M features matrix.
@@ -16,16 +17,16 @@
 bicriterion_iterated_local_search_call <- function(
   data, G, R, 
   W = c(0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 0.5, 0.99, 0.999, 0.999999), 
-  Xi = c(0.05,0.1)) {
+  Xi = c(0.05, 0.1)) {
   
   distances <- convert_to_distances(data) 
   N <- NROW(distances)
   WL <- length(W)
   
-  checkweights(W);
-  checkneighborhood(Xi);
+  checkweights(W)
+  checkneighborhood(Xi)
   
-  if((N %% G) != 0){
+  if ((N %% G) != 0){
     stop("The number of elements must be divisble by the number of clusters.")
   }
   
@@ -55,6 +56,7 @@ bicriterion_iterated_local_search_call <- function(
     result_matrix, 
     upper_bound, N
   )
+  
   result_matrix <- rbind(result_matrix)
   as.matrix(apply(result_matrix, 1, function(x) order_cluster_vector(to_numeric(x))))
 }
