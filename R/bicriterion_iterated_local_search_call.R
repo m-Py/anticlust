@@ -19,6 +19,10 @@ bicriterion_anticlustering <- function(
   W = c(0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 0.5, 0.99, 0.999, 0.999999), 
   Xi = c(0.05, 0.1)) {
   
+  if (is.null(R)) {
+    R <- 2
+  }
+  
   distances <- convert_to_distances(data) 
   N <- NROW(distances)
   WL <- length(W)

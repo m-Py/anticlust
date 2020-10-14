@@ -21,20 +21,18 @@
 #' @param objective The objective to be maximized. The options
 #'     "diversity" (default; previously called "distance", which is
 #'     still supported), "variance", "kplus" and "dispersion" are natively
-#'     supported. May also be a user-defined function object that computes
-#'     an objective value given a clustering. See Details.
-#' @param method One of "exchange" (default) , "local-maximum", or
+#'     supported. May also be a user-defined function. See Details.
+#' @param method One of "exchange" (default) , "local-maximum", "brusco", or
 #'     "ilp".  See Details.
 #' @param preclustering Boolean. Should a preclustering be conducted
 #'     before anticlusters are created? Defaults to \code{FALSE}. See
 #'     Details.
 #' @param categories A vector, data.frame or matrix representing one
 #'     or several categorical constraints. See Details.
-#' @param repetitions The number of times a new exchange procedure is
-#'     initiated when \code{method = "exchange"} or \code{method =
-#'     "local-maximum"}.  In the end, the best objective found across
-#'     the repetitions is returned. If this argument is not passed,
-#'     only one repetition is conducted.
+#' @param repetitions The number of times a search heuristic is
+#'     initiated when using \code{method = "exchange"}, \code{method =
+#'     "local-maximum"}, or \code{method = "brusco"}. In the end, 
+#'     the best objective found across the repetitions is returned.
 #'
 #' @return A vector of length N that assigns a group (i.e, a number
 #'     between 1 and \code{K}) to each input element.
@@ -132,12 +130,17 @@
 #' for larger N. For very large N, check out the function
 #' \code{\link{fast_anticlustering}} that was specifically implemented
 #' to process very large data sets.
+#' 
+#' Since version 0.5.4.9000, another heuristic solution method is available, 
+#' using \code{method = "brusco"}. This option implements the local bicriterion 
+#' iterated local search heuristic by Brusco, Cradit and Steinley 
+#' (in press).
 #'
 #' \strong{Exact anticlustering}
 #'
-#' An optimal anticluster editing objective can be found via integer
-#' linear programming (the integer linear program implemented here can
-#' be found in Papenberg & Klau, 2020, (8) - (12)). To this end, set
+#' An optimal anticluster editing objective (i.e., the diversity) can be found via integer
+#' linear programming. The integer linear program implemented here can
+#' be found in Papenberg & Klau, (2020; (8) - (12)). To this end, set
 #' \code{method = "ilp"}. To obtain an optimal solution, the open
 #' source GNU linear programming kit (available from
 #' https://www.gnu.org/software/glpk/glpk.html) and the R package
@@ -182,9 +185,9 @@
 #'
 #' The argument \code{categories} may induce categorical constraints.
 #' The grouping variables indicated by \code{categories} will be
-#' balanced out across anticlusters. Currently, this functionality is
-#' only available in combination with the heuristic methods, but not
-#' with the exact integer linear programming approach.
+#' balanced out across anticlusters. This functionality is
+#' only available in combination with \code{method = "exchange"} or 
+#' \code{method = "local-maximum"}.
 #' 
 #' \strong{Optimize a custom objective function}
 #' 
@@ -310,13 +313,17 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
       x <- cbind(x, squared_from_mean(x))
       objective <- "variance"
     }
+    if (objective == "distance") {
+      objective <- "diversity"
+    }
   }
   
   # In some cases, `anticlustering()` has to be called repeatedly - 
   # redirect to `repeat_anticlustering()` in this case, which then
   # again calls anticlustering with method "exchange" and 
   # repetitions = NULL
-  if (method == "local-maximum" || argument_exists(repetitions)) {
+  if (method == "local-maximum" || 
+      (method == "exchange" && argument_exists(repetitions))) {
     if (!argument_exists(repetitions)) {
       repetitions <- 1
     }
@@ -335,6 +342,20 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
       K,
       preclustering)
     )
+  }
+  
+  if (method == "brusco") {
+    if (objective == "diversity") {
+      weights <- c(0.5, 0.99, 0.999, 0.999999)
+      obj_fun <- diversity_objective_
+    } else if (objective == "dispersion") {
+      weights <- c(0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1)
+      obj_fun <- dispersion_objective_
+    }
+    partitions <- as.matrix(bicriterion_anticlustering(x, K, repetitions, weights))
+    # get best partition wrt dispersion / diversity
+    best_obj <- which.max(apply(partitions, 2, obj_fun, convert_to_distances(x)))
+    return(partitions[, best_obj])
   }
   
   # Preclustering and categorical constraints are both processed in the

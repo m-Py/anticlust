@@ -2,9 +2,15 @@
 
 ## User-visible changes
 
-- `anticlust` now includes the bicriterion algorithm for simultaneously 
+* `anticlust` now includes the bicriterion algorithm for simultaneously 
 maximizing diversity and dispersion, created by Brusco et al. 
 (<doi:10.1111/bmsp.12186>). Contributed by Martin Breuer (see [his thesis](https://www.cs.hhu.de/fileadmin/redaktion/Fakultaeten/Mathematisch-Naturwissenschaftliche_Fakultaet/Informatik/Algorithmische_Bioinformatik/Bachelorarbeiten/2516084_ba_ifo_AbschlArbeit_klau_mapap102_mabre121_20200820_2320.pdf) for more details)
+  * It can be called from the main function `anticlustering()` by setting 
+  `method = "brusco"`; in this case only either dispersion or diversity is
+  maximized
+  * `bicriterion_anticlustering()` (not yet exported -- TODO) can be used 
+  for a more fine grained usage of the Brusco et al. algorithm, fully using
+  its main functionality to optimize both dispersion as well as diversity
 
 # anticlust 0.5.4
 

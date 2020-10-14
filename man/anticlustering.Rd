@@ -32,10 +32,9 @@ assigned to anticlusters before the optimization starts.}
 \item{objective}{The objective to be maximized. The options
 "diversity" (default; previously called "distance", which is
 still supported), "variance", "kplus" and "dispersion" are natively
-supported. May also be a user-defined function object that computes
-an objective value given a clustering. See Details.}
+supported. May also be a user-defined function. See Details.}
 
-\item{method}{One of "exchange" (default) , "local-maximum", or
+\item{method}{One of "exchange" (default) , "local-maximum", "brusco", or
 "ilp".  See Details.}
 
 \item{preclustering}{Boolean. Should a preclustering be conducted
@@ -45,11 +44,10 @@ Details.}
 \item{categories}{A vector, data.frame or matrix representing one
 or several categorical constraints. See Details.}
 
-\item{repetitions}{The number of times a new exchange procedure is
-initiated when \code{method = "exchange"} or \code{method =
-"local-maximum"}.  In the end, the best objective found across
-the repetitions is returned. If this argument is not passed,
-only one repetition is conducted.}
+\item{repetitions}{The number of times a search heuristic is
+initiated when using \code{method = "exchange"}, \code{method =
+"local-maximum"}, or \code{method = "brusco"}. In the end, 
+the best objective found across the repetitions is returned.}
 }
 \value{
 A vector of length N that assigns a group (i.e, a number
@@ -146,11 +144,16 @@ for larger N. For very large N, check out the function
 \code{\link{fast_anticlustering}} that was specifically implemented
 to process very large data sets.
 
+Since version 0.5.4.9000, another heuristic solution method is available, 
+using \code{method = "brusco"}. This option implements the local bicriterion 
+iterated local search heuristic by Brusco, Cradit and Steinley 
+(in press).
+
 \strong{Exact anticlustering}
 
-An optimal anticluster editing objective can be found via integer
-linear programming (the integer linear program implemented here can
-be found in Papenberg & Klau, 2020, (8) - (12)). To this end, set
+An optimal anticluster editing objective (i.e., the diversity) can be found via integer
+linear programming. The integer linear program implemented here can
+be found in Papenberg & Klau, (2020; (8) - (12)). To this end, set
 \code{method = "ilp"}. To obtain an optimal solution, the open
 source GNU linear programming kit (available from
 https://www.gnu.org/software/glpk/glpk.html) and the R package
@@ -195,9 +198,9 @@ described in Papenberg and Klau (2020; (8) - (10), (12) - (13)).
 
 The argument \code{categories} may induce categorical constraints.
 The grouping variables indicated by \code{categories} will be
-balanced out across anticlusters. Currently, this functionality is
-only available in combination with the heuristic methods, but not
-with the exact integer linear programming approach.
+balanced out across anticlusters. This functionality is
+only available in combination with \code{method = "exchange"} or 
+\code{method = "local-maximum"}.
 
 \strong{Optimize a custom objective function}
 
