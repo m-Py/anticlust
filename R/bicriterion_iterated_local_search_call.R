@@ -12,9 +12,9 @@
 #' 
 #' @return List of useful partitions (approximated pareto set)
 #' 
-#' @export
-#'
-bicriterion_iterated_local_search_call <- function(
+#' @noRd
+
+bicriterion_anticlustering <- function(
   data, G, R, 
   W = c(0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 0.5, 0.99, 0.999, 0.999999), 
   Xi = c(0.05, 0.1)) {
