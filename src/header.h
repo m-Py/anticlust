@@ -3,7 +3,7 @@ void bicriterion_iterated_local_search_call(double *distances, int *N, int *G, i
 struct Pareto_element* multistart_bicriterion_pairwise_interchange(size_t N, double matrix[N][N], int G, int R, int WL, double weights[WL]);
 struct Pareto_element* bicriterion_iterated_local_search(struct Pareto_element* head, size_t N, double matrix[N][N],int G, int R, int WL, double weights[WL], double neighbor_percent[2]);
 double sample(size_t array_size,double array[array_size]);
-void random_partition(size_t N, int G, int random[N]);
+void random_partition(size_t N, int G, int partition[N]);
 double get_diversity(size_t N, int partition[N], double matrix[N][N]);
 double get_dispersion(size_t N, int partition[N], double matrix[N][N]);
 void cluster_swap(size_t N, int i, int j, int partition[N]);
@@ -17,4 +17,4 @@ void linked_list_sample(struct Pareto_element* head, size_t N, int* partition);
 int linked_list_length(struct Pareto_element* head);
 double random_in_range(double min, double max);
 double get_diversity_fast(double diversity, int x,int y, size_t N, int partition[N], double matrix[N][N]);
-double get_dispersion_fast(double dispersion, int x,int y, size_t N, int partition[N], double matrix[N][N], int *counter1, int *counter2, int *counter3,int *counter4, int *counter);
+double get_dispersion_fast(double dispersion, int x,int y, size_t N, int partition[N], double matrix[N][N]);
