@@ -55,9 +55,14 @@ A vector of length N that assigns a group (i.e, a number
 }
 \description{
 Create groups of elements (anticlusters) that are as similar as
-possible to each other, by maximizing the heterogeneity within
+possible to each other. This is accomplished by maximizing instead
+of minimizing a clustering objective function, and often
+corresponds to maximizing the heterogeneity within
 groups. Implements anticlustering algorithms as described in
-Papenberg and Klau (2020; <doi:10.1037/met0000301>).
+Papenberg and Klau (2020; <doi:10.1037/met0000301>); since version
+0.5.4.9000, also includes an implementation of the bicriterion
+anticlustering algorithm described by Brusco, Cradit and Steinley
+(in press).
 }
 \details{
 This function is used to solve anticlustering. That is, \code{K}
@@ -88,7 +93,7 @@ minimize differences with regard to the standard deviations between
 groups (see \code{\link{kplus_objective}}).
 
 The cluster editing "diversity" objective is the sum of pairwise
-distances within groups (see
+distances of elements within the same groups (see
 \code{\link{diversity_objective}}). Anticluster editing is also
 known as the »maximum diverse grouping problem« because it
 maximizes group diversity as measured by the sum of pairwise
@@ -100,9 +105,12 @@ supported) to request anticluster editing, but now \code{method =
 objectives based on pairwise distances (e.g., see
 \code{\link{dispersion_objective}}).
 
-The "dispersion" is the minimum distance between any two elements within 
-the same cluster; applications that require high within-group heterogeneity
-often require to maximize the dispersion.
+The "dispersion" is the minimum distance between any two elements
+that are part of the same cluster; maximization of this objective
+ensures that any two elements within the same group are as
+dissimilar from each other as possible. Applications that require
+high within-group heterogeneity often require to maximize the
+dispersion.
 
 If the data input \code{x} is a feature matrix (that is: each row
 is a "case" and each column is a "variable") and the option
@@ -118,40 +126,39 @@ examples).
 \strong{Heuristic anticlustering}
 
 By default, a heuristic method is employed for anticlustering: the
-exchange method (\code{method = "exchange"}). Building on an
-initial assignment of elements to anticlusters, elements are
-sequentially swapped between anticlusters in such a way that each
-swap improves set similarity by the largest amount that is
-possible. In the default case, elements are randomly assigned to
-anticlusters before the exchange procedure starts; however, it is
-also possible to explicitly specify the initial assignment using
-the argument \code{K} (in this case, \code{K} has length
-\code{nrow(x)}). The exchange procedure is repeated for each
-element. Because each possible swap is investigated for each
-element, the total number of exchanges grows quadratically with
-input size, rendering the exchange method unsuitable for large N.
-When using \code{method = "local-maximum"}, the exchange method is
-repeated until an local maximum is reached. That means after the
+exchange method (\code{method = "exchange"}). First, anticlusters
+are randomly assigned to clusters. (It is also possible to
+explicitly specify the initial assignment using the argument
+\code{K}; in this case, \code{K} has length \code{nrow(x)}.) Based
+on the initial assignment, elements are systematically swapped
+between anticlusters in such a way that each swap improves the
+objective value. For an element, each possible swap with elements
+in other clusters is simulated; then, the one swap is performed
+that improves the objective the most, but a swap is only conducted
+if there is an improvement at all. This swapping procedure is
+repeated for each element. When using \code{method =
+"local-maximum"}, the exchange method does not terminate after the
+first iteration over all elements; instead, the swapping continues
+until a local maximum is reached. This means that after the
 exchange process has been conducted once for each data point, the
 algorithm restarts with the first element and proceeds to conduct
 exchanges until the objective cannot be improved.
 
 When setting \code{preclustering = TRUE}, only the \code{K - 1}
-most similar elements serve as exchange partners, which can
-dramatically speed up the optimization (more information on the
-preclustering option is included below). This option is recommended
-for larger N. For very large N, check out the function
-\code{\link{fast_anticlustering}} that was specifically implemented
-to process very large data sets.
+most similar elements serve as exchange partners for each element,
+which can dramatically speed up the optimization (more information
+on the preclustering heuristic follows below). This option is
+recommended for larger N.
 
-Since version 0.5.4.9000, another heuristic solution method is available, 
-using \code{method = "brusco"}. This option implements the local bicriterion 
-iterated local search heuristic by Brusco, Cradit and Steinley 
-(in press).
+Since version 0.5.4.9000, another heuristic solution method is
+available, using \code{method = "brusco"}. This option implements
+the local bicriterion iterated local search heuristic by Brusco et
+al. (in press).
 
 \strong{Exact anticlustering}
 
-An optimal anticluster editing objective (i.e., the diversity) can be found via integer
+An optimal anticluster editing objective (i.e., a solution having
+the global maximum value in diversity) can be found via integer
 linear programming. The integer linear program implemented here can
 be found in Papenberg & Klau, (2020; (8) - (12)). To this end, set
 \code{method = "ilp"}. To obtain an optimal solution, the open
@@ -288,6 +295,11 @@ ac <- anticlustering(
 
 }
 \references{
+Brusco, M. J., Cradit, J. D., & Steinley, D. (in press). Combining
+diversity and dispersion criteria for anticlustering: A bicriterion
+approach. British Journal of Mathematical and Statistical
+Psychology. https://doi.org/10.1111/bmsp.12186
+
 Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
 for a clustering problem. Mathematical Programming, 45, 59-96.
 
@@ -299,11 +311,11 @@ Späth, H. (1986). Anticlustering: Maximizing the variance criterion.
 Control and Cybernetics, 15, 213-218.
 }
 \seealso{
-\code{\link{fast_anticlustering}}
-
 \code{\link{variance_objective}}
 
 \code{\link{diversity_objective}}
+
+\code{\link{dispersion_objective}}
 }
 \author{
 Martin Papenberg \email{martin.papenberg@hhu.de}
