@@ -12,16 +12,14 @@ test_that("input and output work expectedly for Brusco algorithm", {
   )
   expect_true(all(table(anticlusters) == c(32, 32, 32)))
   
-  # Test false input
-  expect_error(
-    anticlusters <- anticlustering(
-      schaper2019[, 3:6],
-      K = c(48, 24, 24),
-      method = "brusco"
-    ), 
-    regexp = "number of groups"
+  # Different group sizes 
+  anticlusters <- anticlustering(
+    schaper2019[, 3:6],
+    K = c(48, 24, 24),
+    method = "brusco"
   )
-  
+  expect_true(all(table(anticlusters) == c(48, 24, 24)))
+
   # no categorical restrictions
   expect_error(
     anticlusters <- anticlustering(
