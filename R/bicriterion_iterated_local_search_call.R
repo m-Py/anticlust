@@ -27,13 +27,11 @@ bicriterion_anticlustering <- function(
   N <- NROW(distances)
   WL <- length(W)
   
+  clusters <- initialize_clusters(N, G, NULL) - 1
+  
   checkweights(W)
   checkneighborhood(Xi)
-  
-  if ((N %% G) != 0){
-    stop("The number of elements must be divisble by the number of clusters.")
-  }
-  
+
   upper_bound = 500 # limits number of resulting partitions 
   # create empty matrix for results to use in C
   result_matrix = matrix(data = -1, nrow = upper_bound , ncol = N) 
@@ -43,12 +41,12 @@ bicriterion_anticlustering <- function(
     "bicriterion_iterated_local_search_call",
     as.double(distances),
     as.integer(N),
-    as.integer(G),
     as.integer(R),
     as.integer(upper_bound),
     as.integer(WL),
     as.double(W),
     as.double(Xi),
+    as.integer(clusters),
     result = double(length(result_matrix)),
     PACKAGE = "anticlust" # important to call C
   )

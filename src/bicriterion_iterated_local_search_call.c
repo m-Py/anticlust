@@ -15,11 +15,13 @@ struct Pareto_element {
 
 
 //receive data from r, call bils algorithm, save results for r
-void bicriterion_iterated_local_search_call(double *distances, int *N, int *G, int *R, 
-                                            int *upper_bound, int *WL, double *W, double *Xi, double *result) {
+void bicriterion_iterated_local_search_call(double *distances, int *N, int *R, 
+                                            int *upper_bound, int *WL, double *W, double *Xi, 
+                                            int *partition,
+                                            double *result
+                                           ) {
   
   const int n = *N; // number of elements
-  const int g = *G; // number of clusters
   const int r = *R; // number of restarts
   const int u = *upper_bound; //max. length of result-list
   const int wl = *WL; // length of possible weights
@@ -51,7 +53,7 @@ void bicriterion_iterated_local_search_call(double *distances, int *N, int *G, i
   //divide restarts for both parts of the algorithm equally
   int half_restarts = r/2 + (r%2);
   
-  struct Pareto_element* head = multistart_bicriterion_pairwise_interchange(n, distance_pts, g, half_restarts, wl, weights);
+  struct Pareto_element* head = multistart_bicriterion_pairwise_interchange(n, distance_pts, half_restarts, wl, weights, partition);
   head = bicriterion_iterated_local_search(head, n, distance_pts, half_restarts, wl, weights, neighbor_percent);
   
   //fill result with -1 to identify the last partition in the matrix
@@ -72,15 +74,14 @@ void bicriterion_iterated_local_search_call(double *distances, int *N, int *G, i
 }
   
 
-struct Pareto_element* multistart_bicriterion_pairwise_interchange(size_t N, double matrix[N][N], int G, int R, int WL, double weights[WL]) {
+struct Pareto_element* multistart_bicriterion_pairwise_interchange(size_t N, double matrix[N][N], int R, int WL, 
+                                                                   double weights[WL], int *partition) {
   
   struct Pareto_element* head = NULL; // head pointing on the later linked list(paretoset)
   
   for(int a = 0; a < R; a++){
     double div_weight = sample(WL, weights); 
     double dis_weight = 1 - div_weight;
-    int partition[N];
-    random_partition(N,G,partition);
     double diversity = get_diversity(N, partition, matrix);
     double save_diversity = diversity;
     double dispersion = get_dispersion(N, partition, matrix);
@@ -175,28 +176,6 @@ double sample(size_t array_size,double array[array_size]){
   int r = rand() % array_size;
   return(array[r]);
 }
-
-
-void random_partition(size_t N, int G, int partition[N]){
-  
-  int clustersize = N/G;
-  int freeclusters[G];
-  
-  for(int i = 0; i < G; i++){
-    freeclusters[i] = clustersize; 
-  }
-  
-  for(int i = 0; i < N; i++){
-    int r = rand() % G;
-    if(freeclusters[r] > 0){
-      partition[i] = r;
-      freeclusters[r]--;
-    }else{
-      i--;
-    }
-  }
-}
-
 
 double get_diversity(size_t N, int partition[N], double matrix[N][N]){
   
