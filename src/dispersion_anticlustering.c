@@ -153,10 +153,45 @@ void dispersion_anticlustering(double *data, int *N, int *K, int *clusters,
                                 continue;
                         }
                         
+                        // Using local updating of dispersion objective
+                        int i_has_dispersion = has_node_dispersion(
+                                n, DISTANCES, OBJECTIVE, 
+                                CLUSTER_HEADS[PTR_NODES[i]->data->cluster], 
+                                PTR_NODES[i], 0
+                        );
+                        int j_has_dispersion = has_node_dispersion(
+                                n, DISTANCES, OBJECTIVE, 
+                                CLUSTER_HEADS[PTR_NODES[j]->data->cluster], 
+                                PTR_NODES[j], 0
+                        );
+                        
+                        int before = i_has_dispersion || j_has_dispersion;
+                        
                         // Now swap the elements in the cluster list
                         swap(n, i, j, PTR_NODES);
-                        tmp_obj = dispersion_objective(n, k, DISTANCES, CLUSTER_HEADS);
                         
+                        i_has_dispersion = has_node_dispersion(
+                                n, DISTANCES, OBJECTIVE, 
+                                CLUSTER_HEADS[PTR_NODES[i]->data->cluster], 
+                                PTR_NODES[i], 1
+                        );
+                        j_has_dispersion = has_node_dispersion(
+                                n, DISTANCES, OBJECTIVE, 
+                                CLUSTER_HEADS[PTR_NODES[j]->data->cluster], 
+                                PTR_NODES[j], 1
+                        );
+                        
+                        int after = i_has_dispersion || j_has_dispersion;
+                        
+                        if (after) {
+                                tmp_obj = best_obj - 1; // cannot improve objective
+                        } else if (!before) {
+                                tmp_obj = best_obj - 1; // cannot improve objective
+                        } else if (before) {
+                                tmp_obj = dispersion_objective(n, k, DISTANCES, CLUSTER_HEADS);
+                                // todo: more speed up
+                        }
+
                         // Update `best` variables if objective was improved
                         if (tmp_obj > best_obj) {
                                 best_obj = tmp_obj;
@@ -183,6 +218,34 @@ void dispersion_anticlustering(double *data, int *N, int *K, int *clusters,
         free_points(n, POINTS, n);
         free_category_indices(c, CATEGORY_HEADS, c);
         free_cluster_list(k, CLUSTER_HEADS, k);
+}
+
+// Check if an element has a connection to another element in the same cluster, where 
+// their pairwise distance is the current dispersion. For implementing Martin B.'s clever speed ups.
+// Has parameter `after` to check if the minimum within-cluster distance is lower after 
+// a swap.
+int has_node_dispersion(size_t n, double *distances[n], double dispersion, struct node *HEAD, struct node *node, int after) {
+        struct node *current = HEAD->next;
+        int id_node = node->data->ID;
+        while (current != NULL) {
+                int tmp_id = current->data->ID;
+                current = current->next;
+                if (tmp_id == id_node) {
+                        continue; 
+                }
+                double current_distance = distances[id_node][tmp_id];
+                if (after) {
+                        if (current_distance <= dispersion) {
+                                return 1;
+                        }
+                } else {
+                        if (current_distance == dispersion) {
+                                return 1;
+                        }
+                }
+                
+        }
+        return 0;
 }
 
 

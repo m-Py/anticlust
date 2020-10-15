@@ -208,3 +208,13 @@ double minimin_distance_element(
         struct node *start_node, 
         size_t ID
 );
+
+int has_node_dispersion(
+        size_t n, 
+        double *distances[n], 
+        double dispersion, 
+        struct node *HEAD, 
+        struct node *node,
+        int after
+);
+
