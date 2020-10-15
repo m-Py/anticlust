@@ -21,6 +21,8 @@ struct Pareto_element* multistart_bicriterion_pairwise_interchange(
         int *partition
 );
 
+void shuffle_permutation(int N, int *permutation);
+
 struct Pareto_element* bicriterion_iterated_local_search(struct Pareto_element* head, size_t N, double matrix[N][N], int G, int WL, double weights[WL], double neighbor_percent[2]);
 double sample(size_t array_size,double array[array_size]);
 void random_partition(size_t N, int G, int partition[N]);

@@ -80,6 +80,9 @@ struct Pareto_element* multistart_bicriterion_pairwise_interchange(size_t N, dou
   struct Pareto_element* head = NULL; // head pointing on the later linked list(paretoset)
   
   for(int a = 0; a < R; a++){
+    if (a > 0) {
+        shuffle_permutation(N, partition);
+    }
     double div_weight = sample(WL, weights); 
     double dis_weight = 1 - div_weight;
     double diversity = get_diversity(N, partition, matrix);
@@ -172,7 +175,7 @@ struct Pareto_element* bicriterion_iterated_local_search(struct Pareto_element* 
 }     
 
 //sample functin from R. Get one random element from an array
-double sample(size_t array_size,double array[array_size]){
+double sample(size_t array_size, double array[array_size]) {
   int r = rand() % array_size;
   return(array[r]);
 }
@@ -213,8 +216,15 @@ double get_dispersion(size_t N, int partition[N], double matrix[N][N]){
 }
 
 
+// Fisher-Yates shuffle algorithm for shuffling ermutations
+void shuffle_permutation(int N, int *permutation) {
+    for (int i = 0; i <= N-2; i++) {
+        int j = i + (rand() % (N-i));
+        cluster_swap(N, i, j, permutation);
+    }
+}
+
 void cluster_swap(size_t N, int i, int j, int partition[N]){
-  
   int save = partition[i];
   partition[i] = partition[j];
   partition[j] = save;
@@ -349,6 +359,7 @@ void delete_outdated(struct Pareto_element** head_ref, double diversity, double 
 } 
 
 
+// selects a random partition
 void linked_list_sample(struct Pareto_element* head, size_t N, int* partition){
   
   int count = linked_list_length(head);
