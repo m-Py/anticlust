@@ -1,7 +1,9 @@
 // Declare Functions
+#pragma once
+
 void bicriterion_iterated_local_search_call(double *distances, int *N, int *G, int *R,int *upper_bound, int *WL, double *W, double *Xi, double *result);
 struct Pareto_element* multistart_bicriterion_pairwise_interchange(size_t N, double matrix[N][N], int G, int R, int WL, double weights[WL]);
-struct Pareto_element* bicriterion_iterated_local_search(struct Pareto_element* head, size_t N, double matrix[N][N],int G, int R, int WL, double weights[WL], double neighbor_percent[2]);
+struct Pareto_element* bicriterion_iterated_local_search(struct Pareto_element* head, size_t N, double matrix[N][N], int G, int WL, double weights[WL], double neighbor_percent[2]);
 double sample(size_t array_size,double array[array_size]);
 void random_partition(size_t N, int G, int partition[N]);
 double get_diversity(size_t N, int partition[N], double matrix[N][N]);

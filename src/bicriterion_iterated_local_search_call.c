@@ -52,7 +52,7 @@ void bicriterion_iterated_local_search_call(double *distances, int *N, int *G, i
   int half_restarts = r/2 + (r%2);
   
   struct Pareto_element* head = multistart_bicriterion_pairwise_interchange(n, distance_pts, g, half_restarts, wl, weights);
-  head = bicriterion_iterated_local_search(head, n, distance_pts, g, half_restarts, wl, weights, neighbor_percent);
+  head = bicriterion_iterated_local_search(head, n, distance_pts, half_restarts, wl, weights, neighbor_percent);
   
   //fill result with -1 to identify the last partition in the matrix
   for(int i = 0; i < n*u; i++){
@@ -116,7 +116,7 @@ struct Pareto_element* multistart_bicriterion_pairwise_interchange(size_t N, dou
 }  
 
 
-struct Pareto_element* bicriterion_iterated_local_search(struct Pareto_element* head, size_t N, double matrix[N][N],int G, int R, int WL, double weights[WL], double neighbor_percent[2]){
+struct Pareto_element* bicriterion_iterated_local_search(struct Pareto_element* head, size_t N, double matrix[N][N], int R, int WL, double weights[WL], double neighbor_percent[2]){
   
   for(int a = 0; a < R; a++){
     double div_weight = sample(10, weights); 
