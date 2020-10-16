@@ -35,6 +35,11 @@
 #'     "local-maximum"}.  In the end, the best objective found across
 #'     the repetitions is returned. If this argument is not passed,
 #'     only one repetition is conducted.
+#' @param standardize Boolean. If \code{TRUE} and \code{x} is a feature 
+#'     matrix, the data is standardized through a call to \code{\link{scale}}
+#'     before the optimization starts. This argument is silently ignored 
+#'     if \code{x} is a distance matrix.
+#'     
 #'
 #' @return A vector of length N that assigns a group (i.e, a number
 #'     between 1 and \code{K}) to each input element.
@@ -250,8 +255,9 @@
 #'   objective = "kplus",
 #'   K = c(24, 24, 48),
 #'   categories = schaper2019$room,
-#'   repetitions = 2,
-#'   method = "local-maximum"
+#'   repetitions = 10,
+#'   method = "local-maximum",
+#'   standardize = TRUE
 #' )
 #' 
 #' table(anticlusters, schaper2019$room)
@@ -295,7 +301,7 @@
 
 anticlustering <- function(x, K, objective = "diversity", method = "exchange",
                            preclustering = FALSE, categories = NULL, 
-                           repetitions = NULL) {
+                           repetitions = NULL, standardize = FALSE) {
 
   x <- to_matrix(x)
   
@@ -310,6 +316,10 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
       x <- cbind(x, squared_from_mean(x))
       objective <- "variance"
     }
+  }
+  
+  if (!is_distance_matrix(x) && standardize == TRUE) {
+    x <- scale(x)
   }
   
   # In some cases, `anticlustering()` has to be called repeatedly - 

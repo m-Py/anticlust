@@ -11,7 +11,8 @@ anticlustering(
   method = "exchange",
   preclustering = FALSE,
   categories = NULL,
-  repetitions = NULL
+  repetitions = NULL,
+  standardize = FALSE
 )
 }
 \arguments{
@@ -50,6 +51,11 @@ initiated when \code{method = "exchange"} or \code{method =
 "local-maximum"}.  In the end, the best objective found across
 the repetitions is returned. If this argument is not passed,
 only one repetition is conducted.}
+
+\item{standardize}{Boolean. If \code{TRUE} and \code{x} is a feature 
+matrix, the data is standardized through a call to \code{\link{scale}}
+before the optimization starts. This argument is silently ignored 
+if \code{x} is a distance matrix.}
 }
 \value{
 A vector of length N that assigns a group (i.e, a number
@@ -253,8 +259,9 @@ anticlusters <- anticlustering(
   objective = "kplus",
   K = c(24, 24, 48),
   categories = schaper2019$room,
-  repetitions = 2,
-  method = "local-maximum"
+  repetitions = 10,
+  method = "local-maximum",
+  standardize = TRUE
 )
 
 table(anticlusters, schaper2019$room)
