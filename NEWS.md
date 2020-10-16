@@ -1,4 +1,5 @@
-# anticlust 0.5.4.9000 (development version)
+
+# anticlust 0.5.5.9000 (development version)
 
 ## User-visible changes
 
@@ -11,6 +12,21 @@ maximizing diversity and dispersion, created by Brusco et al.
   * `bicriterion_anticlustering()` (not yet exported -- TODO) can be used 
   for a more fine grained usage of the Brusco et al. algorithm, fully using
   its main functionality to optimize both dispersion as well as diversity
+
+# anticlust 0.5.5
+
+## New feature
+
+* `anticlustering()` has a new argument `standardize` to standardize the data
+input before the optimization starts. This is useful to give all variables the 
+same weight in the anticlustering process, irregardless of the scaling of the
+variables. Especially useful for `objective = "kplus"` to ensure that both 
+minimizing differences with regard to means and variance is equally important.
+
+## Bug fix
+
+* Fixes a memory leak in the C code base, via [2c4fe6d](https://github.com/m-Py/anticlust/commit/2c4fe6d4c272b10717158e639a76103ef574cc41)
+>>>>>>> next-release
 
 # anticlust 0.5.4-1
 
