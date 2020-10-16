@@ -94,6 +94,7 @@ void distance_anticlustering(double *data, int *N, int *K, int *clusters,
         if (mem_error_cluster_lists == 1) {
                 free_points(n, POINTS, n);
                 free_category_indices(c, CATEGORY_HEADS, c);
+                free_cluster_list(k, CLUSTER_HEADS, k);
                 *mem_error = 1;
                 return;
         }

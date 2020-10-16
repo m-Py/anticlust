@@ -86,12 +86,12 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         int *categories, int *mem_error) {
         
         /* 
-        * - Free strategy, to be implemented: each function cleans its own mess
-        *   + use safe-free in pointer book
-        *   + free in low-level function when possible (i.e., when the error occurs
-        *     within this function)
-        *   + only free in high-level function when low-level function passed
-        *     correctly previously
+        * - Free strategy: each function cleans its own mess
+        *   + free in low-level function when possible (i.e., when an allocation error 
+        *     occurs within this function)
+        *   + Free in high-level function when previously, memory was allocated successfully,
+        *     but then an allocation error occured
+        *   + TODO use a safe-free function instead of just `free()`
         */ 
     
         const size_t n = (size_t) *N; // number of data points
