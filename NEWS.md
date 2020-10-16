@@ -1,10 +1,16 @@
 # anticlust 0.5.5
 
+## New feature
+
 * `anticlustering()` has a new argument `standardize` to standardize the data
 input before the optimization starts. This is useful to give all variables the 
 same weight in the anticlustering process, irregardless of the scaling of the
 variables. Especially useful for `objective = "kplus"` to ensure that both 
 minimizing differences with regard to means and variance is equally important.
+
+## Bug fix
+
+* Fixes a memory leak in the C code base, via [2c4fe6d](https://github.com/m-Py/anticlust/commit/2c4fe6d4c272b10717158e639a76103ef574cc41)
 
 # anticlust 0.5.4-1
 
