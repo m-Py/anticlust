@@ -336,6 +336,9 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
     }
   }
   
+  validate_input(standardize, "standardize", objmode = "logical", len = 1,
+                 input_set = c(TRUE, FALSE), not_na = TRUE)
+  
   if (!is_distance_matrix(x) && standardize == TRUE) {
     x <- scale(x)
   }

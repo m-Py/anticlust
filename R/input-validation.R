@@ -13,7 +13,7 @@ input_validation_anticlustering <- function(x, K, objective, method,
     validate_input(repetitions, "repetitions", objmode = "numeric", len = 1, 
                    greater_than = 1, must_be_integer = TRUE, not_na = TRUE)
   }
-
+  
   ## Merge categories variable so that `length` can be applied:
   categories <- merge_into_one_variable(categories)
   
