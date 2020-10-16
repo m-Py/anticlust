@@ -108,6 +108,11 @@ void distance_anticlustering(double *data, int *N, int *K, int *clusters,
                 DISTANCES[i] = (double*) malloc(sizeof(double) * n);
                 if (DISTANCES[i] == NULL) {
                         free_distances(n, DISTANCES, i);
+                        free_points(n, POINTS, n);
+                        free_category_indices(c, CATEGORY_HEADS, c);
+                        free_cluster_list(k, CLUSTER_HEADS, k);
+                        *mem_error = 1;
+                        return;
                 }
         }
         
@@ -223,6 +228,7 @@ void distance_anticlustering(double *data, int *N, int *K, int *clusters,
         free_points(n, POINTS, n);
         free_category_indices(c, CATEGORY_HEADS, c);
         free_cluster_list(k, CLUSTER_HEADS, k);
+        free_distances(n, DISTANCES, n);
 }
 
 // Compute sum of distances by cluster
