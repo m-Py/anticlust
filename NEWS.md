@@ -1,3 +1,11 @@
+# anticlust 0.5.5
+
+* `anticlustering()` has a new argument `standardize` to standardize the data
+input before the optimization starts. This is useful to give all variables the 
+same weight in the anticlustering process, irregardless of the scaling of the
+variables. Especially useful for `objective = "kplus"` to ensure that both 
+minimizing differences with regard to means and variance is equally important.
+
 # anticlust 0.5.4-1
 
 - Internal change: `anticlustering()` with `objective = "dispersion"` now 
