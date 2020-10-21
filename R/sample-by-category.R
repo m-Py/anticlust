@@ -16,6 +16,8 @@
 #' categories are just evenly split between samples. Apart from the restriction 
 #' that categories are balanced between samples, the split is random.
 #'
+#' @importFrom stats rbinom
+#'
 #' @export
 #' 
 #' @examples 
