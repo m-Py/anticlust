@@ -29,6 +29,10 @@
 #' groups <- categorical_sampling(categories, K = c(24, 24, 48))
 #' table(groups, categories)
 #' 
+#' # Heavily unequal sized groups, is harder to balance the groups
+#' groups <- categorical_sampling(categories, K = c(51, 19, 26))
+#' table(groups, categories)
+#' 
 
 categorical_sampling <- function(categories, K) {
   categories <- merge_into_one_variable(categories)
