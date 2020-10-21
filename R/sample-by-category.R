@@ -50,12 +50,7 @@ categorical_sampling <- function(categories, K) {
       init <- rep_len(rep(1:length(K), K), N)
       samples <- unlist(by(init, cats$categories, sample_))
     } else {
-      samples <- replicate_sample(K)
-      does_not_fit <- any(sort(table(samples)) != sort(K))
-      while (does_not_fit) {
-        samples <- replicate_sample(K)
-        does_not_fit <- any(sort(table(samples)) != sort(K))
-      }
+      samples <- generate_groups(K)
     }
   } else {
     validate_input(K, "K", objmode = "numeric", len = 1, 
@@ -76,20 +71,45 @@ sample_ <- function(x, ...) {
   sample(x, ...)
 }
 
-sample_stuff <- function(tab) {
+
+
+# Generate groups in case of heaviliy uneven group size requirements
+
+# Outer function repeatedly calls generate_groups_() until constraints
+# on group sizes are met exactly
+
+generate_groups <- function(tab) {
+  loop <- TRUE
+  while (loop) {
+    samples <- generate_groups(tab)
+    # loop until the number of categories fits the requirements
+    loop <- any(sort(table(samples)) != sort(tab))
+  }
+  samples
+}
+
+# Generate group affiliations for all N cases, may not exactly fit 
+# the requirements
+generate_groups_ <- function(tab) {
+  N <- sum(tab) 
+  k <- length(tab)
+  samples <- unlist(
+    replicate(
+      N / sum(floor(tab / min(tab))), 
+      generate_groups_one_set(tab)
+    )
+  )
+  samples[1:sum(tab)]
+}
+
+# Generate one set of group affiliations
+generate_groups_one_set <- function(tab) {
   k <- length(tab)
   proportions <- tab / min(tab)
   has_to_be_in <- floor(proportions)
   sample <- rep(1:k, has_to_be_in)
   add <- which(as.logical(rbinom(k, 1, proportions - has_to_be_in)))
   sort(c(sample, add))
-}
-
-replicate_sample <- function(tab) {
-  N <- sum(tab) 
-  k <- length(tab)
-  samples <- unlist(replicate(N / sum(floor(tab / min(tab))), sample_stuff(tab)))
-  samples[1:sum(tab)]
 }
 
 # Functions to find greatest common denominator among a set of values
