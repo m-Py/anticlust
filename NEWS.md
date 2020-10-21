@@ -26,7 +26,6 @@ minimizing differences with regard to means and variance is equally important.
 ## Bug fix
 
 * Fixes a memory leak in the C code base, via [2c4fe6d](https://github.com/m-Py/anticlust/commit/2c4fe6d4c272b10717158e639a76103ef574cc41)
->>>>>>> next-release
 
 # anticlust 0.5.4-1
 
