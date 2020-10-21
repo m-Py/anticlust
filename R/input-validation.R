@@ -7,11 +7,14 @@
 #' @noRd
 input_validation_anticlustering <- function(x, K, objective, method,
                                           preclustering, categories,
-                                          repetitions) {
+                                          repetitions, standardize = FALSE) {
+  
+  validate_input(standardize, "standardize", objmode = "logical", len = 1,
+                 input_set = c(TRUE, FALSE), not_na = TRUE, not_function = TRUE)
   
   if (argument_exists(repetitions)) {
     validate_input(repetitions, "repetitions", objmode = "numeric", len = 1, 
-                   greater_than = 1, must_be_integer = TRUE, not_na = TRUE,
+                   greater_than = 0, must_be_integer = TRUE, not_na = TRUE,
                    not_function = TRUE)
   }
   

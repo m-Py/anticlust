@@ -303,24 +303,22 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
                            preclustering = FALSE, categories = NULL, 
                            repetitions = NULL, standardize = FALSE) {
 
-  x <- to_matrix(x)
+  ## Get data into required format
+  input_validation_anticlustering(x, K, objective, method, preclustering, 
+                                  categories, repetitions, standardize)
   
   # extend data for k-means extension objective
   if (!inherits(objective, "function")) {
-    validate_input(
-      objective, "objective",
-      input_set = c("distance", "diversity", "dispersion", "variance", "kplus"), 
-      len = 1, not_na = TRUE
-    )
     if (objective == "kplus") {
       x <- cbind(x, squared_from_mean(x))
       objective <- "variance"
     }
+    if (objective == "distance") {
+      objective <- "diversity"
+    }
   }
   
-  validate_input(standardize, "standardize", objmode = "logical", len = 1,
-                 input_set = c(TRUE, FALSE), not_na = TRUE, not_function = TRUE)
-  
+  x <- to_matrix(x)
   if (!is_distance_matrix(x) && standardize == TRUE) {
     x <- scale(x)
   }
@@ -329,13 +327,6 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   # redirect to `repeat_anticlustering()` in this case, which then
   # again calls anticlustering with method "exchange" and 
   # repetitions = NULL
-    
-  validate_input(
-    method, "method", len = 1,
-    input_set = c("ilp", "exchange", "heuristic", "centroid", "local-maximum"), 
-    not_na = TRUE, not_function = TRUE
-  )
-  
   if (method == "local-maximum" || 
     (method == "exchange" && argument_exists(repetitions))) {
     if (!argument_exists(repetitions)) {
@@ -345,10 +336,6 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
                                  method, repetitions))
   }
   
-  ## Get data into required format
-  input_validation_anticlustering(x, K, objective, method, preclustering, 
-                                  categories, repetitions)
-
   ## Exact method using ILP
   if (method == "ilp") {
     return(exact_anticlustering(
