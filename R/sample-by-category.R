@@ -41,8 +41,7 @@ categorical_sampling <- function(categories, K) {
     order = 1:N
   )
   cats <- sort_by_col(cats, "categories")
-  # Unequal group sizes were requested if sum(K) = N
-  if (sum(K) == N) {
+  if (sum(K) == N && length(K) > 1) { # Unequal group sizes were requested
     gdc <- gcd_set(K)
     if (gdc > 1) {
       # if the GDC of all categories is > 1, we can use this procedure:
@@ -54,7 +53,7 @@ categorical_sampling <- function(categories, K) {
     }
   } else {
     validate_input(K, "K", objmode = "numeric", len = 1, 
-                   greater_than = 1)
+                   greater_than = 1, smaller_than = N)
     init <- rep_len(1:K, N)
     samples <- unlist(by(init, cats$categories, sample_))
   } 
