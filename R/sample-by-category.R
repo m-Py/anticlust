@@ -80,7 +80,7 @@ sample_ <- function(x, ...) {
 generate_groups <- function(tab) {
   loop <- TRUE
   while (loop) {
-    samples <- generate_groups(tab)
+    samples <- generate_groups_(tab)
     # loop until the number of categories fits the requirements
     loop <- any(sort(table(samples)) != sort(tab))
   }
