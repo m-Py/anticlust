@@ -43,18 +43,26 @@ categorical_sampling <- function(categories, K) {
   cats <- sort_by_col(cats, "categories")
   # Unequal group sizes were requested if sum(K) = N
   if (sum(K) == N) {
-    samples <- replicate_sample(K)
-    does_not_fit <- any(sort(table(samples)) != sort(K))
-    while (does_not_fit) {
+    gdc <- gcd_set(K)
+    if (gdc > 1) {
+      # if the GDC of all categories is > 1, we can use this procedure:
+      K <- K / gdc
+      init <- rep_len(rep(1:length(K), K), N)
+      samples <- unlist(by(init, cats$categories, sample_))
+    } else {
       samples <- replicate_sample(K)
       does_not_fit <- any(sort(table(samples)) != sort(K))
+      while (does_not_fit) {
+        samples <- replicate_sample(K)
+        does_not_fit <- any(sort(table(samples)) != sort(K))
+      }
     }
   } else {
     validate_input(K, "K", objmode = "numeric", len = 1, 
-                   greater_than = 1, must_be_integer = TRUE, not_na = TRUE)
+                   greater_than = 1)
     init <- rep_len(1:K, N)
     samples <- unlist(by(init, cats$categories, sample_))
-  }
+  } 
   cats$samples <- samples
   sort_by_col(cats, "order")$samples
 }
@@ -66,12 +74,6 @@ sample_ <- function(x, ...) {
     return(x)
   }
   sample(x, ...)
-}
-
-# Weighted sampling for unequal-sized groups
-sample_weighted <- function(tab) {
-  n_categories <- length(tab)
-  sample(1:n_categories, prob = tab / min(tab), size = sum(tab), replace = TRUE)
 }
 
 sample_stuff <- function(tab) {
@@ -88,4 +90,23 @@ replicate_sample <- function(tab) {
   k <- length(tab)
   samples <- unlist(replicate(N / sum(floor(tab / min(tab))), sample_stuff(tab)))
   samples[1:sum(tab)]
+}
+
+# Functions to find greatest common denominator among a set of values
+gcd <- function(x, y) ifelse(y, Recall(y, x %% y), x)
+gcd_ <- function(x) gcd(x[1], x[2])
+
+gcd_all <- function(x) {
+  apply(combn(x, 2), 2, gcd_)
+}
+
+gcd_set <- function(x) {
+  gdc_found <- FALSE 
+  while (!gdc_found) {
+    x <- gcd_all(x)
+    if (all(x == x[1])) {
+      gdc_found <- TRUE
+    }
+  }
+  x[1]
 }
