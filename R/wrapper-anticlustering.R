@@ -319,7 +319,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   }
   
   validate_input(standardize, "standardize", objmode = "logical", len = 1,
-                 input_set = c(TRUE, FALSE), not_na = TRUE)
+                 input_set = c(TRUE, FALSE), not_na = TRUE, not_function = TRUE)
   
   if (!is_distance_matrix(x) && standardize == TRUE) {
     x <- scale(x)
@@ -329,7 +329,15 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   # redirect to `repeat_anticlustering()` in this case, which then
   # again calls anticlustering with method "exchange" and 
   # repetitions = NULL
-  if (method == "local-maximum" || argument_exists(repetitions)) {
+    
+  validate_input(
+    method, "method", len = 1,
+    input_set = c("ilp", "exchange", "heuristic", "centroid", "local-maximum"), 
+    not_na = TRUE, not_function = TRUE
+  )
+  
+  if (method == "local-maximum" || 
+    (method == "exchange" && argument_exists(repetitions))) {
     if (!argument_exists(repetitions)) {
       repetitions <- 1
     }
@@ -354,7 +362,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   # variable `categories` after this step:
   categories <- get_categorical_constraints(x, K, preclustering, categories)
   
-  if (class(objective) == "function") {
+  if (inherits(objective, "function")) {
     # most generic exchange method, deals with any objective function
     return(exchange_method(x, K, objective, categories))
   }
