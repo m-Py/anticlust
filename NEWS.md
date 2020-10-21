@@ -1,3 +1,12 @@
+# anticlust 0.5.5.0001
+
+* `anticlustering()` and `categorical_sampling()` now better balance categorical 
+variables when the output groups require different sizes (if the group
+sizes do not have any common denominator)
+
+* Some additional input validations for more useful error messages when arguments
+in `anticlustering()` are not correctly specified
+
 # anticlust 0.5.5
 
 ## New feature
