@@ -107,9 +107,9 @@ generate_groups_one_set <- function(tab) {
   k <- length(tab)
   proportions <- tab / min(tab)
   has_to_be_in <- floor(proportions)
-  sample <- rep(1:k, has_to_be_in)
+  samples <- rep(1:k, has_to_be_in)
   add <- which(as.logical(rbinom(k, 1, proportions - has_to_be_in)))
-  sort(c(sample, add))
+  sample(c(samples, add))
 }
 
 # Functions to find greatest common denominator among a set of values
