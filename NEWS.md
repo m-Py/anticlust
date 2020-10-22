@@ -2,7 +2,10 @@
 
 ### User-visible changes
 
-- `plot_clusters()` now uses different clustering colors
+- `plot_clusters()` now uses the default color palette to highlight 
+the different clusters 
+- `plot_clusters()` now uses different `pch` symbols when the number of 
+clusters is low (K < 8)
 
 ### Internal changes
 
