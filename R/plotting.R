@@ -34,7 +34,7 @@
 #' @author
 #' Martin Papenberg \email{martin.papenberg@@hhu.de}
 #'
-#' @importFrom grDevices rainbow
+#' @importFrom grDevices palette rainbow
 #' @importFrom graphics lines par plot points
 #'
 #' @details In most cases, the argument \code{clusters} is a vector
@@ -97,7 +97,12 @@ plot_clusters <- function(features, clusters, within_connection = FALSE,
 
   ## Set colors for clusters
   K <- length(unique(clusters))
-  col <- rainbow(K)
+  if (K < 8) {
+    col <- palette()[2:(K+1)]
+  } else {
+    col <- rainbow(K)
+  }
+
   col <- col[clusters]
   
   # Draw plot

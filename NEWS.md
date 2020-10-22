@@ -1,5 +1,11 @@
 # anticlust 0.5.5.0001
 
+### User-visible changes
+
+- `plot_clusters()` now uses different clustering colors
+
+### Internal changes
+
 * `anticlustering()` and `categorical_sampling()` now better balance categorical 
 variables when the output groups require different sizes (if the group
 sizes do not have any common denominator)
