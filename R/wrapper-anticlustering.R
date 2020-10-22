@@ -306,8 +306,8 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   ## Get data into required format
   input_validation_anticlustering(x, K, objective, method, preclustering, 
                                   categories, repetitions, standardize)
-  
-  # extend data for k-means extension objective
+  # extend data for k-means extension objective  
+  x <- to_matrix(x)
   if (!inherits(objective, "function")) {
     if (objective == "kplus") {
       x <- cbind(x, squared_from_mean(x))
@@ -318,7 +318,6 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
     }
   }
   
-  x <- to_matrix(x)
   if (!is_distance_matrix(x) && standardize == TRUE) {
     x <- scale(x)
   }
