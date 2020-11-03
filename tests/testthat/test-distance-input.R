@@ -17,12 +17,12 @@ test_that("distance input works for exact ILP", {
     ac_dist <- anticlustering(distances, K = K,
                               preclustering = FALSE,
                               method = "ilp")
-    expect_equal(diversity_objective_(ac_feat, distances),
-                 diversity_objective_(ac_feat, features))
-    expect_equal(diversity_objective_(ac_dist, distances),
-                 diversity_objective_(ac_dist, features))
-    expect_equal(diversity_objective_(ac_feat, distances),
-                 diversity_objective_(ac_dist, distances))
+    expect_equal(diversity_objective(distances, ac_feat),
+                 diversity_objective(features, ac_feat))
+    expect_equal(diversity_objective(distances, ac_dist),
+                 diversity_objective(features, ac_dist))
+    expect_equal(diversity_objective(distances, ac_feat),
+                 diversity_objective(distances, ac_dist))
   }
 })
 
@@ -41,12 +41,12 @@ test_that("distance input works for precluster ILP", {
     ac_dist <- anticlustering(distances, K = K,
                               preclustering = TRUE,
                               method = "ilp")
-    expect_equal(diversity_objective_(distances, ac_feat),
-                 diversity_objective_(features, ac_feat))
-    expect_equal(diversity_objective_(distances, ac_dist),
-                 diversity_objective_(features, ac_dist))
-    expect_equal(diversity_objective_(distances, ac_feat),
-                 diversity_objective_(distances, ac_dist))
+    expect_equal(diversity_objective(distances, ac_feat),
+                 diversity_objective(features, ac_feat))
+    expect_equal(diversity_objective(distances, ac_dist),
+                 diversity_objective(features, ac_dist))
+    expect_equal(diversity_objective(distances, ac_feat),
+                 diversity_objective(distances, ac_dist))
   }
 })
 
