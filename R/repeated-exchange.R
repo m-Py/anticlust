@@ -1,7 +1,6 @@
 
 # Function that repeatedly calls anticlustering and returns best results
-repeat_anticlustering <- function(x, K, objective, categories, preclustering, 
-                                  method, repetitions) {
+repeat_anticlustering <- function(x, K, objective, categories, method, repetitions) {
   
   N <- nrow(x)
   
