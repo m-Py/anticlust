@@ -10,7 +10,7 @@ test_that("distance input works for exact ILP", {
     K <- conditions[k, "p"]
     n_elements <- K * 5 # n must be multiplier of p
     features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
-    distances <- as.matrix(dist(features))
+    distances <- dist(features)
 
     ac_feat <- anticlustering(features, K = K, preclustering = FALSE,
                               method = "ilp")
