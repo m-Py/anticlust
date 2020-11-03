@@ -11,3 +11,5 @@ docs/*
 *.so
 anticlust.kdev4
 .kdev4/
+/*.tar.gz
+/*.Rcheck/
