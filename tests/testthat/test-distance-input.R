@@ -74,20 +74,9 @@ test_that("distance input works for exchange method", {
                  diversity_objective(features, ac_dist))
     expect_equal(diversity_objective(distances, ac_feat),
                  diversity_objective(distances, ac_dist))
-    
-    ## Do the same with preclustering
-    rnd_seed <- sample(10000, size = 1)
-
-    set.seed(rnd_seed)
-    ac_feat <- anticlustering(features, K = K, preclustering = TRUE)
-    set.seed(rnd_seed)
-    ac_dist <- anticlustering(distances, K = K, preclustering = TRUE)
-
-    expect_equal(diversity_objective(distances, ac_feat),
-                 diversity_objective(features, ac_feat))
-    expect_equal(diversity_objective(distances, ac_dist),
-                 diversity_objective(features, ac_dist))
-    expect_equal(diversity_objective(distances, ac_feat),
-                 diversity_objective(distances, ac_dist))
   }
+  
+  # At the end, just test that the input works without error when preclustering is enabled
+  anticlustering(features, K = K, preclustering = TRUE)
+  anticlustering(distances, K = K, preclustering = TRUE)
 })
