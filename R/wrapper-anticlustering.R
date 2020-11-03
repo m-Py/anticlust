@@ -307,17 +307,18 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   ## Get data into required format
   input_validation_anticlustering(x, K, objective, method, preclustering, 
                                   categories, repetitions, standardize)
-  
+
+  x <- to_matrix(x)
+
   ## Exact method using ILP
   if (method == "ilp") {
     return(exact_anticlustering(x, K, preclustering))
   }
+
   # Preclustering and categorical constraints are both processed in the
   # variable `categories` after this step:
   categories <- get_categorical_constraints(x, K, preclustering, categories)
 
-  # extend data for k-means extension objective  
-  x <- to_matrix(x)
   if (!inherits(objective, "function")) {
     if (objective == "kplus") {
       x <- cbind(x, squared_from_mean(x))
