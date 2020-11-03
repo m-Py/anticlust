@@ -341,8 +341,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
     if (!argument_exists(repetitions)) {
       repetitions <- 1
     }
-    return(repeat_anticlustering(x, K, objective, categories, preclustering, 
-                                 method, repetitions))
+    return(repeat_anticlustering(x, K, objective, categories, method, repetitions))
   }
   
   if (inherits(objective, "function")) {

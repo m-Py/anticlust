@@ -5,9 +5,6 @@ repeat_anticlustering <- function(x, K, objective, categories, preclustering,
   
   N <- nrow(x)
   
-  # Create categorical variable only once at the beginning
-  categories <- get_categorical_constraints(x, K, preclustering, categories)
-  
   # Create initial cluster assignment for each `repetition`
   clusters <- list(initialize_clusters(N, K, categories))
   
