@@ -67,6 +67,7 @@ plot_clusters <- function(features, clusters, within_connection = FALSE,
                           main = "", cex = 1.2,
                           cex.axis = 1.2, cex.lab = 1.2, lwd = 1.5,
                           lty = 2, frame.plot = FALSE, cex_centroid = 2) {
+  features <- as.matrix(features)
   if (!argument_exists(xlim)) {
     xlim <- c(min(features[, 1]), max(features[, 1]))
   }
