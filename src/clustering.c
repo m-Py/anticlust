@@ -20,18 +20,13 @@ void c_balanced_clustering(
         const size_t n = (size_t) *N; // number of data points
         const size_t m = (size_t) *M; // number of variables per data point
         const size_t k = (size_t) *K; // number of clusters
-        const size_t n_per_c = n / k;
+        //const size_t n_per_c = n / k;
         // Some book-keeping variables to track memory error
         int mem_error_points = 0;
-        int mem_error_cluster_lists = 0;
-        int false = 0;
         
         // Set up array of data points, fill it, return if memory runs out
-        struct element POINTS[n];
-        mem_error_points = fill_data_points(
-                data, n, m, POINTS, vector, // "vector" actually not needed, is hacky
-                &false, vector
-        );
+        struct cl_element POINTS[n];
+        mem_error_points = set_up_list(data, n, m, POINTS);
         
         if (mem_error_points == 1) {
                 *mem_error = 1;
@@ -39,94 +34,85 @@ void c_balanced_clustering(
         }
         
         // Set up linked list for data points
-        struct node *HEAD = (struct node*) malloc(sizeof(struct node));
+        struct double_node *HEAD = malloc(sizeof(struct double_node));
         if (HEAD == NULL) {
                 *mem_error = 1;
                 return;
         }
         HEAD->next = NULL;
+        HEAD->prev = NULL;
+        
+        // 
+        struct double_node *PTR_ARRAY[n];
+        // Fill both data structures: (a) linked list and (b) array of pointers
         for (int i = (n-1); i >= 0; i--) { // traverse from the end
-                struct node* tmp = append_to_cluster(HEAD, &POINTS[order[i]]);
-                if (tmp == NULL) {
+                struct double_node* new = insert_double_node(HEAD, &POINTS[order[i]]);
+                if (new == NULL) {
                         *mem_error = 1;
+                        //TODO: free memory
                         return;
                 }
-                printf("%lf \n", POINTS[order[i]].values[0]);
+                // now add pointer to the new node to the pointer array. 
+                // Careful indexing needed
+                PTR_ARRAY[POINTS[order[i]].ID] = new;
         }
-        
-        // Set up array of pointers-to-nodes, return if memory runs out
-        struct node *PTR_NODES[n];
-        mem_error_cluster_lists = fill_cluster_lists(
-            n, k, clusters, 
-            POINTS, PTR_NODES, CLUSTER_HEADS
-        );
-        
-        // TODO: test if memory allocation failed and return if it did        
-        
-        // Iterate through list, find neighbours for each target element
-        int cluster = 0; // counter for the clusters 
-        while (HEAD->next != NULL) {
-                // Use another list for the current cluster
-                // 1. Pop next element from list
-                struct node *target_item = HEAD->next; // for this, look for neighbours
-                struct node *compare_to = target_item->next;
-                double worst_distance = euclidean_squared(
-                        target_item->data->values, compare_to->data->values, m
-                );
-                
-                // Use two arrays to keep count of the neighbours
-                // (a) one includes IDs
-                // (b) one includes distances to the target item
-                int cluster_ids[n_per_c]; 
-                double cluster_distances[n_per_c];
-                
-                // Fill first two members to cluster, one may be replaced later
-                cluster_ids[0] = target_item->data->ID;
-                cluster_ids[1] = compare_to->data->ID;
-                cluster_distances[0] = 0;
-                cluster_distances[1] = worst_distance;
-                target_item->data->cluster = cluster;
-                compare_to->data->cluster = cluster; // may be reverted
-                
-                int members_in_cluster = 2; // counter for the members in a cluster
-                
-                struct node* tmp = compare_to->next;
-                
-                while (tmp->next != NULL) {
-                        double tmp_distance = euclidean_squared(
-                                target_item->data->values, tmp->data->values, m
-                        );
-                        // item is inserted if its closer to target item than the current
-                        // worst item in the cluster, OR if the cluster is not yet filled
-                        // entirely
-                        if (tmp_distance < worst_distance || members_in_cluster < n_per_c) {
-                                // to be implemented: insert into cluster logic
-                                insert_into_cluster(HEAD, tmp, cluster_ids, cluster_distances);
-                                if (tmp_distance > worst_distance) {
-                                       worst_distance = tmp_distance;
-                                }
-                                if (members_in_cluster < n_per_c) {
-                                        members_in_cluster++;
-                                }
-                        }
-                        tmp = tmp->next;
-                }
-                
-                // TODO: Add cluster affiliation to every data point
-                
-                /* TODO: Use `cluster_ids` array and `PTR_TO_NODES` array to remove the nodes 
-                 * from the primary linked list */
-                remove_from_linked_list() // to be implemented
-                
-                
-                // at the end of this loop, HEAD->next must be updated
-                // increment `cluster`
-                cluster++;
-                
-        }
-        
 }
 
+
+/* Insert a double node next to HEAD 
+ * Returns the pointer to the new node so it can be stored in an array
+ * 
+ * Returns NULL if the memory allocation fails.
+ */
+struct double_node* insert_double_node(struct double_node *HEAD, struct cl_element *POINT) {
+        struct double_node* new = malloc(sizeof(struct double_node));
+        if (new == NULL) {
+                return NULL;
+        }
+        new->prev = HEAD;
+        new->next = HEAD->next;
+        HEAD->next = new;
+        new->data = POINT;
+        //printf("%lf \n", new->data->values[0]);
+        return new;
+}
+
+
+/* Extracted method that fill data points into array of struct `element`
+ * param `double *data` pointer to original data array of length n
+ * param `size_t m`: Number of data points
+ * param `size_t m`: Number of variables per data point
+ * param `struct element POINTS[n]`: Array to be filled with data points
+ * 
+ * return: `0` if all data points were successfully stored; `1` if not.
+ * 
+ */
+int set_up_list(double *data, size_t n, size_t m, struct cl_element POINTS[n]) {
+        // Create offset variable to correctly read out data points
+        int m_ptr[m];
+        for (size_t i = 0; i < m; i++) {
+                m_ptr[i] = i * n;
+        }
+        
+        // Size of a data vector per element:
+        size_t data_size = m * sizeof(POINTS[0].values[0]);
+        
+        for (size_t i = 0; i < n; i++) {
+                POINTS[i].cluster = 0; // init as 0, is written later
+                POINTS[i].ID = i;
+                POINTS[i].values = (double*) malloc(data_size);
+                if (POINTS[i].values == NULL) {
+                        //free_points(n, POINTS, i); // TODO: free for cl_element
+                        return 1;
+                } 
+                // Fill data into `element`:
+                for (size_t j = 0; j < m; j++) {
+                        POINTS[i].values[j] = data[m_ptr[j]++];
+                }
+        }
+        return 0;
+}
+ 
 
 /* Must implement the following functionality:
  * - remove item from linked list (is this even reasonably possible?! - I guess I need 
@@ -134,5 +120,5 @@ void c_balanced_clustering(
  *   representation...). Well, no, this should only later be done when all neighbours 
  *   are definitely found and there are no more changes! Thus, I need a PTR_TO_NODES, 
  *   then it should easily work.
- * - add to the two arrays, in correct order!
+ * - add to the two arrays, in correct order! */
 // insert_into_cluster(tmp, cluster_ids, cluster_distances);

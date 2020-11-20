@@ -218,3 +218,32 @@ int has_node_dispersion(
         int after
 );
 
+
+/* Define structures and functions for clustering algorithm */ 
+
+struct cl_element
+{
+        size_t ID; // index of the node in original order of the data
+        size_t cluster; // index of element's cluster
+        double *values; // array of length M, element's data values
+};
+
+/* Define struct for nodes in double linked list */
+struct double_node
+{
+        struct cl_element *data; // Pointer to data point
+        struct double_node *next; // pointer to next node
+        struct double_node *prev; // pointer to previous node
+};
+
+int set_up_list(
+        double *data, 
+        size_t n, 
+        size_t m, 
+        struct cl_element POINTS[n]
+);
+
+struct double_node* insert_double_node(
+        struct double_node *HEAD, 
+        struct cl_element *POINT
+);
