@@ -236,11 +236,26 @@ struct double_node
         struct double_node *prev; // pointer to previous node
 };
 
+/* Define struct for cluster list. Is a linked list where each element is a double_node */
+struct cl_node
+{
+        struct double_node *element;
+        struct cl_node *next;
+        double distance; // distance to target element
+};
+
 int set_up_list(
         double *data, 
         size_t n, 
         size_t m, 
         struct cl_element POINTS[n]
+);
+
+void insert_into_cluster(
+        struct cl_node *HEAD, 
+        struct double_node *node,
+        double distance,
+        int cluster
 );
 
 struct double_node* insert_double_node(
