@@ -262,3 +262,9 @@ struct double_node* insert_double_node(
         struct double_node *HEAD, 
         struct cl_element *POINT
 );
+
+int list_length(struct double_node *HEAD);
+
+void print_arr(size_t n, struct double_node *PTR_ARRAY[n], size_t i);
+
+void print_arr_from_head(struct double_node *HEAD);

@@ -20,7 +20,7 @@ foo_clust <- function(data, K) {
     as.integer(M),
     as.integer(K),
     as.integer(order),
-    vector = rep(0, N),
+    vector = as.integer(rep(0, N)),
     mem_error = as.integer(0),
     PACKAGE = "anticlust"
   )

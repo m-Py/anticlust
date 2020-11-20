@@ -57,9 +57,11 @@ void c_balanced_clustering(
                 PTR_ARRAY[POINTS[order[i]].ID] = new;
         }
         
+
+        
         // Iterate through list, find neighbours for each target element
         int cluster = 0; // counter for the clusters 
-        //while (HEAD->next != NULL) {
+        while (HEAD->next != NULL) {
                 // Use another list for the current cluster
                 // 1. Pop next element from list
                 struct double_node *TARGET = HEAD->next; // for this, look for neighbours
@@ -96,19 +98,43 @@ void c_balanced_clustering(
                                 if (tmp_distance > worst_distance) {
                                        worst_distance = tmp_distance;
                                 }
+                                printf("cluster %d, member %d", cluster, members_in_cluster);
+                                printf("\n");
                                 members_in_cluster++;
                         }
                         tmp = tmp->next;
                 }
                 
-                // TODO: Add cluster affiliation to every data point
-                
-                // TODO: Use `cluster_ids` array and `PTR_TO_NODES` array to remove the nodes  from the primary linked list
-                //remove_from_linked_list() // to be implemented
+                // Iterate through cluster list and remove the assigned elements
+                // from the item pool, so they are no longer used when searching 
+                // for nearest neighbours. Free the cluster list, a new one is 
+                // in the next iteration of the outer loop.
                 struct cl_node *tmp2 = CL_HEAD;
-                for (int i = 0; i < n_per_c; i++) {
-                        printf("%zu ", tmp2->element->data->ID + 1);
+                size_t counter = 0;
+                //printf("# Elemente: %d. \n", list_length(HEAD));
+                while (tmp2 != NULL) {
+                        if (counter < n_per_c) {
+                                
+                                // delete from doubled linked list, but keep pointer in PTR_ARRAY
+                                size_t index = tmp2->element->data->ID;
+                                //print_arr(n, PTR_ARRAY, index);
+                                //print_arr_from_head(HEAD); 
+                                struct double_node *del = PTR_ARRAY[index];
+                                //printf("Entferne Item %zu ", index);
+                                
+                                if (del->next != NULL) {
+                                        del->prev->next = del->next;
+                                        del->next->prev = del->prev;
+                                } else {
+                                        del->prev->next = NULL;
+                                }
+                                //printf("\n");
+                                //printf("# Elemente: %d. \n", list_length(HEAD));
+                        }
+                        struct cl_node *del2 = tmp2;
                         tmp2 = tmp2->next;
+                        free(del2); // can be freed
+                        counter++;
                 }
                 printf("\n");
                                 
@@ -116,9 +142,41 @@ void c_balanced_clustering(
                 // increment `cluster`
                 cluster++;
                 
-        //} 
+        } 
+        // Write output
+        for (size_t i = 0; i < n; i++) {
+                vector[i] = PTR_ARRAY[i]->data->cluster;
+        }
+        
 }
 
+void print_arr(size_t n, struct double_node *PTR_ARRAY[n], size_t i) {
+        struct double_node *fuck = PTR_ARRAY[i];
+        while (fuck != NULL) {
+                printf("%zu ", fuck->data->ID);
+                fuck = fuck->next;
+        }
+        printf("\n");
+}
+
+void print_arr_from_head(struct double_node *HEAD) {
+        struct double_node *fuck = HEAD->next;
+        while (fuck != NULL) {
+                printf("%zu ", fuck->data->ID);
+                fuck = fuck->next;
+        }
+        printf("\n");
+}
+
+int list_length(struct double_node *HEAD) {
+        struct double_node *tmp = HEAD->next;
+        int counter = 0;
+        while (tmp != NULL) {
+                tmp = tmp->next;
+                counter++;
+        }
+        return counter;
+}
 
 
 /* Must implement the following functionality:
@@ -141,7 +199,6 @@ void insert_into_cluster(
                 if (tmp->next == NULL) {
                       tmp->next = new;
                       tmp->next->next = NULL;
-                      printf("yay\n");
                       return; 
                 }
                 // here: insert into the list, somewhere in the middle
@@ -150,7 +207,6 @@ void insert_into_cluster(
                         struct cl_node *safe = tmp->next;
                         tmp->next = new;
                         new->next = safe;
-                        printf("yay\n");
                         return;
                 }
                 tmp = tmp->next;
@@ -171,9 +227,11 @@ struct double_node* insert_double_node(struct double_node *HEAD, struct cl_eleme
         }
         new->prev = HEAD;
         new->next = HEAD->next;
+        if (new->next != NULL) {
+                new->next->prev = new;
+        }
         HEAD->next = new;
         new->data = POINT;
-        //printf("%lf \n", new->data->values[0]);
         return new;
 }
 
