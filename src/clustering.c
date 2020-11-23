@@ -139,35 +139,6 @@ void c_balanced_clustering(
         
 }
 
-void print_arr(size_t n, struct double_node *PTR_ARRAY[n], size_t i) {
-        struct double_node *fuck = PTR_ARRAY[i];
-        while (fuck != NULL) {
-                printf("%zu ", fuck->data->ID);
-                fuck = fuck->next;
-        }
-        printf("\n");
-}
-
-void print_arr_from_head(struct double_node *HEAD) {
-        struct double_node *fuck = HEAD->next;
-        while (fuck != NULL) {
-                printf("%zu ", fuck->data->ID);
-                fuck = fuck->next;
-        }
-        printf("\n");
-}
-
-int list_length(struct double_node *HEAD) {
-        struct double_node *tmp = HEAD->next;
-        int counter = 0;
-        while (tmp != NULL) {
-                tmp = tmp->next;
-                counter++;
-        }
-        return counter;
-}
-
-
 /* Must implement the following functionality:
  * - add to the two arrays, in correct order! */
 void insert_into_cluster(
@@ -209,8 +180,6 @@ void insert_into_cluster(
                 tmp = tmp->next;
         }
 }
-        
-
 
 /* Insert a double node next to HEAD 
  * Returns the pointer to the new node so it can be stored in an array
