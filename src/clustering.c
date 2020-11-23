@@ -125,9 +125,7 @@ void c_balanced_clustering(
                         }
                         // redefine distance as INFINITY so node can be reused
                         tmp2->distance = INFINITY; 
-                        //struct cl_node *del2 = tmp2;
                         tmp2 = tmp2->next;
-                        //free(del2); // can be freed
                         counter++;
                 }
                 cluster++;
