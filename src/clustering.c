@@ -87,7 +87,12 @@ void c_balanced_clustering(
                         // item is inserted if its closer to target item than the current
                         // worst item in the cluster, OR if the cluster is not yet filled
                         // entirely
+                        //printf("Members in Cluster: %d \n", members_in_cluster);
+                        //printf("This distance: %lf \n", tmp_distance);
+                        //printf("Worst distance: %lf \n", worst_distance);
+
                         if (tmp_distance < worst_distance || members_in_cluster < n_per_c) {
+                                //printf("Getting another member: %zu \n", tmp->data->ID);
                                 // to be implemented: insert into cluster logic
                                 insert_into_cluster(
                                         CL_HEAD,
@@ -98,9 +103,8 @@ void c_balanced_clustering(
                                 if (tmp_distance > worst_distance) {
                                        worst_distance = tmp_distance;
                                 }
-                                printf("cluster %d, member %d", cluster, members_in_cluster);
-                                printf("\n");
                                 members_in_cluster++;
+                                //printf("\n\n");
                         }
                         tmp = tmp->next;
                 }
@@ -113,20 +117,20 @@ void c_balanced_clustering(
                 size_t counter = 0;
                 //printf("# Elemente: %d. \n", list_length(HEAD));
                 while (tmp2 != NULL) {
+                        size_t index = tmp2->element->data->ID;
+                        struct double_node *current = PTR_ARRAY[index];
                         if (counter < n_per_c) {
-                                
                                 // delete from doubled linked list, but keep pointer in PTR_ARRAY
-                                size_t index = tmp2->element->data->ID;
                                 //print_arr(n, PTR_ARRAY, index);
                                 //print_arr_from_head(HEAD); 
-                                struct double_node *del = PTR_ARRAY[index];
-                                //printf("Entferne Item %zu ", index);
-                                
-                                if (del->next != NULL) {
-                                        del->prev->next = del->next;
-                                        del->next->prev = del->prev;
+                                //printf("Entferne Item %zu \n", index);
+                                current->data->cluster = cluster;
+                                // Case 1: current->next is NULL (i.e., end of list)
+                                if (current->next == NULL) {
+                                        current->prev->next = NULL;
                                 } else {
-                                        del->prev->next = NULL;
+                                        current->prev->next = current->next;
+                                        current->next->prev = current->prev;
                                 }
                                 //printf("\n");
                                 //printf("# Elemente: %d. \n", list_length(HEAD));
@@ -136,11 +140,12 @@ void c_balanced_clustering(
                         free(del2); // can be freed
                         counter++;
                 }
-                printf("\n");
+                //printf("\n");
                                 
                 // at the end of this loop, HEAD->next must be updated
                 // increment `cluster`
                 cluster++;
+                //printf("\n\n Starting next cluster.\n\n");
                 
         } 
         // Write output
@@ -192,7 +197,6 @@ void insert_into_cluster(
         //TODO: memory check
         new->distance = distance;
         new->element = node;
-        new->element->data->cluster = cluster;
         struct cl_node *tmp = HEAD;
         while (tmp != NULL) {
                 // just insert if we are at the end of the list
