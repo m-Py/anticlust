@@ -1,17 +1,21 @@
 
 
-N <- 10000
+N <- 1000
 M <- 2
-K <- 5
+K <- 20
 data <- matrix(rnorm(N * M), ncol = M)
 tt <- Sys.time()
-foo_clust(data, N / K)
+this <- foo_clust(data, K)
 Sys.time() - tt
 tt <- Sys.time()
-nns <- balanced_clustering(data, N / K)
+nns <- balanced_clustering(data, K)
 Sys.time() - tt
 #nns$nn.idx[which.min(dists), ]
-
+par(mfrow = c(1, 2))
+plot_clusters(data, clusters = this)
+plot_clusters(data, clusters = nns)
+diversity_objective(data, this)
+diversity_objective(data, nns)
 
 # Cluster a data set and visualize results
 N <- 1000
