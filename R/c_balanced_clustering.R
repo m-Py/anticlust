@@ -15,7 +15,7 @@ foo_clust <- function(data, K) {
     stop("NO! K BAD")
   }
   M <- ncol(data)
-  order <- order(distances_from_centroid(data)) - 1 # used as index in C, so starts at 0
+  order <- order(distances_from_centroid(data), decreasing = TRUE) - 1 # used as index in C, so starts at 0
   results <- .C(
     "c_balanced_clustering", 
     as.double(data),
