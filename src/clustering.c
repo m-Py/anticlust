@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h> 
+#include <math.h>
 #include "declarations.h"
 
 /* 
@@ -59,7 +60,8 @@ void c_balanced_clustering(
 
         
         // Iterate through list, find neighbours for each target element
-        int cluster = 0; // counter for the clusters 
+        int cluster = 0; // counter for the clusters
+        struct cl_node *CL_HEAD = malloc(sizeof(struct cl_node*));
         while (HEAD->next != NULL) {
                 // Use another list for the current cluster
                 // 1. Pop next element from list
@@ -67,7 +69,6 @@ void c_balanced_clustering(
                 double worst_distance = 0; 
                 
                 // Set up linked list representing this cluster
-                struct cl_node *CL_HEAD = malloc(sizeof(struct cl_node*));
                 // TODO: Check memory
                 CL_HEAD->element = TARGET;
                 CL_HEAD->next = NULL;
@@ -111,8 +112,9 @@ void c_balanced_clustering(
                         size_t index = tmp2->element->data->ID;
                         struct double_node *current = PTR_ARRAY[index];
                         if (counter < n_per_c) {
-                                // delete from doubled linked list, but keep pointer in PTR_ARRAY
+                                // Update cluster of the current element
                                 current->data->cluster = cluster;
+                                // delete from doubled linked list
                                 // Case 1: current->next is NULL (i.e., end of list)
                                 if (current->next == NULL) {
                                         current->prev->next = NULL;
@@ -121,15 +123,13 @@ void c_balanced_clustering(
                                         current->next->prev = current->prev;
                                 }
                         }
+                        // redefine distance as INFINITY so node can be reused
+                        tmp2->distance = INFINITY; 
                         //struct cl_node *del2 = tmp2;
                         tmp2 = tmp2->next;
                         //free(del2); // can be freed
                         counter++;
                 }
-                //printf("\n");
-                                
-                // at the end of this loop, HEAD->next must be updated
-                // increment `cluster`
                 cluster++;
         } 
         // Write output
@@ -176,22 +176,31 @@ void insert_into_cluster(
         double distance,
         int cluster
 ) {
-        // Make new cl_node for new element
-        struct cl_node *new = malloc(sizeof(struct cl_node*));
-        //TODO: memory check
-        new->distance = distance;
-        new->element = node;
         struct cl_node *tmp = HEAD;
         while (tmp != NULL) {
-                // just insert if we are at the end of the list
+                // Just insert if we are at the end of the list
                 if (tmp->next == NULL) {
+                      // Make new cl_node for new element
+                      struct cl_node *new = malloc(sizeof(struct cl_node*));
+                      //TODO: memory check
+                      new->distance = distance;
+                      new->element = node;
                       tmp->next = new;
                       tmp->next->next = NULL;
                       return; 
                 }
+                // reuse node if possible
+                if (tmp->next->distance == INFINITY) {
+                        tmp->next->distance = distance;
+                        tmp->next->element = node;
+                        return;
+                }
                 // here: insert into the list, somewhere in the middle
                 // if new distance is lower than next distance, insert here
                 if (distance < tmp->next->distance) {
+                        struct cl_node *new = malloc(sizeof(struct cl_node*));
+                        new->distance = distance;
+                        new->element = node;
                         struct cl_node *safe = tmp->next;
                         tmp->next = new;
                         new->next = safe;
