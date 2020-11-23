@@ -12,7 +12,6 @@
  
  */
 
-
 void c_balanced_clustering(
   double *data, int *N, int *M, 
   int *K, int *order, int *vector, int *mem_error) {
@@ -87,13 +86,7 @@ void c_balanced_clustering(
                         // item is inserted if its closer to target item than the current
                         // worst item in the cluster, OR if the cluster is not yet filled
                         // entirely
-                        //printf("Members in Cluster: %d \n", members_in_cluster);
-                        //printf("This distance: %lf \n", tmp_distance);
-                        //printf("Worst distance: %lf \n", worst_distance);
-
                         if (tmp_distance < worst_distance || members_in_cluster < n_per_c) {
-                                //printf("Getting another member: %zu \n", tmp->data->ID);
-                                // to be implemented: insert into cluster logic
                                 insert_into_cluster(
                                         CL_HEAD,
                                         tmp, 
@@ -104,9 +97,9 @@ void c_balanced_clustering(
                                        worst_distance = tmp_distance;
                                 }
                                 members_in_cluster++;
-                                //printf("\n\n");
                         }
                         tmp = tmp->next;
+                        counter++;
                 }
                 
                 // Iterate through cluster list and remove the assigned elements
@@ -114,16 +107,12 @@ void c_balanced_clustering(
                 // for nearest neighbours. Free the cluster list, a new one is 
                 // in the next iteration of the outer loop.
                 struct cl_node *tmp2 = CL_HEAD;
-                size_t counter = 0;
-                //printf("# Elemente: %d. \n", list_length(HEAD));
+                counter = 0;
                 while (tmp2 != NULL) {
                         size_t index = tmp2->element->data->ID;
                         struct double_node *current = PTR_ARRAY[index];
                         if (counter < n_per_c) {
                                 // delete from doubled linked list, but keep pointer in PTR_ARRAY
-                                //print_arr(n, PTR_ARRAY, index);
-                                //print_arr_from_head(HEAD); 
-                                //printf("Entferne Item %zu \n", index);
                                 current->data->cluster = cluster;
                                 // Case 1: current->next is NULL (i.e., end of list)
                                 if (current->next == NULL) {
@@ -132,12 +121,10 @@ void c_balanced_clustering(
                                         current->prev->next = current->next;
                                         current->next->prev = current->prev;
                                 }
-                                //printf("\n");
-                                //printf("# Elemente: %d. \n", list_length(HEAD));
                         }
-                        struct cl_node *del2 = tmp2;
+                        //struct cl_node *del2 = tmp2;
                         tmp2 = tmp2->next;
-                        free(del2); // can be freed
+                        //free(del2); // can be freed
                         counter++;
                 }
                 //printf("\n");
@@ -145,8 +132,6 @@ void c_balanced_clustering(
                 // at the end of this loop, HEAD->next must be updated
                 // increment `cluster`
                 cluster++;
-                //printf("\n\n Starting next cluster.\n\n");
-                
         } 
         // Write output
         for (size_t i = 0; i < n; i++) {
