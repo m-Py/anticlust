@@ -99,7 +99,6 @@ void c_balanced_clustering(
                                 members_in_cluster++;
                         }
                         tmp = tmp->next;
-                        counter++;
                 }
                 
                 // Iterate through cluster list and remove the assigned elements
@@ -107,7 +106,7 @@ void c_balanced_clustering(
                 // for nearest neighbours. Free the cluster list, a new one is 
                 // in the next iteration of the outer loop.
                 struct cl_node *tmp2 = CL_HEAD;
-                counter = 0;
+                size_t counter = 0;
                 while (tmp2 != NULL) {
                         size_t index = tmp2->element->data->ID;
                         struct double_node *current = PTR_ARRAY[index];
