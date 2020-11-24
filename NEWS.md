@@ -1,4 +1,4 @@
-# anticlust 0.5.5.0001
+# anticlust 0.5.6
 
 ### User-visible changes
 
@@ -10,7 +10,7 @@ clusters is low (K < 8)
 ### Internal changes
 
 * `anticlustering()` and `categorical_sampling()` now better balance categorical 
-variables when the output groups require different sizes (if the group
+variables when the output groups require different sizes (i.e., if the group
 sizes do not have any common denominator)
 
 * Some additional input validations for more useful error messages when arguments
