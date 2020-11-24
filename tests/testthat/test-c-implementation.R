@@ -3,6 +3,7 @@ context("C implementation")
 library("anticlust")
 
 test_that("C implemenation of Anticlustering has same output as R implementation", {
+
   set.seed(123)
   N <- sample(40:80, size = 1)
   M <- sample(1:5, size = 1)
@@ -32,8 +33,40 @@ test_that("C implemenation of Anticlustering has same output as R implementation
   )
   expect_true(all(cl1 == cl2))
 
-  # TODO: include a test for the edge cases (i.e., categories with 1 or N members)
-  
+  # Include a test for the edge cases (i.e., categories with 1 or N members)
+  categories[1] <- C + 1 
+  clusters <- initialize_clusters(N, K, categories)
+  cl1 <- anticlustering(
+    features, 
+    clusters, 
+    objective = "variance", 
+    categories = categories
+  )
+  cl2 <- anticlustering(
+    features, 
+    clusters, 
+    objective = variance_objective, 
+    categories = categories
+  )
+  expect_true(all(cl1 == cl2))
+
+  # Include a test for the edge cases (i.e., categories with 1 or N members)
+  categories <- rep(1, N)
+  clusters <- initialize_clusters(N, K, categories)
+  cl1 <- anticlustering(
+    features, 
+    clusters, 
+    objective = "variance", 
+    categories = categories
+  )
+  cl2 <- anticlustering(
+    features, 
+    clusters, 
+    objective = variance_objective, 
+    categories = categories
+  )
+  expect_true(all(cl1 == cl2))
+
   # Use diversity objective
   set.seed(123)
   clusters <- initialize_clusters(N, K, NULL)
