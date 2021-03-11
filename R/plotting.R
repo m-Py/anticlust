@@ -34,7 +34,7 @@
 #' @author
 #' Martin Papenberg \email{martin.papenberg@@hhu.de}
 #'
-#' @importFrom grDevices rainbow
+#' @importFrom grDevices palette rainbow
 #' @importFrom graphics lines par plot points
 #'
 #' @details In most cases, the argument \code{clusters} is a vector
@@ -67,6 +67,7 @@ plot_clusters <- function(features, clusters, within_connection = FALSE,
                           main = "", cex = 1.2,
                           cex.axis = 1.2, cex.lab = 1.2, lwd = 1.5,
                           lty = 2, frame.plot = FALSE, cex_centroid = 2) {
+  features <- as.matrix(features)
   if (!argument_exists(xlim)) {
     xlim <- c(min(features[, 1]), max(features[, 1]))
   }
@@ -97,7 +98,15 @@ plot_clusters <- function(features, clusters, within_connection = FALSE,
 
   ## Set colors for clusters
   K <- length(unique(clusters))
-  col <- rainbow(K)
+  if (K < 8) {
+    col <- palette()[2:(K+1)]
+    pch <- c(15:18, 3, 4, 8)[2:(K+1)]
+    pch <- pch[clusters]
+  } else {
+    col <- rainbow(K)
+    pch <- 19
+  }
+
   col <- col[clusters]
   
   # Draw plot
@@ -106,7 +115,7 @@ plot_clusters <- function(features, clusters, within_connection = FALSE,
     axt <- "s"
   plot(x, y, las = 1, cex.axis = cex.axis, cex.lab = cex.lab,
        col = col, xlab = xlab, ylab = ylab, cex = cex, bg = col,
-       xaxt = axt, yaxt = axt, pch = 19, main = main,
+       xaxt = axt, yaxt = axt, pch = pch, main = main,
        frame.plot = frame.plot, xlim = xlim, ylim = ylim)
   ## Draw graph structure
   if (within_connection == TRUE) {
@@ -116,7 +125,7 @@ plot_clusters <- function(features, clusters, within_connection = FALSE,
     if (K == 2) {
       draw_between_cliques(x, y, clusters, lwd = lwd, lty = lty)
       ## redraw points so that the lines do notlay the points
-      points(x, y, cex = cex, pch = 19, col = col)
+      points(x, y, cex = cex, pch = pch, col = col)
     } else {
       warning("Connections between elements of different clusters were ",
               "not drawn because there were more than two clusters.")

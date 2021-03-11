@@ -1,5 +1,4 @@
-
-# anticlust 0.5.5.9000 (development version)
+# anticlust 0.5.6.9000 (development version)
 
 ## User-visible changes
 
@@ -12,6 +11,24 @@ maximizing diversity and dispersion, created by Brusco et al.
   * `bicriterion_anticlustering()` (not yet exported -- TODO) can be used 
   for a more fine grained usage of the Brusco et al. algorithm, fully using
   its main functionality to optimize both dispersion as well as diversity
+
+# anticlust 0.5.6
+
+### User-visible changes
+
+- `plot_clusters()` now uses the default color palette to highlight 
+the different clusters 
+- `plot_clusters()` now uses different `pch` symbols when the number of 
+clusters is low (K < 8)
+
+### Internal changes
+
+* `anticlustering()` and `categorical_sampling()` now better balance categorical 
+variables when the output groups require different sizes (i.e., if the group
+sizes do not have any common denominator)
+
+* Some additional input validations for more useful error messages when arguments
+in `anticlustering()` are not correctly specified
 
 # anticlust 0.5.5
 

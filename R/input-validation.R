@@ -7,16 +7,19 @@
 #' @noRd
 input_validation_anticlustering <- function(x, K, objective, method,
                                           preclustering, categories,
-                                          repetitions) {
+                                          repetitions, standardize = FALSE) {
+  
+  validate_input(standardize, "standardize", objmode = "logical", len = 1,
+                 input_set = c(TRUE, FALSE), not_na = TRUE, not_function = TRUE)
   
   if (argument_exists(repetitions)) {
     validate_input(repetitions, "repetitions", objmode = "numeric", len = 1, 
-                   greater_than = 1, must_be_integer = TRUE, not_na = TRUE)
+                   greater_than = 0, must_be_integer = TRUE, not_na = TRUE,
+                   not_function = TRUE)
   }
   
   ## Merge categories variable so that `length` can be applied:
   categories <- merge_into_one_variable(categories)
-  
   
   ## Validate feature input
   validate_data_matrix(x)
@@ -24,10 +27,29 @@ input_validation_anticlustering <- function(x, K, objective, method,
   N <- nrow(x)
 
   validate_input(preclustering, "preclustering", len = 1,
-                 input_set = c(TRUE, FALSE), not_na = TRUE)
+                 input_set = c(TRUE, FALSE), not_na = TRUE, not_function = TRUE)
 
+  validate_input(
+    method, "method", len = 1,
+    input_set = c("ilp", "exchange", "heuristic", "centroid", "local-maximum", "brusco"), 
+    not_na = TRUE, not_function = TRUE
+  )
+  
+  if (method == "brusco") {
+    if (argument_exists(categories)) {
+      stop("It is not possible to use the algorithm by Brusco et al. with categorical restrictions.")
+    }
+    if (preclustering == TRUE) {
+      stop("It is not possible to use the algorithm by Brusco et al. with preclustering restrictions.")
+    }
+    if (!objective %in% c("dispersion", "diversity")) {
+      stop("The algorithm by Brusco et al. can only be used to optimize diversity or dispersion.")
+    }
+  }
+  
+                 
   # Allow that K is an initial assignment of elements to clusters
-  validate_input(K, "K", objmode = "numeric", must_be_integer = TRUE, not_na = TRUE)
+  validate_input(K, "K", objmode = "numeric", must_be_integer = TRUE, not_na = TRUE, not_function = TRUE)
   if (length(K) == 1) {
     validate_input(K, "K", greater_than = 1, smaller_than = N)
   } else {
@@ -61,23 +83,7 @@ input_validation_anticlustering <- function(x, K, objective, method,
     }
   }
 
-  validate_input(
-    method, "method", len = 1,
-    input_set = c("ilp", "exchange", "heuristic", "centroid", "local-maximum", "brusco"), 
-    not_na = TRUE
-  )
-  
-  if (method == "brusco") {
-    if (argument_exists(categories)) {
-      stop("It is not possible to use the algorithm by Brusco et al. with categorical restrictions.")
-    }
-    if (preclustering == TRUE) {
-      stop("It is not possible to use the algorithm by Brusco et al. with preclustering restrictions.")
-    }
-    if (!objective %in% c("dispersion", "diversity")) {
-      stop("The algorithm by Brusco et al. can only be used to optimize diversity or dispersion.")
-    }
-  }
+
 
   if (method == "ilp") {
     check_if_solver_is_available()
@@ -138,14 +144,23 @@ input_validation_anticlustering <- function(x, K, objective, method,
 
 validate_input <- function(obj, argument_name, len = NULL, greater_than = NULL,
                            must_be_integer = FALSE, groupsize = NULL, input_set = NULL, 
-                           objmode = NULL, not_na = FALSE, smaller_than = NULL) {
-
+                           objmode = NULL, not_na = FALSE, smaller_than = NULL, 
+                           not_function = NULL) {
+                           
+                           
   self_validation(argument_name, len, greater_than,
                   must_be_integer, groupsize, input_set,
-                  objmode, not_na)
+                  objmode, not_na, not_function)
 
   argument_name <- paste("Argument", argument_name)
-
+  
+  if (argument_exists(not_function) && not_function == TRUE) {
+    if (inherits(obj, "function")) {
+      stop(argument_name, "must not be a function")
+    }
+  }
+   
+  
   ## - Check length of input
   if (argument_exists(len)) {
     if (NROW(obj) != len) {
@@ -219,8 +234,12 @@ validate_data_matrix <- function(x) {
 ## not for users, but only for developers)
 self_validation <- function(argument_name, len, greater_than,
                             must_be_integer, groupsize,
-                            input_set, objmode, not_na) {
+                            input_set, objmode, not_na, not_function) {
 
+  if (argument_exists(not_function)) {
+    stopifnot(not_function %in% c(TRUE, FALSE))
+  }
+                            
   if (argument_exists(len)) {
     stopifnot(class(len) %in% c("numeric", "integer"))
     stopifnot(length(len) == 1)

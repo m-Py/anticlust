@@ -13,3 +13,6 @@ NEWS.md
 anticlust.kdev4
 .kdev4/*
 LICENSE.md
+/*.tar.gz
+/*.Rcheck/
+.radian_profile

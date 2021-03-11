@@ -318,15 +318,23 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
                            preclustering = FALSE, categories = NULL, 
                            repetitions = NULL, standardize = FALSE) {
 
+
+  ## Get data into required format
+  input_validation_anticlustering(x, K, objective, method, preclustering, 
+                                  categories, repetitions, standardize)
+
   x <- to_matrix(x)
-  
-  # extend data for k-means extension objective
+
+  ## Exact method using ILP
+  if (method == "ilp") {
+    return(exact_anticlustering(x, K, preclustering))
+  }
+
+  # Preclustering and categorical constraints are both processed in the
+  # variable `categories` after this step:
+  categories <- get_categorical_constraints(x, K, preclustering, categories)
+
   if (!inherits(objective, "function")) {
-    validate_input(
-      objective, "objective",
-      input_set = c("distance", "diversity", "dispersion", "variance", "kplus"), 
-      len = 1, not_na = TRUE
-    )
     if (objective == "kplus") {
       x <- cbind(x, squared_from_mean(x))
       objective <- "variance"
@@ -335,9 +343,6 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
       objective <- "diversity"
     }
   }
-  
-  validate_input(standardize, "standardize", objmode = "logical", len = 1,
-                 input_set = c(TRUE, FALSE), not_na = TRUE)
   
   if (!is_distance_matrix(x) && standardize == TRUE) {
     x <- scale(x)
@@ -352,8 +357,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
     if (!argument_exists(repetitions)) {
       repetitions <- 1
     }
-    return(repeat_anticlustering(x, K, objective, categories, preclustering, 
-                                 method, repetitions))
+    return(repeat_anticlustering(x, K, objective, categories, method, repetitions))
   }
   
   ## Get data into required format
@@ -387,7 +391,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   # variable `categories` after this step:
   categories <- get_categorical_constraints(x, K, preclustering, categories)
   
-  if (class(objective) == "function") {
+  if (inherits(objective, "function")) {
     # most generic exchange method, deals with any objective function
     return(exchange_method(x, K, objective, categories))
   }

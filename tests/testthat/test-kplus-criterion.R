@@ -30,4 +30,21 @@ test_that("Test that k-plus criterion is computed correctly", {
   
   expect_true(all(groups1 == groups2))
   expect_true(all(groups2 == groups3))
+  
+  # add test with standardize argument
+  groups4 <- anticlustering(
+    df,
+    K = init,
+    objective = "kplus",
+    standardize = TRUE
+  )
+  
+  groups5 <- anticlustering(
+    scale(cbind(df, squared_from_mean(df))),
+    K = init,
+    objective = "variance",
+    standardize = FALSE
+  )
+  expect_true(all(groups4 == groups5))
+  
 })
