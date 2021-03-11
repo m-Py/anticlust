@@ -1,8 +1,8 @@
 
-#' Bicriterion iterated local search heuristic (BILS) for
-#' anticlustering by Brusco et al. (2020)
+#' Bicriterion iterated local search heuristic
 #'
-#' This function implements the bicriterion algorithm proposed by
+#' This function implements the Bicriterion iterated local search heuristic (BILS) for
+#' anticlustering by
 #' Brusco, Cradit, and Steinley (2020). The description of the
 #' algorithm is given in Section 3 of their paper (in particular see
 #' the pseudocode in Figure 2).
@@ -27,8 +27,8 @@
 #' 
 #' @details The bicriterion algorithm by Brusco, Cradit, and Steinley (2020)
 #'     aims to simultaneously optimize the
-#'     \code{\link{diversity_objective}}) and the
-#'     \code{\link{dispersion_objective}}), by returning a list of
+#'     \code{\link{diversity_objective}} and the
+#'     \code{\link{dispersion_objective}}, by returning a list of
 #'     partitions that approximate the pareto set of efficient
 #'     solutions.
 #'
@@ -59,13 +59,48 @@
 #' @export
 #' 
 #' @examples 
-#' 
-#' # Create random data:
-#' M <- 2
-#' N <- 100
+#' # Generate some random data
+#' M <- 3
+#' N <- 80
 #' K <- 4
 #' data <- matrix(rnorm(N * M), ncol = M)
+#' # Use bicriterion algorithm, 200 repetitions
+#' pareto_set <- bicriterion_anticlustering(data, K = K, R = 200)
+#' # Compute objectives for all solutions
+#' diversities_pareto <- apply(pareto_set, 1, diversity_objective, x = data)
+#' dispersions_pareto <- apply(pareto_set, 1, dispersion_objective, x = data)
+#' # Plot the pareto set
+#' plot(diversities_pareto, dispersions_pareto, col = "blue", cex = 2, pch = 19)
 #' 
+#' # Get some random solutions for comparison!
+#' rnd_solutions <- t(replicate(n = 200, sample(pareto_set[1, ])))
+#' 
+#' # Compute all objectives for random solutions
+#' diversities_rnd <- apply(rnd_solutions, 1, diversity_objective, x = data)
+#' dispersions_rnd <- apply(rnd_solutions, 1, dispersion_objective, x = data)
+#' 
+#' # Plot random solutions and pareto set. Random solutions are far away 
+#' # from the good solutions in pareto set
+#' plot(
+#'   diversities_rnd, dispersions_rnd, 
+#'   col = "red",
+#'   ylim = c(
+#'     min(dispersions_rnd, dispersions_pareto), 
+#'     max(dispersions_rnd, dispersions_pareto)
+#'   ),
+#'   xlim = c(
+#'     min(diversities_rnd, diversities_pareto), 
+#'     max(diversities_rnd, diversities_pareto)
+#'   )
+#' )
+#' points(diversities_pareto, dispersions_pareto, col = "blue", cex = 2, pch = 19)
+#' 
+#' @references
+#' 
+#' Brusco, M. J., Cradit, J. D., & Steinley, D. (2020). Combining
+#' diversity and dispersion criteria for anticlustering: A bicriterion
+#' approach. British Journal of Mathematical and Statistical
+#' Psychology, 73, 275-396. https://doi.org/10.1111/bmsp.12186
 #' 
 
 bicriterion_anticlustering <- function(
@@ -91,7 +126,7 @@ bicriterion_anticlustering <- function(
   result_matrix = matrix(data = -1, nrow = upper_bound , ncol = N) 
   
   # Call C function
-  bicriterion <- .C(
+  results <- .C(
     "bicriterion_iterated_local_search_call",
     as.double(distances),
     as.integer(N),
@@ -103,18 +138,16 @@ bicriterion_anticlustering <- function(
     as.integer(clusters),
     result = double(length(result_matrix)),
     PACKAGE = "anticlust" # important to call C
-  )
+  )$result
+  
+  # remove allocated space that was not needed
+  results <- results[results != -1]
 
   # C returns the list of partitions as one vector, 
   # that we turn back into a matrix
-  result_matrix <- vector_to_matrix(
-    bicriterion[["result"]], 
-    result_matrix, 
-    upper_bound, N
-  )
-  
-  result_matrix <- rbind(result_matrix)
-  as.matrix(apply(result_matrix, 1, function(x) order_cluster_vector(to_numeric(x))))
+  results <- matrix(results, ncol = N, byrow = TRUE)
+  # Order each partition:
+  t(apply(results, 1, order_cluster_vector))
 }
 
 #verify input
@@ -136,21 +169,4 @@ checkneighborhood <- function(Xi) {
   if (Xi[1] > Xi[2]) {
     stop("First neighborhood percentage needs to be smaller than the second.")
   }
-}
-
-# fill matrix with results and delete unnecessary columns 
-vector_to_matrix <- function(vector, matrix, upper_bound, size){
-  row <- 1
-  column <- 1
-  pos <- 1
-  while (vector[pos] != -1 & row <= upper_bound) {
-    while (column<= size) {
-      matrix[row, column] <- vector[pos]
-      pos <- pos + 1
-      column <- column + 1
-    }
-    column <- 1
-    row <- row + 1
-  }
-  matrix[1:row-1, 1:size]
 }
