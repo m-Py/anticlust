@@ -67,12 +67,12 @@
 #' described below):
 #' 
 #' \itemize{
-#'   \item{cluster editing `diversity` objective, setting \code{objective = "diversity"} (default)}
+#'   \item{cluster editing `diversity` objective, setting \code{objective = "diversity"} (this is the default objective)}
 #'   \item{k-means `variance` objective, setting \code{objective = "variance"}}
-#'   \item{k-plus objective, an extension of the k-means variance criterion,
+#'   \item{`k-plus` objective, an extension of the k-means variance criterion,
 #'         setting \code{objective = "kplus"}}
-#'   \item{`dispersion` objective, the minimum distance between any two 
-#'         elements within the same cluster.}
+#'   \item{the `dispersion` objective, which the minimum distance between 
+#'         any two elements within the same cluster.}
 #' }
 #'
 #' The k-means objective is the within-group variance---that is, the
@@ -142,10 +142,8 @@
 #' on the preclustering heuristic follows below). This option is
 #' recommended for larger N.
 #' 
-#' Since version 0.5.4.9000, another heuristic solution method is
-#' available, using \code{method = "brusco"}. This option implements
-#' the local bicriterion iterated local search heuristic by Brusco et
-#' al. (in press).
+#' Using \code{method = "brusco"} implements the local bicriterion 
+#' iterated local search heuristic by Brusco et al. (2020).
 #'
 #' \strong{Exact anticlustering}
 #'
@@ -171,9 +169,9 @@
 #' preclustering, optimality is no longer guaranteed, but the solution
 #' is usually optimal or very close to optimal.
 #'
-#' The variance criterion cannot be optimized to optimality using
-#' integer linear programming because the k-means objective function
-#' is not linear. However, it is possible to employ the function
+#' The variance and dispersion criterion cannot be optimized to optimality using
+#' integer linear programming because the objective functions are not linear. 
+#' However, it is possible to employ the function
 #' \code{\link{generate_partitions}} to obtain optimal solutions for
 #' small problem instances.
 #' 
@@ -198,8 +196,8 @@
 #' The argument \code{categories} may induce categorical constraints.
 #' The grouping variables indicated by \code{categories} will be
 #' balanced out across anticlusters. This functionality is
-#' only available in combination with \code{method = "exchange"} or 
-#' \code{method = "local-maximum"}.
+#' only available for the classical exchange procedures, that is, for 
+#' \code{method = "exchange"} and \code{method = "local-maximum"}.
 #' 
 #' \strong{Optimize a custom objective function}
 #' 
@@ -220,15 +218,6 @@
 #' as well. 
 #' 
 #' 
-#' @seealso
-#'
-#' \code{\link{variance_objective}}
-#'
-#' \code{\link{diversity_objective}}
-#'
-#' \code{\link{dispersion_objective}}
-#'
-#'
 #' @examples
 #'
 #' # Optimize the cluster editing (diversity) criterion
@@ -298,10 +287,10 @@
 #'
 #' @references
 #' 
-#' Brusco, M. J., Cradit, J. D., & Steinley, D. (in press). Combining
+#' Brusco, M. J., Cradit, J. D., & Steinley, D. (2020). Combining
 #' diversity and dispersion criteria for anticlustering: A bicriterion
 #' approach. British Journal of Mathematical and Statistical
-#' Psychology. https://doi.org/10.1111/bmsp.12186
+#' Psychology, 73, 275-396. https://doi.org/10.1111/bmsp.12186
 #' 
 #' Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
 #' for a clustering problem. Mathematical Programming, 45, 59-96.
