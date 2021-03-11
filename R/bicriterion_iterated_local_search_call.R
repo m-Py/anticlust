@@ -1,21 +1,75 @@
 
-#' Solve anticlustering by using the BILS algorithm by Brusco et al.
+#' Bicriterion iterated local search heuristic (BILS) for
+#' anticlustering by Brusco et al. (2020)
+#'
+#' This function implements the bicriterion algorithm proposed by
+#' Brusco, Cradit, and Steinley (2020). The description of the
+#' algorithm is given in Section 3 of their paper (in particular see
+#' the pseudocode in Figure 2).
 #' 
-#' @param data A N x N dissimilarity matrix or N x M features matrix.
-#' @param G The number of clusters 
-#' @param R The desired number of restarts for the algorithm
-#' @param W Optional argument, a vector of possible weights for dispersion 
-#'     in the bicriterion (0 <= W <= 1)
-#' @param Xi Optional argument, a vector for the neighborhood size range
-#'     [xi1, xi2] in percent (for example c(0.05, 0.1) can be interpreted as 
-#'     5%-10%)
+#' @param x The data input. Can be one of two structures: (1) A
+#'     feature matrix where rows correspond to elements and columns
+#'     correspond to variables (a single numeric variable can be
+#'     passed as a vector). (2) An N x N matrix dissimilarity matrix;
+#'     can be an object of class \code{dist} (e.g., returned by
+#'     \code{\link{dist}} or \code{\link{as.dist}}) or a \code{matrix}
+#'     where the entries of the upper and lower triangular matrix
+#'     represent pairwise dissimilarities.
+#' @param K How many anticlusters should be created. Alternatively:
+#'     (a) A vector describing the size of each group, or (b) a vector
+#'     of length \code{nrow(x)} describing how elements are assigned
+#'     to anticlusters before the optimization starts.
+#' @param R The desired number of restarts for the BILS algorithm.
+#' @param W Optional argument, a vector of possible weights for
+#'     dispersion in the bicriterion (0 <= W <= 1)
+#' @param Xi Optional argument, a vector for the neighborhood size
+#'     range [xi1, xi2] in percent.
 #' 
-#' @return List of useful partitions (approximated pareto set)
+#' @details The bicriterion algorithm by Brusco, Cradit, and Steinley (2020)
+#'     aims to simultaneously optimize the
+#'     \code{\link{diversity_objective}}) and the
+#'     \code{\link{dispersion_objective}}), by returning a list of
+#'     partitions that approximate the pareto set of efficient
+#'     solutions.
+#'
+#' The arguments \code{R}, \code{W} and \code{Xi} are named for
+#'     consistency with Brusco et al. (2020). The argument \code{R}
+#'     denotes the number of restarts of the search heuristic. The
+#'     argument \code{W} denotes the possible weights given to the
+#'     diversity criterion in a given run of the search heuristic. In
+#'     each run, the a weight is randomly selected from the vector
+#'     \code{W}. We use as default the values that Brusco et al. used
+#'     in their analyses. All values in \code{w} have to be in [0, 1];
+#'     larger values indicate that diversity is more important,
+#'     whereas smaller values indicate that dispersion is more
+#'     important; \code{w = .5} implies the same weight for both
+#'     criteria. The argument \code{Xi} is the probability that an
+#'     element is swapped during the iterated local search
+#'     (specifically, Xi has to be a vector of length 2, denoting the
+#'     range of a uniform distribution from which the probability of
+#'     swapping).
 #' 
-#' @noRd
+#' @return A \code{matrix} of anticlustering partitions (i.e.,
+#'     approximated the pareto set). Each row corresponds to a
+#'     partition, each column corresponds to an input element.
+#' 
+#' @author Martin Breuer \email{M.Breuer@@hhu.de}, Martin Papenberg
+#'     \email{martin.papenberg@@hhu.de}
+#' 
+#' @export
+#' 
+#' @examples 
+#' 
+#' # Create random data:
+#' M <- 2
+#' N <- 100
+#' K <- 4
+#' data <- matrix(rnorm(N * M), ncol = M)
+#' 
+#' 
 
 bicriterion_anticlustering <- function(
-  data, G, R, 
+  x, K, R = NULL, 
   W = c(0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 0.5, 0.99, 0.999, 0.999999), 
   Xi = c(0.05, 0.1)) {
   
@@ -23,11 +77,11 @@ bicriterion_anticlustering <- function(
     R <- 2
   }
   
-  distances <- convert_to_distances(data) 
+  distances <- convert_to_distances(x) 
   N <- NROW(distances)
   WL <- length(W)
   
-  clusters <- initialize_clusters(N, G, NULL) - 1
+  clusters <- initialize_clusters(N, K, NULL) - 1
   
   checkweights(W)
   checkneighborhood(Xi)
@@ -83,7 +137,6 @@ checkneighborhood <- function(Xi) {
     stop("First neighborhood percentage needs to be smaller than the second.")
   }
 }
-
 
 # fill matrix with results and delete unnecessary columns 
 vector_to_matrix <- function(vector, matrix, upper_bound, size){
