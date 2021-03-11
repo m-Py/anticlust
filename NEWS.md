@@ -4,7 +4,7 @@
 
 * `anticlust` now includes the bicriterion algorithm for simultaneously 
 maximizing diversity and dispersion, created by Brusco et al. 
-(<doi:10.1111/bmsp.12186>). Contributed by Martin Breuer (see [his thesis](https://www.cs.hhu.de/fileadmin/redaktion/Fakultaeten/Mathematisch-Naturwissenschaftliche_Fakultaet/Informatik/Algorithmische_Bioinformatik/Bachelor-_Masterarbeiten/2516084_ba_ifo_AbschlArbeit_klau_mapap102_mabre121_20200820_2320.pdf)  
+(<doi:10.1111/bmsp.12186>). Contributed by Martin Breuer (see [his thesis](https://www.cs.hhu.de/fileadmin/redaktion/Fakultaeten/Mathematisch-Naturwissenschaftliche_Fakultaet/Informatik/Algorithmische_Bioinformatik/Bachelor-_Masterarbeiten/2516084_ba_ifo_AbschlArbeit_klau_mapap102_mabre121_20200820_2320.pdf))  
   * It can be called from the main function `anticlustering()` by setting 
   `method = "brusco"`; in this case only either dispersion or diversity is
   maximized
