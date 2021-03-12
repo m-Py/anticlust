@@ -355,11 +355,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
 
   ## Exact method using ILP
   if (method == "ilp") {
-    return(exact_anticlustering(
-      x,
-      K,
-      preclustering)
-    )
+    return(exact_anticlustering(x, K, preclustering))
   }
   
   if (method == "brusco") {
@@ -372,8 +368,8 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
     }
     partitions <- as.matrix(bicriterion_anticlustering(x, K, repetitions, weights))
     # get best partition wrt dispersion / diversity
-    best_obj <- which.max(apply(partitions, 2, obj_fun, convert_to_distances(x)))
-    return(partitions[, best_obj])
+    best_obj <- which.max(apply(partitions, 1, obj_fun, convert_to_distances(x)))
+    return(partitions[best_obj, ])
   }
   
   # Preclustering and categorical constraints are both processed in the
