@@ -1,11 +1,10 @@
 
 #' Bicriterion iterated local search heuristic
 #'
-#' This function implements the Bicriterion iterated local search heuristic (BILS) for
-#' anticlustering by
-#' Brusco, Cradit, and Steinley (2020). The description of the
-#' algorithm is given in Section 3 of their paper (in particular see
-#' the pseudocode in Figure 2).
+#' This function implements the bicriterion iterated local search
+#' heuristic (BILS) for anticlustering by Brusco, Cradit, and Steinley
+#' (2020). The description of the algorithm is given in Section 3 of
+#' their paper (in particular, see the pseudocode in their Figure 2).
 #' 
 #' @param x The data input. Can be one of two structures: (1) A
 #'     feature matrix where rows correspond to elements and columns
@@ -19,39 +18,58 @@
 #'     (a) A vector describing the size of each group, or (b) a vector
 #'     of length \code{nrow(x)} describing how elements are assigned
 #'     to anticlusters before the optimization starts.
-#' @param R The desired number of restarts for the BILS algorithm.
-#' @param W Optional argument, a vector of possible weights for
-#'     dispersion in the bicriterion (0 <= W <= 1)
-#' @param Xi Optional argument, a vector for the neighborhood size
-#'     range [xi1, xi2] in percent.
+#' @param R The desired number of restarts for the BILS algorithm. By
+#'     default, both phases of the BILS algorithm are performed once.
+#' @param W Optional argument, a vector of weights defining the
+#'     relative importance of dispersion and diversity (0 <= W <=
+#'     1). See details.
+#' @param Xi Optional argument, specifies probability of swapping
+#'     elements during the iterated local search. See examples.
 #' 
-#' @details The bicriterion algorithm by Brusco, Cradit, and Steinley (2020)
-#'     aims to simultaneously optimize the
-#'     \code{\link{diversity_objective}} and the
-#'     \code{\link{dispersion_objective}}, by returning a list of
-#'     partitions that approximate the pareto set of efficient
-#'     solutions.
+#' @details
+#'
+#' The bicriterion algorithm by Brusco, Cradit, and Steinley (2020)
+#' aims to simultaneously optimize the
+#' \code{\link{diversity_objective}} and the
+#' \code{\link{dispersion_objective}}. It returns a list of partitions
+#' that approximate the pareto set of efficient solutions across both
+#' criteria. By considering both the diversity and dispersion, this
+#' algorithm is well-suited for maximizing overall within-group
+#' heterogeneity. To select a partition among the approximated pareto
+#' set, it is reasonable to plot the objectives for each partition
+#' (see examples).
 #'
 #' The arguments \code{R}, \code{W} and \code{Xi} are named for
-#'     consistency with Brusco et al. (2020). The argument \code{R}
-#'     denotes the number of restarts of the search heuristic. The
-#'     argument \code{W} denotes the possible weights given to the
-#'     diversity criterion in a given run of the search heuristic. In
-#'     each run, the a weight is randomly selected from the vector
-#'     \code{W}. We use as default the values that Brusco et al. used
-#'     in their analyses. All values in \code{w} have to be in [0, 1];
-#'     larger values indicate that diversity is more important,
-#'     whereas smaller values indicate that dispersion is more
-#'     important; \code{w = .5} implies the same weight for both
-#'     criteria. The argument \code{Xi} is the probability that an
-#'     element is swapped during the iterated local search
-#'     (specifically, Xi has to be a vector of length 2, denoting the
-#'     range of a uniform distribution from which the probability of
-#'     swapping).
+#' consistency with Brusco et al. (2020). The argument \code{K} is
+#' used for consistency with other functions in anticlust. Brusco et
+#' al. used `G` to denote the number of groups. However, note that
+#' \code{K} can not only be used to denote the number of equal-sized
+#' groups, but also to specify group sizes (see
+#' \code{\link{anticlustering}}).
+#'
+#' The argument \code{R} denotes the number of restarts of the search
+#' heuristic. The argument \code{W} denotes the possible weights given
+#' to the diversity criterion in a given run of the search
+#' heuristic. In each run, the a weight is randomly selected from the
+#' vector \code{W}. As default values, we use the weights that Brusco
+#' et al. used in their analyses. All values in \code{w} have to be in
+#' [0, 1]; larger values indicate that diversity is more important,
+#' whereas smaller values indicate that dispersion is more important;
+#' \code{w = .5} implies the same weight for both criteria. The
+#' argument \code{Xi} is the probability that an element is swapped
+#' during the iterated local search (specifically, Xi has to be a
+#' vector of length 2, denoting the range of a uniform distribution
+#' from which the probability of swapping is selected).
+#'
+#' If the data input \code{x} is a feature matrix (that is: each row
+#' is a "case" and each column is a "variable"), a matrix of the
+#' Euclidean distances is computed as input to the algorithm. If a
+#' different measure of dissimilarity is preferred, you may pass a
+#' self-generated dissimiliarity matrix via the argument \code{x}.
 #' 
-#' @return A \code{matrix} of anticlustering partitions (i.e.,
-#'     approximated the pareto set). Each row corresponds to a
-#'     partition, each column corresponds to an input element.
+#' @return A \code{matrix} of anticlustering partitions (i.e., the
+#'     approximated pareto set). Each row corresponds to a partition,
+#'     each column corresponds to an input element.
 #' 
 #' @author Martin Breuer \email{M.Breuer@@hhu.de}, Martin Papenberg
 #'     \email{martin.papenberg@@hhu.de}
@@ -64,18 +82,27 @@
 #' N <- 80
 #' K <- 4
 #' data <- matrix(rnorm(N * M), ncol = M)
-#' # Use bicriterion algorithm, 200 repetitions
+#'
+#' # Perform bicriterion algorithm, use 200 repetitions
 #' pareto_set <- bicriterion_anticlustering(data, K = K, R = 200)
+#'
 #' # Compute objectives for all solutions
 #' diversities_pareto <- apply(pareto_set, 1, diversity_objective, x = data)
 #' dispersions_pareto <- apply(pareto_set, 1, dispersion_objective, x = data)
+#'
 #' # Plot the pareto set
-#' plot(diversities_pareto, dispersions_pareto, col = "blue", cex = 2, pch = 19)
+#' plot(
+#'   diversities_pareto,
+#'   dispersions_pareto,
+#'   col = "blue",
+#'   cex = 2,
+#'   pch = as.character(1:NROW(pareto_set))
+#' )
 #' 
-#' # Get some random solutions for comparison!
+#' # Get some random solutions for comparison
 #' rnd_solutions <- t(replicate(n = 200, sample(pareto_set[1, ])))
 #' 
-#' # Compute all objectives for random solutions
+#' # Compute objectives for all random solutions
 #' diversities_rnd <- apply(rnd_solutions, 1, diversity_objective, x = data)
 #' dispersions_rnd <- apply(rnd_solutions, 1, dispersion_objective, x = data)
 #' 
@@ -84,6 +111,8 @@
 #' plot(
 #'   diversities_rnd, dispersions_rnd, 
 #'   col = "red",
+#'   xlab = "Diversity",
+#'   ylab = "Dispersion",
 #'   ylim = c(
 #'     min(dispersions_rnd, dispersions_pareto), 
 #'     max(dispersions_rnd, dispersions_pareto)
@@ -93,7 +122,19 @@
 #'     max(diversities_rnd, diversities_pareto)
 #'   )
 #' )
+#' 
+#' # Add approximated pareto set from bicriterion algorithm:
 #' points(diversities_pareto, dispersions_pareto, col = "blue", cex = 2, pch = 19)
+#'
+#' @note
+#'
+#' For technical reasons, the pareto set returned by this function has
+#' a maximum of 500 partitions. In our experience, however, the
+#' algorithm usually finds much fewer partitions.
+#'
+#' We do not recommend to use this method when the input data is
+#' one-dimensional. This may cause the algorithm to identify too many
+#' equivalent partitions and it runs very slowly.
 #' 
 #' @references
 #' 
@@ -105,7 +146,7 @@
 
 bicriterion_anticlustering <- function(
   x, K, R = NULL, 
-  W = c(0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 0.5, 0.99, 0.999, 0.999999), 
+  W = c(0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 0.5, 0.99, 0.999, 0.999999),
   Xi = c(0.05, 0.1)) {
   
   if (is.null(R)) {
