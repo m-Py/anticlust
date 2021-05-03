@@ -3,8 +3,8 @@
 ## User-visible changes
 
 * `anticlust` now includes the bicriterion algorithm for simultaneously 
-maximizing diversity and dispersion, created by Brusco et al. 
-(<doi:10.1111/bmsp.12186>). Contributed by Martin Breuer (see [his thesis](https://www.cs.hhu.de/fileadmin/redaktion/Fakultaeten/Mathematisch-Naturwissenschaftliche_Fakultaet/Informatik/Algorithmische_Bioinformatik/Bachelor-_Masterarbeiten/2516084_ba_ifo_AbschlArbeit_klau_mapap102_mabre121_20200820_2320.pdf))  
+maximizing diversity and dispersion, proposed by Brusco et al.
+(<doi:10.1111/bmsp.12186>) and implemented by Martin Breuer (for details see [his thesis](https://www.cs.hhu.de/fileadmin/redaktion/Fakultaeten/Mathematisch-Naturwissenschaftliche_Fakultaet/Informatik/Algorithmische_Bioinformatik/Bachelor-_Masterarbeiten/2516084_ba_ifo_AbschlArbeit_klau_mapap102_mabre121_20200820_2320.pdf))
   * It can be called from the main function `anticlustering()` by setting 
   `method = "brusco"`; in this case only either dispersion or diversity is
   maximized
@@ -47,7 +47,7 @@ minimizing differences with regard to means and variance is equally important.
 # anticlust 0.5.4-1
 
 - Internal change: `anticlustering()` with `objective = "dispersion"` now 
-implements the local updating procedure [proposed by Martin Breuer](https://www.cs.hhu.de/fileadmin/redaktion/Fakultaeten/Mathematisch-Naturwissenschaftliche_Fakultaet/Informatik/Algorithmische_Bioinformatik/Bachelorarbeiten/2516084_ba_ifo_AbschlArbeit_klau_mapap102_mabre121_20200820_2320.pdf). 
+implements the local updating procedure [proposed by Martin Breuer](https://www.cs.hhu.de/fileadmin/redaktion/Fakultaeten/Mathematisch-Naturwissenschaftliche_Fakultaet/Informatik/Algorithmische_Bioinformatik/Bachelor-_Masterarbeiten/2516084_ba_ifo_AbschlArbeit_klau_mapap102_mabre121_20200820_2320.pdf).
 This leads to a considerable speedup when maximizing the dispersion, enabling the fast 
 processing of large data sets.
 
