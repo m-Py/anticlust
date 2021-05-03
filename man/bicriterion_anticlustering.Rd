@@ -50,22 +50,22 @@ their paper (in particular, see the pseudocode in their Figure 2).
 }
 \details{
 The bicriterion algorithm by Brusco, Cradit, and Steinley (2020)
-aims to simultaneously optimize the
-\code{\link{diversity_objective}} and the
+aims to simultaneously optimize the two anticlustering criteria:
+the \code{\link{diversity_objective}} and the
 \code{\link{dispersion_objective}}. It returns a list of partitions
 that approximate the pareto set of efficient solutions across both
 criteria. By considering both the diversity and dispersion, this
 algorithm is well-suited for maximizing overall within-group
 heterogeneity. To select a partition among the approximated pareto
 set, it is reasonable to plot the objectives for each partition
-(see examples).
+(see Examples).
 
 The arguments \code{R}, \code{W} and \code{Xi} are named for
 consistency with Brusco et al. (2020). The argument \code{K} is
-used for consistency with other functions in anticlust. Brusco et
+used for consistency with other functions in anticlust; Brusco et
 al. used `G` to denote the number of groups. However, note that
 \code{K} can not only be used to denote the number of equal-sized
-groups, but also to specify group sizes (see
+groups, but also to specify group sizes, as in
 \code{\link{anticlustering}}).
 
 The argument \code{R} denotes the number of restarts of the search
@@ -90,12 +90,12 @@ self-generated dissimiliarity matrix via the argument \code{x}.
 }
 \note{
 For technical reasons, the pareto set returned by this function has
-a maximum of 500 partitions. In our experience, however, the
-algorithm usually finds much fewer partitions.
-
+a limit of 500 partitions. Usually however, the
+algorithm usually finds much fewer partitions. There is one following exception:
 We do not recommend to use this method when the input data is
 one-dimensional. This may cause the algorithm to identify too many
-equivalent partitions and it runs very slowly.
+equivalent partitions and it runs very slowly (see section 5.6 in Breuer, 
+2020).
 }
 \examples{
 # Generate some random data
@@ -153,6 +153,9 @@ Brusco, M. J., Cradit, J. D., & Steinley, D. (2020). Combining
 diversity and dispersion criteria for anticlustering: A bicriterion
 approach. British Journal of Mathematical and Statistical
 Psychology, 73, 275-396. https://doi.org/10.1111/bmsp.12186
+
+Breuer (2020). Using anticlustering to maximize diversity and dispersion:
+Comparing exact and heuristic approaches. Bachelor thesis.
 }
 \author{
 Martin Breuer \email{M.Breuer@hhu.de}, Martin Papenberg
