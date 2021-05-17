@@ -49,6 +49,9 @@ exchange_method <- function(data, K, obj_function, categories) {
       # Update best solution
       best_total <- best_this_round
     }
+    if (best_this_round > 0 && is.infinite(best_this_round)) {
+      return(clusters) # stopping criterion; just has to meet this one condition
+    }
   }
   clusters
 }

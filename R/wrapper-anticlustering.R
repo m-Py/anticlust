@@ -209,6 +209,11 @@
 #' \code{$}. Objects of class \code{dist} will be converted to matrix
 #' as well. 
 #' 
+#' If the custom objective function returns \code{Inf} (positive infinite),
+#' the function will abort and return the clustering. This is useful to 
+#' abort the optimization as soon as a solution has been found that is "good 
+#' enough".
+#' 
 #' 
 #' @seealso
 #'
