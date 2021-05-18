@@ -73,7 +73,7 @@ merged_cluster_to_original_cluster <- function(merged_clusters, must_link) {
 }
 
 #' @export
-anticlustering_notsplit <- function(x, K, must_link) {
+anticlustering_must_link <- function(x, K, must_link) {
   
   clusters_init <- initialize_must_link_clustering(must_link, N = NROW(x), K = K)
   
@@ -81,7 +81,7 @@ anticlustering_notsplit <- function(x, K, must_link) {
   
   obj_for_merged_clusters <- function(x, clusters) {
     clusters_real <- merged_cluster_to_original_cluster(clusters, DF_[, 1])
-    # only accept legal exchanges!
+    # Punish clusterings that do not adhere to the must_link constraints
     if (any(sort(table(clusters_real)) != sort(table(clusters_init)))) {
       return(-Inf)
     }
@@ -96,4 +96,3 @@ anticlustering_notsplit <- function(x, K, must_link) {
   )
   merged_cluster_to_original_cluster(dummy_groups, must_link)
 }
-
