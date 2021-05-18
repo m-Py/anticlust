@@ -1,4 +1,5 @@
 
+# Quantify how well a clustering satisfies must-link constraints
 # only works for equal-sized groups! (or does it?)
 clustering_fit_must_link <- function(must_link, cl) {
   must_link <- c(must_link)
@@ -19,7 +20,9 @@ obj_fun_must_link <- function(x, cl) {
   if (all(clustering_fit == 0)) {
     return(Inf)
   }
-  sum(clustering_fit) * (-1) # clustering fit has to be minimized
+  # clustering fit has to be minimized, but my exchange method maximizes, 
+  # so return the objective function (*-1)
+  sum(clustering_fit) * (-1)
 }
 
 # Initialize a clustering vector satisfying must-link constraints.
