@@ -28,10 +28,13 @@ obj_fun_must_link <- function(x, cl) {
 # If an initial guess does not work, uses an exchange process to optimize 
 # the above objective function representing the degree to which the constraints
 # are satisfied.
-initialize_must_link_clustering <- function(must_link, N, K) {
+initialize_must_link_clustering <- function(must_link, N, K, categories) {
   df <- data.frame(order = 1:N, must_link = must_link)
+  if (argument_exists(categories)) {
+    df$categories <- categories
+  }
   df <- df[order(df$must_link), ]
-  df$cl <- sort(initialize_clusters(N, K, NULL))
+  df$cl <- initialize_clusters(N, K, df$categories)
   if (all(clustering_fit_must_link(df$must_link, df$cl) == 0)) {
     print("success")
     return(df[order(df$order), ]$cl)
@@ -41,7 +44,7 @@ initialize_must_link_clustering <- function(must_link, N, K) {
     as.matrix(df$must_link), 
     K = df$cl, 
     obj_function = obj_fun_must_link,
-    categories = NULL
+    categories = df$categories
   )
   if (all(clustering_fit_must_link(df$must_link, df$cl) == 0)) {
     print("success after optimization")
@@ -72,16 +75,28 @@ merged_cluster_to_original_cluster <- function(merged_clusters, must_link) {
 }
 
 #' @export
-anticlustering_must_link <- function(x, K, must_link) {
+anticlustering_must_link <- function(x, K, must_link, categories = NULL) {
   
-  clusters_init <- initialize_must_link_clustering(must_link, N = NROW(x), K = K)
+  categories <- merge_into_one_variable(categories)
+  
+  clusters_init <- initialize_must_link_clustering(
+    must_link, 
+    N = NROW(x), 
+    K = K, 
+    categories = categories
+  )
 
   DF_ <- data.frame(must_link, x)
   
   obj_for_merged_clusters <- function(x, clusters) {
     clusters_real <- merged_cluster_to_original_cluster(clusters, DF_[, 1])
-    # Punish clusterings that do not adhere to the constraint of equal group sizes
-    
+    # Punish clusterings that do not adhere to categorical restrictions
+    if (argument_exists(categories)) {
+      if (any(sort(table(clusters_init, categories)) != sort(table(clusters_real, categories)))) {
+        return(-Inf)
+      }
+    }
+    # Punish clusterings that do not adhere to group size constraints
     if (!same_cluster_sizes(clusters_real, clusters_init)) {
       return(-Inf)
     }
