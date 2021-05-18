@@ -1,6 +1,5 @@
 
 # Quantify how well a clustering satisfies must-link constraints
-# only works for equal-sized groups! (or does it?)
 clustering_fit_must_link <- function(must_link, cl) {
   must_link <- c(must_link)
   K <- length(unique(cl))
@@ -32,7 +31,7 @@ obj_fun_must_link <- function(x, cl) {
 initialize_must_link_clustering <- function(must_link, N, K) {
   df <- data.frame(order = 1:N, must_link = must_link)
   df <- df[order(df$must_link), ]
-  df$cl <- sort(rep_len(1:K, N))
+  df$cl <- sort(initialize_clusters(N, K, NULL))
   if (all(clustering_fit_must_link(df$must_link, df$cl) == 0)) {
     print("success")
     return(df[order(df$order), ]$cl)
