@@ -76,12 +76,12 @@ merged_cluster_to_original_cluster <- function(merged_clusters, must_link) {
 anticlustering_must_link <- function(x, K, must_link) {
   
   clusters_init <- initialize_must_link_clustering(must_link, N = NROW(x), K = K)
-  
+
   DF_ <- data.frame(must_link, x)
   
   obj_for_merged_clusters <- function(x, clusters) {
     clusters_real <- merged_cluster_to_original_cluster(clusters, DF_[, 1])
-    # Punish clusterings that do not adhere to the must_link constraints
+    # Punish clusterings that do not adhere to the constraint of equal group sizes
     if (any(sort(table(clusters_real)) != sort(table(clusters_init)))) {
       return(-Inf)
     }
@@ -94,5 +94,13 @@ anticlustering_must_link <- function(x, K, must_link) {
     K = original_cluster_to_merged_cluster(clusters_init, must_link),
     objective = obj_for_merged_clusters
   )
-  merged_cluster_to_original_cluster(dummy_groups, must_link)
+  solution <- merged_cluster_to_original_cluster(dummy_groups, must_link)
+  if (!is.infinite(obj_fun_must_link(must_link, solution))) {
+    stop("I could not fulfil the `must_link` restrictions, sorry!")
+  }
+  # Group sizes may be unequal if restrictions were not fulfilled
+  if (!(all(table(solution) == table(solution)[1]))) {
+    stop("I could not fulfil the `must_link` restrictions, sorry!")
+  }
+  solution
 }
