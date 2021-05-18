@@ -91,7 +91,7 @@ anticlustering_notsplit <- function(x, K, must_link) {
   dummy_data <- 1:length(unique(must_link))
   dummy_groups <- anticlustering(
     dummy_data,
-    K = clusters_init,
+    K = original_cluster_to_merged_cluster(clusters_init, must_link),
     objective = obj_for_merged_clusters
   )
   merged_cluster_to_original_cluster(dummy_groups, must_link)
