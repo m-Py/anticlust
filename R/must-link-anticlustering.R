@@ -60,29 +60,27 @@ merged_cluster_to_original_cluster <- function(merged_clusters, not_split) {
 }
 
 #' @export
-anticlustering_notsplit <- function(x, K, not_split) {
+anticlustering_notsplit <- function(x, K, must_link) {
   
-  clusters_init <- initialize_clusters(NROW(x), K = K, NULL)
+  clusters_init <- initialize_must_link_clustering(must_link, N = NROW(x), K = K)
   
-  DF_ <- data.frame(not_split, x)
+  DF_ <- data.frame(must_link, x)
   
   obj_for_merged_clusters <- function(x, clusters) {
     clusters_real <- merged_cluster_to_original_cluster(clusters, DF_[, 1])
     # only accept legal exchanges!
     if (any(sort(table(clusters_real)) != sort(table(clusters_init)))) {
-      print(table(clusters_real))
-      print(table(clusters_init))
       return(-Inf)
     }
     kplus_objective(DF_[, -1], clusters_real)
   }
   
-  dummy_data <- 1:length(unique(not_split))
+  dummy_data <- 1:length(unique(must_link))
   dummy_groups <- anticlustering(
     dummy_data,
     K = clusters_init,
     objective = obj_for_merged_clusters
   )
-  merged_cluster_to_original_cluster(dummy_groups, not_split)
+  merged_cluster_to_original_cluster(dummy_groups, must_link)
 }
 
