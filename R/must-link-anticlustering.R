@@ -52,13 +52,23 @@ initialize_must_link_clustering <- function(must_link, N, K) {
   df[order(df$order), ]$cl
 }
 
+# Given an assignment of original elements to clusters, generate the
+# corresponding clusters for the merged elements. 
+original_cluster_to_merged_cluster <- function(clusters, must_link) {
+  df <- data.frame(clusters, must_link)
+  new_df <- df[!duplicated(df$must_link), ]
+  # guarantee order by must_link grouping! 
+  # (probably after merge it already is sorted this way, though)
+  new_df[order(new_df$must_link), ]$clusters
+}
 
-# argument `clusters` is an assignment based on matches
-merged_cluster_to_original_cluster <- function(merged_clusters, not_split) {
-  df <- data.frame(not_split, order = 1:length(not_split))
-  new_order <- order(not_split)
+# Given an assignment of "merged" elements to clusters, re-establish the
+# corresponding clusters for the original elements. 
+merged_cluster_to_original_cluster <- function(merged_clusters, must_link) {
+  df <- data.frame(must_link, order = 1:length(must_link))
+  new_order <- order(must_link)
   df <- df[new_order, ]
-  df$clusters <- rep(merged_clusters, table(not_split))
+  df$clusters <- rep(merged_clusters, table(must_link))
   df[order(df$order), "clusters"]
 }
 
