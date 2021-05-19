@@ -59,8 +59,7 @@ initialize_must_link_clustering <- function(must_link, N, K, categories) {
 original_cluster_to_merged_cluster <- function(clusters, must_link) {
   df <- data.frame(clusters, must_link)
   new_df <- df[!duplicated(df$must_link), ]
-  # guarantee order by must_link grouping! 
-  # (probably after merge it already is sorted this way, though)
+  # order by must_link grouping
   new_df[order(new_df$must_link), ]$clusters
 }
 
