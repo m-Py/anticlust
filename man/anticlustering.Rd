@@ -221,7 +221,12 @@ function as first argument. \strong{However, only after}
 that in the function body, columns of the data set cannot be
 accessed using \code{data.frame} operations such as
 \code{$}. Objects of class \code{dist} will be converted to matrix
-as well.
+as well. 
+
+If the custom objective function returns \code{Inf} (positive infinite),
+the function will abort and return the clustering. This is useful to 
+abort the optimization as soon as a solution has been found that is "good 
+enough".
 }
 \examples{
 
