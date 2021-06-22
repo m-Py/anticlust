@@ -45,9 +45,7 @@ Citation
 If you use `anticlust` in your research, it would be courteous if you
 cite the following reference:
 
-Papenberg, M., & Klau, G. W. (2020). Using anticlustering to partition
-data sets into equivalent parts. *Psychological Methods*. Advance Online
-Publication.
+Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition data sets into equivalent parts. *Psychological Methods, 26*(2), 161–174.
 <a href="https://doi.org/10.1037/met0000301" class="uri">https://doi.org/10.1037/met0000301</a>.
 
 How do I learn about `anticlust`
