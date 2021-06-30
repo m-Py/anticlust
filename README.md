@@ -79,11 +79,11 @@ create three similar sets of plants using the classical iris data set:
     # The output is a vector that assigns a group (i.e, a number
     # between 1 and K) to each input element:
     anticlusters
-    #>   [1] 3 2 2 1 3 2 1 3 3 3 3 3 2 1 2 1 1 3 2 1 3 1 1 3 2 2 3 3 3 3 2 2 1 2 3 3 2
-    #>  [38] 1 1 3 1 2 1 1 1 3 2 1 3 2 2 2 2 2 3 3 3 1 2 1 2 2 1 1 2 2 2 3 1 1 2 2 3 1
-    #>  [75] 1 1 2 3 1 1 1 3 1 3 2 1 1 1 2 3 3 1 2 3 2 2 2 2 2 2 2 1 2 2 2 3 3 3 1 1 3
-    #> [112] 3 2 2 2 2 1 2 1 1 2 3 3 3 1 1 1 1 1 1 1 3 3 2 2 3 3 3 1 3 3 1 3 3 3 1 3 2
-    #> [149] 1 3
+    #>   [1] 2 1 2 2 2 1 2 1 1 3 1 2 1 3 3 1 2 2 1 2 3 1 3 2 1 1 1 3 1 1 3 1 3 3 1 2 3
+    #>  [38] 3 2 1 2 2 2 2 2 2 3 3 3 3 3 1 1 1 2 1 3 2 2 1 3 3 3 1 1 3 3 1 2 3 3 2 2 3
+    #>  [75] 3 2 2 1 3 3 1 1 1 3 2 2 2 3 2 1 2 3 3 3 2 3 1 1 1 2 1 1 2 2 2 1 3 1 1 2 1
+    #> [112] 3 1 1 3 3 2 3 1 2 3 1 2 3 3 2 1 2 3 2 2 1 2 3 2 3 1 3 3 1 2 3 3 1 2 2 3 1
+    #> [149] 2 1
 
     # Each group has the same number of items:
     table(anticlusters)
@@ -103,7 +103,7 @@ create three similar sets of plants using the classical iris data set:
     #> ------------------------------------------------------------ 
     #> anticlusters: 3
     #> Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
-    #>         5.85         3.06         3.76         1.20
+    #>         5.84         3.06         3.76         1.20
 
 As illustrated in the example, we can use the function
 `anticlustering()` to create similar sets of elements. In this case

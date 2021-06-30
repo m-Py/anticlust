@@ -1,3 +1,7 @@
+# anticlust 0.5.6-1
+
+- Minor bug fix in `plot_clusters()` (via [87f585798] (https://github.com/m-Py/anticlust/commit/87f5857986d16b338827a213ea0e95dda8e86eef))
+
 # anticlust 0.5.6
 
 ### User-visible changes
