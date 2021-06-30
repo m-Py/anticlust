@@ -61,8 +61,8 @@
 #' @references
 #' 
 #' Papenberg, M., & Klau, G. W. (2020). Using anticlustering to partition 
-#' data sets into equivalent parts. Psychological Methods. Advance Online 
-#' Publication. https://doi.org/10.1037/met0000301.
+#' data sets into equivalent parts. Psychological Methods, 26(2), 
+#' 161–174. https://doi.org/10.1037/met0000301.
 #' 
 #'
 #' @examples

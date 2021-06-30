@@ -84,8 +84,8 @@ Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
 for a clustering problem. Mathematical Programming, 45, 59–96.
 
 Papenberg, M., & Klau, G. W. (2020). Using anticlustering to partition 
-data sets into equivalent parts. Psychological Methods. Advance Online 
-Publication. https://doi.org/10.1037/met0000301.
+data sets into equivalent parts. Psychological Methods, 26(2), 
+161–174. https://doi.org/10.1037/met0000301.
 }
 \author{
 Martin Papenberg \email{martin.papenberg@hhu.de}
