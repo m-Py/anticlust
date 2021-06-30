@@ -5,15 +5,13 @@ Anticlustering partitions a pool of elements into clusters (or
 similarity and high within-cluster heterogeneity. This is accomplished
 by maximizing instead of minimizing a clustering objective function,
 such as the intra-cluster variance (used in k-means clustering) or the
-sum of pairwise distances within clusters. Thus, anticlustering creates
-similar sets of elements by maximizing heterogeneity within
-anticlusters. The package `anticlust` implements anticlustering
-algorithms as described in Papenberg and Klau (2021;
-<https://doi.org/10.1037/met0000301>). It was originally developed to
-stimuli items to experimental conditions in experimental psychology, but
-it can be applied whenever a user requires that a given set of elements
-has to be partitioned groups that have to be as similar as possible, or
-when the within-group heterogeneity should be high.
+sum of pairwise distances within clusters. The package `anticlust`
+implements anticlustering algorithms as described in Papenberg and Klau
+(2021; <https://doi.org/10.1037/met0000301>). It was originally
+developed to stimuli items to experimental conditions in experimental
+psychology, but it can be applied whenever a user requires that a given
+set of elements has to be partitioned groups that have to be as similar
+as possible, or when the within-group heterogeneity should be high.
 
 ## Installation
 
@@ -28,12 +26,6 @@ directly via Github:
 
     library("remotes") # if not available: install.packages("remotes")
     install_github("m-Py/anticlust")
-
-If you like, you can also install the current (unstable) development
-version:
-
-    library("remotes") # if not available: install.packages("remotes")
-    install_github("m-Py/anticlust", ref = "devel")
 
 ## Citation
 
@@ -79,11 +71,11 @@ create three similar sets of plants using the classical iris data set:
     # The output is a vector that assigns a group (i.e, a number
     # between 1 and K) to each input element:
     anticlusters
-    #>   [1] 2 1 2 2 2 1 2 1 1 3 1 2 1 3 3 1 2 2 1 2 3 1 3 2 1 1 1 3 1 1 3 1 3 3 1 2 3
-    #>  [38] 3 2 1 2 2 2 2 2 2 3 3 3 3 3 1 1 1 2 1 3 2 2 1 3 3 3 1 1 3 3 1 2 3 3 2 2 3
-    #>  [75] 3 2 2 1 3 3 1 1 1 3 2 2 2 3 2 1 2 3 3 3 2 3 1 1 1 2 1 1 2 2 2 1 3 1 1 2 1
-    #> [112] 3 1 1 3 3 2 3 1 2 3 1 2 3 3 2 1 2 3 2 2 1 2 3 2 3 1 3 3 1 2 3 3 1 2 2 3 1
-    #> [149] 2 1
+    #>   [1] 1 3 1 1 3 2 2 3 3 3 1 2 3 1 1 2 1 2 2 1 3 2 3 2 3 3 1 3 1 2 1 2 3 2 2 1 3
+    #>  [38] 3 3 3 2 3 1 2 2 2 1 1 1 1 3 1 2 1 1 3 2 2 1 1 1 2 1 3 2 3 1 2 2 2 3 2 3 3
+    #>  [75] 1 1 2 2 1 3 1 2 3 1 1 1 3 2 3 2 3 3 2 1 3 2 2 3 2 3 3 3 3 2 2 1 2 1 1 1 1
+    #> [112] 3 3 1 3 1 2 1 2 1 1 3 2 2 2 3 1 2 1 3 1 3 3 2 2 2 2 1 3 3 1 3 1 1 3 3 3 2
+    #> [149] 2 2
 
     # Each group has the same number of items:
     table(anticlusters)
@@ -103,7 +95,7 @@ create three similar sets of plants using the classical iris data set:
     #> ------------------------------------------------------------ 
     #> anticlusters: 3
     #> Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
-    #>         5.84         3.06         3.76         1.20
+    #>         5.85         3.06         3.76         1.20
 
 As illustrated in the example, we can use the function
 `anticlustering()` to create similar sets of elements. In this case

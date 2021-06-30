@@ -9,7 +9,7 @@ output:
 
 # anticlust <a href='https://m-py.github.io/anticlust/'><img src='man/figures/anticlustStickerV1-0.svg' align="right" height="160" /></a>
 
-Anticlustering partitions a pool of elements into clusters (or *anticlusters*) with the goal of achieving high between-cluster similarity and high within-cluster heterogeneity. This is accomplished by maximizing instead of minimizing a clustering objective function, such as the intra-cluster variance (used in k-means clustering) or the sum of pairwise distances within clusters. Thus, anticlustering creates similar sets of elements by maximizing heterogeneity within anticlusters. The package `anticlust` implements anticlustering algorithms as described in Papenberg and Klau (2021; https://doi.org/10.1037/met0000301). It was originally developed to stimuli items to experimental conditions in experimental psychology, but it can be applied whenever a user requires that a given set of elements has to be partitioned groups that have to be as similar as possible, or when the within-group heterogeneity should be high.
+Anticlustering partitions a pool of elements into clusters (or *anticlusters*) with the goal of achieving high between-cluster similarity and high within-cluster heterogeneity. This is accomplished by maximizing instead of minimizing a clustering objective function, such as the intra-cluster variance (used in k-means clustering) or the sum of pairwise distances within clusters. The package `anticlust` implements anticlustering algorithms as described in Papenberg and Klau (2021; https://doi.org/10.1037/met0000301). It was originally developed to stimuli items to experimental conditions in experimental psychology, but it can be applied whenever a user requires that a given set of elements has to be partitioned groups that have to be as similar as possible, or when the within-group heterogeneity should be high.
 
 ```{r setup, include = FALSE}
 library("anticlust")
@@ -32,6 +32,7 @@ knitr::opts_chunk$set(
 ```
 
 ## Installation
+
 The stable release of `anticlust` is available from [CRAN](https://CRAN.R-project.org/package=anticlust) and can be installed via:
 
 ```R
@@ -43,14 +44,6 @@ A (potentially more recent) version of anticlust can also be installed directly 
 ```R
 library("remotes") # if not available: install.packages("remotes")
 install_github("m-Py/anticlust")
-```
-
-
-If you like, you can also install the current (unstable) development version:
-
-```R
-library("remotes") # if not available: install.packages("remotes")
-install_github("m-Py/anticlust", ref = "devel")
 ```
 
 ## Citation
