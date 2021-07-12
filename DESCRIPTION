@@ -1,7 +1,7 @@
 Type: Package
 Package: anticlust
 Title: Subset Partitioning via Anticlustering
-Version: 0.5.6.9000
+Version: 0.5.7.9000
 Authors@R: 
     c(person(given = "Martin",
              family = "Papenberg",

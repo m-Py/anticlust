@@ -100,7 +100,7 @@ plot_clusters <- function(features, clusters, within_connection = FALSE,
   K <- length(unique(clusters))
   if (K < 8) {
     col <- palette()[2:(K+1)]
-    pch <- c(15:18, 3, 4, 8)[2:(K+1)]
+    pch <- c(15:18, 3, 4, 8)[1:K]
     pch <- pch[clusters]
   } else {
     col <- rainbow(K)
