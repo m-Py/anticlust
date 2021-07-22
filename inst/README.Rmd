@@ -72,7 +72,7 @@ anticlusters <- anticlustering(
   iris[, -5],
   K = 3,
   objective = "variance",
-  method = "exchange"
+  method = "local-maximum"
 )
 
 # The output is a vector that assigns a group (i.e, a number

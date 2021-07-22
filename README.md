@@ -1,4 +1,5 @@
-# anticlust <a href='https://m-py.github.io/anticlust/'><img src='man/figures/anticlustStickerV1-0.svg' align="right" height="160" /></a>
+anticlust <a href='https://m-py.github.io/anticlust/'><img src='man/figures/anticlustStickerV1-0.svg' align="right" height="160" /></a>
+=======================================================================================================================================
 
 Anticlustering partitions a pool of elements into clusters (or
 *anticlusters*) with the goal of achieving high between-cluster
@@ -7,13 +8,16 @@ by maximizing instead of minimizing a clustering objective function,
 such as the intra-cluster variance (used in k-means clustering) or the
 sum of pairwise distances within clusters. The package `anticlust`
 implements anticlustering algorithms as described in Papenberg and Klau
-(2021; <https://doi.org/10.1037/met0000301>). It was originally
-developed to stimuli items to experimental conditions in experimental
-psychology, but it can be applied whenever a user requires that a given
-set of elements has to be partitioned groups that have to be as similar
-as possible, or when the within-group heterogeneity should be high.
+(2021;
+<a href="https://doi.org/10.1037/met0000301" class="uri">https://doi.org/10.1037/met0000301</a>).
+It was originally developed to stimuli items to experimental conditions
+in experimental psychology, but it can be applied whenever a user
+requires that a given set of elements has to be partitioned groups that
+have to be as similar as possible, or when the within-group
+heterogeneity should be high.
 
-## Installation
+Installation
+------------
 
 The stable release of `anticlust` is available from
 [CRAN](https://CRAN.R-project.org/package=anticlust) and can be
@@ -27,24 +31,28 @@ directly via Github:
     library("remotes") # if not available: install.packages("remotes")
     install_github("m-Py/anticlust")
 
-## Citation
+Citation
+--------
 
 If you use `anticlust` in your research, it would be courteous if you
 cite the following reference:
 
 Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition
 data sets into equivalent parts. *Psychological Methods, 26*(2),
-161–174. <https://doi.org/10.1037/met0000301>
+161–174.
+<a href="https://doi.org/10.1037/met0000301" class="uri">https://doi.org/10.1037/met0000301</a>
 
-## How do I learn about `anticlust`
+How do I learn about `anticlust`
+--------------------------------
 
 This README contains some basic information on the `R` package
 `anticlust`. More information is available via the following sources:
 
 -   A paper is available describing the theoretical background of
     anticlustering and the `anticlust` package in detail
-    (<https://doi.org/10.1037/met0000301>). The freely available
-    preprint can be retrieved from <https://psyarxiv.com/3razc/>.
+    (<a href="https://doi.org/10.1037/met0000301" class="uri">https://doi.org/10.1037/met0000301</a>).
+    The freely available preprint can be retrieved from
+    <a href="https://psyarxiv.com/3razc/" class="uri">https://psyarxiv.com/3razc/</a>.
 
 -   The [package website](https://m-py.github.io/anticlust/) contains
     all relevant documentation. This includes a
@@ -53,7 +61,8 @@ This README contains some basic information on the `R` package
     experiments and documentation for the main `anticlust` functions
     `anticlustering()`, `balanced_clustering()` and `matching()`.
 
-## A quick start
+A quick start
+-------------
 
 In this initial example, I use the main function `anticlustering()` to
 create three similar sets of plants using the classical iris data set:
@@ -65,17 +74,17 @@ create three similar sets of plants using the classical iris data set:
       iris[, -5],
       K = 3,
       objective = "variance",
-      method = "exchange"
+      method = "local-maximum"
     )
 
     # The output is a vector that assigns a group (i.e, a number
     # between 1 and K) to each input element:
     anticlusters
-    #>   [1] 1 3 1 1 3 2 2 3 3 3 1 2 3 1 1 2 1 2 2 1 3 2 3 2 3 3 1 3 1 2 1 2 3 2 2 1 3
-    #>  [38] 3 3 3 2 3 1 2 2 2 1 1 1 1 3 1 2 1 1 3 2 2 1 1 1 2 1 3 2 3 1 2 2 2 3 2 3 3
-    #>  [75] 1 1 2 2 1 3 1 2 3 1 1 1 3 2 3 2 3 3 2 1 3 2 2 3 2 3 3 3 3 2 2 1 2 1 1 1 1
-    #> [112] 3 3 1 3 1 2 1 2 1 1 3 2 2 2 3 1 2 1 3 1 3 3 2 2 2 2 1 3 3 1 3 1 1 3 3 3 2
-    #> [149] 2 2
+    #>   [1] 1 1 2 1 1 1 3 3 1 2 2 3 1 3 2 1 2 2 1 3 1 2 2 2 3 1 2 3 1 3 3 2 3 3 1 2 1
+    #>  [38] 3 3 1 2 1 3 1 3 2 3 3 2 3 2 2 3 2 2 1 2 3 3 3 2 2 2 1 2 1 1 1 3 1 2 1 3 1
+    #>  [75] 3 3 2 2 2 1 1 2 3 1 3 3 3 3 1 3 2 2 2 2 2 1 2 3 2 1 3 3 3 2 3 3 2 1 1 2 1
+    #> [112] 2 1 1 3 2 1 2 3 1 1 3 2 3 1 2 1 2 3 3 3 1 3 2 2 3 2 2 1 3 1 1 1 1 2 3 3 1
+    #> [149] 1 1
 
     # Each group has the same number of items:
     table(anticlusters)
@@ -95,7 +104,7 @@ create three similar sets of plants using the classical iris data set:
     #> ------------------------------------------------------------ 
     #> anticlusters: 3
     #> Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
-    #>         5.85         3.06         3.76         1.20
+    #>         5.84         3.06         3.76         1.20
 
 As illustrated in the example, we can use the function
 `anticlustering()` to create similar sets of elements. In this case
@@ -129,7 +138,8 @@ It is also possible to optimize user-defined measures of cluster
 similarity, which is also described in the documentation
 (`?anticlustering`).
 
-## Categorical constraints
+Categorical constraints
+-----------------------
 
 Sometimes, it is required that sets are not only similar with regard to
 some numeric variables, but we also want to ensure that each set
@@ -152,7 +162,8 @@ use the argument `categories` as follows:
     #>            2     17         16        17
     #>            3     16         17        17
 
-## Matching and clustering
+Matching and clustering
+-----------------------
 
 Anticlustering in a sense creates sets of dissimilar elements; the
 heterogenity within anticlusters is maximized (either using the cluster
@@ -186,10 +197,11 @@ small groups of similar elements, e.g., triplets as in this example:
 
 <img src="man/figures/matching-1.png" style="display: block; margin: auto;" />
 
-## Questions and suggestions
+Questions and suggestions
+-------------------------
 
 If you have any question on the `anticlust` package or any suggestions
 (which are greatly appreciated), I encourage you to contact me via email
-(<martin.papenberg@hhu.de>) or
-[Twitter](https://twitter.com/MPapenberg), or to open an [issue on the
-Github repository](https://github.com/m-Py/anticlust/issues).
+(<a href="mailto:martin.papenberg@hhu.de" class="email">martin.papenberg@hhu.de</a>)
+or [Twitter](https://twitter.com/MPapenberg), or to open an [issue on
+the Github repository](https://github.com/m-Py/anticlust/issues).
