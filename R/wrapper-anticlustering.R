@@ -2,9 +2,14 @@
 #' Anticlustering
 #'
 #' Create groups of elements (anticlusters) that are as similar as
-#' possible to each other, by maximizing the heterogeneity within
+#' possible to each other. This is accomplished by maximizing instead
+#' of minimizing a clustering objective function, and often
+#' corresponds to maximizing the heterogeneity within
 #' groups. Implements anticlustering algorithms as described in
-#' Papenberg and Klau (2020; <doi:10.1037/met0000301>).
+#' Papenberg and Klau (2020; <doi:10.1037/met0000301>); since version
+#' 0.5.4.9000, also includes an implementation of the bicriterion
+#' anticlustering algorithm described by Brusco, Cradit and Steinley
+#' (in press).
 #'
 #' @param x The data input. Can be one of two structures: (1) A
 #'     feature matrix where rows correspond to elements and columns
@@ -21,20 +26,18 @@
 #' @param objective The objective to be maximized. The options
 #'     "diversity" (default; previously called "distance", which is
 #'     still supported), "variance", "kplus" and "dispersion" are natively
-#'     supported. May also be a user-defined function object that computes
-#'     an objective value given a clustering. See Details.
-#' @param method One of "exchange" (default) , "local-maximum", or
+#'     supported. May also be a user-defined function. See Details.
+#' @param method One of "exchange" (default) , "local-maximum", "brusco", or
 #'     "ilp".  See Details.
 #' @param preclustering Boolean. Should a preclustering be conducted
 #'     before anticlusters are created? Defaults to \code{FALSE}. See
 #'     Details.
 #' @param categories A vector, data.frame or matrix representing one
 #'     or several categorical constraints. See Details.
-#' @param repetitions The number of times a new exchange procedure is
-#'     initiated when \code{method = "exchange"} or \code{method =
-#'     "local-maximum"}.  In the end, the best objective found across
-#'     the repetitions is returned. If this argument is not passed,
-#'     only one repetition is conducted.
+#' @param repetitions The number of times a search heuristic is
+#'     initiated when using \code{method = "exchange"}, \code{method =
+#'     "local-maximum"}, or \code{method = "brusco"}. In the end, 
+#'     the best objective found across the repetitions is returned.
 #' @param standardize Boolean. If \code{TRUE} and \code{x} is a feature 
 #'     matrix, the data is standardized through a call to \code{\link{scale}}
 #'     before the optimization starts. This argument is silently ignored 
@@ -64,12 +67,12 @@
 #' described below):
 #' 
 #' \itemize{
-#'   \item{cluster editing `diversity` objective, setting \code{objective = "diversity"} (default)}
+#'   \item{cluster editing `diversity` objective, setting \code{objective = "diversity"} (this is the default objective)}
 #'   \item{k-means `variance` objective, setting \code{objective = "variance"}}
-#'   \item{k-plus objective, an extension of the k-means variance criterion,
+#'   \item{`k-plus` objective, an extension of the k-means variance criterion,
 #'         setting \code{objective = "kplus"}}
-#'   \item{`dispersion` objective, the minimum distance between any two 
-#'         elements within the same cluster.}
+#'   \item{the `dispersion` objective, which the minimum distance between 
+#'         any two elements within the same cluster.}
 #' }
 #'
 #' The k-means objective is the within-group variance---that is, the
@@ -82,7 +85,7 @@
 #' groups (see \code{\link{kplus_objective}}).
 #' 
 #' The cluster editing "diversity" objective is the sum of pairwise
-#' distances within groups (see
+#' distances of elements within the same groups (see
 #' \code{\link{diversity_objective}}). Anticluster editing is also
 #' known as the »maximum diverse grouping problem« because it
 #' maximizes group diversity as measured by the sum of pairwise
@@ -94,9 +97,12 @@
 #' objectives based on pairwise distances (e.g., see
 #' \code{\link{dispersion_objective}}).
 #' 
-#' The "dispersion" is the minimum distance between any two elements within 
-#' the same cluster; applications that require high within-group heterogeneity
-#' often require to maximize the dispersion.
+#' The "dispersion" is the minimum distance between any two elements
+#' that are part of the same cluster; maximization of this objective
+#' ensures that any two elements within the same group are as
+#' dissimilar from each other as possible. Applications that require
+#' high within-group heterogeneity often require to maximize the
+#' dispersion.
 #'
 #' If the data input \code{x} is a feature matrix (that is: each row
 #' is a "case" and each column is a "variable") and the option
@@ -112,37 +118,39 @@
 #' \strong{Heuristic anticlustering}
 #'
 #' By default, a heuristic method is employed for anticlustering: the
-#' exchange method (\code{method = "exchange"}). Building on an
-#' initial assignment of elements to anticlusters, elements are
-#' sequentially swapped between anticlusters in such a way that each
-#' swap improves set similarity by the largest amount that is
-#' possible. In the default case, elements are randomly assigned to
-#' anticlusters before the exchange procedure starts; however, it is
-#' also possible to explicitly specify the initial assignment using
-#' the argument \code{K} (in this case, \code{K} has length
-#' \code{nrow(x)}). The exchange procedure is repeated for each
-#' element. Because each possible swap is investigated for each
-#' element, the total number of exchanges grows quadratically with
-#' input size, rendering the exchange method unsuitable for large N.
-#' When using \code{method = "local-maximum"}, the exchange method is
-#' repeated until an local maximum is reached. That means after the
+#' exchange method (\code{method = "exchange"}). First, anticlusters
+#' are randomly assigned to clusters. (It is also possible to
+#' explicitly specify the initial assignment using the argument
+#' \code{K}; in this case, \code{K} has length \code{nrow(x)}.) Based
+#' on the initial assignment, elements are systematically swapped
+#' between anticlusters in such a way that each swap improves the
+#' objective value. For an element, each possible swap with elements
+#' in other clusters is simulated; then, the one swap is performed
+#' that improves the objective the most, but a swap is only conducted
+#' if there is an improvement at all. This swapping procedure is
+#' repeated for each element. When using \code{method =
+#' "local-maximum"}, the exchange method does not terminate after the
+#' first iteration over all elements; instead, the swapping continues
+#' until a local maximum is reached. This means that after the
 #' exchange process has been conducted once for each data point, the
 #' algorithm restarts with the first element and proceeds to conduct
 #' exchanges until the objective cannot be improved.
 #'
 #' When setting \code{preclustering = TRUE}, only the \code{K - 1}
-#' most similar elements serve as exchange partners, which can
-#' dramatically speed up the optimization (more information on the
-#' preclustering option is included below). This option is recommended
-#' for larger N. For very large N, check out the function
-#' \code{\link{fast_anticlustering}} that was specifically implemented
-#' to process very large data sets.
+#' most similar elements serve as exchange partners for each element,
+#' which can dramatically speed up the optimization (more information
+#' on the preclustering heuristic follows below). This option is
+#' recommended for larger N.
+#' 
+#' Using \code{method = "brusco"} implements the local bicriterion 
+#' iterated local search heuristic by Brusco et al. (2020).
 #'
 #' \strong{Exact anticlustering}
 #'
-#' An optimal anticluster editing objective can be found via integer
-#' linear programming (the integer linear program implemented here can
-#' be found in Papenberg & Klau, 2020, (8) - (12)). To this end, set
+#' An optimal anticluster editing objective (i.e., a solution having
+#' the global maximum value in diversity) can be found via integer
+#' linear programming. The integer linear program implemented here can
+#' be found in Papenberg & Klau, (2020; (8) - (12)). To this end, set
 #' \code{method = "ilp"}. To obtain an optimal solution, the open
 #' source GNU linear programming kit (available from
 #' https://www.gnu.org/software/glpk/glpk.html) and the R package
@@ -161,9 +169,9 @@
 #' preclustering, optimality is no longer guaranteed, but the solution
 #' is usually optimal or very close to optimal.
 #'
-#' The variance criterion cannot be optimized to optimality using
-#' integer linear programming because the k-means objective function
-#' is not linear. However, it is possible to employ the function
+#' The variance and dispersion criterion cannot be optimized to optimality using
+#' integer linear programming because the objective functions are not linear. 
+#' However, it is possible to employ the function
 #' \code{\link{generate_partitions}} to obtain optimal solutions for
 #' small problem instances.
 #' 
@@ -187,9 +195,9 @@
 #'
 #' The argument \code{categories} may induce categorical constraints.
 #' The grouping variables indicated by \code{categories} will be
-#' balanced out across anticlusters. Currently, this functionality is
-#' only available in combination with the heuristic methods, but not
-#' with the exact integer linear programming approach.
+#' balanced out across anticlusters. This functionality is
+#' only available for the classical exchange procedures, that is, for 
+#' \code{method = "exchange"} and \code{method = "local-maximum"}.
 #' 
 #' \strong{Optimize a custom objective function}
 #' 
@@ -210,15 +218,6 @@
 #' as well. 
 #' 
 #' 
-#' @seealso
-#'
-#' \code{\link{fast_anticlustering}}
-#'
-#' \code{\link{variance_objective}}
-#'
-#' \code{\link{diversity_objective}}
-#'
-#'
 #' @examples
 #'
 #' # Optimize the cluster editing (diversity) criterion
@@ -287,7 +286,12 @@
 #' )
 #'
 #' @references
-#'
+#' 
+#' Brusco, M. J., Cradit, J. D., & Steinley, D. (2020). Combining
+#' diversity and dispersion criteria for anticlustering: A bicriterion
+#' approach. British Journal of Mathematical and Statistical
+#' Psychology, 73, 275-396. https://doi.org/10.1111/bmsp.12186
+#' 
 #' Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
 #' for a clustering problem. Mathematical Programming, 45, 59-96.
 #' 
@@ -338,12 +342,39 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   # again calls anticlustering with method "exchange" and 
   # repetitions = NULL
   if (method == "local-maximum" || 
-    (method == "exchange" && argument_exists(repetitions))) {
+      (method == "exchange" && argument_exists(repetitions))) {
     if (!argument_exists(repetitions)) {
       repetitions <- 1
     }
     return(repeat_anticlustering(x, K, objective, categories, method, repetitions))
   }
+  
+  ## Get data into required format
+  input_validation_anticlustering(x, K, objective, method, preclustering, 
+                                  categories, repetitions)
+
+  ## Exact method using ILP
+  if (method == "ilp") {
+    return(exact_anticlustering(x, K, preclustering))
+  }
+  
+  if (method == "brusco") {
+    if (objective == "diversity") {
+      weights <- c(0.5, 0.99, 0.999, 0.999999)
+      obj_fun <- diversity_objective_
+    } else if (objective == "dispersion") {
+      weights <- c(0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1)
+      obj_fun <- dispersion_objective_
+    }
+    partitions <- as.matrix(bicriterion_anticlustering(x, K, repetitions, weights))
+    # get best partition wrt dispersion / diversity
+    best_obj <- which.max(apply(partitions, 1, obj_fun, convert_to_distances(x)))
+    return(partitions[best_obj, ])
+  }
+  
+  # Preclustering and categorical constraints are both processed in the
+  # variable `categories` after this step:
+  categories <- get_categorical_constraints(x, K, preclustering, categories)
   
   if (inherits(objective, "function")) {
     # most generic exchange method, deals with any objective function

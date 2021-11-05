@@ -2,6 +2,7 @@
 
 export(anticlustering)
 export(balanced_clustering)
+export(bicriterion_anticlustering)
 export(categorical_sampling)
 export(dispersion_objective)
 export(diversity_objective)

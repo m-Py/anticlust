@@ -1,52 +1,49 @@
 Type: Package
 Package: anticlust
 Title: Subset Partitioning via Anticlustering
-Version: 0.5.7
-Authors@R: 
-    c(person(given = "Martin",
-             family = "Papenberg",
-             role = c("aut", "cre"),
-             email = "martin.papenberg@hhu.de",
-             comment = c(ORCID = "0000-0002-9900-4268")),
-      person(given = "Meik",
-             family = "Michalke",
-             role = "ctb",
-             comment = "centroid based clustering algorithm"),
-      person(given = c("Gunnar", "W."),
-             family = "Klau",
-             role = "ths"),
-      person(given = c("Juliane", "V."),
-             family = "Tkotz",
-             role = "ctb",
-             comment = "package logo"))
+Version: 0.5.8
+Authors@R: c(
+    person("Martin", "Papenberg", , "martin.papenberg@hhu.de", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-9900-4268")),
+    person("Meik", "Michalke", role = "ctb",
+           comment = "centroid based clustering algorithm"),
+    person(c("Gunnar", "W."), "Klau", role = "ths"),
+    person(c("Juliane", "V."), "Tkotz", role = "ctb",
+           comment = "package logo"),
+    person("Martin", "Breuer", role = "ctb",
+           comment = "Bicriterion algorithm by Brusco et al.")
+  )
 Author: Martin Papenberg [aut, cre]
     (<https://orcid.org/0000-0002-9900-4268>), Meik Michalke [ctb]
     (centroid based clustering algorithm), Gunnar W. Klau [ths], Juliane
-    V. Tkotz [ctb] (package logo)
+    V. Tkotz [ctb] (package logo), Martin Breuer [ctb] (Bicriterion
+    algorithm by Brusco et al.)
 Maintainer: Martin Papenberg <martin.papenberg@hhu.de>
-Description: The method of anticlustering partitions a pool of
-    elements into groups (i.e., anticlusters) in such a way that the
-    between-group similarity is maximized and -- at the same time -- the
-    within-group heterogeneity is maximized. This reverses the logic of
-    cluster analysis that strives for high within-group homogeneity and
+Description: The method of anticlustering partitions a pool of elements
+    into groups (i.e., anticlusters) with the goal of maximizing
+    between-group similarity or maximizing the within-group heterogeneity
+    is maximized.  The anticlustering approach thereby reverses the logic
+    of cluster analysis that strives for high within-group homogeneity and
     low similarity of the different groups. Computationally,
     anticlustering is accomplished by maximizing instead of minimizing a
     clustering objective function, such as the intra-cluster variance
     (used in k-means clustering) or the sum of pairwise distances within
     clusters.  The function anticlustering() implements exact and
     heuristic anticlustering algorithms as described in Papenberg and Klau
-    (2020; <doi:10.1037/met0000301>). The exact approach requires that the
-    GNU linear programming kit
+    (2021; <doi:10.1037/met0000301>). The exact algorithms require that
+    the GNU linear programming kit
     (<https://www.gnu.org/software/glpk/glpk.html>) is available and the R
     package 'Rglpk' (<https://cran.R-project.org/package=Rglpk>) is
-    installed. Some other functions are available to solve classical
-    clustering problems. The function balanced_clustering() applies a
-    cluster analysis under size constraints, i.e., creates equal-sized
-    clusters. The function matching() can be used for (unrestricted,
-    bipartite, or K-partite) matching. The function wce() can be used
-    optimally solve the (weighted) cluster editing problem, also known as
-    correlation clustering, clique partitioning problem or transitivity
-    clustering.
+    installed. A bicriterion anticlustering method by Brusco et al. (2020;
+    <doi:10.1111/bmsp.12186>) is available through the function
+    bicriterion_anticlustering(). Some other functions are available to
+    solve classical clustering problems. The function
+    balanced_clustering() applies a cluster analysis under size
+    constraints, i.e., creates equal-sized clusters. The function
+    matching() can be used for (unrestricted, bipartite, or K-partite)
+    matching. The function wce() can be used optimally solve the
+    (weighted) cluster editing problem, also known as correlation
+    clustering, clique partitioning problem or transitivity clustering.
 License: MIT + file LICENSE
 URL: https://github.com/m-Py/anticlust
 BugReports: https://github.com/m-Py/anticlust/issues
@@ -67,7 +64,7 @@ Encoding: UTF-8
 LazyData: true
 NeedsCompilation: yes
 RoxygenNote: 7.1.1
-SystemRequirements: The exact (anti)clustering algorithms
-    require that the GNU linear programming kit (GLPK library) is
-    installed (<http://www.gnu.org/software/glpk/>). Rendering the
-    vignette requires pandoc.
+SystemRequirements: The exact (anti)clustering algorithms require that the
+    GNU linear programming kit (GLPK library) is installed
+    (<http://www.gnu.org/software/glpk/>). Rendering the vignette requires
+    pandoc.

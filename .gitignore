@@ -14,3 +14,4 @@ anticlust.kdev4
 /*.tar.gz
 /*.Rcheck/
 .radian_profile
+tags

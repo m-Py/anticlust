@@ -31,9 +31,22 @@ input_validation_anticlustering <- function(x, K, objective, method,
 
   validate_input(
     method, "method", len = 1,
-    input_set = c("ilp", "exchange", "heuristic", "centroid", "local-maximum"), 
+    input_set = c("ilp", "exchange", "heuristic", "centroid", "local-maximum", "brusco"), 
     not_na = TRUE, not_function = TRUE
   )
+  
+  if (method == "brusco") {
+    if (argument_exists(categories)) {
+      stop("It is not possible to use the algorithm by Brusco et al. with categorical restrictions.")
+    }
+    if (preclustering == TRUE) {
+      stop("It is not possible to use the algorithm by Brusco et al. with preclustering restrictions.")
+    }
+    if (!objective %in% c("dispersion", "diversity")) {
+      stop("The algorithm by Brusco et al. can only be used to optimize diversity or dispersion.")
+    }
+  }
+  
                  
   # Allow that K is an initial assignment of elements to clusters
   validate_input(K, "K", objmode = "numeric", must_be_integer = TRUE, not_na = TRUE, not_function = TRUE)
@@ -69,6 +82,8 @@ input_validation_anticlustering <- function(x, K, objective, method,
            "(Try out method = 'exchange'.)")
     }
   }
+
+
 
   if (method == "ilp") {
     check_if_solver_is_available()
