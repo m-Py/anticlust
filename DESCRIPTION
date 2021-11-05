@@ -63,7 +63,7 @@ VignetteBuilder:
 Encoding: UTF-8
 LazyData: true
 NeedsCompilation: yes
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 SystemRequirements: The exact (anti)clustering algorithms require that the
     GNU linear programming kit (GLPK library) is installed
     (<http://www.gnu.org/software/glpk/>). Rendering the vignette requires

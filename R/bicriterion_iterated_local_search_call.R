@@ -45,7 +45,7 @@
 #' al. used `G` to denote the number of groups. However, note that
 #' \code{K} can not only be used to denote the number of equal-sized
 #' groups, but also to specify group sizes, as in
-#' \code{\link{anticlustering}}).
+#' \code{\link{anticlustering}}.
 #'
 #' The argument \code{R} denotes the number of restarts of the search
 #' heuristic. The argument \code{W} denotes the possible weights given
