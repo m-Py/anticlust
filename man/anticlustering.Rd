@@ -65,10 +65,9 @@ possible to each other. This is accomplished by maximizing instead
 of minimizing a clustering objective function, and often
 corresponds to maximizing the heterogeneity within
 groups. Implements anticlustering algorithms as described in
-Papenberg and Klau (2020; <doi:10.1037/met0000301>); since version
-0.5.4.9000, also includes an implementation of the bicriterion
-anticlustering algorithm described by Brusco, Cradit and Steinley
-(in press).
+Papenberg and Klau (2021; <doi:10.1037/met0000301>) and an implementation
+of the bicriterion anticlustering algorithm described by Brusco, Cradit 
+and Steinley (2020; <doi:10.1111/bmsp.12186>).
 }
 \details{
 This function is used to solve anticlustering. That is, \code{K}
@@ -308,7 +307,7 @@ Psychology, 73, 275-396. https://doi.org/10.1111/bmsp.12186
 Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
 for a clustering problem. Mathematical Programming, 45, 59-96.
 
-Papenberg, M., & Klau, G. W. (2020). Using anticlustering to partition 
+Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition 
 data sets into equivalent parts. Psychological Methods, 26(2), 
 161–174. https://doi.org/10.1037/met0000301.
 

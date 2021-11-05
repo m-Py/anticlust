@@ -3,7 +3,7 @@
 #'
 #' This function implements the bicriterion iterated local search
 #' heuristic (BILS) for anticlustering by Brusco, Cradit, and Steinley
-#' (2020). The description of the algorithm is given in Section 3 of
+#' (2020; <doi:10.1111/bmsp.12186>). The description of the algorithm is given in Section 3 of
 #' their paper (in particular, see the pseudocode in their Figure 2).
 #' 
 #' @param x The data input. Can be one of two structures: (1) A

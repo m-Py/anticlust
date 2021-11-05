@@ -1,4 +1,4 @@
-# anticlust 0.5.8
+# anticlust 0.5.7.9999 (development version)
 
 * `anticlust` now includes the bicriterion algorithm for simultaneously 
 maximizing diversity and dispersion, proposed by Brusco et al.
