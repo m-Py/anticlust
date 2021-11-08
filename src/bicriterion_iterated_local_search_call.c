@@ -201,7 +201,7 @@ struct Pareto_element* bicriterion_iterated_local_search(struct Pareto_element* 
 //sample functin from R. Get one random element from an array
 double sample(size_t array_size, double array[array_size]) {
   int max = (int) array_size;
-  int r = random_integer(0, max);
+  int r = random_integer(0, max-1);
   return(array[r]);
 }
 
