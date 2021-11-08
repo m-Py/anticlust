@@ -166,7 +166,7 @@ bicriterion optimization that is offered by Brusco et al.'s algorithm.
 An optimal anticluster editing objective (i.e., a solution having
 the global maximum value in diversity) can be found via integer
 linear programming. The integer linear program implemented here can
-be found in Papenberg & Klau, (2020; (8) - (12)). To this end, set
+be found in Papenberg & Klau, (2021; (8) - (12)). To this end, set
 \code{method = "ilp"}. To obtain an optimal solution, the open
 source GNU linear programming kit (available from
 https://www.gnu.org/software/glpk/glpk.html) and the R package
