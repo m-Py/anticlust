@@ -49,8 +49,8 @@ dispersion_objective(random_data, optimized_clusters)
 
 }
 \references{
-Brusco, M. J., Cradit, J. D., & Steinley, D. (in press). Combining
+Brusco, M. J., Cradit, J. D., & Steinley, D. (2020). Combining
 diversity and dispersion criteria for anticlustering: A bicriterion
 approach. British Journal of Mathematical and Statistical
-Psychology. https://doi.org/10.1111/bmsp.12186
+Psychology, 73, 275-396. https://doi.org/10.1111/bmsp.12186
 }
