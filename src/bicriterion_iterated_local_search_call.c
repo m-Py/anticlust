@@ -388,7 +388,7 @@ void delete_outdated(struct Pareto_element** head_ref, double diversity, double 
 void linked_list_sample(struct Pareto_element* head, size_t N, int* partition){
   
   int count = linked_list_length(head);
-  int r = rand() % count;
+  int r = random_integer(0, count-1);
   struct Pareto_element* current = head; 
   
   for(int i = 0; i < r; i++){
