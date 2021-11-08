@@ -8,6 +8,7 @@
 
 double uniform_rnd_number();
 double uni_rnd_number_range(double min, double max);
+int random_integer(int min, int max);
 
 // generate a random uniform number in range
 double uni_rnd_number_range(double min, double max) {
@@ -15,11 +16,17 @@ double uni_rnd_number_range(double min, double max) {
   return (min + number * (max - min));
 }
 
+// Generate a random integer in given range
+int random_integer(int min, int max) {
+  int integer = (int) floor(uniform_rnd_number() * (max - min + 1)) + min;
+  return integer;
+}
+
 double uniform_rnd_number() {
   GetRNGstate();
   double my_number = unif_rand();
   PutRNGstate();
-  return(my_number);
+  return my_number;
 }
 
 //datastructure to store a linked-list of partitions
@@ -193,7 +200,8 @@ struct Pareto_element* bicriterion_iterated_local_search(struct Pareto_element* 
 
 //sample functin from R. Get one random element from an array
 double sample(size_t array_size, double array[array_size]) {
-  int r = rand() % array_size;
+  int max = (int) array_size;
+  int r = random_integer(0, max);
   return(array[r]);
 }
 
