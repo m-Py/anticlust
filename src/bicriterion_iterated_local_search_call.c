@@ -244,7 +244,7 @@ double get_dispersion(size_t N, int partition[N], double matrix[N][N]){
 // Fisher-Yates shuffle algorithm for shuffling ermutations
 void shuffle_permutation(int N, int *permutation) {
     for (int i = 0; i <= N-2; i++) {
-        int j = i + (rand() % (N-i));
+        int j = random_integer(0, i);
         cluster_swap(N, i, j, permutation);
     }
 }
