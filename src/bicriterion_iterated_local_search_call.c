@@ -4,6 +4,23 @@
 #include <stdbool.h>
 #include <string.h>
 #include "header.h"
+#include <R.h>
+
+double uniform_rnd_number();
+double uni_rnd_number_range(double min, double max);
+
+// generate a random uniform number in range
+double uni_rnd_number_range(double min, double max) {
+  double number = uniform_rnd_number();
+  return (min + number * (max - min));
+}
+
+double uniform_rnd_number() {
+  GetRNGstate();
+  double my_number = unif_rand();
+  PutRNGstate();
+  return(my_number);
+}
 
 //datastructure to store a linked-list of partitions
 struct Pareto_element { 
@@ -125,7 +142,7 @@ struct Pareto_element* bicriterion_iterated_local_search(struct Pareto_element* 
   for(int a = 0; a < R; a++){
     double div_weight = sample(10, weights); 
     double dis_weight = 1 - div_weight;
-    double neighborhood_size = random_in_range(neighbor_percent[0], neighbor_percent[1]);
+    double neighborhood_size = uni_rnd_number_range(neighbor_percent[0], neighbor_percent[1]);
     int partition[N];
     linked_list_sample(head, N, partition);
     for(int i = 0; i < N-1; i++){
@@ -133,7 +150,7 @@ struct Pareto_element* bicriterion_iterated_local_search(struct Pareto_element* 
         int g = partition[i];
         int h = partition[j];
         if(g != h){
-          double random = random_in_range(0,1);
+          double random = uni_rnd_number_range(0,1);
           if(random < neighborhood_size){
             cluster_swap(N, i, j, partition);
           }
@@ -375,15 +392,6 @@ void linked_list_sample(struct Pareto_element* head, size_t N, int* partition){
   }
   
 }
-
-
-double random_in_range(double min, double max) {
-  
-  double range = (max - min); 
-  double div = RAND_MAX / range;
-  return min + (rand() / div);
-}
-
 
 int linked_list_length(struct Pareto_element* head) {
   
