@@ -142,7 +142,10 @@
 #' recommended for larger N.
 #' 
 #' Using \code{method = "brusco"} implements the local bicriterion 
-#' iterated local search heuristic by Brusco et al. (2020).
+#' iterated local search heuristic by Brusco et al. (2020), but only optimizes
+#' for one criterion - diversity or dispersion.
+#' \code{\link{bicriterion_anticlustering}}) can be used to conduct the actual 
+#' bicriterion optimization that is offered by Brusco et al.'s algorithm.
 #'
 #' \strong{Exact anticlustering}
 #'
@@ -188,7 +191,7 @@
 #' is conducted using a call to \code{\link{matching}}. When using
 #' \code{method = "ilp"}, the preclustering optimally finds groups of
 #' minimum pairwise distance by solving the integer linear program
-#' described in Papenberg and Klau (2020; (8) - (10), (12) - (13)).
+#' described in Papenberg and Klau (2021; (8) - (10), (12) - (13)).
 #' 
 #' \strong{Categorical constraints}
 #'
