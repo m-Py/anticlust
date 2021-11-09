@@ -1,11 +1,13 @@
 
 #' Anticlustering
 #'
-#' Create groups of elements (anticlusters) that are as similar as
-#' possible to each other. This is accomplished by maximizing instead
-#' of minimizing a clustering objective function, and often
-#' corresponds to maximizing the heterogeneity within
-#' groups. Implements anticlustering algorithms as described in
+#' Partition a pool of elements into groups (i.e., anticlusters). Anticlustering
+#' strives to create groups that are as similar as
+#' possible to each other, or that achieve high within-group heterogeneity. Oftentimes,
+#' these two objectives coincide and high between-group similarity corresponds to
+#' high within-group diversity. Anticlustering is accomplished by maximizing instead
+#' of minimizing a clustering objective function. 
+#' Implements anticlustering algorithms as described in
 #' Papenberg and Klau (2021; <doi:10.1037/met0000301>) and an implementation
 #' of the bicriterion anticlustering algorithm described by Brusco, Cradit 
 #' and Steinley (2020; <doi:10.1111/bmsp.12186>).
@@ -59,7 +61,7 @@
 #' This function is used to solve anticlustering. That is, \code{K}
 #' groups are created in such a way that all groups are as similar as
 #' possible (this usually corresponds to creating groups with high
-#' within-group heterogeneity). This is accomplished by maximizing
+#' within-group heterogeneity). Anticlustering is accomplished by maximizing
 #' instead of minimizing a clustering objective function. The
 #' maximization of four clustering objective functions is natively
 #' supported (other functions can also defined by the user as
