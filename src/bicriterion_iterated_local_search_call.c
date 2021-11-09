@@ -367,6 +367,7 @@ void delete_outdated(struct Pareto_element** head_ref, double diversity, double 
             (diversity > temp->diversity && dispersion >= temp->dispersion))){
             *head_ref = temp->next; 
             prev = temp->next;
+            free(temp->partition);
             free(temp); 
             temp = prev;
         }
@@ -378,7 +379,8 @@ void delete_outdated(struct Pareto_element** head_ref, double diversity, double 
             if((diversity >= temp->diversity && dispersion > temp->dispersion) || 
                 (diversity > temp->diversity && dispersion >= temp->dispersion)){
             prev->next = temp->next;
-            safe = temp->next;  
+            safe = temp->next;
+            free(temp->partition);
             free(temp);
             temp = safe;
             }else{
