@@ -1,7 +1,7 @@
 Type: Package
 Package: anticlust
 Title: Subset Partitioning via Anticlustering
-Version: 0.5.7.9999
+Version: 0.6.0
 Authors@R: c(
     person("Martin", "Papenberg", , "martin.papenberg@hhu.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-9900-4268")),
@@ -21,8 +21,8 @@ Author: Martin Papenberg [aut, cre]
 Maintainer: Martin Papenberg <martin.papenberg@hhu.de>
 Description: The method of anticlustering partitions a pool of elements
     into groups (i.e., anticlusters) with the goal of maximizing
-    between-group similarity or maximizing the within-group heterogeneity
-    is maximized.  The anticlustering approach thereby reverses the logic
+    between-group similarity or within-group heterogeneity. 
+    The anticlustering approach thereby reverses the logic
     of cluster analysis that strives for high within-group homogeneity and
     low similarity of the different groups. Computationally,
     anticlustering is accomplished by maximizing instead of minimizing a
