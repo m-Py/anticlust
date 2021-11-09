@@ -344,7 +344,7 @@ void push(struct Pareto_element** head_ref, double diversity, double dispersion,
         /* 2. put in the data  */
         new_node->diversity  = diversity;
         new_node->dispersion = dispersion;
-        new_node->partition =(int *)malloc(sizeof(int)*N ) ;  // vllt memcpy anstatt schleife?
+        new_node->partition = (int*) malloc(sizeof(int) * N);  // vllt memcpy anstatt schleife?
         for(int b = 0;b<N;b++){ 
             new_node->partition[b]  = partition[b];
         }
