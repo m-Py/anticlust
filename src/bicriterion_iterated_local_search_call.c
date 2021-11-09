@@ -6,10 +6,6 @@
 #include "header.h"
 #include <R.h>
 
-double uniform_rnd_number();
-double uni_rnd_number_range(double min, double max);
-int random_integer(int min, int max);
-
 // generate a random uniform number in range
 double uni_rnd_number_range(double min, double max) {
   double number = uniform_rnd_number();
@@ -37,12 +33,12 @@ struct Pareto_element {
   struct Pareto_element *next;
 };
 
-
 //receive data from r, call bils algorithm, save results for r
 void bicriterion_iterated_local_search_call(double *distances, int *N, int *R, 
                                             int *upper_bound, int *WL, double *W, double *Xi, 
                                             int *partition,
-                                            double *result
+                                            double *result,
+                                            int *mem_error
                                            ) {
   
   const int n = *N; // number of elements
@@ -78,31 +74,47 @@ void bicriterion_iterated_local_search_call(double *distances, int *N, int *R,
   int half_restarts = r/2 + (r%2);
   
   struct Pareto_element* head = multistart_bicriterion_pairwise_interchange(n, distance_pts, half_restarts, wl, weights, partition);
+  if (head == NULL) {
+    *mem_error = 1; // return after memory allocation error
+    return;
+  }
   head = bicriterion_iterated_local_search(head, n, distance_pts, half_restarts, wl, weights, neighbor_percent);
+  if (head == NULL) {
+    *mem_error = 1; // return after memory allocation error
+    return;
+  }
   
   //fill result with -1 to identify the last partition in the matrix
   for(int i = 0; i < n*u; i++){
     result[i] = -1;
   }
-  
   //update result with the solutions from the linked list
   int position = 0;
-  struct Pareto_element* tmp; // for freeing memory
   while (head != NULL && position != n*u) {
     int *array = head->partition;
     for(int i = 0; i < n; i++){
       result[position] = array[i];
       position++;
     }
-    // todo: free "partition" from each pareto element, and then free the pareto element
+    head = head->next;
+  } 
+  free_pareto_set(head);
+  return;
+}
+
+// function to free all memory allocated by the pareto set
+void free_pareto_set(struct Pareto_element* head) {
+  struct Pareto_element* tmp; // for freeing memory
+  while (head != NULL) {
     tmp = head;
     head = head->next;
     free(tmp->partition);
     free(tmp);
-  } 
+  }
+  return;
 }
 
-
+// returns the HEAD to a pareto set (linked list); if it returns NULL, a memory allocation error occurred
 struct Pareto_element* multistart_bicriterion_pairwise_interchange(size_t N, double matrix[N][N], int R, int WL, 
                                                                    double weights[WL], int *partition) {
   
@@ -130,7 +142,10 @@ struct Pareto_element* multistart_bicriterion_pairwise_interchange(size_t N, dou
             cluster_swap(N, i, j, partition);
             double current_diversity = get_diversity_fast(save_diversity, i, j, N, partition, matrix);
             double current_dispersion = get_dispersion_fast(save_dispersion , i, j, N, partition, matrix);
-            update_pareto(&head, N, partition,current_diversity, current_dispersion);
+            if (update_pareto(&head, N, partition,current_diversity, current_dispersion) == 1) {
+                free_pareto_set(head); // free all memory
+                return NULL;
+            }
             double current_bicriterion = div_weight*current_diversity + dis_weight*current_dispersion;
             if(current_bicriterion > max_bicriterion){
               save_diversity = current_diversity;
@@ -148,7 +163,7 @@ struct Pareto_element* multistart_bicriterion_pairwise_interchange(size_t N, dou
   return (head);
 }  
 
-
+// returns the HEAD to a pareto set (linked list); if it returns NULL, a memory allocation error occurred
 struct Pareto_element* bicriterion_iterated_local_search(struct Pareto_element* head, size_t N, double matrix[N][N], int R, int WL, double weights[WL], double neighbor_percent[2]){
   
   for(int a = 0; a < R; a++){
@@ -185,7 +200,10 @@ struct Pareto_element* bicriterion_iterated_local_search(struct Pareto_element* 
             cluster_swap(N, i, j, partition);
             double current_diversity = get_diversity_fast(save_diversity, i, j, N, partition, matrix);
             double current_dispersion = get_dispersion_fast(save_dispersion , i, j, N, partition, matrix);
-            update_pareto(&head, N, partition, current_diversity, current_dispersion);
+            if (update_pareto(&head, N, partition, current_diversity, current_dispersion) == 1) {
+                free_pareto_set(head); // free all memory
+                return NULL;
+            }
             double current_bicriterion = div_weight*current_diversity + dis_weight*current_dispersion;
             if(current_bicriterion > max_bicriterion){
               save_diversity = current_diversity;
@@ -261,21 +279,26 @@ void cluster_swap(size_t N, int i, int j, int partition[N]){
 }
 
 
-void update_pareto(struct Pareto_element** head_ref, size_t N, int partition[N], double diversity, double dispersion){
+int update_pareto(struct Pareto_element** head_ref, size_t N, int partition[N], double diversity, double dispersion){
   
   if(*head_ref == NULL){
     compress(N, partition);
-    push(head_ref, diversity, dispersion, N, partition);
+    if (push(head_ref, diversity, dispersion, N, partition) == 1) {
+        return 1;
+    }
     
   }else{
     if(!(paretodominated(*head_ref, diversity, dispersion))){
       compress(N, partition);
       if(!(paretoincluded(*head_ref, N, partition))){
         delete_outdated(head_ref, diversity, dispersion);
-        push(head_ref, diversity, dispersion, N, partition);
+        if (push(head_ref, diversity, dispersion, N, partition) == 1) {
+            return 1;
+        }
       }
     }
   }
+  return 0;
 }
 
 
@@ -336,15 +359,22 @@ bool paretoincluded(struct Pareto_element* head, size_t N, int partition[N]){
 }
 
 
-void push(struct Pareto_element** head_ref, double diversity, double dispersion, size_t N, int partition[N]) { 
+// returns 1 if a memory allocation error occurs, 0 otherwise
+int push(struct Pareto_element** head_ref, double diversity, double dispersion, size_t N, int partition[N]) { 
   
         /* 1. allocate node */
         struct Pareto_element* new_node = (struct Pareto_element*) malloc(sizeof(struct Pareto_element)); 
+        if (new_node == NULL) {
+            return 1;
+        }
         
         /* 2. put in the data  */
         new_node->diversity  = diversity;
         new_node->dispersion = dispersion;
         new_node->partition = (int*) malloc(sizeof(int) * N);  // vllt memcpy anstatt schleife?
+        if (new_node->partition == NULL) {
+            return 1;
+        }
         for(int b = 0;b<N;b++){ 
             new_node->partition[b]  = partition[b];
         }
@@ -354,6 +384,7 @@ void push(struct Pareto_element** head_ref, double diversity, double dispersion,
             
         /* 4. move the head to point to the new node */
         (*head_ref)    = new_node; 
+        return 0;
 }  
 
 

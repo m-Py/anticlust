@@ -187,8 +187,15 @@ bicriterion_anticlustering <- function(
     as.double(Xi),
     as.integer(clusters),
     result = double(length(result_matrix)),
+    mem_error = as.integer(0),
     PACKAGE = "anticlust" # important to call C
-  )$result
+  )
+  
+  if (results[["mem_error"]] == 1) {
+    stop("Could not allocate enough memory.")
+  }
+  
+  results <- results$result
   
   # remove allocated space that was not needed
   results <- results[results != -1]

@@ -10,7 +10,8 @@ void bicriterion_iterated_local_search_call(
         double *W, 
         double *Xi, 
         int *partition,
-        double *result
+        double *result,
+        int *mem_error
 );
 struct Pareto_element* multistart_bicriterion_pairwise_interchange(
         size_t N, 
@@ -29,14 +30,18 @@ void random_partition(size_t N, int G, int partition[N]);
 double get_diversity(size_t N, int partition[N], double matrix[N][N]);
 double get_dispersion(size_t N, int partition[N], double matrix[N][N]);
 void cluster_swap(size_t N, int i, int j, int partition[N]);
-void update_pareto(struct Pareto_element** head_ref, size_t N, int partition[N], double diversity, double dispersion);
+int update_pareto(struct Pareto_element** head_ref, size_t N, int partition[N], double diversity, double dispersion);
 void compress(size_t N, int partition[N]);
 bool paretodominated(struct Pareto_element* head, double diversity, double dispersion);
 bool paretoincluded(struct Pareto_element* head, size_t N, int partition[N]);
-void push(struct Pareto_element** head_ref, double diversity, double dispersion, size_t N, int partition[N]);
+int push(struct Pareto_element** head_ref, double diversity, double dispersion, size_t N, int partition[N]);
 void delete_outdated(struct Pareto_element** head_ref, double diversity, double dispersion);
 void linked_list_sample(struct Pareto_element* head, size_t N, int* partition);
 int linked_list_length(struct Pareto_element* head);
 double random_in_range(double min, double max);
 double get_diversity_fast(double diversity, int x,int y, size_t N, int partition[N], double matrix[N][N]);
 double get_dispersion_fast(double dispersion, int x,int y, size_t N, int partition[N], double matrix[N][N]);
+void free_pareto_set(struct Pareto_element* head);
+double uniform_rnd_number();
+double uni_rnd_number_range(double min, double max);
+int random_integer(int min, int max);
