@@ -87,16 +87,21 @@ void bicriterion_iterated_local_search_call(double *distances, int *N, int *R,
   
   //update result with the solutions from the linked list
   int position = 0;
+  struct Pareto_element* tmp; // for freeing memory
   while (head != NULL && position != n*u) {
     int *array = head->partition;
     for(int i = 0; i < n; i++){
       result[position] = array[i];
       position++;
     }
+    // todo: free "partition" from each pareto element, and then free the pareto element
+    tmp = head;
     head = head->next;
+    free(tmp->partition);
+    free(tmp);
   } 
 }
-  
+
 
 struct Pareto_element* multistart_bicriterion_pairwise_interchange(size_t N, double matrix[N][N], int R, int WL, 
                                                                    double weights[WL], int *partition) {
