@@ -12,7 +12,9 @@ maximizing diversity and dispersion, proposed by Brusco et al.
 
 # anticlust 0.5.7
 
-- Just an update to the documentation: Updating all references to the Papenberg & Klau paper after its "actual" publication in Psychological Methods.
+- Just an update to the documentation: Updating all references to the Papenberg & Klau paper after its "actual" publication in Psychological Methods:
+
+Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition data sets into equivalent parts. *Psychological Methods, 26*(2), 161–174. https://doi.org/10.1037/met0000301
 
 # anticlust 0.5.6-1
 
