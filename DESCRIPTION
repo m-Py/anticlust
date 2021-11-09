@@ -34,8 +34,8 @@ Description: The method of anticlustering partitions a pool of elements
     the GNU linear programming kit
     (<https://www.gnu.org/software/glpk/glpk.html>) is available and the R
     package 'Rglpk' (<https://cran.R-project.org/package=Rglpk>) is
-    installed. A bicriterion anticlustering method by Brusco et al. (2020;
-    <doi:10.1111/bmsp.12186>) is available through the function
+    installed. A bicriterion anticlustering method proposed by Brusco et al. 
+    (2020; <doi:10.1111/bmsp.12186>) is available through the function
     bicriterion_anticlustering(). Some other functions are available to
     solve classical clustering problems. The function
     balanced_clustering() applies a cluster analysis under size
