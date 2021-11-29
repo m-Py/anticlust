@@ -186,7 +186,7 @@ bicriterion_anticlustering <- function(
     as.double(W),
     as.double(Xi),
     as.integer(clusters),
-    result = double(length(result_matrix)),
+    result = integer(length(result_matrix)),
     mem_error = as.integer(0),
     PACKAGE = "anticlust" # important to call C
   )
