@@ -204,7 +204,10 @@ bicriterion_anticlustering <- function(
   # that we turn back into a matrix
   results <- matrix(results, ncol = N, byrow = TRUE)
   # Order each partition:
-  t(apply(results, 1, order_cluster_vector))
+  results <- data.frame(t(apply(results, 1, order_cluster_vector)))
+  # Remove duplicates
+  results <- results[!duplicated(results), ]
+  as.matrix(results)
 }
 
 #verify input
