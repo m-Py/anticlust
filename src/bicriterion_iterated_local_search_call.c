@@ -6,25 +6,6 @@
 #include "header.h"
 #include <R.h>
 
-// generate a random uniform number in range
-double uni_rnd_number_range(double min, double max) {
-  double number = uniform_rnd_number();
-  return (min + number * (max - min));
-}
-
-// Generate a random integer in given range
-int random_integer(int min, int max) {
-  int integer = (int) floor(uniform_rnd_number() * (max - min + 1)) + min;
-  return integer;
-}
-
-double uniform_rnd_number() {
-  GetRNGstate();
-  double my_number = unif_rand();
-  PutRNGstate();
-  return my_number;
-}
-
 //datastructure to store a linked-list of partitions
 struct Pareto_element { 
   double diversity; 
@@ -549,4 +530,23 @@ double get_dispersion_fast(double dispersion, int x,int y, size_t N, int partiti
   }
   
   return(dispersion);
+}
+
+// generate a random uniform number in range
+double uni_rnd_number_range(double min, double max) {
+  double number = uniform_rnd_number();
+  return (min + number * (max - min));
+}
+
+// Generate a random integer in given range
+int random_integer(int min, int max) {
+  int integer = (int) floor(uniform_rnd_number() * (max - min + 1)) + min;
+  return integer;
+}
+
+double uniform_rnd_number() {
+  GetRNGstate();
+  double my_number = unif_rand();
+  PutRNGstate();
+  return my_number;
 }
