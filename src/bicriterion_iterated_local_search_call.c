@@ -73,9 +73,8 @@ void bicriterion_iterated_local_search_call(double *distances, int *N, int *R,
   int position = 0;
   struct Pareto_element* tmp = head; // for freeing memory lateron
   while (head != NULL && position != n*u) {
-    int *array = head->partition;
     for(int i = 0; i < n; i++){
-      result[position] = array[i];
+      result[position] = head->partition[i];
       position++;
     }
     head = head->next;
