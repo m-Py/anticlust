@@ -268,7 +268,7 @@ void shuffle_permutation(int N, int *permutation) {
     }
 }
 
-void cluster_swap(size_t N, int i, int j, int* partition){
+void cluster_swap(size_t N, size_t i, size_t j, int* partition){
   int save = partition[i];
   partition[i] = partition[j];
   partition[j] = save;
@@ -278,49 +278,19 @@ void cluster_swap(size_t N, int i, int j, int* partition){
 int update_pareto(struct Pareto_element** head_ref, size_t N, int* partition, double diversity, double dispersion){
   
   if(*head_ref == NULL){
-    compress(N, partition);
     if (push(head_ref, diversity, dispersion, N, partition) == 1) {
         return 1;
     }
     
-  }else{
-    if(!(paretodominated(*head_ref, diversity, dispersion))){
-      compress(N, partition);
-      if(!(paretoincluded(*head_ref, N, partition))){
-        delete_outdated(head_ref, diversity, dispersion);
-        if (push(head_ref, diversity, dispersion, N, partition) == 1) {
-            return 1;
-        }
+  }
+  if (!(paretodominated(*head_ref, diversity, dispersion))) {
+      delete_outdated(head_ref, diversity, dispersion);
+      if (push(head_ref, diversity, dispersion, N, partition) == 1) {
+        return 1;
       }
-    }
   }
   return 0;
 }
-
-
-//compress partition to uniform ascending order
-void compress(size_t N, int* partition){
-  
-  int cluster = 0;
-  int change;
-  
-  for (size_t i = 0; i < N; i++){
-    if (partition[i] == cluster){
-      cluster++;
-    } else if (partition[i] > cluster){
-      change = partition[i];
-      for (size_t j = i; j < N; j++){
-        if (change == partition[j]){
-          partition[j] = cluster;
-        } else if(cluster == partition[j]){
-          partition[j] = change;          
-        }
-      }
-      cluster++;
-    }
-  } 
-}
-
 
 bool paretodominated(struct Pareto_element* head, double diversity, double dispersion){
   
@@ -333,26 +303,6 @@ bool paretodominated(struct Pareto_element* head, double diversity, double dispe
   
   return (false);
 }
-
-
-bool paretoincluded(struct Pareto_element* head, size_t N, int* partition){
-  
-  while(head != NULL){
-    int counter = 0;
-    for(int i = 0; i < N; i++){
-      if(partition[i] == head->partition[i]){
-        counter++;
-      }
-    }
-    if (N == counter){
-      return true;
-    }
-    head = head->next;
-  }
-  
-  return(false);
-}
-
 
 // returns 1 if a memory allocation error occurs, 0 otherwise
 int push(struct Pareto_element** head_ref, double diversity, double dispersion, size_t N, int* partition) { 

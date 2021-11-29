@@ -36,11 +36,9 @@ struct Pareto_element* bicriterion_iterated_local_search(
 double sample(size_t array_size,double array[array_size]);
 double get_diversity(size_t N, int* partition, double matrix[N][N]);
 double get_dispersion(size_t N, int* partition, double matrix[N][N]);
-void cluster_swap(size_t N, int i, int j, int* partition);
+void cluster_swap(size_t N, size_t i, size_t j, int* partition);
 int update_pareto(struct Pareto_element** head_ref, size_t N, int* partition, double diversity, double dispersion);
-void compress(size_t N, int* partition);
 bool paretodominated(struct Pareto_element* head, double diversity, double dispersion);
-bool paretoincluded(struct Pareto_element* head, size_t N, int* partition);
 int push(struct Pareto_element** head_ref, double diversity, double dispersion, size_t N, int* partition);
 void delete_outdated(struct Pareto_element** head_ref, double diversity, double dispersion);
 void linked_list_sample(struct Pareto_element* head, size_t N, int* partition);
