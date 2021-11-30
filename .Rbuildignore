@@ -16,4 +16,4 @@ LICENSE.md
 /*.tar.gz
 /*.Rcheck/
 .radian_profile
-*.dll
+/*.dll
