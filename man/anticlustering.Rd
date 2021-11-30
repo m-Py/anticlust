@@ -60,11 +60,9 @@ A vector of length N that assigns a group (i.e, a number
     between 1 and \code{K}) to each input element.
 }
 \description{
-Partition a pool of elements into groups (i.e., anticlusters). Anticlustering
-strives to create groups that are as similar as
-possible to each other, or that achieve high within-group heterogeneity. Oftentimes,
-these two objectives coincide and high between-group similarity corresponds to
-high within-group diversity. Anticlustering is accomplished by maximizing instead
+Partition a pool of elements into groups (i.e., anticlusters) with the aim 
+of creating high within-group heterogeneity and high between-group similarity.
+Anticlustering is accomplished by maximizing instead
 of minimizing a clustering objective function. 
 Implements anticlustering algorithms as described in
 Papenberg and Klau (2021; <doi:10.1037/met0000301>) and an implementation
@@ -72,10 +70,9 @@ of the bicriterion anticlustering algorithm described by Brusco, Cradit
 and Steinley (2020; <doi:10.1111/bmsp.12186>).
 }
 \details{
-This function is used to solve anticlustering. That is, \code{K}
-groups are created in such a way that all groups are as similar as
-possible (this usually corresponds to creating groups with high
-within-group heterogeneity). Anticlustering is accomplished by maximizing
+This function is used to solve anticlustering. That is, the data input is 
+divided into \code{K} in such a way that elements within groups are heterogeneous 
+and the different groups are similar. Anticlustering is accomplished by maximizing
 instead of minimizing a clustering objective function. The
 maximization of four clustering objective functions is natively
 supported (other functions can also defined by the user as
@@ -117,7 +114,7 @@ that are part of the same cluster; maximization of this objective
 ensures that any two elements within the same group are as
 dissimilar from each other as possible. Applications that require
 high within-group heterogeneity often require to maximize the
-dispersion.
+dispersion. 
 
 If the data input \code{x} is a feature matrix (that is: each row
 is a "case" and each column is a "variable") and the option
@@ -130,7 +127,7 @@ In the standard case, groups of equal size are generated. Adjust
 the argument \code{K} to create groups of different size (see
 examples).
 
-\strong{Heuristic anticlustering}
+\strong{Algorithms for anticlustering}
 
 By default, a heuristic method is employed for anticlustering: the
 exchange method (\code{method = "exchange"}). First, anticlusters
@@ -163,7 +160,7 @@ for one criterion - diversity or dispersion.
 \code{\link{bicriterion_anticlustering}}) can be used to conduct the actual 
 bicriterion optimization that is offered by Brusco et al.'s algorithm.
 
-\strong{Exact anticlustering}
+\strong{Optimal anticlustering}
 
 An optimal anticluster editing objective (i.e., a solution having
 the global maximum value in diversity) can be found via integer

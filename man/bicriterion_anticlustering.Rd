@@ -93,9 +93,9 @@ For technical reasons, the pareto set returned by this function has
 a limit of 500 partitions. Usually however, the
 algorithm usually finds much fewer partitions. There is one following exception:
 We do not recommend to use this method when the input data is
-one-dimensional. This may cause the algorithm to identify too many
-equivalent partitions and it runs very slowly (see section 5.6 in Breuer, 
-2020).
+one-dimensional where the algorithm may identify too many
+equivalent partitions causing it to run very slowly (see section 5.6 in 
+Breuer, 2020).
 }
 \examples{
 # Generate some random data
