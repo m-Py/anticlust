@@ -131,7 +131,7 @@ struct Pareto_element* multistart_bicriterion_pairwise_interchange(
           int g = partition[i];
           int h = partition[j];
           if(g != h){
-            cluster_swap(N, i, j, partition);
+            cluster_swap(i, j, partition);
             double current_diversity = get_diversity_fast(save_diversity, i, j, N, partition, matrix);
             double current_dispersion = get_dispersion_fast(save_dispersion , i, j, N, partition, matrix);
             if (update_pareto(&head, N, partition,current_diversity, current_dispersion) == 1) {
@@ -145,7 +145,7 @@ struct Pareto_element* multistart_bicriterion_pairwise_interchange(
               max_bicriterion = current_bicriterion;
               Flag = false;
             }else{
-              cluster_swap(N, i, j, partition);
+              cluster_swap(i, j, partition);
             }
           }
         }
@@ -173,7 +173,7 @@ struct Pareto_element* bicriterion_iterated_local_search(
         if (g != h){
           double random = uni_rnd_number_range(0,1);
           if(random < neighborhood_size){
-            cluster_swap(N, i, j, partition);
+            cluster_swap(i, j, partition);
           }
         }
       }
@@ -191,7 +191,7 @@ struct Pareto_element* bicriterion_iterated_local_search(
           int g = partition[i];
           int h = partition[j];
           if(g != h){
-            cluster_swap(N, i, j, partition);
+            cluster_swap(i, j, partition);
             double current_diversity = get_diversity_fast(save_diversity, i, j, N, partition, matrix);
             double current_dispersion = get_dispersion_fast(save_dispersion , i, j, N, partition, matrix);
             if (update_pareto(&head, N, partition, current_diversity, current_dispersion) == 1) {
@@ -206,7 +206,7 @@ struct Pareto_element* bicriterion_iterated_local_search(
               max_bicriterion = current_bicriterion;
               Flag = false;
             }else{
-              cluster_swap(N, i, j, partition);
+              cluster_swap(i, j, partition);
             }
           }
         }
@@ -264,11 +264,11 @@ double get_dispersion(size_t N, int* partition, double matrix[N][N]){
 void shuffle_permutation(int N, int *permutation) {
     for (int i = 0; i <= N-2; i++) {
         int j = random_integer(0, i);
-        cluster_swap(N, i, j, permutation);
+        cluster_swap(i, j, permutation);
     }
 }
 
-void cluster_swap(size_t N, size_t i, size_t j, int* partition){
+void cluster_swap(size_t i, size_t j, int* partition){
   int save = partition[i];
   partition[i] = partition[j];
   partition[j] = save;
