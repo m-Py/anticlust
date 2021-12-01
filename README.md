@@ -80,10 +80,10 @@ create three similar sets of plants using the classical iris data set:
     # The output is a vector that assigns a group (i.e, a number
     # between 1 and K) to each input element:
     anticlusters
-    #>   [1] 1 1 2 3 2 3 2 1 2 1 2 1 2 3 1 2 1 1 2 3 3 1 2 1 3 1 3 2 1 3 3 1 3 2 3 2 2
-    #>  [38] 2 3 1 1 1 3 3 1 2 3 1 2 3 2 3 3 2 2 2 3 3 3 2 3 3 2 1 2 3 1 1 3 2 2 1 1 3
-    #>  [75] 1 3 3 2 1 3 1 2 1 2 1 3 1 2 3 3 1 3 1 2 2 2 2 3 1 3 1 3 2 2 1 3 3 3 2 3 3
-    #> [112] 2 3 1 2 2 1 1 1 1 3 1 1 3 1 1 2 2 1 2 3 2 2 1 2 2 3 1 3 3 2 1 1 1 1 3 3 2
+    #>   [1] 1 3 2 2 1 2 3 2 2 3 3 3 3 2 1 2 1 1 1 3 2 1 1 1 3 2 1 1 1 3 1 3 2 2 3 1 3
+    #>  [38] 3 2 3 3 2 2 2 1 3 1 2 2 3 2 3 2 1 3 1 3 1 2 2 2 1 3 1 2 3 2 3 2 1 3 1 1 2
+    #>  [75] 2 1 1 3 2 3 3 1 1 3 2 3 2 1 1 3 1 1 2 2 3 2 3 3 1 2 1 1 2 2 2 2 3 2 1 1 3
+    #> [112] 3 3 3 3 1 3 3 1 3 1 2 2 3 3 2 2 1 2 1 3 3 3 1 1 2 1 1 1 1 3 2 1 3 2 2 1 3
     #> [149] 2 2
 
     # Each group has the same number of items:
@@ -100,7 +100,7 @@ create three similar sets of plants using the classical iris data set:
     #> ------------------------------------------------------------ 
     #> anticlusters: 2
     #> Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
-    #>         5.84         3.06         3.76         1.20 
+    #>         5.85         3.06         3.76         1.20 
     #> ------------------------------------------------------------ 
     #> anticlusters: 3
     #> Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
@@ -113,11 +113,13 @@ pretty much the same across three groups. The function
 `anticlustering()` takes as input a data table describing the elements
 that should be assigned to sets. In the data table, each row represents
 an element, for example a person, word or a photo. Each column is a
-numeric variable describing one of the elements’ features. The table may
-be an R `matrix` or `data.frame`; a single feature can also be passed as
-a `vector`. The number of groups is specified through the argument `K`.
-(Alternatively, it is also possible to pass a dissimilarity matrix
-describing the pairwise distance between elements.)
+numeric variable describing one of the elements’ features.
+(Alternatively, it is also possible to pass a distance matrix describing
+the pairwise dissimilarity between elements.) The number of groups is
+specified through the argument `K`. The argument `objective` specifies
+how between-group similarity is computed; the argument `method`
+specifies the algorithm by which this measure is optimized. See the
+documentation `?anticlustering` for more details.
 
 To quantify cluster similarity, `anticlust` employs one of several
 measures that have been developed in the context of cluster analysis:
