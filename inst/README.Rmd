@@ -97,7 +97,7 @@ To quantify cluster similarity, `anticlust` employs one of several measures that
 
 The anticlustering objectives are described in detail in the documentation (`?diversity_objective`, `?variance_objective`, `?kplus_objective`, `?dispersion_objective`) and the references therein. It is also possible to optimize user-defined measures of cluster similarity, which is also described in the documentation (`?anticlustering`).
 
-## Categorical constraints
+## Categorical variables
 
 Sometimes, it is required that sets are not only similar with regard to
 some numeric variables, but we also want to ensure that each set
@@ -120,7 +120,7 @@ table(anticlusters, iris$Species)
 
 ## Matching and clustering
 
-Anticlustering in a sense creates sets of dissimilar elements; the heterogenity within anticlusters is maximized (either using the cluster editing or k-means objective as measure of heterogenity). The `anticlust` package also provides functions for "classical" clustering applications: `balanced_clustering()` creates sets of elements that are similar while ensuring that clusters are of equal size. This is an example:
+Anticlustering creates sets of dissimilar elements; the heterogenity within anticlusters is maximized. This is the opposite of clustering problems that strive for high within-cluster similarity and good separation between clusters. The `anticlust` package also provides functions for "classical" clustering applications: `balanced_clustering()` creates sets of elements that are similar while ensuring that clusters are of equal size. This is an example:
 
 ```{r clustering}
 # Generate random data, cluster the data set and visualize results

@@ -80,11 +80,11 @@ create three similar sets of plants using the classical iris data set:
     # The output is a vector that assigns a group (i.e, a number
     # between 1 and K) to each input element:
     anticlusters
-    #>   [1] 1 1 2 1 1 1 3 3 1 2 2 3 1 3 2 1 2 2 1 3 1 2 2 2 3 1 2 3 1 3 3 2 3 3 1 2 1
-    #>  [38] 3 3 1 2 1 3 1 3 2 3 3 2 3 2 2 3 2 2 1 2 3 3 3 2 2 2 1 2 1 1 1 3 1 2 1 3 1
-    #>  [75] 3 3 2 2 2 1 1 2 3 1 3 3 3 3 1 3 2 2 2 2 2 1 2 3 2 1 3 3 3 2 3 3 2 1 1 2 1
-    #> [112] 2 1 1 3 2 1 2 3 1 1 3 2 3 1 2 1 2 3 3 3 1 3 2 2 3 2 2 1 3 1 1 1 1 2 3 3 1
-    #> [149] 1 1
+    #>   [1] 1 1 2 3 2 3 2 1 2 1 2 1 2 3 1 2 1 1 2 3 3 1 2 1 3 1 3 2 1 3 3 1 3 2 3 2 2
+    #>  [38] 2 3 1 1 1 3 3 1 2 3 1 2 3 2 3 3 2 2 2 3 3 3 2 3 3 2 1 2 3 1 1 3 2 2 1 1 3
+    #>  [75] 1 3 3 2 1 3 1 2 1 2 1 3 1 2 3 3 1 3 1 2 2 2 2 3 1 3 1 3 2 2 1 3 3 3 2 3 3
+    #> [112] 2 3 1 2 2 1 1 1 1 3 1 1 3 1 1 2 2 1 2 3 2 2 1 2 2 3 1 3 3 2 1 1 1 1 3 3 2
+    #> [149] 2 2
 
     # Each group has the same number of items:
     table(anticlusters)
@@ -138,8 +138,8 @@ It is also possible to optimize user-defined measures of cluster
 similarity, which is also described in the documentation
 (`?anticlustering`).
 
-Categorical constraints
------------------------
+Categorical variables
+---------------------
 
 Sometimes, it is required that sets are not only similar with regard to
 some numeric variables, but we also want to ensure that each set
@@ -165,13 +165,13 @@ use the argument `categories` as follows:
 Matching and clustering
 -----------------------
 
-Anticlustering in a sense creates sets of dissimilar elements; the
-heterogenity within anticlusters is maximized (either using the cluster
-editing or k-means objective as measure of heterogenity). The
-`anticlust` package also provides functions for “classical” clustering
-applications: `balanced_clustering()` creates sets of elements that are
-similar while ensuring that clusters are of equal size. This is an
-example:
+Anticlustering creates sets of dissimilar elements; the heterogenity
+within anticlusters is maximized. This is the opposite of clustering
+problems that strive for high within-cluster similarity and good
+separation between clusters. The `anticlust` package also provides
+functions for “classical” clustering applications:
+`balanced_clustering()` creates sets of elements that are similar while
+ensuring that clusters are of equal size. This is an example:
 
     # Generate random data, cluster the data set and visualize results
     N <- 1400
