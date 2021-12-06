@@ -159,9 +159,9 @@ struct Pareto_element* multistart_bicriterion_pairwise_interchange(
 struct Pareto_element* bicriterion_iterated_local_search(
     struct Pareto_element* head, size_t N, double matrix[N][N], size_t R, 
     size_t WL, double weights[WL], double neighbor_percent[2]){
-  
+
   for (size_t a = 0; a < R; a++){
-    double div_weight = sample(10, weights); 
+    double div_weight = sample(WL, weights); 
     double dis_weight = 1 - div_weight;
     double neighborhood_size = uni_rnd_number_range(neighbor_percent[0], neighbor_percent[1]);
     int* partition = (int*) malloc(sizeof(int) * N);
