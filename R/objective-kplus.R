@@ -52,7 +52,7 @@
 #' already made the methodology available as its results have been
 #' very convincing thus far (e.g., check out the examples below). When
 #' using k-plus anticlustering in your research, it would be courteous
-#' to cite Papenberg and Klau (2020) as the primary \code{anticlust}
+#' to cite Papenberg and Klau (2021) as the primary \code{anticlust}
 #' reference, even though the criterion has not been described in that
 #' paper. In doubt, contact the author to inquire whether a new
 #' reference is available, or check out the package website
@@ -60,7 +60,7 @@
 #'
 #' @references
 #' 
-#' Papenberg, M., & Klau, G. W. (2020). Using anticlustering to partition 
+#' Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition 
 #' data sets into equivalent parts. Psychological Methods, 26(2), 
 #' 161–174. https://doi.org/10.1037/met0000301.
 #' 

@@ -62,7 +62,7 @@ plot_clusters(data, cl, illustrate_variance = TRUE)
 Jain, A. K. (2010). Data clustering: 50 years beyond k-means.
 Pattern Recognition Letters, 31, 651–666.
 
-Papenberg, M., & Klau, G. W. (2020). Using anticlustering to partition 
+Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition 
 data sets into equivalent parts. Psychological Methods, 26(2), 
 161–174. https://doi.org/10.1037/met0000301.
 

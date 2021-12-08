@@ -50,7 +50,7 @@
 #' approach. British Journal of Mathematical and Statistical
 #' Psychology, 73, 275-396. https://doi.org/10.1111/bmsp.12186
 #' 
-#' Papenberg, M., & Klau, G. W. (2020). Using anticlustering to partition 
+#' Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition 
 #' data sets into equivalent parts. Psychological Methods, 26(2), 
 #' 161–174. https://doi.org/10.1037/met0000301.
 #'
