@@ -70,13 +70,19 @@ features <- schaper2019[, 3:6]
 kplus_groups <- anticlustering(
   features,
   K = 3,
-  objective = "kplus"
+  objective = "kplus",
+  standardize = TRUE,
+  repetitions = 50,
+  method = "local-maximum"
 )
 # Optimize normal k-means criterion
 kmeans_groups <- anticlustering(
   features,
   K = 3,
-  objective = "variance"
+  objective = "variance",
+  standardize = TRUE,
+  repetitions = 50,
+  method = "local-maximum"
 )
 
 # Compute k-plus criterion (k-plus is much better here)
