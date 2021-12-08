@@ -25,18 +25,19 @@ can be an object of class \code{dist} (e.g., returned by
 where the entries of the upper and lower triangular matrix
 represent pairwise dissimilarities.}
 
-\item{K}{How many anticlusters should be created. Alternatively: (a) 
-A vector describing the size of each group, or (b) a
-vector of length \code{nrow(x)} describing how elements are
-assigned to anticlusters before the optimization starts.}
+\item{K}{How many anticlusters should be created. Alternatively:
+(a) A vector describing the size of each group, or (b) a vector
+of length \code{nrow(x)} describing how elements are assigned
+to anticlusters before the optimization starts.}
 
 \item{objective}{The objective to be maximized. The options
 "diversity" (default; previously called "distance", which is
-still supported), "variance", "kplus" and "dispersion" are natively
-supported. May also be a user-defined function. See Details.}
+still supported), "variance", "kplus" and "dispersion" are
+natively supported. May also be a user-defined function. See
+Details.}
 
-\item{method}{One of "exchange" (default) , "local-maximum", "brusco", or
-"ilp".  See Details.}
+\item{method}{One of "exchange" (default) , "local-maximum",
+"brusco", or "ilp".  See Details.}
 
 \item{preclustering}{Boolean. Should a preclustering be conducted
 before anticlusters are created? Defaults to \code{FALSE}. See
@@ -47,54 +48,56 @@ or several categorical constraints. See Details.}
 
 \item{repetitions}{The number of times a search heuristic is
 initiated when using \code{method = "exchange"}, \code{method =
-"local-maximum"}, or \code{method = "brusco"}. In the end, 
-the best objective found across the repetitions is returned.}
+"local-maximum"}, or \code{method = "brusco"}. In the end, the
+best objective found across the repetitions is returned.}
 
-\item{standardize}{Boolean. If \code{TRUE} and \code{x} is a feature 
-matrix, the data is standardized through a call to \code{\link{scale}}
-before the optimization starts. This argument is silently ignored 
-if \code{x} is a distance matrix.}
+\item{standardize}{Boolean. If \code{TRUE} and \code{x} is a
+feature matrix, the data is standardized through a call to
+\code{\link{scale}} before the optimization starts. This
+argument is silently ignored if \code{x} is a distance matrix.}
 }
 \value{
 A vector of length N that assigns a group (i.e, a number
     between 1 and \code{K}) to each input element.
 }
 \description{
-Partition a pool of elements into groups (i.e., anticlusters) with the aim 
-of creating high within-group heterogeneity and high between-group similarity.
-Anticlustering is accomplished by maximizing instead
-of minimizing a clustering objective function. 
-Implements anticlustering algorithms as described in
-Papenberg and Klau (2021; <doi:10.1037/met0000301>) and an implementation
-of the bicriterion anticlustering algorithm described by Brusco, Cradit 
+Partition a pool of elements into groups (i.e., anticlusters) with
+the aim of creating high within-group heterogeneity and high
+between-group similarity.  Anticlustering is accomplished by
+maximizing instead of minimizing a clustering objective function.
+Implements anticlustering algorithms as described in Papenberg and
+Klau (2021; <doi:10.1037/met0000301>) and an implementation of the
+bicriterion anticlustering algorithm described by Brusco, Cradit
 and Steinley (2020; <doi:10.1111/bmsp.12186>).
 }
 \details{
-This function is used to solve anticlustering. That is, the data input is 
-divided into \code{K} in such a way that elements within groups are heterogeneous 
-and the different groups are similar. Anticlustering is accomplished by maximizing
-instead of minimizing a clustering objective function. The
-maximization of four clustering objective functions is natively
-supported (other functions can also defined by the user as
-described below):
+This function is used to solve anticlustering. That is, the data
+input is divided into \code{K} groups in such a way that elements
+within groups are heterogeneous and the different groups are
+similar. Anticlustering is accomplished by maximizing instead of
+minimizing a clustering objective function. The maximization of
+four clustering objective functions is natively supported (other
+functions can also defined by the user as described below):
 
 \itemize{
-  \item{cluster editing `diversity` objective, setting \code{objective = "diversity"} (this is the default objective)}
+  \item{cluster editing `diversity` objective, setting 
+        \code{objective = "diversity"} (this is the default objective)}
   \item{k-means `variance` objective, setting \code{objective = "variance"}}
   \item{`k-plus` objective, an extension of the k-means variance criterion,
         setting \code{objective = "kplus"}}
-  \item{the `dispersion` objective, which the minimum distance between 
-        any two elements within the same cluster.}
+  \item{the `dispersion` objective is the minimum distance between 
+        any two elements within the same cluster (setting 
+        \code{objective = "dispersion"})}
 }
 
 The k-means objective is the within-group variance---that is, the
 sum of the squared distances between each element and its cluster
 center (see \code{\link{variance_objective}}). K-means
 anticlustering focuses on minimizing differences with regard to the
-means of the input variables \code{x}; k-plus \code{objective = "kplus"}
-anticlustering is an extension of this criterion that also tries to
-minimize differences with regard to the standard deviations between
-groups (see \code{\link{kplus_objective}}).
+means of the input variables \code{x}; k-plus \code{objective =
+"kplus"} anticlustering is an extension of this criterion that also
+tries to minimize differences with regard to the standard
+deviations between groups (see \code{\link{kplus_objective}}).
 
 The cluster editing "diversity" objective is the sum of pairwise
 distances of elements within the same groups (see
@@ -102,19 +105,26 @@ distances of elements within the same groups (see
 known as the »maximum diverse grouping problem« because it
 maximizes group diversity as measured by the sum of pairwise
 distances. Hence, anticlustering maximizes between-group similarity
-by maximizing within-group heterogeneity. In previous versions of
-this package, \code{method = "distance"} was used (and is still
-supported) to request anticluster editing, but now \code{method =
-"diversity"} is preferred because there are several clustering
-objectives based on pairwise distances (e.g., see
-\code{\link{dispersion_objective}}).
+by maximizing within-group heterogeneity. Note that the equivalence
+of within-group heterogeneity and between-group similarity only
+holds for equal-sized groups. If you request different-sized groups
+and wish the different groups to be similar to each other, use
+\code{objective = "kplus"} or \code{objective = "variance"}. In
+previous versions of this package, \code{method = "distance"} was
+used (and is still supported) to request anticluster editing, but
+now \code{method = "diversity"} is preferred because there are
+several clustering objectives based on pairwise distances (e.g.,
+see \code{\link{dispersion_objective}}).
 
 The "dispersion" is the minimum distance between any two elements
 that are part of the same cluster; maximization of this objective
 ensures that any two elements within the same group are as
 dissimilar from each other as possible. Applications that require
 high within-group heterogeneity often require to maximize the
-dispersion. 
+dispersion. Oftentimes, it is useful to also consider the diversity
+and not only the dispersion; to optimize both objectives at the
+same time, see the function
+\code{\link{bicriterion_anticlustering}}.
 
 If the data input \code{x} is a feature matrix (that is: each row
 is a "case" and each column is a "variable") and the option
@@ -125,7 +135,7 @@ self-generated dissimiliarity matrix via the argument \code{x}.
 
 In the standard case, groups of equal size are generated. Adjust
 the argument \code{K} to create groups of different size (see
-examples).
+Examples).
 
 \strong{Algorithms for anticlustering}
 
@@ -154,11 +164,13 @@ which can dramatically speed up the optimization (more information
 on the preclustering heuristic follows below). This option is
 recommended for larger N.
 
-Using \code{method = "brusco"} implements the local bicriterion 
-iterated local search heuristic by Brusco et al. (2020), but only optimizes
-for one criterion - diversity or dispersion.
-\code{\link{bicriterion_anticlustering}}) can be used to conduct the actual 
-bicriterion optimization that is offered by Brusco et al.'s algorithm.
+Using \code{method = "brusco"} implements the local bicriterion
+iterated local search heuristic by Brusco et al. (2020), but only
+optimizes for one criterion - diversity or dispersion. The function
+\code{\link{bicriterion_anticlustering}} can be used to conduct the
+actual bicriterion optimization (i.e., optimize both diversity and
+dispersion at the same time) that is offered by Brusco et al.'s
+algorithm.
 
 \strong{Optimal anticlustering}
 
@@ -184,11 +196,11 @@ approach applicable for larger problem instances. With
 preclustering, optimality is no longer guaranteed, but the solution
 is usually optimal or very close to optimal.
 
-The variance and dispersion criterion cannot be optimized to optimality using
-integer linear programming because the objective functions are not linear. 
-However, it is possible to employ the function
-\code{\link{generate_partitions}} to obtain optimal solutions for
-small problem instances.
+The variance and dispersion criterion cannot be optimized to
+optimality using integer linear programming because the objective
+functions are not linear.  However, it is possible to employ the
+function \code{\link{generate_partitions}} to obtain optimal
+solutions for small problem instances.
 
 \strong{Preclustering}
 
@@ -206,13 +218,15 @@ is conducted using a call to \code{\link{matching}}. When using
 minimum pairwise distance by solving the integer linear program
 described in Papenberg and Klau (2021; (8) - (10), (12) - (13)).
 
-\strong{Categorical constraints}
+\strong{Categorical variables}
 
-The argument \code{categories} may induce categorical constraints.
-The grouping variables indicated by \code{categories} will be
-balanced out across anticlusters. This functionality is
-only available for the classical exchange procedures, that is, for 
-\code{method = "exchange"} and \code{method = "local-maximum"}.
+The argument \code{categories} may induce categorical constraints,
+i.e., can be used to distribute categorical variables evenly
+between sets.  The grouping variables indicated by
+\code{categories} will be balanced out across anticlusters. This
+functionality is only available for the classical exchange
+procedures, that is, for \code{method = "exchange"} and
+\code{method = "local-maximum"}.
 
 \strong{Optimize a custom objective function}
 
