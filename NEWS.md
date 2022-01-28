@@ -1,4 +1,4 @@
-# 0.6.1.9999 (development version)
+# 0.6.2
 
 - Some work on docs and examples
 
