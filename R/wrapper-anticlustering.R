@@ -126,8 +126,8 @@
 #' \strong{Algorithms for anticlustering}
 #'
 #' By default, a heuristic method is employed for anticlustering: the
-#' exchange method (\code{method = "exchange"}). First, anticlusters
-#' are randomly assigned to clusters. (It is also possible to
+#' exchange method (\code{method = "exchange"}). First, elements
+#' are randomly assigned to anticlusters (It is also possible to
 #' explicitly specify the initial assignment using the argument
 #' \code{K}; in this case, \code{K} has length \code{nrow(x)}.) Based
 #' on the initial assignment, elements are systematically swapped
