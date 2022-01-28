@@ -1,3 +1,7 @@
+# 0.6.1.9999 (development version)
+
+- Some work on docs and examples
+
 # anticlust 0.6.1
 
 - Minor bug fix in C code base via [c1a5604f](https://github.com/m-Py/anticlust/commit/c1a5604f36a08cb963428af46d98ece616c73568)
