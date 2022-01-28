@@ -80,11 +80,11 @@ create three similar sets of plants using the classical iris data set:
     # The output is a vector that assigns a group (i.e, a number
     # between 1 and K) to each input element:
     anticlusters
-    #>   [1] 1 3 2 2 1 2 3 2 2 3 3 3 3 2 1 2 1 1 1 3 2 1 1 1 3 2 1 1 1 3 1 3 2 2 3 1 3
-    #>  [38] 3 2 3 3 2 2 2 1 3 1 2 2 3 2 3 2 1 3 1 3 1 2 2 2 1 3 1 2 3 2 3 2 1 3 1 1 2
-    #>  [75] 2 1 1 3 2 3 3 1 1 3 2 3 2 1 1 3 1 1 2 2 3 2 3 3 1 2 1 1 2 2 2 2 3 2 1 1 3
-    #> [112] 3 3 3 3 1 3 3 1 3 1 2 2 3 3 2 2 1 2 1 3 3 3 1 1 2 1 1 1 1 3 2 1 3 2 2 1 3
-    #> [149] 2 2
+    #>   [1] 2 3 3 3 3 3 1 3 3 2 2 1 2 2 2 2 3 3 1 2 2 3 1 3 1 1 3 1 2 1 2 1 1 1 2 3 2
+    #>  [38] 2 3 1 3 3 1 3 1 1 1 3 3 2 1 2 2 1 2 2 2 1 1 2 3 1 3 1 3 2 1 1 1 2 3 3 2 2
+    #>  [75] 1 3 1 1 1 1 2 2 2 1 1 2 1 1 3 3 1 1 2 3 1 2 2 3 2 2 3 2 3 3 3 1 2 3 2 3 2
+    #> [112] 2 1 1 2 2 3 2 3 3 1 3 3 2 2 2 3 2 1 3 3 3 2 2 3 1 3 3 1 3 3 2 1 2 1 1 1 1
+    #> [149] 1 3
 
     # Each group has the same number of items:
     table(anticlusters)
@@ -100,7 +100,7 @@ create three similar sets of plants using the classical iris data set:
     #> ------------------------------------------------------------ 
     #> anticlusters: 2
     #> Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
-    #>         5.85         3.06         3.76         1.20 
+    #>         5.84         3.06         3.76         1.20 
     #> ------------------------------------------------------------ 
     #> anticlusters: 3
     #> Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
