@@ -62,11 +62,11 @@
 #' plot(features)
 #' # standard k-plus anticlustering: optimize similarity with regard to mean
 #' # and variance:
-#' cl <- k_plus_anticlustering(features, K = 3, method = "local-maximum")
+#' cl <- kplus_anticlustering(features, K = 3, method = "local-maximum")
 #' mean_sd_tab(features, cl)
 #' 
 #' # Also optimize with regard to skewness and kurtosis
-#' cl2 <- k_plus_anticlustering(
+#' cl2 <- kplus_anticlustering(
 #'   features, 
 #'   K = 3, 
 #'   method = "local-maximum", 
@@ -76,7 +76,7 @@
 #' 
 #' # Try to equalize the first 10 moments between groups (the first moment, 
 #' # i.e., the mean, is always considered in k-plus anticlustering)
-#' k_plus_anticlustering(
+#' kplus_anticlustering(
 #'   features, 
 #'   K = 3, 
 #'   moments = 2:10, 
@@ -85,7 +85,7 @@
 #' 
 
 
-k_plus_anticlustering <- function(
+kplus_anticlustering <- function(
     x, K, 
     variance = TRUE,
     skew = FALSE,
