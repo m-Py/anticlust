@@ -22,22 +22,67 @@
 #' @param covariances Boolean: Should the k-plus objective include a term to 
 #'   maximizie between-group similarity with regard to covariance structure? 
 #'   (Default = FALSE)
-#' @param moments An integer vector specifying which distribution moments  
-#'   should be equalized between groups.
+#' @param moments Optional argument: An integer vector specifying which 
+#'   distribution moments should be equalized between groups.
 #' @param standardize Boolean. If \code{TRUE}, the data is standardized through 
 #'     a call to \code{\link{scale}} before the optimization starts. 
 #'     Defaults to TRUE. See details.
-#' @param ... Arguments passed down to \code{link{anticlustering}}. All of the 
-#'   arguments are supported except for \code{objective}. Any arguments that are
-#'   not explicitly changed here (i.e., \code{standardize}) receive the same 
-#'   defaults as in \code{link{anticlustering}}.
+#' @param ... Arguments passed down to \code{\link{anticlustering}}. All of the 
+#'   arguments are supported except for \code{objective}. 
 #' 
 #' @details 
-#'     The standardization is applied 
+#'     
+#'     If the argument \code{moments} is used, it overrides the arguments
+#'     \code{variance}, \code{skew} and \code{kurtosis} (corresponding to
+#'     the second, third and fourth moment), ignoring their values. Note that 
+#'     the first moment, i.e., the mean is always included in the optimization
+#'     (corresponding to the standard k-means criterion); it cannot be "turned off"
+#'     by using the argument \code{moments}.
+#'     
+#'     The \code{standardization} is applied 
 #'     to all original features and the additional features that are appended
 #'     in order to optimize the k-plus criterion (this means that all criteria
-#'     such as means, variances, skewness etc. receive the same weight during
-#'     the optimization.)
+#'     such as means, variances, skewness etc. receive the same relative weight 
+#'     during the optimization.)
+#'    
+#'     This function can use any arguments that are also possible in 
+#'     \code{\link{anticlustering}}
+#'     (except for `objective` of course; because the objective optimized here
+#'     is the k-plus objective -- to use a different objective, 
+#'     call \code{\link{anticlustering}} directly). Any arguments that are
+#'     not explicitly changed here (i.e., \code{standardize}) receives the 
+#'     defaults given in \code{link{anticlustering}} (e.g., `method = "exchange"`.)
+#'     
+#' @examples 
+#' 
+#' # Generate some skewed data
+#' N <- 180
+#' M <- 4
+#' features <- matrix(rnorm(N * M), ncol = M)
+#' plot(features)
+#' # standard k-plus anticlustering: optimize similarity with regard to mean
+#' # and variance:
+#' cl <- k_plus_anticlustering(features, K = 3, method = "local-maximum")
+#' mean_sd_tab(features, cl)
+#' 
+#' # Also optimize with regard to skewness and kurtosis
+#' cl2 <- k_plus_anticlustering(
+#'   features, 
+#'   K = 3, 
+#'   method = "local-maximum", 
+#'   skew = TRUE, 
+#'   kurtosis = TRUE
+#' )
+#' 
+#' # Try to equalize the first 10 moments between groups (the first moment, 
+#' # i.e., the mean, is always considered in k-plus anticlustering)
+#' k_plus_anticlustering(
+#'   features, 
+#'   K = 3, 
+#'   moments = 2:10, 
+#' )
+#' @export
+#' 
 
 
 k_plus_anticlustering <- function(
@@ -47,9 +92,44 @@ k_plus_anticlustering <- function(
     kurtosis = FALSE,
     covariances = FALSE,
     moments = NULL,
-    standardize = TRUE
+    standardize = TRUE,
     ...) {
   
+  validate_input_kplus(x, K, variance, skew, kurtosis, covariances, moments, ...)
+  
+  x <- as.matrix(x)
+  M <- ncol(x) 
+  feature_bools <- c(variance, skew, kurtosis)
+  
+
+  if (is.null(moments)) {
+    moments <- (2:4)[feature_bools]
+  }
+  # determine the number of features after augmentation, for validation below
+  M_augmented <- M + M * length(moments) + ifelse(covariances, choose(M, 2), 0)
+
+  # Add additional k-plus features: 
+  #   1. Moments
+  augmented_data <- x
+  for (i in seq_along(moments)) {
+    augmented_data <- cbind(augmented_data, moment_features(x, moments[i]))
+  }
+  #   2. Covariance    
+  if (covariances == TRUE) {
+    augmented_data <- cbind(augmented_data, covariance_features(x))
+  }
+  
+  # Validation of number of features
+  stopifnot(ncol(augmented_data) == M_augmented)
+  
+  # Call anticlustering
+  anticlustering(
+    augmented_data, 
+    K = K, 
+    standardize = standardize, 
+    objective = "variance", ...
+  )
+
 }
 
 # function to compute features for variance
@@ -78,3 +158,22 @@ covariance_features <- function(data) {
 }
 
 
+validate_input_kplus <- function(x, K, variance, skew, kurtosis, covariances, moments, standardize, ...) {
+  validate_data_matrix(x)
+  # K is validated in anticlustering()
+  validate_input(variance, "variance", len = 1,
+                 input_set = c(TRUE, FALSE), not_na = TRUE, not_function = TRUE)
+  validate_input(skew, "skew", len = 1,
+                 input_set = c(TRUE, FALSE), not_na = TRUE, not_function = TRUE)
+  validate_input(kurtosis, "kurtosis", len = 1,
+                 input_set = c(TRUE, FALSE), not_na = TRUE, not_function = TRUE)
+  validate_input(covariances, "covariances", len = 1,
+                 input_set = c(TRUE, FALSE), not_na = TRUE, not_function = TRUE)
+  validate_input(moments, "moments", greater_than = 1, must_be_integer = TRUE,
+                 not_na = TRUE, not_function = TRUE)
+  elipsis_arg_names <- names(lapply(substitute(list(...))[-1], deparse))
+  if ("objective" %in% elipsis_arg_names) {
+    stop("You cannot set the `objective` argument - this is k-plus anticlustering!",
+    " \n(-> k-plus is the objective, an extension to k-means anticlustering, see the documenation).")
+  }
+}
