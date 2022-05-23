@@ -24,10 +24,21 @@
 #'   (Default = FALSE)
 #' @param moments An integer vector specifying which distribution moments  
 #'   should be equalized between groups.
+#' @param standardize Boolean. If \code{TRUE}, the data is standardized through 
+#'     a call to \code{\link{scale}} before the optimization starts. 
+#'     Defaults to TRUE. See details.
 #' @param ... Arguments passed down to \code{link{anticlustering}}. All of the 
-#'   arguments are supported except for \code{objective}. This function employs
-#'   the same defaults as \code{link{anticlustering}}.
+#'   arguments are supported except for \code{objective}. Any arguments that are
+#'   not explicitly changed here (i.e., \code{standardize}) receive the same 
+#'   defaults as in \code{link{anticlustering}}.
 #' 
+#' @details 
+#'     The standardization is applied 
+#'     to all original features and the additional features that are appended
+#'     in order to optimize the k-plus criterion (this means that all criteria
+#'     such as means, variances, skewness etc. receive the same weight during
+#'     the optimization.)
+
 
 k_plus_anticlustering <- function(
     x, K, 
@@ -36,6 +47,7 @@ k_plus_anticlustering <- function(
     kurtosis = FALSE,
     covariances = FALSE,
     moments = NULL,
+    standardize = TRUE
     ...) {
   
 }
