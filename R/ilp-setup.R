@@ -69,7 +69,7 @@ anticlustering_ilp <- function(distances, K, group_restriction = TRUE) {
 #     equality (e), lower (l), and greater (g) relationships
 #
 equality_identifiers <- function() {
-  equal_sign <- "=="
+  equal_sign <- "="
   lower_sign <- "<="
   greater_sign <- ">="
   list(e = equal_sign, l = lower_sign, g = greater_sign)

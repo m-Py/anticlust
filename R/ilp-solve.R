@@ -16,23 +16,19 @@
 #' @noRd
 
 solve_ilp <- function(ilp, objective = "max") {
-  if (objective == "max") {
-    max <- TRUE
-  } else {
-    max <- FALSE
-  }
-  ilp_solution <- Rglpk::Rglpk_solve_LP(
-    obj = ilp$obj_function,
-    mat = ilp$constraints,
-    dir = ilp$equalities,
-    rhs = ilp$rhs,
-    types = "B",
-    max = max
-  )
-  # return the optimal value and the variable assignment
-  ret_list <- list() 
-  ret_list$x <- ilp_solution$solution
-  ret_list$obj <- ilp_solution$optimum
+  ## build model
+  model <- list()
+  model$A          <- ilp$constraints
+  model$obj        <- ilp$obj_function
+  model$modelsense <- objective
+  model$rhs        <- ilp$rhs
+  model$sense      <- ilp$equalities
+  model$vtypes     <- "B"
+  ## solve
+  ilp_solution <- gurobi::gurobi(model)
+  ret_list <- list()
+  ret_list$x <- ilp_solution$x
+  ret_list$obj <- ilp_solution$objval
   ## name the decision variables
   names(ret_list$x) <- colnames(ilp$constraints)
   ret_list
