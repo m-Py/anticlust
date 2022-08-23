@@ -367,15 +367,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
     return(repeat_anticlustering(x, K, objective, categories, method, repetitions))
   }
   
-  ## Get data into required format
-  input_validation_anticlustering(x, K, objective, method, preclustering, 
-                                  categories, repetitions)
 
-  ## Exact method using ILP
-  if (method == "ilp") {
-    return(exact_anticlustering(x, K, preclustering))
-  }
-  
   if (method == "brusco") {
     if (objective == "diversity") {
       weights <- c(0.5, 0.99, 0.999, 0.999999)
@@ -389,11 +381,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
     best_obj <- which.max(apply(partitions, 1, obj_fun, convert_to_distances(x)))
     return(partitions[best_obj, ])
   }
-  
-  # Preclustering and categorical constraints are both processed in the
-  # variable `categories` after this step:
-  categories <- get_categorical_constraints(x, K, preclustering, categories)
-  
+
   if (inherits(objective, "function")) {
     # most generic exchange method, deals with any objective function
     return(exchange_method(x, K, objective, categories))
