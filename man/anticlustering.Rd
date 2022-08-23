@@ -107,7 +107,8 @@ maximizes group diversity as measured by the sum of pairwise
 distances. Hence, anticlustering maximizes between-group similarity
 by maximizing within-group heterogeneity. Note that the equivalence
 of within-group heterogeneity and between-group similarity only
-holds for equal-sized groups. If you request different-sized groups
+holds for equal-sized groups in the case of anticluster editing. 
+If you request different-sized groups
 and wish the different groups to be similar to each other, use
 \code{objective = "kplus"} or \code{objective = "variance"}. In
 previous versions of this package, \code{method = "distance"} was
@@ -165,12 +166,14 @@ on the preclustering heuristic follows below). This option is
 recommended for larger N.
 
 Using \code{method = "brusco"} implements the local bicriterion
-iterated local search heuristic by Brusco et al. (2020), but only
-optimizes for one criterion - diversity or dispersion. The function
-\code{\link{bicriterion_anticlustering}} can be used to conduct the
-actual bicriterion optimization (i.e., optimize both diversity and
-dispersion at the same time) that is offered by Brusco et al.'s
-algorithm.
+iterated local search (BILS) heuristic by Brusco et al. (2020) and returns
+the partition that best optimized either the diversity or the dispersion
+during the optimization process. The function
+\code{\link{bicriterion_anticlustering}} can also be used to run the algorithm
+by Brusco et al., but it returns multiple partitions that approximate the 
+optimal pareto efficient set according to both objectives (diversity and 
+dispersion). Thus, to fully utilize the BILS algorithm, use the function 
+\code{\link{bicriterion_anticlustering}}.
 
 \strong{Optimal anticlustering}
 
