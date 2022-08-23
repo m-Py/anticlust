@@ -97,7 +97,7 @@ anticlustering focuses on minimizing differences with regard to the
 means of the input variables \code{x}; k-plus \code{objective =
 "kplus"} anticlustering is an extension of this criterion that also
 tries to minimize differences with regard to the standard
-deviations between groups (see \code{\link{kplus_objective}}).
+deviations between groups (see \code{\link{kplus_anticlustering}}).
 
 The cluster editing "diversity" objective is the sum of pairwise
 distances of elements within the same groups (see

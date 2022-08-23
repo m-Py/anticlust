@@ -1,7 +1,8 @@
 #' K-plus anticlustering
 #' 
-#' Perform anticlustering using the k-plus objective to maximize betwee-group 
-#' similarity.
+#' Perform anticlustering using the k-plus objective to maximize between-group 
+#' similarity. This function implements the k-plus anticlustering method described 
+#' in "paper title <doi>". (TODO)
 #'
 #' @param x A feature matrix where rows correspond to elements and columns
 #'     correspond to variables (a single numeric variable can be
@@ -50,12 +51,13 @@
 #'     (except for `objective` of course; because the objective optimized here
 #'     is the k-plus objective -- to use a different objective, 
 #'     call \code{\link{anticlustering}} directly). Any arguments that are
-#'     not explicitly changed here (i.e., \code{standardize}) receives the 
-#'     defaults given in \code{link{anticlustering}} (e.g., `method = "exchange"`.)
+#'     not explicitly changed here (i.e., \code{standardize = TRUE}) receive the 
+#'     default given in \code{\link{anticlustering}} 
+#'     (e.g., `method = "exchange"`.)
 #'     
 #' @examples 
 #' 
-#' # Generate some skewed data
+#' # Generate some data
 #' N <- 180
 #' M <- 4
 #' features <- matrix(rnorm(N * M), ncol = M)
