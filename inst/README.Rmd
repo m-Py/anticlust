@@ -95,7 +95,7 @@ To quantify cluster similarity, `anticlust` employs one of several measures that
 - the "k-plus" objective, an extension of the k-means variance criterion, setting `objective = "kplus"`
 - the "dispersion" objective (the minimum distance between any two elements within the same cluster), setting `objective = "dispersion"`
 
-The anticlustering objectives are described in detail in the documentation (`?diversity_objective`, `?variance_objective`, `?kplus_objective`, `?dispersion_objective`) and the references therein. It is also possible to optimize user-defined measures of cluster similarity, which is also described in the documentation (`?anticlustering`).
+The anticlustering objectives are described in detail in the documentation (`?diversity_objective`, `?variance_objective`, `?kplus_anticlustering`, `?dispersion_objective`) and the references therein. It is also possible to optimize user-defined measures of cluster similarity, which is also described in the documentation (`?anticlustering`).
 
 ## Categorical variables
 

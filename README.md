@@ -80,10 +80,10 @@ create three similar sets of plants using the classical iris data set:
     # The output is a vector that assigns a group (i.e, a number
     # between 1 and K) to each input element:
     anticlusters
-    #>   [1] 2 3 3 3 3 3 1 3 3 2 2 1 2 2 2 2 3 3 1 2 2 3 1 3 1 1 3 1 2 1 2 1 1 1 2 3 2
-    #>  [38] 2 3 1 3 3 1 3 1 1 1 3 3 2 1 2 2 1 2 2 2 1 1 2 3 1 3 1 3 2 1 1 1 2 3 3 2 2
-    #>  [75] 1 3 1 1 1 1 2 2 2 1 1 2 1 1 3 3 1 1 2 3 1 2 2 3 2 2 3 2 3 3 3 1 2 3 2 3 2
-    #> [112] 2 1 1 2 2 3 2 3 3 1 3 3 2 2 2 3 2 1 3 3 3 2 2 3 1 3 3 1 3 3 2 1 2 1 1 1 1
+    #>   [1] 1 2 3 2 3 1 3 1 2 2 3 1 3 3 2 2 1 1 1 1 1 1 2 2 2 3 1 3 3 1 1 1 3 2 3 3 1
+    #>  [38] 3 3 2 3 2 2 1 2 1 2 2 3 2 3 2 1 1 2 1 1 3 2 1 1 1 2 2 2 3 1 3 1 1 2 1 1 2
+    #>  [75] 2 3 2 1 3 2 1 3 1 1 3 2 3 2 3 2 1 1 2 3 2 2 3 3 3 3 1 1 3 2 1 2 3 1 2 2 2
+    #> [112] 3 2 1 2 3 3 3 3 1 1 3 3 1 1 3 3 1 2 1 1 1 2 3 2 2 2 2 3 3 1 3 2 3 2 3 2 3
     #> [149] 1 3
 
     # Each group has the same number of items:
@@ -135,9 +135,9 @@ measures that have been developed in the context of cluster analysis:
 
 The anticlustering objectives are described in detail in the
 documentation (`?diversity_objective`, `?variance_objective`,
-`?kplus_objective`, `?dispersion_objective`) and the references therein.
-It is also possible to optimize user-defined measures of cluster
-similarity, which is also described in the documentation
+`?kplus_anticlustering`, `?dispersion_objective`) and the references
+therein. It is also possible to optimize user-defined measures of
+cluster similarity, which is also described in the documentation
 (`?anticlustering`).
 
 Categorical variables
