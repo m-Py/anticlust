@@ -42,6 +42,9 @@ data sets into equivalent parts. *Psychological Methods, 26*(2),
 161–174.
 <a href="https://doi.org/10.1037/met0000301" class="uri">https://doi.org/10.1037/met0000301</a>
 
+Another great way of showing your appreciation of `anticlust` is to
+leave a star on this Github repository.
+
 How do I learn about `anticlust`
 --------------------------------
 
@@ -54,12 +57,18 @@ This README contains some basic information on the `R` package
     The freely available preprint can be retrieved from
     <a href="https://psyarxiv.com/3razc/" class="uri">https://psyarxiv.com/3razc/</a>.
 
+-   The `R` documentation of the main functions is actually quite rich
+    and up to date, so you should definitely check that out when using
+    the `anticlust` package (primarily `?anticlustering`,
+    `?kplus_anticlustering` `?balanced_clustering` and `?matching`).
+
 -   The [package website](https://m-py.github.io/anticlust/) contains
-    all relevant documentation. This includes a
+    most relevant documentation. This includes a
     [vignette](https://m-py.github.io/anticlust/articles/stimulus-selection.html)
     detailing how to use the anticlust package for stimulus selection in
-    experiments and documentation for the main `anticlust` functions
-    `anticlustering()`, `balanced_clustering()` and `matching()`.
+    experiments and documentation for the main `anticlust` functions.
+    Note that the homepage is not completely up to date right now; this
+    should change in the future, and additional vignettes are planned.
 
 A quick start
 -------------
@@ -80,11 +89,11 @@ create three similar sets of plants using the classical iris data set:
     # The output is a vector that assigns a group (i.e, a number
     # between 1 and K) to each input element:
     anticlusters
-    #>   [1] 1 2 3 2 3 1 3 1 2 2 3 1 3 3 2 2 1 1 1 1 1 1 2 2 2 3 1 3 3 1 1 1 3 2 3 3 1
-    #>  [38] 3 3 2 3 2 2 1 2 1 2 2 3 2 3 2 1 1 2 1 1 3 2 1 1 1 2 2 2 3 1 3 1 1 2 1 1 2
-    #>  [75] 2 3 2 1 3 2 1 3 1 1 3 2 3 2 3 2 1 1 2 3 2 2 3 3 3 3 1 1 3 2 1 2 3 1 2 2 2
-    #> [112] 3 2 1 2 3 3 3 3 1 1 3 3 1 1 3 3 1 2 1 1 1 2 3 2 2 2 2 3 3 1 3 2 3 2 3 2 3
-    #> [149] 1 3
+    #>   [1] 1 2 3 1 1 2 1 2 3 2 1 2 1 2 1 1 3 3 2 3 2 3 1 3 2 2 2 2 3 2 1 2 1 3 3 2 3
+    #>  [38] 3 3 1 1 2 3 3 3 3 1 3 2 2 3 1 2 2 1 1 2 2 1 3 1 1 3 3 3 1 2 1 3 1 1 1 3 3
+    #>  [75] 3 1 3 2 3 2 1 3 1 3 3 2 1 2 1 1 3 1 1 2 1 1 2 2 1 2 1 1 3 1 3 3 2 2 2 3 3
+    #> [112] 3 1 3 3 1 2 3 3 1 1 2 2 2 1 3 1 2 2 2 1 2 1 1 3 2 2 3 3 1 2 3 3 2 2 1 3 2
+    #> [149] 2 2
 
     # Each group has the same number of items:
     table(anticlusters)
