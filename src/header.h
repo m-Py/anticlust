@@ -47,6 +47,6 @@ double random_in_range(double min, double max);
 double get_diversity_fast(double diversity, int x,int y, size_t N, int* partition, double matrix[N][N]);
 double get_dispersion_fast(double dispersion, int x,int y, size_t N, int* partition, double matrix[N][N]);
 void free_pareto_set(struct Pareto_element* head);
-double uniform_rnd_number();
+double uniform_rnd_number(void);
 double uni_rnd_number_range(double min, double max);
 int random_integer(int min, int max);
