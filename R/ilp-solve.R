@@ -25,7 +25,7 @@ solve_ilp <- function(ilp, objective = "max") {
   model$sense      <- ilp$equalities
   model$vtypes     <- "B"
   ## solve
-  ilp_solution <- gurobi::gurobi(model)
+  ilp_solution <- gurobi::gurobi(model, params = list(LogToConsole = 0))
   ret_list <- list()
   ret_list$x <- ilp_solution$x
   ret_list$obj <- ilp_solution$objval
