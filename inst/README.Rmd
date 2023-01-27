@@ -9,7 +9,7 @@ output:
 
 # anticlust <a href='https://m-py.github.io/anticlust/'><img src='man/figures/anticlustStickerV1-0.svg' align="right" height="160" /></a>
 
-Anticlustering partitions a pool of elements into clusters (or *anticlusters*) with the goal of achieving high between-cluster similarity and high within-cluster heterogeneity. This is accomplished by maximizing instead of minimizing a clustering objective function, such as the intra-cluster variance (used in k-means clustering) or the sum of pairwise distances within clusters. The package `anticlust` implements anticlustering algorithms as described in Papenberg and Klau (2021; https://doi.org/10.1037/met0000301). It was originally developed to stimuli items to experimental conditions in experimental psychology, but it can be applied whenever a user requires that a given set of elements has to be partitioned groups that have to be as similar as possible, or when the within-group heterogeneity should be high.
+Anticlustering partitions a pool of elements into clusters (or *anticlusters*) with the goal of achieving high between-cluster similarity and high within-cluster heterogeneity. This is accomplished by maximizing instead of minimizing a clustering objective function, such as the intra-cluster variance (used in k-means clustering) or the sum of pairwise distances within clusters. The package `anticlust` implements anticlustering methods as described in Papenberg and Klau (2021; https://doi.org/10.1037/met0000301), Papenberg (2023; https://psyarxiv.com/7jw6v/) and Brusco et al. (2020; https://doi.org/10.1111/bmsp.12186).
 
 ```{r setup, include = FALSE}
 library("anticlust")
@@ -28,6 +28,8 @@ knitr::opts_chunk$set(
 knitr::opts_chunk$set(
   fig.path = "man/figures/"
 )
+
+set.seed(123)
 
 ```
 
@@ -52,21 +54,31 @@ If you use `anticlust` in your research, it would be courteous if you cite the f
 
 Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition data sets into equivalent parts. *Psychological Methods, 26*(2), 161--174. https://doi.org/10.1037/met0000301
 
+If you use the bicriterion anticlustering heuristic by Brusco et al. (2020),[^whenbrusco] you should also cite their paper: 
+
+Brusco, M. J., Cradit, J. D., & Steinley, D. (2020). Combining diversity and dispersion criteria for anticlustering: A bicriterion approach. *British Journal of Mathematical and Statistical Psychology, 73*(3), 375–396. https://doi.org/10.1111/bmsp.12186
+
+[^whenbrusco]: You are using the BILS heuristic by Brusco et al. (2020) if you use the function `anticlustering()` with the argument `method = "brusco"` or if you are using the function `bicriterion_anticlustering()`.
+
+The k-plus paper has not yet been published in a journal, but you might want to consider citing the preprint if you use k-plus anticlustering:[^whenkplus]
+
+Papenberg, M. (2023). k-plus Anticlustering: An Improved k-means Criterion  for Maximizing Between-Group Similarity. Retrieved from psyarxiv.com/7jw6v 
+
+[^whenkplus]: You are using k-plus anticlustering if you use the function `anticlustering()` with the argument `objective = "kplus"` or if you are using the function `kplus_anticlustering()`.
+
 Another great way of showing your appreciation of `anticlust` is to leave a star on this Github repository.
 
 ## How do I learn about `anticlust`
 
 This README contains some basic information on the `R` package `anticlust`. More information is available via the following sources:
 
-- A paper is available describing the theoretical background of anticlustering and the `anticlust` package in detail (https://doi.org/10.1037/met0000301). The freely available preprint can be retrieved from https://psyarxiv.com/3razc/.
-
+- A paper is available describing the theoretical background of anticlustering and the `anticlust` package in detail (https://doi.org/10.1037/met0000301). The freely available preprint can be retrieved from https://psyarxiv.com/3razc/. A more recent paper focusing on the k-plus anticlustering method can be retrieved from https://psyarxiv.com/7jw6v/.
 - The `R` documentation of the main functions is actually quite rich and up to date, so you should definitely check that out when using the `anticlust` package (primarily `?anticlustering`, `?kplus_anticlustering`, `?balanced_clustering`, and `?matching`).
-
 - The [package website](https://m-py.github.io/anticlust/) contains most relevant documentation. This includes a [vignette](https://m-py.github.io/anticlust/articles/stimulus-selection.html) detailing how to use the anticlust package for stimulus selection in experiments and documentation for the main `anticlust` functions. Note that the homepage is not completely up to date right now; this should change in the future, and additional vignettes are planned.
 
 ## A quick start
 
-In this initial example, I use the main function `anticlustering()` to create three similar sets of plants using the classical iris data set:
+In this initial example, I use the main function `anticlustering()` to create five similar sets of plants using the classical iris data set:
 
 ```{r}
 # load the package via
@@ -74,9 +86,10 @@ library("anticlust")
 
 anticlusters <- anticlustering(
   iris[, -5],
-  K = 3,
-  objective = "variance",
-  method = "local-maximum"
+  K = 5,
+  objective = "kplus",
+  method = "local-maximum",
+  repetitions = 10
 )
 
 # The output is a vector that assigns a group (i.e, a number
@@ -86,13 +99,13 @@ anticlusters
 # Each group has the same number of items:
 table(anticlusters)
 
-# Compare the feature means by anticluster:
-by(iris[, -5], anticlusters, function(x) round(colMeans(x), 2))
+# Compare the features' means and standard deviations across groups:
+knitr::kable(mean_sd_tab(iris[, -5], anticlusters), row.names = TRUE)
 ```
 
-As illustrated in the example, we can use the function `anticlustering()` to create similar sets of elements. In this case "similar" primarily means that the mean values of the variables are pretty much the same across three groups. The function `anticlustering()` takes as input a data table describing the elements that should be assigned to sets. In the data table, each row represents an element, for example a person, word or a photo. Each column is a numeric variable describing one of the elements' features. (Alternatively, it is also possible to pass a distance matrix describing the pairwise dissimilarity between elements.) The number of groups is specified through the argument `K`. The argument `objective` specifies how between-group similarity is computed; the argument `method` specifies the algorithm by which this measure is optimized. See the documentation `?anticlustering` for more details.
+As illustrated in the example, we can use the function `anticlustering()` to create similar groups of plants. In this case "similar" primarily means that the means and standard deviations (in parentheses) of the variables are pretty much the same across the five groups. The function `anticlustering()` takes as input a data table describing the elements that should be assigned to sets. In the data table, each row represents an element, for example a person, word or a photo. Each column is a numeric variable describing one of the elements' features. The number of groups is specified through the argument `K`. The argument `objective` specifies how between-group similarity is quantified; the argument `method` specifies the algorithm by which this measure is optimized. See the documentation `?anticlustering` for more details. 
 
-To quantify cluster similarity, `anticlust` employs one of several measures that have been developed in the context of cluster analysis:
+Four anticlustering objectives are natively supported in `anticlustering()`:
 
 - the cluster editing "diversity" objective, setting `objective = "diversity"` (default)
 - the k-means "variance" objective, setting `objective = "variance"`
@@ -151,4 +164,4 @@ plot_clusters(
 
 ## Questions and suggestions
 
-If you have any question on the `anticlust` package or any suggestions (which are greatly appreciated), I encourage you to contact me via email (martin.papenberg@hhu.de) or [Twitter](https://twitter.com/MPapenberg), or to open an [issue on the Github repository](https://github.com/m-Py/anticlust/issues).
+If you have any question on the `anticlust` package or find some bugs, I encourage you to open an [issue on the Github repository](https://github.com/m-Py/anticlust/issues).

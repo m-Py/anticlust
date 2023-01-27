@@ -38,7 +38,9 @@ Description: The method of anticlustering partitions a pool of elements
     (<https://cran.R-project.org/package=Rglpk>) is installed. A
     bicriterion anticlustering method proposed by Brusco et al.  (2020;
     <doi:10.1111/bmsp.12186>) is available through the function
-    bicriterion_anticlustering(). Some other functions are available to
+    bicriterion_anticlustering(), kplus_anticlustering implements the
+    k-plus anticlustering approach proposed by Papenberg (2023;
+    <doi:10.31234/osf.io/7jw6v>).  Some other functions are available to
     solve classical clustering problems. The function
     balanced_clustering() applies a cluster analysis under size
     constraints, i.e., creates equal-sized clusters. The function

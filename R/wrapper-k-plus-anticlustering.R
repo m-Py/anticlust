@@ -2,7 +2,7 @@
 #' 
 #' Perform anticlustering using the k-plus objective to maximize between-group 
 #' similarity. This function implements the k-plus anticlustering method described 
-#' in "paper title <doi>". (TODO)
+#' Papenberg (2023; <doi:10.31234/osf.io/7jw6v>).
 #'
 #' @param x A feature matrix where rows correspond to elements and columns
 #'     correspond to variables (a single numeric variable can be
@@ -40,10 +40,10 @@
 #'     (corresponding to the standard k-means criterion); it cannot be "turned off"
 #'     by using the argument \code{moments}.
 #'     
-#'     The \code{standardization} is applied 
-#'     to all original features and the additional features that are appended
-#'     in order to optimize the k-plus criterion (this means that all criteria
-#'     such as means, variances, skewness etc. receive the same relative weight 
+#'     The \code{standardization} is applied to all original features and the 
+#'     additional features that are appended in order to optimize 
+#'     the k-plus criterion (this means that all criteria such as means, 
+#'     variances, skewness etc. receive the same relative weight 
 #'     during the optimization.)
 #'    
 #'     This function can use any arguments that are also possible in 
@@ -84,6 +84,11 @@
 #'   moments = 2:10, 
 #' )
 #' @export
+#' 
+#' @references
+#' 
+#' Papenberg, M. (2023). k-plus Anticlustering: An Improved k-means Criterion 
+#' for Maximizing Between-Group Similarity. Retrieved from psyarxiv.com/7jw6v 
 #' 
 
 

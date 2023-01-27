@@ -51,7 +51,7 @@ arguments are supported except for \code{objective}.}
 \description{
 Perform anticlustering using the k-plus objective to maximize between-group 
 similarity. This function implements the k-plus anticlustering method described 
-in "paper title <doi>". (TODO)
+Papenberg (2023; <doi:10.31234/osf.io/7jw6v>).
 }
 \details{
 If the argument \code{moments} is used, it overrides the arguments
@@ -104,4 +104,8 @@ kplus_anticlustering(
   K = 3, 
   moments = 2:10, 
 )
+}
+\references{
+Papenberg, M. (2023). k-plus Anticlustering: An Improved k-means Criterion 
+for Maximizing Between-Group Similarity. Retrieved from psyarxiv.com/7jw6v
 }
