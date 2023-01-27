@@ -507,7 +507,7 @@ int random_integer(int min, int max) {
   return integer;
 }
 
-double uniform_rnd_number() {
+double uniform_rnd_number(void) {
   GetRNGstate();
   double my_number = unif_rand();
   PutRNGstate();
