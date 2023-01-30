@@ -3,19 +3,20 @@
 **Major changes**
 
 * This release adds a new exported function and removes two others (I very much doubt anyone used those, though -- see below -- if your code is affected, please email me).
-  - `kplus_anticlustering()` is a new exported function: A new interface function to k-plus anticlustering, implementing the k-plus method as described in "preprint title (link)". Using `anticlustering(x, K, objective = "kplus")` is still supported and remains unchanged. The new function `kplus_anticlustering()`, however, offers more functionality and nuance with regard to optimizing the k-plus objective family.
+  - `kplus_anticlustering()` is a new exported function: A new interface function to k-plus anticlustering, implementing the k-plus method as described in "k-plus Anticlustering: An Improved k-means Criterion for Maximizing Between-Group Similarity" (Papenberg, 2023; https://doi.org/10.31234/osf.io/7jw6v). Using `anticlustering(x, K, objective = "kplus")` is still supported and remains unchanged. The new function `kplus_anticlustering()`, however, offers more functionality and nuance with regard to optimizing the k-plus objective family.
   - The function `kplus_objective()` was removed. 
   - The function `mean_sd_obj()` was removed. 
   
 Explanations for the rather drastic changes, i.e., removing instead of deprecating functions (that very likely do not affect anyone):
 
-- Given the advanced theoretical background for k-plus anticlustering, the function  `kplus_objective()`  no longer makes any sense. Given that the k-plus objective is a family of objectives, keeping the function that computes one special case is more harmful to keep it than to just remove it now. As the k-plus objective basically re-uses the k-means criterion, maintaing a function such as `kplus_objective()` was questionable to begin with.
+- Given the advanced theoretical background for k-plus anticlustering, the function  `kplus_objective()`  no longer makes any sense. Given that the k-plus objective is a family of objectives, keeping the function that computes one special case is more harmful to keep it than to just remove it now. As the k-plus objective basically re-uses the k-means criterion, maintaining a function such as `kplus_objective()` was questionable to begin with.
 
 - Since there is the k-plus anticlustering method now, I did not want to keep the "hacky" way to optimize similarity with regard to means and standard deviations, i.e., using the `mean_sd_obj()` function as `objective` in anticlustering. Please use the k-plus method to optimize similarity with regard to means and standard deviations (you can even extend to skewness, kurtosis, and other higher order moments; see the new `kplus_anticlustering()` function).
 
 **Minor changes**
 
 - Finally added Marie Luisa Schaper as contributor for contributing her data set
+- Some work on documentation
 
 # 0.6.2
 
