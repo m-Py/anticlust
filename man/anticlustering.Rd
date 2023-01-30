@@ -44,7 +44,8 @@ before anticlusters are created? Defaults to \code{FALSE}. See
 Details.}
 
 \item{categories}{A vector, data.frame or matrix representing one
-or several categorical constraints. See Details.}
+or several categorical variables whose distribution should be similar 
+between groups. See Details.}
 
 \item{repetitions}{The number of times a search heuristic is
 initiated when using \code{method = "exchange"}, \code{method =
@@ -65,10 +66,10 @@ Partition a pool of elements into groups (i.e., anticlusters) with
 the aim of creating high within-group heterogeneity and high
 between-group similarity.  Anticlustering is accomplished by
 maximizing instead of minimizing a clustering objective function.
-Implements anticlustering algorithms as described in Papenberg and
-Klau (2021; <doi:10.1037/met0000301>) and an implementation of the
-bicriterion anticlustering algorithm described by Brusco, Cradit
-and Steinley (2020; <doi:10.1111/bmsp.12186>).
+Implements anticlustering methods as described in Papenberg and
+Klau (2021; <doi:10.1037/met0000301>), Brusco et al. 
+(2020; <doi:10.1111/bmsp.12186>), and Papenberg (2023; 
+<doi:10.31234/osf.io/7jw6v>).
 }
 \details{
 This function is used to solve anticlustering. That is, the data
@@ -198,12 +199,6 @@ size of the solution space, making the integer linear programming
 approach applicable for larger problem instances. With
 preclustering, optimality is no longer guaranteed, but the solution
 is usually optimal or very close to optimal.
-
-The variance and dispersion criterion cannot be optimized to
-optimality using integer linear programming because the objective
-functions are not linear.  However, it is possible to employ the
-function \code{\link{generate_partitions}} to obtain optimal
-solutions for small problem instances.
 
 \strong{Preclustering}
 

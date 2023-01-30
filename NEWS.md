@@ -1,4 +1,4 @@
-# 0.6.3 (in development)
+# 0.6.3
 
 **Major changes**
 
