@@ -56,7 +56,7 @@ anticlustering:[2]
 
 -   Papenberg, M. (2023). k-plus Anticlustering: An Improved k-means
     Criterion for Maximizing Between-Group Similarity. Retrieved from
-    psyarxiv.com/7jw6v
+    <a href="https://doi.org/10.31234/osf.io/7jw6v" class="uri">https://doi.org/10.31234/osf.io/7jw6v</a>
 
 Another great way of showing your appreciation of `anticlust` is to
 leave a star on this Github repository.

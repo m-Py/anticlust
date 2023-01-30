@@ -62,7 +62,7 @@ If you use the bicriterion anticlustering heuristic by Brusco et al. (2020),[^wh
 
 The k-plus paper has not yet been published in a journal, but you might want to consider citing the preprint if you use k-plus anticlustering:[^whenkplus]
 
-- Papenberg, M. (2023). k-plus Anticlustering: An Improved k-means Criterion  for Maximizing Between-Group Similarity. Retrieved from psyarxiv.com/7jw6v 
+- Papenberg, M. (2023). k-plus Anticlustering: An Improved k-means Criterion  for Maximizing Between-Group Similarity. Retrieved from https://doi.org/10.31234/osf.io/7jw6v
 
 [^whenkplus]: You are using k-plus anticlustering if you use the function `anticlustering()` with the argument `objective = "kplus"` or if you are using the function `kplus_anticlustering()`.
 
