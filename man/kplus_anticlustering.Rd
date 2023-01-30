@@ -31,6 +31,10 @@ maximizie between-group similarity with regard to the variance?
 (Default = TRUE)}
 
 \item{skew}{Boolean: Should the k-plus objective include a term to 
+maximizie between-group similarity with regard to skewness? 
+(Default = FALSE)}
+
+\item{kurtosis}{Boolean: Should the k-plus objective include a term to 
 maximizie between-group similarity with regard to kurtosis? 
 (Default = FALSE)}
 
@@ -61,10 +65,10 @@ If the argument \code{moments} is used, it overrides the arguments
     (corresponding to the standard k-means criterion); it cannot be "turned off"
     by using the argument \code{moments}.
     
-    The \code{standardization} is applied 
-    to all original features and the additional features that are appended
-    in order to optimize the k-plus criterion (this means that all criteria
-    such as means, variances, skewness etc. receive the same relative weight 
+    The \code{standardization} is applied to all original features and the 
+    additional features that are appended in order to optimize 
+    the k-plus criterion (this means that all criteria such as means, 
+    variances, skewness etc. receive the same relative weight 
     during the optimization.)
    
     This function can use any arguments that are also possible in 

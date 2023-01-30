@@ -48,7 +48,7 @@
 #'     between 1 and \code{K}) to each input element.
 #'
 #' @importFrom Matrix sparseMatrix
-#' @importFrom stats as.dist dist
+#' @importFrom stats as.dist dist sd
 #'
 #' @export
 #'

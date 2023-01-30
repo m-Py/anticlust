@@ -17,7 +17,7 @@
 #' @param skew Boolean: Should the k-plus objective include a term to 
 #'   maximizie between-group similarity with regard to skewness? 
 #'   (Default = FALSE)
-#' @param skew Boolean: Should the k-plus objective include a term to 
+#' @param kurtosis Boolean: Should the k-plus objective include a term to 
 #'   maximizie between-group similarity with regard to kurtosis? 
 #'   (Default = FALSE)
 #' @param covariances Boolean: Should the k-plus objective include a term to 
