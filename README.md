@@ -36,27 +36,27 @@ Citation
 If you use `anticlust` in your research, it would be courteous if you
 cite the following reference:
 
-Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition
-data sets into equivalent parts. *Psychological Methods, 26*(2),
-161–174.
-<a href="https://doi.org/10.1037/met0000301" class="uri">https://doi.org/10.1037/met0000301</a>
+-   Papenberg, M., & Klau, G. W. (2021). Using anticlustering to
+    partition data sets into equivalent parts. *Psychological Methods,
+    26*(2), 161–174.
+    <a href="https://doi.org/10.1037/met0000301" class="uri">https://doi.org/10.1037/met0000301</a>
 
 If you use the bicriterion anticlustering heuristic by Brusco et
 al. (2020),[1] you should also cite their paper:
 
-Brusco, M. J., Cradit, J. D., & Steinley, D. (2020). Combining diversity
-and dispersion criteria for anticlustering: A bicriterion approach.
-*British Journal of Mathematical and Statistical Psychology, 73*(3),
-375–396.
-<a href="https://doi.org/10.1111/bmsp.12186" class="uri">https://doi.org/10.1111/bmsp.12186</a>
+-   Brusco, M. J., Cradit, J. D., & Steinley, D. (2020). Combining
+    diversity and dispersion criteria for anticlustering: A bicriterion
+    approach. *British Journal of Mathematical and Statistical
+    Psychology, 73*(3), 375–396.
+    <a href="https://doi.org/10.1111/bmsp.12186" class="uri">https://doi.org/10.1111/bmsp.12186</a>
 
 The k-plus paper has not yet been published in a journal, but you might
 want to consider citing the preprint if you use k-plus
 anticlustering:[2]
 
-Papenberg, M. (2023). k-plus Anticlustering: An Improved k-means
-Criterion for Maximizing Between-Group Similarity. Retrieved from
-psyarxiv.com/7jw6v
+-   Papenberg, M. (2023). k-plus Anticlustering: An Improved k-means
+    Criterion for Maximizing Between-Group Similarity. Retrieved from
+    psyarxiv.com/7jw6v
 
 Another great way of showing your appreciation of `anticlust` is to
 leave a star on this Github repository.
