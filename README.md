@@ -10,10 +10,10 @@ sum of pairwise distances within clusters. The package `anticlust`
 implements anticlustering methods as described in Papenberg and Klau
 (2021;
 <a href="https://doi.org/10.1037/met0000301" class="uri">https://doi.org/10.1037/met0000301</a>),
-Papenberg (2023;
-<a href="https://psyarxiv.com/7jw6v/" class="uri">https://psyarxiv.com/7jw6v/</a>)
-and Brusco et al. (2020;
-<a href="https://doi.org/10.1111/bmsp.12186" class="uri">https://doi.org/10.1111/bmsp.12186</a>).
+Brusco et al. (2020;
+<a href="https://doi.org/10.1111/bmsp.12186" class="uri">https://doi.org/10.1111/bmsp.12186</a>),
+and Papenberg (2023;
+<a href="https://doi.org/10.31234/osf.io/7jw6v" class="uri">https://doi.org/10.31234/osf.io/7jw6v</a>).
 
 Installation
 ------------
@@ -79,6 +79,10 @@ This README contains some basic information on the `R` package
     and up to date, so you should definitely check that out when using
     the `anticlust` package (primarily `?anticlustering`,
     `?kplus_anticlustering`, `?balanced_clustering`, and `?matching`).
+-   A [video](https://youtu.be/YGrhSmi1oA8) is available in German
+    language where I illustrate the main functionalities of the
+    `anticlustering()` function. My plan is to make a similar video in
+    English in the future.
 -   The [package website](https://m-py.github.io/anticlust/) contains
     most relevant documentation. This includes a
     [vignette](https://m-py.github.io/anticlust/articles/stimulus-selection.html)
