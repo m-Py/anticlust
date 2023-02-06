@@ -95,10 +95,13 @@ A quick start
 -------------
 
 In this initial example, I use the main function `anticlustering()` to
-create five similar sets of plants using the classical iris data set:
+create three similar sets of plants using the classical iris data set:
 
-    # load the package via
+First, load the package via
+
     library("anticlust")
+
+Call the `anticlustering()` method:
 
     anticlusters <- anticlustering(
       iris[, -5],
@@ -108,8 +111,9 @@ create five similar sets of plants using the classical iris data set:
       repetitions = 10
     )
 
-    # The output is a vector that assigns a group (i.e, a number
-    # between 1 and K) to each input element:
+The output is a vector that assigns a group (i.e, a number between 1 and
+`K`) to each input element:
+
     anticlusters
     #>   [1] 1 2 2 5 5 4 3 4 4 5 1 1 2 1 2 5 3 5 3 1 5 2 1 3 5 3 3 4 3 1 2 4 2 3 1 4 5
     #>  [38] 4 5 3 1 2 2 4 1 4 2 3 5 4 2 4 2 2 3 4 2 5 3 3 1 5 4 1 5 1 2 3 1 3 2 2 4 4
@@ -117,13 +121,17 @@ create five similar sets of plants using the classical iris data set:
     #> [112] 5 4 2 3 1 4 3 3 5 3 4 5 4 1 5 2 4 3 3 4 4 5 1 1 5 5 2 1 2 3 1 3 5 2 1 5 3
     #> [149] 4 1
 
-    # Each group has the same number of items:
+By default, each group has the same number of elements (but the argument
+`K` can be adjusted to request different group sizes):
+
     table(anticlusters)
     #> anticlusters
     #>  1  2  3  4  5 
     #> 30 30 30 30 30
 
-    # Compare the features' means and standard deviations across groups:
+Last, let’s compare the features’ means and standard deviations across
+groups to find out if the five groups are similar to each other:
+
     knitr::kable(mean_sd_tab(iris[, -5], anticlusters), row.names = TRUE)
 
 <table>
@@ -181,13 +189,13 @@ As illustrated in the example, we can use the function
 parentheses) of the variables are pretty much the same across the five
 groups. The function `anticlustering()` takes as input a data table
 describing the elements that should be assigned to sets. In the data
-table, each row represents an element, for example a person, word or a
-photo. Each column is a numeric variable describing one of the elements’
-features. The number of groups is specified through the argument `K`.
-The argument `objective` specifies how between-group similarity is
-quantified; the argument `method` specifies the algorithm by which this
-measure is optimized. See the documentation `?anticlustering` for more
-details.
+table, each row represents an element (here a plant, but it can be
+anything; for example a person, word, or a photo). Each column is a
+numeric variable describing one of the elements’ features. The number of
+groups is specified through the argument `K`. The argument `objective`
+specifies how between-group similarity is quantified; the argument
+`method` specifies the algorithm by which this measure is optimized. See
+the documentation `?anticlustering` for more details.
 
 Four anticlustering objectives are natively supported in
 `anticlustering()`:
