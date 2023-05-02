@@ -11,7 +11,7 @@ kplus_anticlustering(
   skew = FALSE,
   kurtosis = FALSE,
   covariances = FALSE,
-  moments = NULL,
+  T = NULL,
   standardize = TRUE,
   ...
 )
@@ -42,7 +42,7 @@ maximizie between-group similarity with regard to kurtosis?
 maximizie between-group similarity with regard to covariance structure? 
 (Default = FALSE)}
 
-\item{moments}{Optional argument: An integer vector specifying which 
+\item{T}{Optional argument: An integer specifying how many
 distribution moments should be equalized between groups.}
 
 \item{standardize}{Boolean. If \code{TRUE}, the data is standardized through 
@@ -55,26 +55,33 @@ arguments are supported except for \code{objective}.}
 \description{
 Perform anticlustering using the k-plus objective to maximize between-group 
 similarity. This function implements the k-plus anticlustering method described 
-Papenberg (2023; <doi:10.31234/osf.io/7jw6v>).
+in Papenberg (2023; <doi:10.31234/osf.io/7jw6v>).
 }
 \details{
-If the argument \code{moments} is used, it overrides the arguments
+This function implements the unweighted sum approach for k-plus 
+    anticlustering. Details are given in Papenberg (2023). 
+    
+    The optional argument \code{T} denotes the number of distribution 
+    moments that are considered in the anticlustering process. For example,
+    \code{T = 4} will lead to similar means, variances, skew and kurtosis. 
+    For the first four moments, it is also possible to use the boolean
+    convenience arguments \code{variance}, \code{skew} and \code{kurtosis}; the
+    mean (the first moment) is always included and cannot be "turned off".
+    If the argument \code{T} is used, it overrides the arguments
     \code{variance}, \code{skew} and \code{kurtosis} (corresponding to
-    the second, third and fourth moment), ignoring their values. Note that 
-    the first moment, i.e., the mean is always included in the optimization
-    (corresponding to the standard k-means criterion); it cannot be "turned off"
-    by using the argument \code{moments}.
+    the second, third and fourth moment), ignoring their values.
     
     The \code{standardization} is applied to all original features and the 
-    additional features that are appended in order to optimize 
-    the k-plus criterion (this means that all criteria such as means, 
-    variances, skewness etc. receive the same relative weight 
-    during the optimization.)
+    additional k-plus features that are appended to the data set in order 
+    to optimize the k-plus criterion. When using standardization, 
+    all criteria such as means, variances and skewness receive a comparable
+    weight during the optimization. It is usually recommended not
+    to change the default setting \code{standardization = TRUE}.
    
     This function can use any arguments that are also possible in 
     \code{\link{anticlustering}}
-    (except for `objective` of course; because the objective optimized here
-    is the k-plus objective -- to use a different objective, 
+    (except for `objective` because the objective optimized here
+    is the k-plus objective; to use a different objective, 
     call \code{\link{anticlustering}} directly). Any arguments that are
     not explicitly changed here (i.e., \code{standardize = TRUE}) receive the 
     default given in \code{\link{anticlustering}} 
@@ -86,11 +93,11 @@ If the argument \code{moments} is used, it overrides the arguments
 N <- 180
 M <- 4
 features <- matrix(rnorm(N * M), ncol = M)
-plot(features)
-# standard k-plus anticlustering: optimize similarity with regard to mean
-# and variance:
+# standard k-plus anticlustering: optimize similarity with regard to mean and variance:
 cl <- kplus_anticlustering(features, K = 3, method = "local-maximum")
 mean_sd_tab(features, cl)
+# Visualize an anticlustering solution:
+plot(features, col = palette()[2:4][cl], pch = c(16:18)[cl])
 
 # Also optimize with regard to skewness and kurtosis
 cl2 <- kplus_anticlustering(
@@ -101,13 +108,24 @@ cl2 <- kplus_anticlustering(
   kurtosis = TRUE
 )
 
-# Try to equalize the first 10 moments between groups (the first moment, 
-# i.e., the mean, is always considered in k-plus anticlustering)
-kplus_anticlustering(
+# The following two calls are equivalent: 
+init_clusters <- sample(rep_len(1:3, nrow(features)))
+# 1.
+x1 <- kplus_anticlustering(
   features, 
-  K = 3, 
-  moments = 2:10, 
+  K = init_clusters, 
+  variance = TRUE,
+  skew = TRUE
 )
+# 2. 
+x2 <- kplus_anticlustering(
+  features, 
+  K = init_clusters, 
+  T = 3
+)
+# Verify: 
+all(x1 == x2)
+
 }
 \references{
 Papenberg, M. (2023). k-plus Anticlustering: An Improved k-means Criterion 
