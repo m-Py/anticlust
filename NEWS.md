@@ -1,3 +1,8 @@
+# 0.6.4
+
+- `kplus_anticlustering()` now has an argument `T` instead of `moments`, where `T` denotes the number of distribution moments considered during k-plus anticlustering (`moments` was an integer vector specifying each individual moment that should be considered)
+  * Explanation: Lower order moments should be skipped in favour of higher order moments, so the new interface makes more sense.
+
 # 0.6.3
 
 **Major changes**
