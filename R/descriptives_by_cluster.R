@@ -76,3 +76,29 @@ range_diff <- function(x, na.rm) {
 force_decimals <- function(x, decimals = 2) {
   format(round(x, decimals), nsmall = decimals, scientific = FALSE)
 }
+
+
+# Functions to compute means / SD / skew per group 
+descriptives_by_group_ <- function(features, anticlusters, FUN, name, decimals = NULL) {
+  df <- data.frame(
+    t(data.frame(lapply(by(features, anticlusters, FUN), c)))
+  )
+  if (!is.null(decimals)) {
+    df <- round(df, decimals)
+  }
+  df$Statistic = name
+  df$Group <- 1:nrow(df)
+  df
+}
+
+descriptives_by_group <- function(features, anticlusters, decimals = NULL) {
+  result <- rbind(
+    descriptives_by_group_(features, anticlusters, colMeans, "M", decimals),
+    descriptives_by_group_(features, anticlusters, function(x) sapply(x, sd), "SD", decimals),
+    descriptives_by_group_(features, anticlusters, function(x) sapply(x, DescTools::Skew), "Skewness", decimals),
+    descriptives_by_group_(features, anticlusters, function(x) sapply(x, DescTools::Kurt), "Kurtosis", decimals)
+  )
+  rownames(result) <- NULL
+  result
+}
+
