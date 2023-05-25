@@ -350,15 +350,8 @@ input_validation_matching <- function(
 
 # Check if a solver package can be used
 check_if_solver_is_available <- function() {
-  if (!requireNamespace("Rglpk", quietly = TRUE)) {
-    stop("\n\nAn exact method was requested, but the package 'Rglpk' is not \n",
-         "available. Possibly, you have to install the GNU linear \nprogramming kit first: \n\n",
-         "- On windows, visit ",
-         "http://gnuwin32.sourceforge.net/packages/glpk.htm \n\n",
-         "- Use homebrew to install it on mac, 'brew install glpk' \n\n",
-         "- 'sudo apt install libglpk-dev' on Ubuntu ",
-         "\n\nThen, install the Rglpk package via ",
-         "`install.packages('Rglpk')`.")
+  if (!requireNamespace("gurobi", quietly = TRUE)) {
+    stop("You are using the Github branch of anticlust that uses gurobi as ILP solver, but the R package gurobi does not seem to be installed.")
   }
   return(invisible(NULL))
 }
