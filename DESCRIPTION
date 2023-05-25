@@ -71,4 +71,4 @@ RoxygenNote: 7.2.3
 SystemRequirements: The exact (anti)clustering algorithms require that the 
     commercial software gurobi is installed (<https://www.gurobi.com/downloads/>). 
     Rendering the vignette requires pandoc.
-
+Additional_repositories: https://www.gurobi.com/downloads/
