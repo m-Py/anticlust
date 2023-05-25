@@ -58,7 +58,7 @@ Imports:
     RANN (>= 2.6.0)
 Suggests: 
     knitr,
-    Rglpk,
+    gurobi,
     rmarkdown,
     testthat
 VignetteBuilder: 
@@ -68,7 +68,7 @@ Encoding: UTF-8
 LazyData: true
 NeedsCompilation: yes
 RoxygenNote: 7.2.3
-SystemRequirements: The exact (anti)clustering algorithms require that the
-    GNU linear programming kit (GLPK library) is installed
-    (<http://www.gnu.org/software/glpk/>). Rendering the vignette requires
-    pandoc.
+SystemRequirements: The exact (anti)clustering algorithms require that the 
+    commercial software gurobi is installed (<https://www.gurobi.com/downloads/>). 
+    Rendering the vignette requires pandoc.
+
