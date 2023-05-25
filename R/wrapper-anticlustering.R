@@ -5,10 +5,10 @@
 #' the aim of creating high within-group heterogeneity and high
 #' between-group similarity.  Anticlustering is accomplished by
 #' maximizing instead of minimizing a clustering objective function.
-#' Implements anticlustering algorithms as described in Papenberg and
-#' Klau (2021; <doi:10.1037/met0000301>) and an implementation of the
-#' bicriterion anticlustering algorithm described by Brusco, Cradit
-#' and Steinley (2020; <doi:10.1111/bmsp.12186>).
+#' Implements anticlustering methods as described in Papenberg and
+#' Klau (2021; <doi:10.1037/met0000301>), Brusco et al. 
+#' (2020; <doi:10.1111/bmsp.12186>), and Papenberg (2023; 
+#' <doi:10.31234/osf.io/7jw6v>).
 #'
 #' @param x The data input. Can be one of two structures: (1) A
 #'     feature matrix where rows correspond to elements and columns
@@ -33,7 +33,8 @@
 #'     before anticlusters are created? Defaults to \code{FALSE}. See
 #'     Details.
 #' @param categories A vector, data.frame or matrix representing one
-#'     or several categorical constraints. See Details.
+#'     or several categorical variables whose distribution should be similar 
+#'     between groups. See Details.
 #' @param repetitions The number of times a search heuristic is
 #'     initiated when using \code{method = "exchange"}, \code{method =
 #'     "local-maximum"}, or \code{method = "brusco"}. In the end, the
@@ -48,7 +49,7 @@
 #'     between 1 and \code{K}) to each input element.
 #'
 #' @importFrom Matrix sparseMatrix
-#' @importFrom stats as.dist dist
+#' @importFrom stats as.dist dist sd
 #'
 #' @export
 #'
@@ -83,7 +84,7 @@
 #' means of the input variables \code{x}; k-plus \code{objective =
 #' "kplus"} anticlustering is an extension of this criterion that also
 #' tries to minimize differences with regard to the standard
-#' deviations between groups (see \code{\link{kplus_objective}}).
+#' deviations between groups (see \code{\link{kplus_anticlustering}}).
 #' 
 #' The cluster editing "diversity" objective is the sum of pairwise
 #' distances of elements within the same groups (see
@@ -93,7 +94,8 @@
 #' distances. Hence, anticlustering maximizes between-group similarity
 #' by maximizing within-group heterogeneity. Note that the equivalence
 #' of within-group heterogeneity and between-group similarity only
-#' holds for equal-sized groups. If you request different-sized groups
+#' holds for equal-sized groups in the case of anticluster editing. 
+#' If you request different-sized groups
 #' and wish the different groups to be similar to each other, use
 #' \code{objective = "kplus"} or \code{objective = "variance"}. In
 #' previous versions of this package, \code{method = "distance"} was
@@ -151,12 +153,14 @@
 #' recommended for larger N.
 #' 
 #' Using \code{method = "brusco"} implements the local bicriterion
-#' iterated local search heuristic by Brusco et al. (2020), but only
-#' optimizes for one criterion - diversity or dispersion. The function
-#' \code{\link{bicriterion_anticlustering}} can be used to conduct the
-#' actual bicriterion optimization (i.e., optimize both diversity and
-#' dispersion at the same time) that is offered by Brusco et al.'s
-#' algorithm.
+#' iterated local search (BILS) heuristic by Brusco et al. (2020) and returns
+#' the partition that best optimized either the diversity or the dispersion
+#' during the optimization process. The function
+#' \code{\link{bicriterion_anticlustering}} can also be used to run the algorithm
+#' by Brusco et al., but it returns multiple partitions that approximate the 
+#' optimal pareto efficient set according to both objectives (diversity and 
+#' dispersion). Thus, to fully utilize the BILS algorithm, use the function 
+#' \code{\link{bicriterion_anticlustering}}.
 #'
 #' \strong{Optimal anticlustering}
 #'
@@ -181,12 +185,6 @@
 #' approach applicable for larger problem instances. With
 #' preclustering, optimality is no longer guaranteed, but the solution
 #' is usually optimal or very close to optimal.
-#'
-#' The variance and dispersion criterion cannot be optimized to
-#' optimality using integer linear programming because the objective
-#' functions are not linear.  However, it is possible to employ the
-#' function \code{\link{generate_partitions}} to obtain optimal
-#' solutions for small problem instances.
 #' 
 #' \strong{Preclustering}
 #' 
@@ -313,6 +311,9 @@
 #' Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition 
 #' data sets into equivalent parts. Psychological Methods, 26(2), 
 #' 161–174. https://doi.org/10.1037/met0000301.
+#' 
+#' Papenberg, M. (2023). k-plus Anticlustering: An Improved k-means Criterion 
+#' for Maximizing Between-Group Similarity. Retrieved from psyarxiv.com/7jw6v 
 #'
 #' Späth, H. (1986). Anticlustering: Maximizing the variance criterion.
 #' Control and Cybernetics, 15, 213-218.
@@ -364,15 +365,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
     return(repeat_anticlustering(x, K, objective, categories, method, repetitions))
   }
   
-  ## Get data into required format
-  input_validation_anticlustering(x, K, objective, method, preclustering, 
-                                  categories, repetitions)
 
-  ## Exact method using ILP
-  if (method == "ilp") {
-    return(exact_anticlustering(x, K, preclustering))
-  }
-  
   if (method == "brusco") {
     if (objective == "diversity") {
       weights <- c(0.5, 0.99, 0.999, 0.999999)
@@ -386,11 +379,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
     best_obj <- which.max(apply(partitions, 1, obj_fun, convert_to_distances(x)))
     return(partitions[best_obj, ])
   }
-  
-  # Preclustering and categorical constraints are both processed in the
-  # variable `categories` after this step:
-  categories <- get_categorical_constraints(x, K, preclustering, categories)
-  
+
   if (inherits(objective, "function")) {
     # most generic exchange method, deals with any objective function
     return(exchange_method(x, K, objective, categories))

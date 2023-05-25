@@ -44,7 +44,8 @@ before anticlusters are created? Defaults to \code{FALSE}. See
 Details.}
 
 \item{categories}{A vector, data.frame or matrix representing one
-or several categorical constraints. See Details.}
+or several categorical variables whose distribution should be similar 
+between groups. See Details.}
 
 \item{repetitions}{The number of times a search heuristic is
 initiated when using \code{method = "exchange"}, \code{method =
@@ -65,10 +66,10 @@ Partition a pool of elements into groups (i.e., anticlusters) with
 the aim of creating high within-group heterogeneity and high
 between-group similarity.  Anticlustering is accomplished by
 maximizing instead of minimizing a clustering objective function.
-Implements anticlustering algorithms as described in Papenberg and
-Klau (2021; <doi:10.1037/met0000301>) and an implementation of the
-bicriterion anticlustering algorithm described by Brusco, Cradit
-and Steinley (2020; <doi:10.1111/bmsp.12186>).
+Implements anticlustering methods as described in Papenberg and
+Klau (2021; <doi:10.1037/met0000301>), Brusco et al. 
+(2020; <doi:10.1111/bmsp.12186>), and Papenberg (2023; 
+<doi:10.31234/osf.io/7jw6v>).
 }
 \details{
 This function is used to solve anticlustering. That is, the data
@@ -97,7 +98,7 @@ anticlustering focuses on minimizing differences with regard to the
 means of the input variables \code{x}; k-plus \code{objective =
 "kplus"} anticlustering is an extension of this criterion that also
 tries to minimize differences with regard to the standard
-deviations between groups (see \code{\link{kplus_objective}}).
+deviations between groups (see \code{\link{kplus_anticlustering}}).
 
 The cluster editing "diversity" objective is the sum of pairwise
 distances of elements within the same groups (see
@@ -107,7 +108,8 @@ maximizes group diversity as measured by the sum of pairwise
 distances. Hence, anticlustering maximizes between-group similarity
 by maximizing within-group heterogeneity. Note that the equivalence
 of within-group heterogeneity and between-group similarity only
-holds for equal-sized groups. If you request different-sized groups
+holds for equal-sized groups in the case of anticluster editing. 
+If you request different-sized groups
 and wish the different groups to be similar to each other, use
 \code{objective = "kplus"} or \code{objective = "variance"}. In
 previous versions of this package, \code{method = "distance"} was
@@ -165,12 +167,14 @@ on the preclustering heuristic follows below). This option is
 recommended for larger N.
 
 Using \code{method = "brusco"} implements the local bicriterion
-iterated local search heuristic by Brusco et al. (2020), but only
-optimizes for one criterion - diversity or dispersion. The function
-\code{\link{bicriterion_anticlustering}} can be used to conduct the
-actual bicriterion optimization (i.e., optimize both diversity and
-dispersion at the same time) that is offered by Brusco et al.'s
-algorithm.
+iterated local search (BILS) heuristic by Brusco et al. (2020) and returns
+the partition that best optimized either the diversity or the dispersion
+during the optimization process. The function
+\code{\link{bicriterion_anticlustering}} can also be used to run the algorithm
+by Brusco et al., but it returns multiple partitions that approximate the 
+optimal pareto efficient set according to both objectives (diversity and 
+dispersion). Thus, to fully utilize the BILS algorithm, use the function 
+\code{\link{bicriterion_anticlustering}}.
 
 \strong{Optimal anticlustering}
 
@@ -195,12 +199,6 @@ size of the solution space, making the integer linear programming
 approach applicable for larger problem instances. With
 preclustering, optimality is no longer guaranteed, but the solution
 is usually optimal or very close to optimal.
-
-The variance and dispersion criterion cannot be optimized to
-optimality using integer linear programming because the objective
-functions are not linear.  However, it is possible to employ the
-function \code{\link{generate_partitions}} to obtain optimal
-solutions for small problem instances.
 
 \strong{Preclustering}
 
@@ -326,6 +324,9 @@ for a clustering problem. Mathematical Programming, 45, 59-96.
 Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition 
 data sets into equivalent parts. Psychological Methods, 26(2), 
 161–174. https://doi.org/10.1037/met0000301.
+
+Papenberg, M. (2023). k-plus Anticlustering: An Improved k-means Criterion 
+for Maximizing Between-Group Similarity. Retrieved from psyarxiv.com/7jw6v 
 
 Späth, H. (1986). Anticlustering: Maximizing the variance criterion.
 Control and Cybernetics, 15, 213-218.

@@ -1,3 +1,28 @@
+# 0.6.4
+
+- `kplus_anticlustering()` now has an argument `T` instead of `moments`, where `T` denotes the number of distribution moments considered during k-plus anticlustering (`moments` was an integer vector specifying each individual moment that should be considered)
+  * Explanation: Lower order moments should be skipped in favour of higher order moments, so the new interface makes more sense.
+
+# 0.6.3
+
+**Major changes**
+
+* This release adds a new exported function and removes two others (I very much doubt anyone used those, though -- see below -- if your code is affected, please email me).
+  - `kplus_anticlustering()` is a new exported function: A new interface function to k-plus anticlustering, implementing the k-plus method as described in "k-plus Anticlustering: An Improved k-means Criterion for Maximizing Between-Group Similarity" (Papenberg, 2023; https://doi.org/10.31234/osf.io/7jw6v). Using `anticlustering(x, K, objective = "kplus")` is still supported and remains unchanged. The new function `kplus_anticlustering()`, however, offers more functionality and nuance with regard to optimizing the k-plus objective family.
+  - The function `kplus_objective()` was removed. 
+  - The function `mean_sd_obj()` was removed. 
+  
+Explanations for the rather drastic changes, i.e., removing instead of deprecating functions (that very likely do not affect anyone):
+
+- Given the advanced theoretical background for k-plus anticlustering, the function  `kplus_objective()`  no longer makes any sense. Given that the k-plus objective is a family of objectives, keeping the function that computes one special case is more harmful to keep it than to just remove it now. As the k-plus objective basically re-uses the k-means criterion, maintaining a function such as `kplus_objective()` was questionable to begin with.
+
+- Since there is the k-plus anticlustering method now, I did not want to keep the "hacky" way to optimize similarity with regard to means and standard deviations, i.e., using the `mean_sd_obj()` function as `objective` in anticlustering. Please use the k-plus method to optimize similarity with regard to means and standard deviations (you can even extend to skewness, kurtosis, and other higher order moments; see the new `kplus_anticlustering()` function).
+
+**Minor changes**
+
+- Finally added Marie Luisa Schaper as contributor for contributing her data set
+- Some work on documentation
+
 # 0.6.2
 
 - Some work on docs and examples
@@ -63,13 +88,8 @@ minimizing differences with regard to means and variance is equally important.
 # anticlust 0.5.4-1
 
 - Internal change: `anticlustering()` with `objective = "dispersion"` now 
-<<<<<<< HEAD
 implements the local updating procedure [proposed by Martin Breuer](https://www.cs.hhu.de/fileadmin/redaktion/Fakultaeten/Mathematisch-Naturwissenschaftliche_Fakultaet/Informatik/Algorithmische_Bioinformatik/Bachelor-_Masterarbeiten/2516084_ba_ifo_AbschlArbeit_klau_mapap102_mabre121_20200820_2320.pdf). 
-=======
-implements the local updating procedure [proposed by Martin Breuer](https://www.cs.hhu.de/fileadmin/redaktion/Fakultaeten/Mathematisch-Naturwissenschaftliche_Fakultaet/Informatik/Algorithmische_Bioinformatik/Bachelor-_Masterarbeiten/2516084_ba_ifo_AbschlArbeit_klau_mapap102_mabre121_20200820_2320.pdf).
->>>>>>> devel
-This leads to a considerable speedup when maximizing the dispersion, enabling the fast 
-processing of large data sets.
+This leads to a considerable speedup when maximizing the dispersion, enabling the fast processing of large data sets.
 
 # anticlust 0.5.4
 

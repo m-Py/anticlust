@@ -39,7 +39,7 @@
 #' deviation), and can be used to simultaneously equalize the mean and
 #' the spread of the data.
 #'
-#' @export
+#' @noRd
 #'
 #' @author
 #' Martin Papenberg \email{martin.papenberg@@hhu.de}
