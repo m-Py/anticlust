@@ -41,7 +41,7 @@ In the context of anticlustering problems, the **dispersion** objective has for 
 
 **K-plus** anticlustering was introduced by Papenberg (in press). The k-plus criterion extends the k-means objective, but it no longer has a (reversed) clustering interpretation. Thus, no earlier references exist that discuss the k-plus criterion in the context of cluster analysis. 
 
-This list on literature on anticlustering objectives is necessarily not exhaustive. However, if you feel that important references are missing, please tell me <a href="martin.papenberg@hhu.de">via email</a>.
+This list on literature on anticlustering objectives is necessarily not exhaustive. However, if you feel that important references are missing, please tell me <a href="mailto:martin.papenberg@hhu.de">via email</a>.
 
 ## Cluster analysis
 
