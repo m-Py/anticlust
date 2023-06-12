@@ -4,8 +4,6 @@ If you use any anticlustering methods from the `anticlust` package in your resea
 
 - Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition data sets into equivalent parts. *Psychological Methods, 26*(2), 161--174. https://doi.org/10.1037/met0000301
 
-The preprint of this paper is freely available from https://psyarxiv.com/3razc/.
-
 The functions that implement anticlustering methods are currently:
 
 - `anticlustering()`
