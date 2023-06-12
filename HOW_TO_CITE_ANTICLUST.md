@@ -7,7 +7,7 @@ If you use any anticlustering methods from the `anticlust` package in your resea
 The functions that implement anticlustering methods are currently:
 
 - `anticlustering()`
-- `kmeans_anticlustering()`
+- `kplus_anticlustering()`
 - `bicriterion_anticlustering()`
 - `fast_anticlustering()`
 
