@@ -23,7 +23,7 @@ If you use k-plus anticlustering, you should cite the following reference:
 
 You are using k-plus anticlustering if you use the function `anticlustering()` with the argument `objective = "kplus"` or if you are using the function `kplus_anticlustering()`.
 
-## Citing anticlustering algorithms
+## References for anticlustering algorithms
 
 The default anticlustering algorithm `method = "exchange"` was described in Papenberg and Klau (2021). However, this algorithm is actually just a shorter version of the local maximum method (i.e., `method = "local-maximum"`), which was used in Papenberg (in press) and corresponds to the algorithm "LCW" by Weitz and Lakshminarayanan (1996, 1998). By default, the anticlustering algorithms (including LCW) create equal-sized groups, and Papenberg (in press) discussed how to adapt the LCW method for different sized groups. However, this extension is pretty straight forward and has probably been done elsewhere. 
 
@@ -31,7 +31,7 @@ Papenberg and Klau (2021) presented an adaptation of the LCW method to incorpora
 
 The optimal anticlustering method based on integer linear programming (i.e., `method = "ilp"`) was presented in Papenberg and Klau (2021). This ILP is an extension of the model by Grötschel and Wakabayashi (1989).
 
-## Citing anticlustering objectives
+## References for anticlustering objectives
 
 A classical reference discussing the **diversity** objective is Feo and Khellaf (1990). Brusco et al. (2020) were the first to discuss the diversity in the context of Psychological research. Papenberg and Klau (2021) and Papenberg (in press) conducted a comparative evaluation of the k-means and diversity objective (using the Euclidean distance to compute the diversity). See Brusco et al. (2020) and Papenberg and Klau (2021) for additional references on the diversity objective (e.g., Gallego et al., 2013). Many other papers have discussed algorithms for maximizing the diversity (i.e., solving the Maximum Diverse Grouping Problem, MDGP), even very recently (e.g. Yang et al., 2022). Note that the reversal of the diversity, which is the sum of intra-cluster (dis)similarities, is a very classical clustering objective that has already been discussed in the literature much earlier (e.g., Zahn, 1964).
 
