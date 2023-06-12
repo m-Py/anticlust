@@ -35,7 +35,7 @@ The optimal anticlustering method based on integer linear programming (i.e., `me
 
 A classical reference discussing the **diversity** objective is Feo and Khellaf (1990). Brusco et al. (2020) were the first to discuss the diversity in the context of Psychological research. Papenberg and Klau (2021) and Papenberg (in press) conducted a comparative evaluation of the k-means and diversity objective (using the Euclidean distance to compute the diversity). See Brusco et al. (2020) and Papenberg and Klau (2021) for additional references on the diversity objective (e.g., Gallego et al., 2013). Many other papers have discussed algorithms for maximizing the diversity (i.e., solving the Maximum Diverse Grouping Problem, MDGP), even very recently (e.g. Yang et al., 2022). Note that the reversal of the diversity, which is the sum of intra-cluster (dis)similarities, is a very classical clustering objective that has already been discussed in the literature much earlier (e.g., Zahn, 1964).
 
-Späth (1986) discussed the reversal of the **k-means** criterion (i.e., the **"variance"**) and coined the term anticlustering for this purpose. Note that Valev (1983, 1998) also independently and earlier introduced the term anticlustering.
+Späth (1986) discussed the reversal of the **k-means** criterion (i.e., the **"variance"**) and coined the term anticlustering for this purpose. Note that Valev (1983, 1998) also independently and earlier introduced the term anticlustering. Reviews of the enormousness literature on k-means *clustering* are for example found in Jain (2010) and Steinley (2006).
 
 In the context of anticlustering problems, the **dispersion** objective has for example been discussed by Fernández et al. (2013) and Brusco et al. (2020). However note that the reversal of the dispersion is also a classical clustering objective and much earlier work exists, for example in the context of hierarchical clustering (see references in Brusco et al. 2020).
 
@@ -73,9 +73,13 @@ maximally diverse grouping problem. *Journal of the Operational Research Society
 
 Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm for a clustering problem. *Mathematical Programming, 45*, 59-96.
 
+Jain, A. K. (2010). Data clustering: 50 years beyond k-means. *Pattern Recognition Letters, 31*, 651--666.
+
 Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition data sets into equivalent parts. *Psychological Methods, 26*(2), 161--174. https://doi.org/10.1037/met0000301
 
-Papenberg, M. (in press). k-plus Anticlustering: An Improved k-means Criterion  for Maximizing Between-Group Similarity. *British Journal of Mathematical and Statistical Psychology*.
+Papenberg, M. (in press). k-plus Anticlustering: An Improved k-means Criterion for Maximizing Between-Group Similarity. *British Journal of Mathematical and Statistical Psychology*.
+
+Steinley, D. (2006). K-means clustering: A half-century synthesis. *British Journal of Mathematical and Statistical Psychology, 59*, 1--34.
 
 Valev, V. (1983). Set partition principles. In J. Kozesnik (Ed.), *Transactions of the ninth Prague conference on information theory, statistical decision functions, and random processes* (Prague, 1982) (pp. 251--256). Prague, Czech Republic: Springer Netherlands.
 
