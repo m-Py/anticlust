@@ -1,5 +1,4 @@
-anticlust <a href='https://m-py.github.io/anticlust/'><img src='man/figures/anticlustStickerV1-0.svg' align="right" height="160" /></a>
-=======================================================================================================================================
+# anticlust <a href='https://m-py.github.io/anticlust/'><img src='man/figures/anticlustStickerV1-0.svg' align="right" height="160" /></a>
 
 Anticlustering partitions a pool of elements into clusters (or
 *anticlusters*) with the goal of achieving high between-cluster
@@ -8,15 +7,11 @@ by maximizing instead of minimizing a clustering objective function,
 such as the intra-cluster variance (used in k-means clustering) or the
 sum of pairwise distances within clusters. The package `anticlust`
 implements anticlustering methods as described in Papenberg and Klau
-(2021;
-<a href="https://doi.org/10.1037/met0000301" class="uri">https://doi.org/10.1037/met0000301</a>),
-Brusco et al. (2020;
-<a href="https://doi.org/10.1111/bmsp.12186" class="uri">https://doi.org/10.1111/bmsp.12186</a>),
-and Papenberg (2023;
-<a href="https://doi.org/10.31234/osf.io/7jw6v" class="uri">https://doi.org/10.31234/osf.io/7jw6v</a>).
+(2021; <https://doi.org/10.1037/met0000301>), Brusco et al. (2020;
+<https://doi.org/10.1111/bmsp.12186>), and Papenberg (2023;
+<https://doi.org/10.31234/osf.io/7jw6v>).
 
-Installation
-------------
+## Installation
 
 The stable release of `anticlust` is available from
 [CRAN](https://CRAN.R-project.org/package=anticlust) and can be
@@ -30,51 +25,33 @@ directly via Github:
     library("remotes") # if not available: install.packages("remotes")
     install_github("m-Py/anticlust")
 
-Citation
---------
+## Citation
 
 If you use `anticlust` in your research, it would be courteous if you
 cite the following reference:
 
 -   Papenberg, M., & Klau, G. W. (2021). Using anticlustering to
     partition data sets into equivalent parts. *Psychological Methods,
-    26*(2), 161–174.
-    <a href="https://doi.org/10.1037/met0000301" class="uri">https://doi.org/10.1037/met0000301</a>
+    26*(2), 161–174. <https://doi.org/10.1037/met0000301>
 
-If you use the bicriterion anticlustering heuristic by Brusco et
-al. (2020),[1] you should also cite their paper:
-
--   Brusco, M. J., Cradit, J. D., & Steinley, D. (2020). Combining
-    diversity and dispersion criteria for anticlustering: A bicriterion
-    approach. *British Journal of Mathematical and Statistical
-    Psychology, 73*(3), 375–396.
-    <a href="https://doi.org/10.1111/bmsp.12186" class="uri">https://doi.org/10.1111/bmsp.12186</a>
-
-The k-plus paper has not yet been published in a journal, but you might
-want to consider citing the preprint if you use k-plus
-anticlustering:[2]
-
--   Papenberg, M. (2023). k-plus Anticlustering: An Improved k-means
-    Criterion for Maximizing Between-Group Similarity. Retrieved from
-    <a href="https://doi.org/10.31234/osf.io/7jw6v" class="uri">https://doi.org/10.31234/osf.io/7jw6v</a>
+Depending on which functions and methods you are using, other references
+may also be fair. [Here you can find out in detail how to cite
+`anticlust`](HOW_TO_CITE_ANTICLUST.md).
 
 Another great way of showing your appreciation of `anticlust` is to
 leave a star on this Github repository.
 
-How do I learn about `anticlust`
---------------------------------
+## How do I learn about `anticlust`
 
 This README contains some basic information on the `R` package
 `anticlust`. More information is available via the following sources:
 
 -   A paper is available describing the theoretical background of
     anticlustering and the `anticlust` package in detail
-    (<a href="https://doi.org/10.1037/met0000301" class="uri">https://doi.org/10.1037/met0000301</a>).
-    The freely available preprint can be retrieved from
-    <a href="https://psyarxiv.com/3razc/" class="uri">https://psyarxiv.com/3razc/</a>.
-    A more recent paper focusing on the k-plus anticlustering method can
-    be retrieved from
-    <a href="https://psyarxiv.com/7jw6v/" class="uri">https://psyarxiv.com/7jw6v/</a>.
+    (<https://doi.org/10.1037/met0000301>). The freely available
+    preprint can be retrieved from <https://psyarxiv.com/3razc/>. A more
+    recent paper focusing on the k-plus anticlustering method can be
+    retrieved from <https://psyarxiv.com/7jw6v/>.
 -   The `R` documentation of the main functions is actually quite rich
     and up to date, so you should definitely check that out when using
     the `anticlust` package (primarily `?anticlustering`,
@@ -91,8 +68,7 @@ This README contains some basic information on the `R` package
     Note that the homepage is not completely up to date right now; this
     should change in the future, and additional vignettes are planned.
 
-A quick start
--------------
+## A quick start
 
 In this initial example, I use the main function `anticlustering()` to
 create three similar sets of plants using the classical iris data set:
@@ -216,8 +192,7 @@ therein. It is also possible to optimize user-defined measures of
 cluster similarity, which is also described in the documentation
 (`?anticlustering`).
 
-Categorical variables
----------------------
+## Categorical variables
 
 Sometimes, it is required that sets are not only similar with regard to
 some numeric variables, but we also want to ensure that each set
@@ -240,8 +215,7 @@ use the argument `categories` as follows:
     #>            2     17         16        17
     #>            3     16         17        17
 
-Matching and clustering
------------------------
+## Matching and clustering
 
 Anticlustering creates sets of dissimilar elements; the heterogenity
 within anticlusters is maximized. This is the opposite of clustering
@@ -275,17 +249,8 @@ small groups of similar elements, e.g., triplets as in this example:
 
 <img src="man/figures/matching-1.png" style="display: block; margin: auto;" />
 
-Questions and suggestions
--------------------------
+## Questions and suggestions
 
 If you have any question on the `anticlust` package or find some bugs, I
 encourage you to open an [issue on the Github
 repository](https://github.com/m-Py/anticlust/issues).
-
-[1] You are using the BILS heuristic by Brusco et al. (2020) if you use
-the function `anticlustering()` with the argument `method = "brusco"` or
-if you are using the function `bicriterion_anticlustering()`.
-
-[2] You are using k-plus anticlustering if you use the function
-`anticlustering()` with the argument `objective = "kplus"` or if you are
-using the function `kplus_anticlustering()`.
