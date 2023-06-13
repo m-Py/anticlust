@@ -62,7 +62,7 @@ This README contains some basic information on the `R` package
     English in the future.
 -   The [package website](https://m-py.github.io/anticlust/) contains
     all documentation as a convenient website. At the current time, the
-    website also lists four package vignettes, while additional
+    website also lists three package vignettes, while additional
     vignettes are planned.
 
 ## A quick start
