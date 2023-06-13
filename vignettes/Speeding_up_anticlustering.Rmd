@@ -189,26 +189,7 @@ system.time(anticlustering(data, K = K, objective = "diversity"))
 system.time(anticlustering(data, K = K, objective = "variance"))
 ```
 
-In most application I am aware of, the k-means method is faster because $M$ and $K$ are usually not very large. However, for example, if we happen to have (approximately) "$M = N$", the diversity implementation is much faster because its theoretical run time is better. If we still wish to work with the k-means objective for $M = N$, we can exploit the fact that maximizing the k-means objective is actually equivalent to maximizing the diversity. Wow -- right? The equivalence holds when we have equal-sized groups (which is the default) and when we use the squared Euclidean distance as input for the diversity implementation: 
-
-```{r}
-K <- 5
-N <- 250
-M <- 250
-data <- matrix(rnorm(M*N), ncol = M)
-dists_squared <- dist(data)^2
-
-initial_clusters <- sample(rep_len(1:K, nrow(data)))
-
-system.time(cl1 <- anticlustering(dists_squared, K = initial_clusters, objective = "diversity"))
-system.time(cl2 <- anticlustering(data, K = initial_clusters, objective = "variance"))
-
-all(cl1 == cl2)
-```
-
-Based on the same initial grouping, the outputs of the k-means and the diversity implementation are identical. But the diversity implementation was much faster. Thus, we can transform a k-means problem into a diversity problem. The equivalence also generalizes to k-plus anticlustering when we compute the squared Euclidean distance over all variables (i.e., the original and the additional k-plus variables). However, the reverse does not work in general: We cannot convert a diversity problem into a k-means problem (for other distances than squared Euclidean). 
-
-Note that for very large data sets, using the diversity objective may not be feasible at all. The reason for this is that a quadratic matrix of between-item distances has to be computed and stored in memory. It is my experience that on a personal computer this becomes difficult for about > 20000 elements (where the distance matrix has 20000^2 = `r format(20000^2, scientific = FALSE)` elements). Thus, for large data sets a change of the objective is reasonable; the k-means objective is computationally more efficient and even very large data sets can be processed---at least this is true when the number of variables is (much) smaller than the number of elements. I live in a world where this is usually the case.
+In most application I am aware of, the k-means method is faster because $M$ and $K$ are usually not very large. However, for example, if we happen to have (approximately) "$M = N$", the diversity implementation is much faster because its theoretical run time is better. Note that for very large data sets, however, using the diversity objective may not be feasible at all. The reason for this is that a quadratic matrix of between-item distances has to be computed and stored in memory. It is my experience that on a personal computer this becomes difficult for about > 20000 elements (where the distance matrix has 20000^2 = `r format(20000^2, scientific = FALSE)` elements). Thus, for large data sets a change of the objective is reasonable; the k-means objective is computationally more efficient and even very large data sets can be processed---at least this is true when the number of variables is (much) smaller than the number of elements. I live in a world where this is usually the case.
 
 Because the k-means objective has some disadvantages for anticlustering (see Papenberg, 2023),[^kmeansbad] you may consider using the k-plus objective, which extends---and effectively re-uses---the k-means criterion. For example, the following code---using $N = 50000$, 2 features and 2 exchange partners per element---ran in just about 15 seconds on my 10 year old personal computer: 
 
