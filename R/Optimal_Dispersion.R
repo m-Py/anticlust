@@ -1,9 +1,13 @@
 
 #' Maximize dispersion for K groups
 #' 
-#' @param distances Input data, dissimilarity matrix
-#' @param K The number of anticlusters to be created
-#' @param solver Either "glpk" (default) or "symphony"
+#' @param distances Input data: a dissimilarity matrix. Can be an object of 
+#'     class \code{dist} (e.g., returned by
+#'     \code{\link{dist}} or \code{\link{as.dist}}) or a \code{matrix}
+#'     where the entries of the upper and lower triangular matrix
+#'     represent pairwise dissimilarities.
+#' @param K The number of groups.
+#' @param solver Either "glpk" (default) or "symphony". See details.
 #'
 #' @export
 #' 
@@ -15,8 +19,29 @@
 #'    of elements cannot be part of the same group in order to achieve maximum 
 #'    dispersion)
 #' 
-#' @details Finds the optimal dispersion as using the algorithm presented in 
-#'   Max Diekhoff's Bachelor thesis. 
+#' @details The dispersion is the minimum distance between two elements within the 
+#'   same group. This function implements an optimal method to maximize the dispersion by assigning
+#'   the elements to \code{K} equal-sized groups. 
+#'   It uses the algorithm presented in Max Diekhoff's Bachelor thesis at the Computer Science Department
+#'   at the Heinrich Heine University Düsseldorf. 
+#'
+#'   To find out which items are not allowed to be grouped in the same 
+#'   cluster for maximum dispersion, the algorithm sequentially builds instances 
+#'   of a graph coloring problem, using an integer linear programming (ILP) 
+#'   representation (also see Fernandez et al., 2013). 
+#'   It is possible to specify the ILP solver via the argument \code{solver}. The default GNU linear programming kit
+#'   (\code{solver = "glpk"}) seems to be considerably slower for K > 3 than the SYMPHPONY solver
+#'   (\code{solver = "symphony"}). 
+#' 
+#'   Optimally solving the maximum dispersion problem
+#'   is NP-hard for K > 2, and therefore computationally infeasible for larger problem instances.
+#'   For larger data sets, use \code{\link{anticlustering}} or \code{\link{bicriterion_anticlustering}}.
+#'   
+#'
+#' @note This function either requires the R package \code{Rglpk} and the GNU linear 
+#' programming kit (<http://www.gnu.org/software/glpk/>) or the R package 
+#' \code{Rsymphony} and the COIN-OR SYMPHONY solver libraries 
+#' (<https://github.com/coin-or/SYMPHONY>).
 #' 
 #' @author
 #' 
@@ -24,11 +49,35 @@
 #' 
 #' Martin Papenberg \email{martin.papenberg@@hhu.de}
 #' 
+#' @seealso \code{\link{dispersion_objective}} \code{\link{anticlustering}}
+#' 
 #' @references 
 #' 
 #' Diekhoff (2023). Maximizing dispersion for anticlustering. Retrieved from https://www.cs.hhu.de/fileadmin/redaktion/Fakultaeten/Mathematisch-Naturwissenschaftliche_Fakultaet/Informatik/Algorithmische_Bioinformatik/Bachelor-_Masterarbeiten/2831963_ba_ifo_AbschlArbeit_klau_mapap102_madie120_20230203_1815.pdf  
 #' 
 #' Fernández, E., Kalcsics, J., & Nickel, S. (2013). The maximum dispersion problem. Omega, 41(4), 721–730. https://doi.org/10.1016/j.omega.2012.09.005 
+#' 
+#' 
+#' @examples
+#' 
+#' N <- 30
+#' M <- 5
+#' K <- 3
+#' data <- matrix(rnorm(N*M), ncol = M)
+#' distances <- dist(data)
+#' 
+#' opt <- optimal_dispersion(distances, K = K)
+#' opt
+#' 
+#' # Compare to bicriterion heuristic:
+#' groups_heuristic <- anticlustering(
+#'   distances, 
+#'   K = K,
+#'   method = "brusco", 
+#'   objective = "dispersion", 
+#'   repetitions = 100
+#' )
+#' c(OPT = opt$dispersion, HEURISTIC = dispersion_objective(distances, groups_heuristic))
 #'
 
 optimal_dispersion <- function(distances, K, solver = "glpk") {

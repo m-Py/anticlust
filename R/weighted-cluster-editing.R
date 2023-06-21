@@ -39,8 +39,10 @@
 #' 
 #' @note
 #' 
-#' This function requires the R package \code{Rglpk} and the GNU linear 
-#' programming kit.
+#' This function either requires the R package \code{Rglpk} and the GNU linear 
+#' programming kit (<http://www.gnu.org/software/glpk/>) or the R package 
+#' \code{Rsymphony} and the COIN-OR SYMPHONY solver libraries 
+#' (<https://github.com/coin-or/SYMPHONY>).
 #' 
 #' @references
 #'
