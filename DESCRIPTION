@@ -61,6 +61,7 @@ Imports:
 Suggests: 
     knitr,
     Rglpk,
+    Rsymphony,
     rmarkdown,
     testthat
 VignetteBuilder: 
@@ -70,7 +71,8 @@ Encoding: UTF-8
 LazyData: true
 NeedsCompilation: yes
 RoxygenNote: 7.2.3
-SystemRequirements: The exact (anti)clustering algorithms require that the
+SystemRequirements: The exact (anti)clustering algorithms require that either the
     GNU linear programming kit (GLPK library) is installed
-    (<http://www.gnu.org/software/glpk/>). Rendering the vignette requires
+    (<http://www.gnu.org/software/glpk/>) or the SYMPHONY open source MILP solver 
+    (<https://github.com/coin-or/SYMPHONY>). Rendering the vignette requires
     pandoc.
