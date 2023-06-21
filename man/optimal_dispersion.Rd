@@ -45,7 +45,7 @@ The dispersion is the minimum distance between two elements within the
   of a graph coloring problem, using an integer linear programming (ILP) 
   representation (also see Fernandez et al., 2013). 
   It is possible to specify the ILP solver via the argument \code{solver}. The default GNU linear programming kit
-  (\code{solver = "glpk"}) seems to be considerably slower for K > 3 than the SYMPHPONY solver
+  (\code{solver = "glpk"}) seems to be considerably slower for K >= 3 than the SYMPHPONY solver
   (\code{solver = "symphony"}). 
 
   Optimally solving the maximum dispersion problem
@@ -77,7 +77,10 @@ groups_heuristic <- anticlustering(
   objective = "dispersion", 
   repetitions = 100
 )
-c(OPT = opt$dispersion, HEURISTIC = dispersion_objective(distances, groups_heuristic))
+c(
+  OPT = opt$dispersion, 
+  HEURISTIC = dispersion_objective(distances, groups_heuristic)
+)
 
 }
 \references{
