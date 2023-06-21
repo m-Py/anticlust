@@ -305,10 +305,13 @@ groups_from_k_coloring_mapping <- function(result_value, result_x, all_nns, all_
   # how many are not yet assigned
   freq_not_assigned <- rep(N / K, K)
   assigned <- table(groups_new)
-  for(i in 1:result_value){
-    freq_not_assigned[i] <- freq_not_assigned[i] - assigned[i]
+  # Randomly fill other groups that are not yet full
+  if (sum(assigned) < N) {
+    for(i in 1:result_value){
+      freq_not_assigned[i] <- freq_not_assigned[i] - assigned[i]
+    }
+    groups_new[is.na(groups_new)] <- sample_(rep(1:K, freq_not_assigned))
   }
-  groups_new[is.na(groups_new)] <- sample_(rep(1:K, freq_not_assigned))
   list(groups = groups_new, edges = df)
 }
 
