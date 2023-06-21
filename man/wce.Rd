@@ -4,11 +4,15 @@
 \alias{wce}
 \title{Exact weighted cluster editing}
 \usage{
-wce(x)
+wce(x, K = NULL, solver = "glpk")
 }
 \arguments{
 \item{x}{A N x N similarity matrix. Larger values indicate stronger
 agreement / similarity between a pair of data points}
+
+\item{K}{Optional argument; if specified, denotes the number of (equal-sized) clusters.}
+
+\item{solver}{Either "glpk" (default) or "symphony"}
 }
 \value{
 An integer vector representing the cluster affiliation of each data point

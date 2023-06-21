@@ -15,13 +15,17 @@
 #'
 #' @noRd
 
-solve_ilp <- function(ilp, objective = "max") {
+solve_ilp_diversity <- function(ilp, objective = "max", solver = "glpk") {
   if (objective == "max") {
     max <- TRUE
   } else {
     max <- FALSE
   }
-  ilp_solution <- Rglpk::Rglpk_solve_LP(
+  
+  solver_function <- ifelse(solver == "symphony", Rsymphony::Rsymphony_solve_LP, Rglpk::Rglpk_solve_LP)
+  name_opt <- ifelse(solver == "symphony", "objval", "optimum")
+  
+  ilp_solution <- solver_function(
     obj = ilp$obj_function,
     mat = ilp$constraints,
     dir = ilp$equalities,
@@ -32,7 +36,7 @@ solve_ilp <- function(ilp, objective = "max") {
   # return the optimal value and the variable assignment
   ret_list <- list() 
   ret_list$x <- ilp_solution$solution
-  ret_list$obj <- ilp_solution$optimum
+  ret_list$obj <- ilp_solution[[name_opt]]
   ## name the decision variables
   names(ret_list$x) <- colnames(ilp$constraints)
   ret_list
