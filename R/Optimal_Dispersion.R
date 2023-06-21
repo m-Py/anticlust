@@ -40,13 +40,11 @@ optimal_dispersion <- function(distances, K, solver = "glpk") {
     # Construct graph from all previous edges (that had low distances)
     #gr <- graph_from_edgelist(all_nns_reordered, directed = FALSE)
     ilp <- k_coloring_ilp(all_nns_reordered, N, K)
-    #print(ilp)
-    solution <- solve_ilp(ilp, solver)
+    solution <- solve_ilp_graph_colouring(ilp, solver)
     # Dispersion is found when graph has no k-coloring, which corresponds to objective value beeing 0
-    dispersion_found <- solution$obj == 0
+    dispersion_found <- solution$status != 0
     if(!dispersion_found){
       last_solution <- solution
-      #print(last_solution)
       all_nns_last <- all_nns
       all_nns_reordered_last <- all_nns_reordered
     }
