@@ -193,17 +193,6 @@ k_coloring_ilp <- function(all_nns_reordered, N, K){
   return(instance)
 
 }
-# Return identifiers for equality relationships
-#
-# @return A list of three elements containing strings representing
-#     equality (e), lower (l), and greater (g) relationships
-#
-equality_identifiers <- function() {
-  equal_sign <- "=="
-  lower_sign <- "<="
-  greater_sign <- ">="
-  list(e = equal_sign, l = lower_sign, g = greater_sign)
-}
 
 # Construct a sparse matrix representing the ILP constraints
 #
