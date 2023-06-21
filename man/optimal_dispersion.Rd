@@ -47,12 +47,16 @@ The dispersion is the minimum distance between two elements
   instances of a graph coloring problem, using an integer linear
   programming (ILP) representation (also see Fernandez et al.,
   2013).  It is possible to specify the ILP solver via the argument
-  \code{solver}. The default GNU linear programming kit
-  (\code{solver = "glpk"}) seems to be considerably slower for K >=
-  3 than the SYMPHPONY solver (\code{solver = "symphony"}). If the
-  argument \code{solver} is not specified, the function will try to
-  find the GLPK or SYMPHONY by itself (it prioritizes using
-  SYMPHONY if available).
+  \code{solver}. This function either requires the R package
+  \code{Rglpk} and the GNU linear programming kit
+  (<http://www.gnu.org/software/glpk/>) or the R package
+  \code{Rsymphony} and the COIN-OR SYMPHONY solver libraries
+  (<https://github.com/coin-or/SYMPHONY>). If the argument
+  \code{solver} is not specified, the function will try to find the
+  GLPK or SYMPHONY by itself (it prioritizes using SYMPHONY if
+  available). The GNU linear programming kit (\code{solver =
+  "glpk"}) seems to be considerably slower for K >= 3 than the
+  SYMPHPONY solver (\code{solver = "symphony"}).
 
   Optimally solving the maximum dispersion problem is NP-hard for K
   > 2 and therefore computationally infeasible for larger problem
@@ -61,10 +65,19 @@ The dispersion is the minimum distance between two elements
   \code{\link{bicriterion_anticlustering}}.
 }
 \note{
-This function either requires the R package \code{Rglpk} and the GNU linear 
-programming kit (<http://www.gnu.org/software/glpk/>) or the R package 
-\code{Rsymphony} and the COIN-OR SYMPHONY solver libraries 
-(<https://github.com/coin-or/SYMPHONY>).
+If the SYMPHONY solver is used, an unfortunate
+"message" is printed to the console when this function terminates: 
+
+sym_get_col_solution(): No solution has been stored!
+
+This message is no reason to worry and instead is a direct result
+of the algorithm finding the optimal value for the dispersion
+(because the dispersion is found the first time the graph colouring
+ILP fails to assign all item below a certain dissimilarity to
+different sets; hence, the ILP fails, which means that the solution
+is found).  Unfortunately, this message is generated in the C code
+(function printf) of the SYMPHONY library, which cannot be
+prevented in R.
 }
 \examples{
 
