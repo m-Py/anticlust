@@ -329,6 +329,10 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
                                   categories, repetitions, standardize)
 
   x <- to_matrix(x)
+  # there is a reason why scaling happens here and below (because of ILP + kplus)
+  if (!is_distance_matrix(x) && standardize == TRUE) {
+    x <- scale(x)
+  }
 
   ## Exact method using ILP
   if (method == "ilp") {
