@@ -193,13 +193,13 @@ constraint_names <- function(nr_of_nodes, K) {
 
 # allow for different solvers (Symphony, GLPK)
 
-solve_ilp <- function(ilp, solver) {
+solve_ilp_graph_colouring <- function(ilp, solver) {
   
   # solver_function = Rglpk::Rglpk_solve_LP OR Rsymphony::Rsymphony_solve_LP
   # name_opt (refers to the output of the function) = "objval" (GLPK) OR "optimum" (Symphony)
   # rest of the input is the same between the solver functions, which is nice
   solver_function <- ifelse(solver == "symphony", Rsymphony::Rsymphony_solve_LP, Rglpk::Rglpk_solve_LP)
-  name_opt <- ifelse(solver == "symphony", "optimum", "objval")
+  name_opt <- ifelse(solver == "symphony", "objval", "optimum")
   
   ilp_solution <- solver_function(
     obj = ilp$obj_function,
@@ -209,11 +209,12 @@ solve_ilp <- function(ilp, solver) {
     types = "B",
     max = FALSE
   )
-  
+
   # return the optimal value and the variable assignment
   ret_list <- list() 
   ret_list$x <- ilp_solution$solution
   ret_list$obj <- ilp_solution[[name_opt]]
+  ret_list$status <- ilp_solution$status
   ## name the decision variables
   names(ret_list$x) <- colnames(ilp$constraints)
   ret_list
