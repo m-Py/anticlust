@@ -22,26 +22,34 @@
 #'    of elements cannot be part of the same group in order to achieve maximum 
 #'    dispersion)
 #' 
-#' @details The dispersion is the minimum distance between two elements within the 
-#'   same group. This function implements an optimal method to maximize the dispersion by assigning
-#'   the elements to \code{K} equal-sized groups. If the data input \code{x} is a feature
-#'   matrix and not a dissimilarity matrix, the pairwise Euclidean distance is used. 
-#'   It uses the algorithm presented in Max Diekhoff's Bachelor thesis at the Computer Science Department
-#'   at the Heinrich Heine University Düsseldorf. 
+#' @details
 #'
-#'   To find out which items are not allowed to be grouped in the same 
-#'   cluster for maximum dispersion, the algorithm sequentially builds instances 
-#'   of a graph coloring problem, using an integer linear programming (ILP) 
-#'   representation (also see Fernandez et al., 2013). 
-#'   It is possible to specify the ILP solver via the argument \code{solver}. The default GNU linear programming kit
-#'   (\code{solver = "glpk"}) seems to be considerably slower for K >= 3 than the SYMPHPONY solver
-#'   (\code{solver = "symphony"}). If the argument \code{solver} is not specified, the
-#'   function will try to find the GLPK or SYMPHONY by itself (it prioritizes 
-#'   using SYMPHONY if available).
+#'   The dispersion is the minimum distance between two elements
+#'   within the same group. This function implements an optimal method
+#'   to maximize the dispersion by assigning the elements to \code{K}
+#'   equal-sized groups. If the data input \code{x} is a feature
+#'   matrix and not a dissimilarity matrix, the pairwise Euclidean
+#'   distance is used.  It uses the algorithm presented in Max
+#'   Diekhoff's Bachelor thesis at the Computer Science Department at
+#'   the Heinrich Heine University Düsseldorf.
+#'
+#'   To find out which items are not allowed to be grouped in the same
+#'   cluster for maximum dispersion, the algorithm sequentially builds
+#'   instances of a graph coloring problem, using an integer linear
+#'   programming (ILP) representation (also see Fernandez et al.,
+#'   2013).  It is possible to specify the ILP solver via the argument
+#'   \code{solver}. The default GNU linear programming kit
+#'   (\code{solver = "glpk"}) seems to be considerably slower for K >=
+#'   3 than the SYMPHPONY solver (\code{solver = "symphony"}). If the
+#'   argument \code{solver} is not specified, the function will try to
+#'   find the GLPK or SYMPHONY by itself (it prioritizes using
+#'   SYMPHONY if available).
 #' 
-#'   Optimally solving the maximum dispersion problem
-#'   is NP-hard for K > 2, and therefore computationally infeasible for larger problem instances.
-#'   For larger data sets, use \code{\link{anticlustering}} or \code{\link{bicriterion_anticlustering}}.
+#'   Optimally solving the maximum dispersion problem is NP-hard for K
+#'   > 2 and therefore computationally infeasible for larger problem
+#'   instances.  For larger data sets, use
+#'   \code{\link{anticlustering}} or
+#'   \code{\link{bicriterion_anticlustering}}.
 #'   
 #'
 #' @note This function either requires the R package \code{Rglpk} and the GNU linear 
