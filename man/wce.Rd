@@ -10,7 +10,7 @@ wce(x, solver = NULL)
 \item{x}{A N x N similarity matrix. Larger values indicate stronger
 agreement / similarity between a pair of data points}
 
-\item{solver}{Either "glpk" (default) or "symphony"}
+\item{solver}{Optional argument, either "glpk" (default) or "symphony". See details.}
 }
 \value{
 An integer vector representing the cluster affiliation of each data point
@@ -23,7 +23,9 @@ Optimally solves weighted cluster editing (also known as »correlation clusterin
 Finds the clustering that maximizes the sum of pairwise similarities within clusters. 
 In the input some similarities should be negative (indicating dissimilarity) because 
 otherwise the maximum sum of similarities is obtained by simply joining all elements 
-within a single big cluster.
+within a single big cluster. If the argument \code{solver} is not specified, the function
+will try to find the GLPK or SYMPHONY by itself (it prioritizes using SYMPHONY if 
+available).
 }
 \note{
 This function either requires the R package \code{Rglpk} and the GNU linear 

@@ -35,7 +35,9 @@
 #'   representation (also see Fernandez et al., 2013). 
 #'   It is possible to specify the ILP solver via the argument \code{solver}. The default GNU linear programming kit
 #'   (\code{solver = "glpk"}) seems to be considerably slower for K >= 3 than the SYMPHPONY solver
-#'   (\code{solver = "symphony"}). 
+#'   (\code{solver = "symphony"}). If the argument \code{solver} is not specified, the
+#'   function will try to find the GLPK or SYMPHONY by itself (it prioritizes 
+#'   using SYMPHONY if available).
 #' 
 #'   Optimally solving the maximum dispersion problem
 #'   is NP-hard for K > 2, and therefore computationally infeasible for larger problem instances.
