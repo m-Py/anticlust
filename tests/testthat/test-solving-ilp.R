@@ -24,3 +24,17 @@ test_that("all levels of heuristicism work and that exact approach has best obje
     expect_equal(which.max(obj_values), 1)
   }
 })
+
+test_that("Solving ILP works as expected for max dispersion", {
+  N <- 30
+  K <- 3
+  M <- 5
+  dat <- matrix(rnorm(N*M), ncol = M)
+  
+  ILP <- anticlustering(dat, K = K, objective = "dispersion", method = "ilp")
+  HEURISTIC <- anticlustering(dat, K = K, objective = "dispersion", method = "local-maximum")
+  
+  expect_true(dispersion_objective(dat, ILP) >= dispersion_objective(dat, HEURISTIC))
+  expect_true(all(table(ILP) == N/K))
+})
+

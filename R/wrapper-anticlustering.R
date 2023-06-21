@@ -332,6 +332,9 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
 
   ## Exact method using ILP
   if (method == "ilp") {
+    if (objective == "dispersion") {
+      return(optimal_dispersion(x, K)$groups)
+    }
     return(exact_anticlustering(x, K, preclustering))
   }
 

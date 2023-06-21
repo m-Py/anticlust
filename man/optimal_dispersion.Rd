@@ -4,11 +4,14 @@
 \alias{optimal_dispersion}
 \title{Maximize dispersion for K groups}
 \usage{
-optimal_dispersion(distances, K, solver = "glpk")
+optimal_dispersion(x, K, solver = "glpk")
 }
 \arguments{
-\item{distances}{Input data: a dissimilarity matrix. Can be an object of 
-class \code{dist} (e.g., returned by
+\item{x}{The data input. Can be one of two structures: (1) A
+feature matrix where rows correspond to elements and columns
+correspond to variables (a single numeric variable can be
+passed as a vector). (2) An N x N matrix dissimilarity matrix;
+can be an object of class \code{dist} (e.g., returned by
 \code{\link{dist}} or \code{\link{as.dist}}) or a \code{matrix}
 where the entries of the upper and lower triangular matrix
 represent pairwise dissimilarities.}
@@ -32,7 +35,8 @@ Maximize dispersion for K groups
 \details{
 The dispersion is the minimum distance between two elements within the 
   same group. This function implements an optimal method to maximize the dispersion by assigning
-  the elements to \code{K} equal-sized groups. 
+  the elements to \code{K} equal-sized groups. If the data input \code{x} is a feature
+  matrix and not a dissimilarity matrix, the pairwise Euclidean distance is used. 
   It uses the algorithm presented in Max Diekhoff's Bachelor thesis at the Computer Science Department
   at the Heinrich Heine University Düsseldorf. 
 
