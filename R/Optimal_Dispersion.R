@@ -51,17 +51,16 @@
 #'   SYMPHPONY solver (\code{solver = "symphony"}).
 #' 
 #'   Optimally solving the maximum dispersion problem is NP-hard for K
-#'   > 2 and therefore computationally infeasible for larger problem
-#'   instances. For K = 3 and K = 4, it seems that this approach scales up to several 100 elements, 
+#'   > 2 and therefore computationally infeasible for larger data
+#'   sets. For K = 3 and K = 4, it seems that this approach scales up to several 100 elements, 
 #'   or even > 1000 for K = 3 (at least when using the Symphony solver). 
-#'   For larger data sets, use \code{\link{anticlustering}} or
+#'   For larger data sets, use the heuristic approaches in \code{\link{anticlustering}} or
 #'   \code{\link{bicriterion_anticlustering}}. However, note that for K = 2, 
-#'   the optimal approach is usually much faster than the heuristic approaches in 
-#'   \code{\link{anticlustering}} and \code{\link{bicriterion_anticlustering}}.
+#'   the optimal approach is usually much even than the heuristics.
 #'   
 #'   In the output, the element \code{edges} defines which elements must be in separate 
 #'   clusters in order to achieve maximum dispersion. All elements not listed here
-#'   can be assigned arbitrarily without reducing the dispersion.
+#'   can be changed arbitrarily between clusters without reducing the dispersion.
 #'   
 #'
 #' @note If the SYMPHONY solver is used, an unfortunate
