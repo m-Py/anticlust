@@ -15,10 +15,27 @@ optimal_dispersion(distances, K, solver = "glpk")
 }
 \value{
 A list with three elements:  
-  $dispersion: The optimal dispersion; 
-  $groups: A possible assignment to groups (vector);
-  $edges: A matrix of 2 columns. Each row is an edge that had to be investigated to find the dispersion.
+   \code{dispersion}: The optimal dispersion; 
+   \code{groups}: A possible assignment to groups (vector);
+   \code{edges}: A matrix of 2 columns. Each row contains the indices of 
+   elements that had to be investigated to find the dispersion. (i.e., each pair
+   of elements cannot be part of the same group in order to achieve maximum 
+   dispersion)
 }
 \description{
 Maximize dispersion for K groups
+}
+\details{
+Finds the optimal dispersion as using the algorithm presented in 
+  Max Diekhoff's Bachelor thesis.
+}
+\references{
+Diekhoff (2023). Maximizing dispersion for anticlustering. Retrieved from https://www.cs.hhu.de/fileadmin/redaktion/Fakultaeten/Mathematisch-Naturwissenschaftliche_Fakultaet/Informatik/Algorithmische_Bioinformatik/Bachelor-_Masterarbeiten/2831963_ba_ifo_AbschlArbeit_klau_mapap102_madie120_20230203_1815.pdf  
+
+Fernández, E., Kalcsics, J., & Nickel, S. (2013). The maximum dispersion problem. Omega, 41(4), 721–730. https://doi.org/10.1016/j.omega.2012.09.005
+}
+\author{
+Max Diekhoff
+
+Martin Papenberg \email{martin.papenberg@hhu.de}
 }
