@@ -56,7 +56,7 @@
 #'   or even > 1000 for K = 3 (at least when using the Symphony solver). 
 #'   For larger data sets, use the heuristic approaches in \code{\link{anticlustering}} or
 #'   \code{\link{bicriterion_anticlustering}}. However, note that for K = 2, 
-#'   the optimal approach is usually much even than the heuristics.
+#'   the optimal approach is usually much faster than the heuristics.
 #'   
 #'   In the output, the element \code{edges} defines which elements must be in separate 
 #'   clusters in order to achieve maximum dispersion. All elements not listed here
