@@ -61,7 +61,7 @@
 #' 419–420. 
 #'
 
-wce <- function(x, K = NULL, solver = "glpk") {
+wce <- function(x, K = NULL, solver = NULL) {
 
   if (argument_exists(K)) {
     validate_input(K, "K", objmode = "numeric", must_be_integer = TRUE, not_na = TRUE, not_function = TRUE)
@@ -71,15 +71,19 @@ wce <- function(x, K = NULL, solver = "glpk") {
     K <- 0 # k is irrelevant for standard WCE
   }
   
-  validate_input(solver, "solver", objmode = "character", len = 1,
-                 input_set = c("glpk", "symphony"), not_na = TRUE, not_function = TRUE)
-  
-  check_if_solver_is_available()
+  if (argument_exists(solver)) {
+    validate_input(solver, "solver", objmode = "character", len = 1,
+                   input_set = c("glpk", "symphony"), not_na = TRUE, not_function = TRUE)
+  } else {
+    solver <- find_ilp_solver()
+  }
+
   validate_data_matrix(x)
   if (!is_distance_matrix(x)) {
     stop("The input via argument `weights` is not a similarity matrix, ",
          "the upper and lower triangulars of your matrix differ.")
   }
+  
   x <- as.matrix(x)
   ilp <- anticlustering_ilp(x, K = K, equal_sized_groups)
   solution <- solve_ilp_diversity(ilp, "max", solver)

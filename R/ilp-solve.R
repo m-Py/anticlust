@@ -15,11 +15,15 @@
 #'
 #' @noRd
 
-solve_ilp_diversity <- function(ilp, objective = "max", solver = "glpk") {
+solve_ilp_diversity <- function(ilp, objective = "max", solver = NULL) {
   if (objective == "max") {
     max <- TRUE
   } else {
     max <- FALSE
+  }
+  
+  if (is.null(solver)) {
+    solver <- find_ilp_solver()
   }
   
   solver_function <- ifelse(solver == "symphony", Rsymphony::Rsymphony_solve_LP, Rglpk::Rglpk_solve_LP)
@@ -40,4 +44,14 @@ solve_ilp_diversity <- function(ilp, objective = "max", solver = "glpk") {
   ## name the decision variables
   names(ret_list$x) <- colnames(ilp$constraints)
   ret_list
+}
+
+# Function to find a solver package
+find_ilp_solver <- function() {
+  if (requireNamespace("Rsymphony", quietly = TRUE)) {
+    return("symphony")
+  } else if (requireNamespace("Rglpk", quietly = TRUE)) {
+    return("glpk")
+  }
+  check_if_solver_is_available() # throws an error here!
 }

@@ -81,13 +81,20 @@
 #'   objective = "dispersion", 
 #'   repetitions = 100
 #' )
-#' c(OPT = opt$dispersion, HEURISTIC = dispersion_objective(distances, groups_heuristic))
+#' c(
+#'   OPT = opt$dispersion, 
+#'   HEURISTIC = dispersion_objective(distances, groups_heuristic)
+#' )
 #'
 
-optimal_dispersion <- function(x, K, solver = "glpk") {
+optimal_dispersion <- function(x, K, solver = NULL) {
   
-  validate_input(solver, "solver", objmode = "character", len = 1,
-                 input_set = c("glpk", "symphony"), not_na = TRUE, not_function = TRUE)
+  if (argument_exists(solver)) {
+    validate_input(solver, "solver", objmode = "character", len = 1,
+                   input_set = c("glpk", "symphony"), not_na = TRUE, not_function = TRUE)
+  } else {
+    solver <- find_ilp_solver()
+  }
   validate_data_matrix(x)
   validate_input(K, "K", objmode = "numeric", must_be_integer = TRUE, not_na = TRUE, not_function = TRUE)
   
