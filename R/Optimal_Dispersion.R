@@ -308,7 +308,7 @@ groups_from_k_coloring_mapping <- function(result_value, result_x, all_nns, all_
   for(i in 1:result_value){
     freq_not_assigned[i] <- freq_not_assigned[i] - assigned[i]
   }
-  groups_new[is.na(groups_new)] <- sample(rep(1:K, freq_not_assigned))
+  groups_new[is.na(groups_new)] <- sample_(rep(1:K, freq_not_assigned))
   list(groups = groups_new, edges = df)
 }
 
