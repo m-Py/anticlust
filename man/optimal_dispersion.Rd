@@ -62,9 +62,11 @@ The dispersion is the minimum distance between two elements
   Optimally solving the maximum dispersion problem is NP-hard for K
   > 2 and therefore computationally infeasible for larger problem
   instances. For K = 3 and K = 4, it seems that this approach scales up to several 100 elements, 
-  or even > 1000 for K = 3. For larger data sets, use
-  \code{\link{anticlustering}} or
-  \code{\link{bicriterion_anticlustering}}.
+  or even > 1000 for K = 3 (at least when using the Symphony solver). 
+  For larger data sets, use \code{\link{anticlustering}} or
+  \code{\link{bicriterion_anticlustering}}. However, note that for K = 2, 
+  the optimal approach is usually much faster than the heuristic approaches in 
+  \code{\link{anticlustering}} and \code{\link{bicriterion_anticlustering}}.
   
   In the output, the element \code{edges} defines which elements must be in separate 
   clusters in order to achieve maximum dispersion. All elements not listed here
