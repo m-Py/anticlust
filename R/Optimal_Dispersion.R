@@ -139,14 +139,10 @@ sparse_constraints_dispersion <- function(all_nns_reordered, nr_of_nodes, nr_of_
 # Indices for sparse matrix representation of node constraints
 node_constraints <- function(nr_of_nodes, K) {
   col_indices <- rep(1:nr_of_nodes, each=K)
-  #print(col_indices)
   row_start <- K+1
   row_end <- (nr_of_nodes+1)*K
   row_indices <- row_start:row_end
-  #print(row_indices)
   xes <- rep(1, nr_of_nodes * K)
-  #print(xes)
-  #print(length(xes))
   list(i = col_indices, j = row_indices, x = xes)
 }
 
@@ -155,8 +151,6 @@ edge_constraints <- function(all_nns, nr_of_nodes, nr_of_edges, K) {
   col_start <- nr_of_nodes+1
   col_end <- nr_of_nodes+(nr_of_edges * K)
   col_indices <- rep(col_start:col_end, each=3)
-  #print(length(col_indices))
-  #print(col_indices)
   row_indices <- c()
   for(i in 1:nr_of_edges){
     u <- all_nns[i,1]
@@ -164,11 +158,7 @@ edge_constraints <- function(all_nns, nr_of_nodes, nr_of_edges, K) {
     current_rows <- c(rep(c(0, u * K, v * K), K))
     row_indices <- c(row_indices, current_rows + rep(1:K, each=3))
   }
-  #print(length(row_indices))
-  #print(row_indices)
   xes <- rep(c(-1,1,1), nr_of_edges * K)
-  #print(length(xes))
-  #print(xes)
   list(i = col_indices, j = row_indices, x = xes)
 }
 
@@ -177,14 +167,8 @@ group_constraints_dispersion <- function(nr_of_nodes, nr_of_edges, max_group_siz
   col_start <- nr_of_nodes+(nr_of_edges * K)+1
   col_end <- nr_of_nodes+(nr_of_edges * K)+K
   col_indices <- rep(col_start:col_end, each=nr_of_nodes)
-  #print(length(col_indices))
-  #print(col_indices)
   row_indices <- (rep(1:nr_of_nodes) * K) + rep(1:K, each=nr_of_nodes) 
-  #print(length(row_indices))
-  #print(row_indices)
   xes <- rep(1, nr_of_nodes * K)
-  #print(length(xes))
-  #print(xes)
   list(i = col_indices, j = row_indices, x = xes)
 }
 
