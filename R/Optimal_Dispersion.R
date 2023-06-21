@@ -96,7 +96,6 @@ optimal_dispersion <- function(distances, K, solver = "glpk") {
   all_nns_last <- NULL
   all_nns_reordered_last <- NULL
   counter <- 1
-  # TODO: Include code on what to do when the first check for bipartiteness already fails
   while (!dispersion_found) {
     dispersion <- min(distances)
     ids_of_nearest_neighbours <- which(dispersion == distances, arr.ind = TRUE)
@@ -105,10 +104,8 @@ optimal_dispersion <- function(distances, K, solver = "glpk") {
     # of relevant edges (Better for creating K-coloring ILP).
     all_nns_reordered <- reorder_edges(all_nns)
     # Construct graph from all previous edges (that had low distances)
-    #gr <- graph_from_edgelist(all_nns_reordered, directed = FALSE)
     ilp <- k_coloring_ilp(all_nns_reordered, N, K)
     solution <- solve_ilp_graph_colouring(ilp, solver)
-    # Dispersion is found when graph has no k-coloring, which corresponds to objective value beeing 0
     dispersion_found <- solution$status != 0
     if(!dispersion_found){
       last_solution <- solution
