@@ -86,7 +86,7 @@ groups_heuristic <- anticlustering(
   repetitions = 100
 )
 c(
-  OPT = opt$dispersion, 
+  OPT = dispersion_objective(distances, opt$groups),
   HEURISTIC = dispersion_objective(distances, groups_heuristic)
 )
 

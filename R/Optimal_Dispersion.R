@@ -92,7 +92,7 @@
 #'   repetitions = 100
 #' )
 #' c(
-#'   OPT = opt$dispersion, 
+#'   OPT = dispersion_objective(distances, opt$groups),
 #'   HEURISTIC = dispersion_objective(distances, groups_heuristic)
 #' )
 #'
@@ -135,7 +135,7 @@ optimal_dispersion <- function(x, K, solver = NULL) {
       all_nns_last <- all_nns
       all_nns_reordered_last <- all_nns_reordered
     }
-    counter <- counter +1
+    counter <- counter + 1
     # Take out distances that have been investigated to proceed
     distances[ids_of_nearest_neighbours] <- Inf 
   }
