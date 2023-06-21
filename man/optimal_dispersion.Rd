@@ -18,16 +18,17 @@ represent pairwise dissimilarities.}
 
 \item{K}{The number of groups.}
 
-\item{solver}{Either "glpk" (default) or "symphony". See details.}
+\item{solver}{Optional argument; if passed, has to be either "glpk" or
+"symphony". See details.}
 }
 \value{
 A list with three elements:  
    \code{dispersion}: The optimal dispersion; 
    \code{groups}: A possible assignment to groups (vector);
    \code{edges}: A matrix of 2 columns. Each row contains the indices of 
-   elements that had to be investigated to find the dispersion. (i.e., each pair
+   elements that had to be investigated to find the dispersion (i.e., each pair
    of elements cannot be part of the same group in order to achieve maximum 
-   dispersion)
+   dispersion).
 }
 \description{
 Maximize dispersion for K groups
@@ -53,16 +54,21 @@ The dispersion is the minimum distance between two elements
   \code{Rsymphony} and the COIN-OR SYMPHONY solver libraries
   (<https://github.com/coin-or/SYMPHONY>). If the argument
   \code{solver} is not specified, the function will try to find the
-  GLPK or SYMPHONY by itself (it prioritizes using SYMPHONY if
-  available). The GNU linear programming kit (\code{solver =
+  GLPK or SYMPHONY solver by itself (it prioritizes using SYMPHONY if
+  both are available). The GNU linear programming kit (\code{solver =
   "glpk"}) seems to be considerably slower for K >= 3 than the
   SYMPHPONY solver (\code{solver = "symphony"}).
 
   Optimally solving the maximum dispersion problem is NP-hard for K
   > 2 and therefore computationally infeasible for larger problem
-  instances.  For larger data sets, use
+  instances. For K = 3 and K = 4, it seems that this approach scales up to several 100 elements, 
+  or even > 1000 for K = 3. For larger data sets, use
   \code{\link{anticlustering}} or
   \code{\link{bicriterion_anticlustering}}.
+  
+  In the output, the element \code{edges} defines which elements must be in separate 
+  clusters in order to achieve maximum dispersion. All elements not listed here
+  can be assigned arbitrarily without reducing the dispersion.
 }
 \note{
 If the SYMPHONY solver is used, an unfortunate
@@ -71,12 +77,9 @@ If the SYMPHONY solver is used, an unfortunate
 sym_get_col_solution(): No solution has been stored!
 
 This message is no reason to worry and instead is a direct result
-of the algorithm finding the optimal value for the dispersion
-(because the dispersion is found the first time the graph colouring
-ILP fails to assign all item below a certain dissimilarity to
-different sets; hence, the ILP fails, which means that the solution
-is found).  Unfortunately, this message is generated in the C code
-(function printf) of the SYMPHONY library, which cannot be
+of the algorithm finding the optimal value for the dispersion.
+Unfortunately, this message is generated in the C code underlying the 
+SYMPHONY library (via the printing function \code{printf}), which cannot be
 prevented in R.
 }
 \examples{
@@ -105,9 +108,11 @@ c(
 
 }
 \references{
-Diekhoff (2023). Maximizing dispersion for anticlustering. Retrieved from https://www.cs.hhu.de/fileadmin/redaktion/Fakultaeten/Mathematisch-Naturwissenschaftliche_Fakultaet/Informatik/Algorithmische_Bioinformatik/Bachelor-_Masterarbeiten/2831963_ba_ifo_AbschlArbeit_klau_mapap102_madie120_20230203_1815.pdf  
+Diekhoff (2023). Maximizing dispersion for anticlustering. Retrieved from 
+https://www.cs.hhu.de/fileadmin/redaktion/Fakultaeten/Mathematisch-Naturwissenschaftliche_Fakultaet/Informatik/Algorithmische_Bioinformatik/Bachelor-_Masterarbeiten/2831963_ba_ifo_AbschlArbeit_klau_mapap102_madie120_20230203_1815.pdf  
 
-Fernández, E., Kalcsics, J., & Nickel, S. (2013). The maximum dispersion problem. Omega, 41(4), 721–730. https://doi.org/10.1016/j.omega.2012.09.005
+Fernández, E., Kalcsics, J., & Nickel, S. (2013). The maximum dispersion 
+problem. Omega, 41(4), 721–730. https://doi.org/10.1016/j.omega.2012.09.005
 }
 \seealso{
 \code{\link{dispersion_objective}} \code{\link{anticlustering}}

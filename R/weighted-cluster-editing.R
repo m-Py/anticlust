@@ -6,8 +6,9 @@
 #'
 #' @param x A N x N similarity matrix. Larger values indicate stronger
 #'     agreement / similarity between a pair of data points
-#' @param solver Optional argument, either "glpk" (default) or "symphony". See details.
-#'
+#' @param solver Optional argument; if passed, has to be either "glpk" or
+#'   "symphony". See details.
+#'   
 #' @return An integer vector representing the cluster affiliation of each data point
 #' 
 #'
@@ -35,7 +36,7 @@
 #' In the input some similarities should be negative (indicating dissimilarity) because 
 #' otherwise the maximum sum of similarities is obtained by simply joining all elements 
 #' within a single big cluster. If the argument \code{solver} is not specified, the function
-#' will try to find the GLPK or SYMPHONY by itself (it prioritizes using SYMPHONY if 
+#' will try to find the GLPK or SYMPHONY solver by itself (it prioritizes using SYMPHONY if both are
 #' available).
 #' 
 #' @note
