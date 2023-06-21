@@ -179,17 +179,25 @@ BILS algorithm, use the function
 
 \strong{Optimal anticlustering}
 
-Because all anticlustering problems considered here are in general
-NP-hard, it is computational infeasible to try to find optimal
-solutions for (more or less) large data sets. For example,
-enumerating all possible groupings in order to find the best very
-quickly becomes impossible with increasing N. Therefore, heuristics
-usually are employed to tackle anticlustering problems, and their
-performance is generally very satisfying. Integer linear
-programming (ILP) is an approach that tries to be clever when
-finding optimal solutions: It does not enumerate all possibilities
-but still returns the optimal solution. Still, for NP hard problems
-such as anticlustering, ILP methods will also fail at some point.
+Usually, heuristics are employed to tackle anticlustering problems,
+and their performance is generally very satisfying.  However,
+heuristics do not investigate all possible group assignments and
+therefore do not (necessarily) find the
+"globally optimal solution", i.e., a partitioning that has best
+possible value for the objective that is optimized.  Enumerating
+all possible partitions in order to find the best solution,
+however, quickly becomes impossible with increasing N, and
+therefore it is not possible to find a global optimum this
+way. Because all anticlustering problems considered here are also
+NP-hard, there is also no (known) clever algorithm that might
+identify the best solution without considering all possibilities -
+at least in the worst case. Integer linear programming (ILP) is an
+approach for tackling NP hard problems that nevertheless tries to
+be clever when finding optimal solutions: It does not necessarily
+enumerate all possibilities but is still guaranteed to return the
+optimal solution. Still, for NP hard problems such as
+anticlustering, ILP methods will also fail at some point (i.e.,
+when N increases).
 
 For the objectives \code{diversity} and \code{dispersion},
 \code{anticlust} implements optimal solution algorithms via integer
@@ -204,15 +212,18 @@ anticlustering() when using \code{objective = "dispersion"} and
 package \code{Rglpk} and the GNU linear programming kit
 (<http://www.gnu.org/software/glpk/>) or the R package
 \code{Rsymphony} and the COIN-OR SYMPHONY solver libraries
-(<https://github.com/coin-or/SYMPHONY>).
+(<https://github.com/coin-or/SYMPHONY>). The function will try to
+find the GLPK or SYMPHONY solver and throw an error if none is
+available (it prioritizes using SYMPHONY if both are available).
 
 Optimally maximizing the diversity only works for rather small N
-and K; N = 20 and K = 2 is solved within some seconds, but the run
-time quickly increases with K and N. The maximum dispersion ILP can
-be solved for much larger instances, especially for K = 2 (which in
-theory in not even NP hard). For K = 3, and K = 4, several 100
-elements can usually be processed, especially when installing the
-SYMPHONY solver.
+and K; N = 20 and K = 2 is usually solved within some seconds, but
+the run time quickly increases with increasing N (or K). The
+maximum dispersion problem can be solved for much larger instances,
+especially for K = 2 (which in theory is not even NP hard; note
+that for the diversity, K = 2 is already NP hard). For K = 3, and K
+= 4, several 100 elements can usually be processed, especially when
+installing the SYMPHONY solver.
 
 \strong{Preclustering}
 
