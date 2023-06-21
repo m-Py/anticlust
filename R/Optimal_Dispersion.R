@@ -118,12 +118,12 @@ optimal_dispersion <- function(distances, K, solver = "glpk") {
   }
   # Calculate anticlusters from the last iteration with a K-coloring
   groups <- groups_from_k_coloring_mapping(
-    last_solution$obj,
-    last_solution$x,
-    all_nns_last,
-    all_nns_reordered_last,
-    N,
-    K
+    result_value = last_solution$obj,
+    result_x = last_solution$x,
+    all_nns = all_nns_last,
+    all_nns_reordered = all_nns_reordered_last,
+    N = N,
+    K = K
   )
   return(
     list(
