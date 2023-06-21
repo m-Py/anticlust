@@ -4,7 +4,7 @@
 \alias{optimal_dispersion}
 \title{Maximize dispersion for K groups}
 \usage{
-optimal_dispersion(x, K, solver = "glpk")
+optimal_dispersion(x, K, solver = NULL)
 }
 \arguments{
 \item{x}{The data input. Can be one of two structures: (1) A

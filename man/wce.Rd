@@ -4,13 +4,11 @@
 \alias{wce}
 \title{Exact weighted cluster editing}
 \usage{
-wce(x, K = NULL, solver = "glpk")
+wce(x, solver = NULL)
 }
 \arguments{
 \item{x}{A N x N similarity matrix. Larger values indicate stronger
 agreement / similarity between a pair of data points}
-
-\item{K}{Optional argument; if specified, denotes the number of (equal-sized) clusters.}
 
 \item{solver}{Either "glpk" (default) or "symphony"}
 }
@@ -57,7 +55,7 @@ Computability in Europe (pp. 33–44).
 Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
 for a clustering problem. Mathematical Programming, 45, 59-96.
 
-Wittkop, T., Emig, D., Lange, S., Rahmann, S., Albrecht, M., Morris, J. H., . . . Baumbach,
+Wittkop, T., Emig, D., Lange, S., Rahmann, S., Albrecht, M., Morris, J. H., ..., Baumbach,
 J. (2010). Partitioning biological data with transitivity clustering. Nature Methods, 7,
 419–420.
 }

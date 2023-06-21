@@ -6,7 +6,6 @@
 #'
 #' @param x A N x N similarity matrix. Larger values indicate stronger
 #'     agreement / similarity between a pair of data points
-#' @param K Optional argument; if specified, denotes the number of (equal-sized) clusters.
 #' @param solver Either "glpk" (default) or "symphony"
 #'
 #' @return An integer vector representing the cluster affiliation of each data point
@@ -56,21 +55,13 @@
 #' Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
 #' for a clustering problem. Mathematical Programming, 45, 59-96.
 #' 
-#' Wittkop, T., Emig, D., Lange, S., Rahmann, S., Albrecht, M., Morris, J. H., . . . Baumbach,
+#' Wittkop, T., Emig, D., Lange, S., Rahmann, S., Albrecht, M., Morris, J. H., ..., Baumbach,
 #' J. (2010). Partitioning biological data with transitivity clustering. Nature Methods, 7,
 #' 419–420. 
 #'
 
-wce <- function(x, K = NULL, solver = NULL) {
+wce <- function(x, solver = NULL) {
 
-  if (argument_exists(K)) {
-    validate_input(K, "K", objmode = "numeric", must_be_integer = TRUE, not_na = TRUE, not_function = TRUE)
-    equal_sized_groups <- TRUE
-  } else {
-    equal_sized_groups <- FALSE
-    K <- 0 # k is irrelevant for standard WCE
-  }
-  
   if (argument_exists(solver)) {
     validate_input(solver, "solver", objmode = "character", len = 1,
                    input_set = c("glpk", "symphony"), not_na = TRUE, not_function = TRUE)
@@ -85,7 +76,7 @@ wce <- function(x, K = NULL, solver = NULL) {
   }
   
   x <- as.matrix(x)
-  ilp <- anticlustering_ilp(x, K = K, equal_sized_groups)
+  ilp <- anticlustering_ilp(x, K = 0, FALSE) # k is irrelevant
   solution <- solve_ilp_diversity(ilp, "max", solver)
   ilp_to_groups(solution, nrow(x))
 }
