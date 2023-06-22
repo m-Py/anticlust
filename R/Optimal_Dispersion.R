@@ -12,6 +12,9 @@
 #' @param K The number of groups.
 #' @param solver Optional argument; if passed, has to be either "glpk" or
 #'   "symphony". See details.
+#' @param max_dispersion_considered Optional argument used for early stopping. If the dispersion found
+#'   is equal to or exceeds this value, a solution having the previous best dispersion 
+#'   is returned.
 #'
 #' @export
 #' 
@@ -116,7 +119,7 @@
 #' )
 #'
 
-optimal_dispersion <- function(x, K, solver = NULL) {
+optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = NULL) {
   
   if (argument_exists(solver)) {
     validate_input(solver, "solver", objmode = "character", len = 1,
@@ -137,9 +140,13 @@ optimal_dispersion <- function(x, K, solver = NULL) {
   last_solution <- NULL
   all_nns_last <- NULL
   all_nns_reordered_last <- NULL
+  dispersions_considered <- NULL
   counter <- 1
   while (!dispersion_found) {
     dispersion <- min(distances)
+    if (dispersion >= max_dispersion_considered) {
+      break
+    }
     ids_of_nearest_neighbours <- which(dispersion == distances, arr.ind = TRUE)
     all_nns <- rbind(all_nns, remove_redundant_edges(ids_of_nearest_neighbours))
     # Reorder edge labels so that they start from 1 to C, where C is the number
@@ -148,11 +155,12 @@ optimal_dispersion <- function(x, K, solver = NULL) {
     # Construct graph from all previous edges (that had low distances)
     ilp <- k_coloring_ilp(all_nns_reordered, N, K)
     solution <- solve_ilp_graph_colouring(ilp, solver)
-    dispersion_found <- solution$status != 0
-    if(!dispersion_found){
+    dispersion_found <- solution$status != 0 
+    if (!dispersion_found){
       last_solution <- solution
       all_nns_last <- all_nns
       all_nns_reordered_last <- all_nns_reordered
+      dispersions_considered <- c(dispersions_considered, dispersion)
     }
     counter <- counter + 1
     # Take out distances that have been investigated to proceed
@@ -171,7 +179,8 @@ optimal_dispersion <- function(x, K, solver = NULL) {
     list(
       dispersion = dispersion, 
       groups = groups$groups,
-      edges = all_nns
+      edges = all_nns,
+      dispersions_considered = c(dispersions_considered, dispersion)
     )
   )
 }
