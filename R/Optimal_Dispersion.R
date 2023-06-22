@@ -130,6 +130,13 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
   validate_data_matrix(x)
   validate_input(K, "K", objmode = "numeric", must_be_integer = TRUE, not_na = TRUE, not_function = TRUE)
   
+  if (is.null(max_dispersion_considered)) {
+    max_dispersion_considered <- Inf
+  } else {
+    validate_input(max_dispersion_considered, "max_dispersion_considered", 
+                   objmode = "numeric", len = 1, not_na = TRUE, not_function = TRUE)
+  }
+
   distances <- convert_to_distances(x)
   diag(distances) <- Inf
   N <- nrow(distances)
