@@ -1,3 +1,7 @@
+# anticlust 0.6.4-2
+
+- fixed another potential infinite loop for `categories` argument with uneven group sizes via [9bb8275cad](https://github.com/m-Py/anticlust/commit/9bb8275cad).
+
 # anticlust 0.6.4-1
 
 - fixed potential infinite loop for `categories` argument with uneven group sizes via [435958a0577](https://github.com/m-Py/anticlust/commit/435958a0577).
