@@ -126,6 +126,7 @@ gcd_all <- function(x) {
 }
 
 gcd_set <- function(x) {
+  x <- unique(x)
   gdc_found <- FALSE 
   while (!gdc_found) {
     x <- gcd_all(x)
