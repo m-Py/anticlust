@@ -7,9 +7,9 @@ output:
   variant: gfm
 ---
 
-# anticlust <a href='https://m-py.github.io/anticlust/'><img src='man/figures/anticlustStickerV1-0.svg' align="right" height="160" /></a>
+# anticlust <a href='https://m-py.github.io/anticlust/'><img src='man/figures/anticlustStickerV1-0.svg' style="float:right; height:160px" /></a>
 
-Anticlustering partitions a pool of elements into clusters (or *anticlusters*) with the goal of achieving high between-cluster similarity and high within-cluster heterogeneity. This is accomplished by maximizing instead of minimizing a clustering objective function, such as the intra-cluster variance (used in k-means clustering) or the sum of pairwise distances within clusters. The package `anticlust` implements anticlustering methods as described in Papenberg and Klau (2021; https://doi.org/10.1037/met0000301), Brusco et al. (2020; https://doi.org/10.1111/bmsp.12186), and Papenberg (2023; https://doi.org/10.31234/osf.io/7jw6v).
+Anticlustering partitions a pool of elements into clusters (or *anticlusters*) with the goal of achieving high between-cluster similarity and high within-cluster heterogeneity. This is accomplished by maximizing instead of minimizing a clustering objective function, such as the intra-cluster variance (used in k-means clustering) or the sum of pairwise distances within clusters. The package `anticlust` implements anticlustering methods as described in Papenberg and Klau (2021; https://doi.org/10.1037/met0000301), Brusco et al. (2020; https://doi.org/10.1111/bmsp.12186), and Papenberg (in press; preprint: https://doi.org/10.31234/osf.io/7jw6v).
 
 ```{r setup, include = FALSE}
 library("anticlust")
@@ -41,7 +41,7 @@ The stable release of `anticlust` is available from [CRAN](https://CRAN.R-projec
 install.packages("anticlust")
 ```
 
-A (potentially more recent) version of anticlust can also be installed directly via Github:
+A (potentially more recent) version of `anticlust` can also be installed directly via Github:
 
 ```R
 library("remotes") # if not available: install.packages("remotes")
@@ -54,17 +54,7 @@ If you use `anticlust` in your research, it would be courteous if you cite the f
 
 - Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition data sets into equivalent parts. *Psychological Methods, 26*(2), 161--174. https://doi.org/10.1037/met0000301
 
-If you use the bicriterion anticlustering heuristic by Brusco et al. (2020),[^whenbrusco] you should also cite their paper: 
-
-- Brusco, M. J., Cradit, J. D., & Steinley, D. (2020). Combining diversity and dispersion criteria for anticlustering: A bicriterion approach. *British Journal of Mathematical and Statistical Psychology, 73*(3), 375–396. https://doi.org/10.1111/bmsp.12186
-
-[^whenbrusco]: You are using the BILS heuristic by Brusco et al. (2020) if you use the function `anticlustering()` with the argument `method = "brusco"` or if you are using the function `bicriterion_anticlustering()`.
-
-The k-plus paper has not yet been published in a journal, but you might want to consider citing the preprint if you use k-plus anticlustering:[^whenkplus]
-
-- Papenberg, M. (2023). k-plus Anticlustering: An Improved k-means Criterion  for Maximizing Between-Group Similarity. Retrieved from https://doi.org/10.31234/osf.io/7jw6v
-
-[^whenkplus]: You are using k-plus anticlustering if you use the function `anticlustering()` with the argument `objective = "kplus"` or if you are using the function `kplus_anticlustering()`.
+Depending on which `anticlust` functions you are using, including other references may also be fair. [Here you can find out in detail how to cite `anticlust`](HOW_TO_CITE_ANTICLUST.md).
 
 Another great way of showing your appreciation of `anticlust` is to leave a star on this Github repository.
 
@@ -75,7 +65,7 @@ This README contains some basic information on the `R` package `anticlust`. More
 - A paper is available describing the theoretical background of anticlustering and the `anticlust` package in detail (https://doi.org/10.1037/met0000301). The freely available preprint can be retrieved from https://psyarxiv.com/3razc/. A more recent paper focusing on the k-plus anticlustering method can be retrieved from https://psyarxiv.com/7jw6v/.
 - The `R` documentation of the main functions is actually quite rich and up to date, so you should definitely check that out when using the `anticlust` package (primarily `?anticlustering`, `?kplus_anticlustering`, `?balanced_clustering`, and `?matching`).
 - A [video](https://youtu.be/YGrhSmi1oA8) is available in German language where I illustrate the main functionalities of the `anticlustering()` function. My plan is to make a similar video in English in the future. 
-- The [package website](https://m-py.github.io/anticlust/) contains most relevant documentation. This includes a [vignette](https://m-py.github.io/anticlust/articles/stimulus-selection.html) detailing how to use the anticlust package for stimulus selection in experiments and documentation for the main `anticlust` functions. Note that the homepage is not completely up to date right now; this should change in the future, and additional vignettes are planned.
+- The [package website](https://m-py.github.io/anticlust/) contains all documentation as a convenient website. At the current time, the website also lists three package vignettes, while additional vignettes are planned.
 
 ## A quick start
 
@@ -120,8 +110,8 @@ As illustrated in the example, we can use the function `anticlustering()` to cre
 
 Four anticlustering objectives are natively supported in `anticlustering()`:
 
-- the cluster editing "diversity" objective, setting `objective = "diversity"` (default)
-- the k-means "variance" objective, setting `objective = "variance"`
+- the "diversity" objective, setting `objective = "diversity"` (default)
+- the k-means objective (i.e., the "variance") setting `objective = "variance"`
 - the "k-plus" objective, an extension of the k-means variance criterion, setting `objective = "kplus"`
 - the "dispersion" objective (the minimum distance between any two elements within the same cluster), setting `objective = "dispersion"`
 
