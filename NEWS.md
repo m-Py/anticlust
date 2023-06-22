@@ -1,3 +1,7 @@
+# anticlust 0.6.4-1
+
+- fixed potential infinite loop for `categories` argument with uneven group sizes via [435958a0577](https://github.com/m-Py/anticlust/commit/435958a0577).
+
 # anticlust 0.6.4
 
 - `kplus_anticlustering()` now has an argument `T` instead of `moments`, where `T` denotes the number of distribution moments considered during k-plus anticlustering (`moments` was an integer vector specifying each individual moment that should be considered)
