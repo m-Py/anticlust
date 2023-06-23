@@ -22,8 +22,15 @@ test_that("Test that k-plus criterion is computed correctly", {
     objective = "variance"
   )
   
+  groups3 <- anticlustering(
+    kplus_moment_variables(df, T = 2, standardize = FALSE), 
+    K = init,
+    objective = "variance"
+  )
+  
   expect_true(all(groups1 == groups2))
-
+  expect_true(all(groups1 == groups3))
+  
   # add test with standardize argument
   groups4 <- anticlustering(
     df,
@@ -38,6 +45,13 @@ test_that("Test that k-plus criterion is computed correctly", {
     objective = "variance",
     standardize = FALSE
   )
-  expect_true(all(groups4 == groups5))
   
+  groups6 <- anticlustering(
+    kplus_moment_variables(df, T = 2), 
+    K = init,
+    objective = "variance"
+  )
+  
+  expect_true(all(groups4 == groups5))
+  expect_true(all(groups4 == groups6))
 })
