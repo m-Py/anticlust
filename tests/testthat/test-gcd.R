@@ -1,6 +1,6 @@
 library("anticlust")
 
-context("Utility function tests")
+context("Greatest common denominator")
 
 test_that("test that function for greatest common denominator works correctly", {
   x <- c(20, 20, 40, 40, 60, 60, 80, 80)
