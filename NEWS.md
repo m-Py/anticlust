@@ -1,3 +1,8 @@
+# anticlust 0.6.4-3
+
+- (hopefully) [last fix](https://github.com/m-Py/anticlust/commit/33cee784cb392a) 
+on function that finds greatest common denominator in a set of numbers
+
 # anticlust 0.6.4-2
 
 - fixed another potential infinite loop for `categories` argument with uneven group sizes via [9bb8275cad](https://github.com/m-Py/anticlust/commit/9bb8275cad).
