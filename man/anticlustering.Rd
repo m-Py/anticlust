@@ -108,15 +108,15 @@ maximizes group diversity as measured by the sum of pairwise
 distances. Hence, anticlustering maximizes between-group similarity
 by maximizing within-group heterogeneity. Note that the equivalence
 of within-group heterogeneity and between-group similarity only
-holds for equal-sized groups in the case of anticluster editing. 
-If you request different-sized groups
-and wish the different groups to be similar to each other, use
-\code{objective = "kplus"} or \code{objective = "variance"}. In
-previous versions of this package, \code{method = "distance"} was
-used (and is still supported) to request anticluster editing, but
-now \code{method = "diversity"} is preferred because there are
-several clustering objectives based on pairwise distances (e.g.,
-see \code{\link{dispersion_objective}}).
+holds for equal-sized groups in the case of anticluster editing.
+If you request different-sized groups and wish the different groups
+to be similar to each other, use \code{objective = "kplus"} or
+\code{objective = "variance"}. In previous versions of this
+package, \code{method = "distance"} was used (and is still
+supported) to request anticluster editing, but now \code{method =
+"diversity"} is preferred because there are several clustering
+objectives based on pairwise distances (e.g., see
+\code{\link{dispersion_objective}}).
 
 The "dispersion" is the minimum distance between any two elements
 that are part of the same cluster; maximization of this objective
@@ -142,8 +142,8 @@ Examples).
 \strong{Algorithms for anticlustering}
 
 By default, a heuristic method is employed for anticlustering: the
-exchange method (\code{method = "exchange"}). First, elements
-are randomly assigned to anticlusters (It is also possible to
+exchange method (\code{method = "exchange"}). First, elements are
+randomly assigned to anticlusters (It is also possible to
 explicitly specify the initial assignment using the argument
 \code{K}; in this case, \code{K} has length \code{nrow(x)}.) Based
 on the initial assignment, elements are systematically swapped
@@ -167,38 +167,63 @@ on the preclustering heuristic follows below). This option is
 recommended for larger N.
 
 Using \code{method = "brusco"} implements the local bicriterion
-iterated local search (BILS) heuristic by Brusco et al. (2020) and returns
-the partition that best optimized either the diversity or the dispersion
-during the optimization process. The function
-\code{\link{bicriterion_anticlustering}} can also be used to run the algorithm
-by Brusco et al., but it returns multiple partitions that approximate the 
-optimal pareto efficient set according to both objectives (diversity and 
-dispersion). Thus, to fully utilize the BILS algorithm, use the function 
+iterated local search (BILS) heuristic by Brusco et al. (2020) and
+returns the partition that best optimized either the diversity or
+the dispersion during the optimization process. The function
+\code{\link{bicriterion_anticlustering}} can also be used to run
+the algorithm by Brusco et al., but it returns multiple partitions
+that approximate the optimal pareto efficient set according to both
+objectives (diversity and dispersion). Thus, to fully utilize the
+BILS algorithm, use the function
 \code{\link{bicriterion_anticlustering}}.
 
 \strong{Optimal anticlustering}
 
-An optimal anticluster editing objective (i.e., a solution having
-the global maximum value in diversity) can be found via integer
-linear programming. The integer linear program implemented here can
-be found in Papenberg & Klau, (2021; (8) - (12)). To this end, set
-\code{method = "ilp"}. To obtain an optimal solution, the open
-source GNU linear programming kit (available from
-https://www.gnu.org/software/glpk/glpk.html) and the R package
-\code{Rglpk} must be installed. The optimal solution is retrieved
-by setting \code{objective = "diversity"}, \code{method = "ilp"}
-and \code{preclustering = FALSE}. Use this combination of arguments
-only for small problem sizes.
+Usually, heuristics are employed to tackle anticlustering problems,
+and their performance is generally very satisfying.  However,
+heuristics do not investigate all possible group assignments and
+therefore do not (necessarily) find the
+"globally optimal solution", i.e., a partitioning that has best
+possible value for the objective that is optimized.  Enumerating
+all possible partitions in order to find the best solution,
+however, quickly becomes impossible with increasing N, and
+therefore it is not possible to find a global optimum this
+way. Because all anticlustering problems considered here are also
+NP-hard, there is also no (known) clever algorithm that might
+identify the best solution without considering all possibilities -
+at least in the worst case. Integer linear programming (ILP) is an
+approach for tackling NP hard problems that nevertheless tries to
+be clever when finding optimal solutions: It does not necessarily
+enumerate all possibilities but is still guaranteed to return the
+optimal solution. Still, for NP hard problems such as
+anticlustering, ILP methods will also fail at some point (i.e.,
+when N increases).
 
-To relax the optimality requirement, it is possible to set the
-argument \code{preclustering = TRUE}. In this case, the anticluster
-editing objective is still optimized using integer linear
-programming, but a preprocessing forbids very similar elements to
-be assigned to the same anticluster. The preclustering reduces the
-size of the solution space, making the integer linear programming
-approach applicable for larger problem instances. With
-preclustering, optimality is no longer guaranteed, but the solution
-is usually optimal or very close to optimal.
+For the objectives \code{diversity} and \code{dispersion},
+\code{anticlust} implements optimal solution algorithms via integer
+linear programming. In order to use the ILP methods, set
+\code{method = "ilp"}. The integer linear program optimizing the
+diversity was described in Papenberg & Klau, (2021; (8) -
+(12)). The documentation of the function
+\code{\link{optimal_dispersion}} has more information on the
+optimal maximization of the dispersion (it is called internally by
+anticlustering() when using \code{objective = "dispersion"} and
+\code{method = "ilp"}). The ILP methods either require the R
+package \code{Rglpk} and the GNU linear programming kit
+(<http://www.gnu.org/software/glpk/>) or the R package
+\code{Rsymphony} and the COIN-OR SYMPHONY solver libraries
+(<https://github.com/coin-or/SYMPHONY>). The function will try to
+find the GLPK or SYMPHONY solver and throw an error if none is
+available (it prioritizes using SYMPHONY if both are available).
+
+Optimally maximizing the diversity only works for rather small N
+and K; N = 20 and K = 2 is usually solved within some seconds, but
+the run time quickly increases with increasing N (or K). The
+maximum dispersion problem can be solved for much larger instances,
+especially for K = 2 (which in theory is not even NP hard; note
+that for the diversity, K = 2 is already NP hard). For K = 3, and K
+= 4, several 100 elements can usually be processed, especially when
+installing the SYMPHONY solver.
 
 \strong{Preclustering}
 

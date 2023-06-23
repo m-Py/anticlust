@@ -4,11 +4,14 @@
 \alias{wce}
 \title{Exact weighted cluster editing}
 \usage{
-wce(x)
+wce(x, solver = NULL)
 }
 \arguments{
 \item{x}{A N x N similarity matrix. Larger values indicate stronger
 agreement / similarity between a pair of data points}
+
+\item{solver}{Optional argument; if passed, has to be either "glpk" or
+"symphony". See details.}
 }
 \value{
 An integer vector representing the cluster affiliation of each data point
@@ -21,11 +24,15 @@ Optimally solves weighted cluster editing (also known as »correlation clusterin
 Finds the clustering that maximizes the sum of pairwise similarities within clusters. 
 In the input some similarities should be negative (indicating dissimilarity) because 
 otherwise the maximum sum of similarities is obtained by simply joining all elements 
-within a single big cluster.
+within a single big cluster. If the argument \code{solver} is not specified, the function
+will try to find the GLPK or SYMPHONY solver by itself (it prioritizes using SYMPHONY if both are
+available).
 }
 \note{
-This function requires the R package \code{Rglpk} and the GNU linear 
-programming kit.
+This function either requires the R package \code{Rglpk} and the GNU linear 
+programming kit (<http://www.gnu.org/software/glpk/>) or the R package 
+\code{Rsymphony} and the COIN-OR SYMPHONY solver libraries 
+(<https://github.com/coin-or/SYMPHONY>).
 }
 \examples{
 \donttest{
@@ -51,7 +58,7 @@ Computability in Europe (pp. 33–44).
 Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
 for a clustering problem. Mathematical Programming, 45, 59-96.
 
-Wittkop, T., Emig, D., Lange, S., Rahmann, S., Albrecht, M., Morris, J. H., . . . Baumbach,
+Wittkop, T., Emig, D., Lange, S., Rahmann, S., Albrecht, M., Morris, J. H., ..., Baumbach,
 J. (2010). Partitioning biological data with transitivity clustering. Nature Methods, 7,
 419–420.
 }

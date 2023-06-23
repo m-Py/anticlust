@@ -6,7 +6,9 @@
 #'
 #' @param x A N x N similarity matrix. Larger values indicate stronger
 #'     agreement / similarity between a pair of data points
-#'
+#' @param solver Optional argument; if passed, has to be either "glpk" or
+#'   "symphony". See details.
+#'   
 #' @return An integer vector representing the cluster affiliation of each data point
 #' 
 #'
@@ -33,12 +35,16 @@
 #' Finds the clustering that maximizes the sum of pairwise similarities within clusters. 
 #' In the input some similarities should be negative (indicating dissimilarity) because 
 #' otherwise the maximum sum of similarities is obtained by simply joining all elements 
-#' within a single big cluster.
+#' within a single big cluster. If the argument \code{solver} is not specified, the function
+#' will try to find the GLPK or SYMPHONY solver by itself (it prioritizes using SYMPHONY if both are
+#' available).
 #' 
 #' @note
 #' 
-#' This function requires the R package \code{Rglpk} and the GNU linear 
-#' programming kit.
+#' This function either requires the R package \code{Rglpk} and the GNU linear 
+#' programming kit (<http://www.gnu.org/software/glpk/>) or the R package 
+#' \code{Rsymphony} and the COIN-OR SYMPHONY solver libraries 
+#' (<https://github.com/coin-or/SYMPHONY>).
 #' 
 #' @references
 #'
@@ -52,20 +58,28 @@
 #' Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
 #' for a clustering problem. Mathematical Programming, 45, 59-96.
 #' 
-#' Wittkop, T., Emig, D., Lange, S., Rahmann, S., Albrecht, M., Morris, J. H., . . . Baumbach,
+#' Wittkop, T., Emig, D., Lange, S., Rahmann, S., Albrecht, M., Morris, J. H., ..., Baumbach,
 #' J. (2010). Partitioning biological data with transitivity clustering. Nature Methods, 7,
 #' 419–420. 
 #'
 
-wce <- function(x) {
-  check_if_solver_is_available()
+wce <- function(x, solver = NULL) {
+
+  if (argument_exists(solver)) {
+    validate_input(solver, "solver", objmode = "character", len = 1,
+                   input_set = c("glpk", "symphony"), not_na = TRUE, not_function = TRUE)
+  } else {
+    solver <- find_ilp_solver()
+  }
+
   validate_data_matrix(x)
   if (!is_distance_matrix(x)) {
     stop("The input via argument `weights` is not a similarity matrix, ",
          "the upper and lower triangulars of your matrix differ.")
   }
+  
   x <- as.matrix(x)
   ilp <- anticlustering_ilp(x, K = 0, FALSE) # k is irrelevant
-  solution <- solve_ilp(ilp, "max")
+  solution <- solve_ilp_diversity(ilp, "max", solver)
   ilp_to_groups(solution, nrow(x))
 }

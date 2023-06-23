@@ -87,6 +87,9 @@ input_validation_anticlustering <- function(x, K, objective, method,
 
   if (method == "ilp") {
     check_if_solver_is_available()
+    if (!objective %in% c("distance", "diversity", "dispersion")) {
+      stop("The ILP method is only available for the diversity and dispersion objectives.")
+    }
     if (argument_exists(repetitions)) {
       stop("Do not use argument `repetitions` when using the ILP method.")
     }

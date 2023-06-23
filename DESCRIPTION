@@ -1,7 +1,7 @@
 Type: Package
 Package: anticlust
 Title: Subset Partitioning via Anticlustering
-Version: 0.6.4-3
+Version: 0.6.4.9999
 Authors@R: c(
     person("Martin", "Papenberg", , "martin.papenberg@hhu.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-9900-4268")),
@@ -13,13 +13,15 @@ Authors@R: c(
     person("Martin", "Breuer", role = "ctb",
            comment = "Bicriterion algorithm by Brusco et al."),
     person("Marie L.", "Schaper", role = "ctb",
-           comment = "Example data set")
+           comment = "Example data set"),
+    person("Max", "Diekhoff", role = "ctb", comment = "Optimal maximum dispersion algorithm")
   )
 Author: Martin Papenberg [aut, cre]
     (<https://orcid.org/0000-0002-9900-4268>), Meik Michalke [ctb]
     (centroid based clustering algorithm), Gunnar W. Klau [ths], Juliane
     V. Nagel [ctb] (package logo), Martin Breuer [ctb] (Bicriterion
-    algorithm by Brusco et al.), Marie L. Schaper [ctb] (Example data set)
+    algorithm by Brusco et al.), Marie L. Schaper [ctb] (Example data set),
+    Max Diekhoff [ctb] (Optimal maximum dispersion algorithm)
 Maintainer: Martin Papenberg <martin.papenberg@hhu.de>
 Description: The method of anticlustering partitions a pool of elements
     into groups (i.e., anticlusters) with the goal of maximizing
@@ -59,6 +61,7 @@ Imports:
 Suggests: 
     knitr,
     Rglpk,
+    Rsymphony,
     rmarkdown,
     testthat
 VignetteBuilder: 
@@ -68,7 +71,8 @@ Encoding: UTF-8
 LazyData: true
 NeedsCompilation: yes
 RoxygenNote: 7.2.3
-SystemRequirements: The exact (anti)clustering algorithms require that the
+SystemRequirements: The exact (anti)clustering algorithms require that either the
     GNU linear programming kit (GLPK library) is installed
-    (<http://www.gnu.org/software/glpk/>). Rendering the vignette requires
+    (<http://www.gnu.org/software/glpk/>) or the SYMPHONY open source MILP solver 
+    (<https://github.com/coin-or/SYMPHONY>). Rendering the vignette requires
     pandoc.
