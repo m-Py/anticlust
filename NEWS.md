@@ -1,6 +1,6 @@
 # anticlust devel (target: 0.7.0)
 
-TODOs:
+DONE:
 
 - An exact ILP method is now available for the dispersion
   * `optimal_dispersion()` is a new exported function implementing the method
@@ -9,6 +9,9 @@ TODOs:
   * Offers some additional flexibility as compared to calling `kplus_anticlustering()`, which generates these variables internally
 - `categories_to_binary()` is a new exported function that converts one or several categorical variables into a binary representation
   * Can be used to include categorical variables as part of the optimization criterion in k-means / k-plus anticlustering
+  
+TODOs: 
+
 - Fixed a bug in `kplus_anticlustering()` that did not correctly implement `preclustering = TRUE`
 - X new vignettes are now distributed with `anticlust`
 
