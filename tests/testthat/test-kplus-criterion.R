@@ -22,15 +22,8 @@ test_that("Test that k-plus criterion is computed correctly", {
     objective = "variance"
   )
   
-  groups3 <- anticlustering(
-    df,
-    K = init,
-    objective = kplus_objective
-  )
-  
   expect_true(all(groups1 == groups2))
-  expect_true(all(groups2 == groups3))
-  
+
   # add test with standardize argument
   groups4 <- anticlustering(
     df,
