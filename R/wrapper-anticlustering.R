@@ -212,6 +212,11 @@
 #' procedures, that is, for \code{method = "exchange"} and
 #' \code{method = "local-maximum"}.
 #' 
+#' Note that when \code{categories} has multiple columns (i.e., each element is
+#' assigned to multiple columns), each combination of categories is
+#' treated as a distinct category by the exchange method. This behaviour may lead
+#' to less than optimal results on the level of each single categorical variable.
+#' 
 #' \strong{Optimize a custom objective function}
 #' 
 #' It is possible to pass a \code{function} to the argument

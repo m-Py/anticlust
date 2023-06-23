@@ -69,7 +69,7 @@ This README contains some basic information on the `R` package `anticlust`. More
 
 ## A quick start
 
-In this initial example, I use the main function `anticlustering()` to create three similar sets of plants using the classical iris data set:
+In this initial example, I use the main function `anticlustering()` to create five similar sets of plants using the classical iris data set:
 
 First, load the package via
 ```{r}

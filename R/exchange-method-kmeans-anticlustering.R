@@ -1,9 +1,12 @@
 
 #' Fast anticlustering
 #'
-#' The most efficient way to solve anticlustering optimizing the
-#' k-means variance criterion with an exchange method. Can be used for
-#' very large data sets.
+#' Anticlustering via optimizing the k-means variance criterion with an
+#' adjusted exchange method where the number of exchange partners can be 
+#' specified. Note that this function is no longer the fastest way to solve
+#' anticlustering, because the exchange method used in \code{\link{anticlustering}}
+#' and \code{\link{kplus_anticlustering}} has been reimplemented in C,
+#' while \code{fast_anticlustering} still uses a plain R implementation. 
 #'
 #' @param x A numeric vector, matrix or data.frame of data
 #'     points.  Rows correspond to elements and columns correspond to
@@ -32,8 +35,9 @@
 #'
 #' This function was created to make anticlustering applicable
 #' to large data sets (e.g., 100,000 elements). It optimizes the k-means
-#' variance objective because computing all pairwise distances is not
-#' feasible for many elements. Additionally, this function employs a
+#' variance objective because computing all pairwise as is done when optimizing 
+#' the diversity is not feasible for very large data sets (like for about N > 30000). 
+#' Additionally, this function employs a
 #' speed-optimized exchange method. For each element, the potential
 #' exchange partners are generated using a nearest neighbor search with the
 #' function \code{\link[RANN]{nn2}} from the \code{RANN} package. The nearest
@@ -52,6 +56,12 @@
 #' \code{categories} has multiple columns (i.e., each element is
 #' assigned to multiple columns), each combination of categories is
 #' treated as a distinct category by the exchange method.
+#' 
+#' Note that in the recent versions of anticlust, the function \code{\link{anticlustering}}
+#' is actually faster than \code{fast_anticlustering} because the exchange method
+#' there has been implemented in C instead of plain R. In most cases it is therefore
+#' not recommended to call \code{fast_anticlustering}, instead use \code{\link{anticlustering}}
+#' or \code{\link{kplus_anticlustering}}.
 #'
 #' @examples
 #'
