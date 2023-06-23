@@ -17,8 +17,8 @@ vector represents a single feature.}
 (defaults to TRUE).}
 }
 \value{
-A data frame containing all columns of \code{x} and all additional
-columns of k-plus variables. If \code{x} has M columns, the output data frame
+A matrix containing all columns of \code{x} and all additional
+columns of k-plus variables. If \code{x} has M columns, the output matrix
 has M * T columns.
 }
 \description{
@@ -27,16 +27,17 @@ Compute k-plus variables
 \details{
 The k-plus criterion is an extension of the k-means criterion
 (i.e., the "variance", see \code{\link{variance_objective}}).
-In \code{\link{kplus_anticlustering}}, equalizing means and standard 
-deviations simultaneously (and possibly additional distribution moments) is
+In \code{\link{kplus_anticlustering}}, equalizing means and variances
+simultaneously (and possibly additional distribution moments) is
 accomplished by internally appending new variables to the data
-input \code{x}, one new variable for each column in \code{x}. When using only 
-the  variance as additional criterion, these
+input \code{x}. When using only the  variance as additional criterion, the
 new variables represent the squared difference of each data point to
-the mean of the respective column; all columns are then included---in
+the mean of the respective column. All columns are then included---in
 addition to the original data---in standard k-means
 anticlustering. The logic is readily extended towards higher order moments,
-see Papenberg (in press).
+see Papenberg (in press). This function gives users the possibility to generate
+k-plus variables themselves, which offers some additional flexibility when
+conducting k-plus anticlustering.
 }
 \examples{
 

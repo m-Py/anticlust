@@ -12,16 +12,16 @@
 #'     of length \code{nrow(x)} describing how elements are assigned
 #'     to anticlusters before the optimization starts.
 #' @param variance Boolean: Should the k-plus objective include a term to 
-#'   maximizie between-group similarity with regard to the variance? 
+#'   maximize between-group similarity with regard to the variance? 
 #'   (Default = TRUE)
 #' @param skew Boolean: Should the k-plus objective include a term to 
-#'   maximizie between-group similarity with regard to skewness? 
+#'   maximize between-group similarity with regard to skewness? 
 #'   (Default = FALSE)
 #' @param kurtosis Boolean: Should the k-plus objective include a term to 
-#'   maximizie between-group similarity with regard to kurtosis? 
+#'   maximize between-group similarity with regard to kurtosis? 
 #'   (Default = FALSE)
 #' @param covariances Boolean: Should the k-plus objective include a term to 
-#'   maximizie between-group similarity with regard to covariance structure? 
+#'   maximize between-group similarity with regard to covariance structure? 
 #'   (Default = FALSE)
 #' @param T Optional argument: An integer specifying how many
 #'   distribution moments should be equalized between groups. 

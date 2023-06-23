@@ -27,19 +27,19 @@ of length \code{nrow(x)} describing how elements are assigned
 to anticlusters before the optimization starts.}
 
 \item{variance}{Boolean: Should the k-plus objective include a term to 
-maximizie between-group similarity with regard to the variance? 
+maximize between-group similarity with regard to the variance? 
 (Default = TRUE)}
 
 \item{skew}{Boolean: Should the k-plus objective include a term to 
-maximizie between-group similarity with regard to skewness? 
+maximize between-group similarity with regard to skewness? 
 (Default = FALSE)}
 
 \item{kurtosis}{Boolean: Should the k-plus objective include a term to 
-maximizie between-group similarity with regard to kurtosis? 
+maximize between-group similarity with regard to kurtosis? 
 (Default = FALSE)}
 
 \item{covariances}{Boolean: Should the k-plus objective include a term to 
-maximizie between-group similarity with regard to covariance structure? 
+maximize between-group similarity with regard to covariance structure? 
 (Default = FALSE)}
 
 \item{T}{Optional argument: An integer specifying how many

@@ -9,24 +9,25 @@
 #' @param standardize Logical, should all columns of the output be standardized
 #'  (defaults to TRUE).
 #'
-#' @return A data frame containing all columns of \code{x} and all additional
-#' columns of k-plus variables. If \code{x} has M columns, the output data frame
+#' @return A matrix containing all columns of \code{x} and all additional
+#' columns of k-plus variables. If \code{x} has M columns, the output matrix
 #' has M * T columns.
 #'
 #' @details
 #' 
 #' The k-plus criterion is an extension of the k-means criterion
 #' (i.e., the "variance", see \code{\link{variance_objective}}).
-#' In \code{\link{kplus_anticlustering}}, equalizing means and standard 
-#' deviations simultaneously (and possibly additional distribution moments) is
+#' In \code{\link{kplus_anticlustering}}, equalizing means and variances
+#' simultaneously (and possibly additional distribution moments) is
 #' accomplished by internally appending new variables to the data
-#' input \code{x}, one new variable for each column in \code{x}. When using only 
-#' the  variance as additional criterion, these
+#' input \code{x}. When using only the  variance as additional criterion, the
 #' new variables represent the squared difference of each data point to
-#' the mean of the respective column; all columns are then included---in
+#' the mean of the respective column. All columns are then included---in
 #' addition to the original data---in standard k-means
 #' anticlustering. The logic is readily extended towards higher order moments,
-#' see Papenberg (in press).
+#' see Papenberg (in press). This function gives users the possibility to generate
+#' k-plus variables themselves, which offers some additional flexibility when
+#' conducting k-plus anticlustering.
 #'
 #'
 #' @author
@@ -47,7 +48,7 @@
 #' features <- schaper2019[, 3:6]
 #' K <- 3
 #' N <- nrow(features)
-#' 
+#'
 #' # Some equivalent ways of doing k-plus anticlustering:
 #' 
 #' init_groups <- sample(rep_len(1:3, N))
@@ -84,13 +85,18 @@ kplus_moment_variables <- function(x, T, standardize = TRUE) {
   validate_data_matrix(x)
   validate_input(T, "T", greater_than = 1, must_be_integer = TRUE, len = 1,
                  not_na = TRUE, not_function = TRUE)
+  validate_input(standardize, "standardize", objmode = "logical", len = 1,
+                 input_set = c(TRUE, FALSE), not_na = TRUE, not_function = TRUE)
+  x <- as.matrix(x)
+  M <- ncol(x)
   for (i in 2:T) {
     x <- cbind(x, moment_features(x, T))
   }
-  if (standardize) {
-    return(data.frame(scale(x)))
+  colnames(x) <- paste0(colnames(x), "^", rep(1:T, each = M))
+  if (!standardize) {
+    return(x)
   }
-  data.frame(x)
+  scale(x)
 }
 
 # function to compute features for variance
