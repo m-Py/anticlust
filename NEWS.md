@@ -1,3 +1,15 @@
+# anticlust devel (target: 0.7.0)
+
+TODOs:
+
+- An exact ILP method is now available for the dispersion
+- X new vignettes are available
+- 2 new exported functions are available:
+  * `kplus_moment_variables()`
+  * `kplus_covariance_variables()`
+  * These functions can be used to generate k-plus variables from a data set (offering some additional flexibility as compared to `kplus_anticlustering()`, which generates these variables internally)
+- Fixed a bug in `kplus_anticlustering()` that did not correctly implement `preclustering = TRUE`
+
 # anticlust 0.6.4-1 / 0.6.4-2 / 0.6.4-3
 
 - [Implements](https://github.com/m-Py/anticlust/commit/435958a0577) 
