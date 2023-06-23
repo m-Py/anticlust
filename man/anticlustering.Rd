@@ -81,7 +81,7 @@ four clustering objective functions is natively supported (other
 functions can also defined by the user as described below):
 
 \itemize{
-  \item{cluster editing `diversity` objective, setting 
+  \item{the `diversity`, setting 
         \code{objective = "diversity"} (this is the default objective)}
   \item{k-means `variance` objective, setting \code{objective = "variance"}}
   \item{`k-plus` objective, an extension of the k-means variance criterion,
@@ -95,28 +95,38 @@ The k-means objective is the within-group variance---that is, the
 sum of the squared distances between each element and its cluster
 center (see \code{\link{variance_objective}}). K-means
 anticlustering focuses on minimizing differences with regard to the
-means of the input variables \code{x}; k-plus \code{objective =
-"kplus"} anticlustering is an extension of this criterion that also
-tries to minimize differences with regard to the standard
-deviations between groups (see \code{\link{kplus_anticlustering}}).
+means of the input variables (that is, the columns in \code{x}), but it ignores any other distribution
+characterstics such as the variance / standard deviation. K-plus anticlustering
+(using \code{objective = "kplus"}) is an extension of the k-means criterion that also
+minimizes differences with regard to the standard
+deviations between groups (for details see \code{\link{kplus_anticlustering}}). K-plus
+anticlustering can also be extended towards higher order moments such as skew and kurtosis; 
+to consider these additional distribution characteristics, use the function
+\code{\link{kplus_anticlustering}}. Setting \code{objective = "kplus"} in 
+\code{anticlustering} function will only consider means 
+and standard deviations (in my experience, this is what users usually want). 
+It is strongly recommended to set the argument \code{standardize = TRUE} 
+when using the k-plus objective.
 
-The cluster editing "diversity" objective is the sum of pairwise
+The "diversity" objective is the sum of pairwise
 distances of elements within the same groups (see
-\code{\link{diversity_objective}}). Anticluster editing is also
-known as the »maximum diverse grouping problem« because it
-maximizes group diversity as measured by the sum of pairwise
-distances. Hence, anticlustering maximizes between-group similarity
-by maximizing within-group heterogeneity. Note that the equivalence
-of within-group heterogeneity and between-group similarity only
-holds for equal-sized groups in the case of anticluster editing.
-If you request different-sized groups and wish the different groups
-to be similar to each other, use \code{objective = "kplus"} or
-\code{objective = "variance"}. In previous versions of this
-package, \code{method = "distance"} was used (and is still
-supported) to request anticluster editing, but now \code{method =
+\code{\link{diversity_objective}}). Hence, anticlustering using the diversity 
+criterion maximizes between-group similarity
+by maximizing within-group heterogeneity (represented as the sum of all pairwise distances). 
+The diversity is an all rounder objective that tends to equalize all distribution 
+characteristics between groups (such as means, variances, ...). 
+Note that the equivalence of within-group heterogeneity and between-group similarity only
+holds for equal-sized groups. For unequal-sized groups, it is recommended to
+use a different objective when striving for overall between-group similarity
+(e.g., the k-plus objective). In previous versions of this
+package, \code{objective = "distance"} was used (and is still
+supported) to refer to the diversity objective, but now \code{objective =
 "diversity"} is preferred because there are several clustering
 objectives based on pairwise distances (e.g., see
-\code{\link{dispersion_objective}}).
+\code{\link{dispersion_objective}}). In the publication that introduces
+the \code{anticlust} package (Papenberg & Klau, 2021), we used the term "anticluster 
+editing" to refer to the maximization of the diversity, because the reversed 
+procedure - minimizing the diversity - is also known as "cluster editing". 
 
 The "dispersion" is the minimum distance between any two elements
 that are part of the same cluster; maximization of this objective
@@ -131,7 +141,7 @@ same time, see the function
 If the data input \code{x} is a feature matrix (that is: each row
 is a "case" and each column is a "variable") and the option
 \code{objective = "diversity"} is used, the Euclidean distance is
-computed as the basic unit of the anticluster editing objective. If
+computed as the basic unit of the diversity and dispersion objectives. If
 a different measure of dissimilarity is preferred, you may pass a
 self-generated dissimiliarity matrix via the argument \code{x}.
 
@@ -162,9 +172,10 @@ exchanges until the objective cannot be improved.
 
 When setting \code{preclustering = TRUE}, only the \code{K - 1}
 most similar elements serve as exchange partners for each element,
-which can dramatically speed up the optimization (more information
-on the preclustering heuristic follows below). This option is
-recommended for larger N.
+which can speed up the optimization (more information
+on the preclustering heuristic follows below). If the \code{categories} argument
+is used, only elements having the same value in \code{categories} serve as exchange
+partners.
 
 Using \code{method = "brusco"} implements the local bicriterion
 iterated local search (BILS) heuristic by Brusco et al. (2020) and
@@ -183,7 +194,7 @@ Usually, heuristics are employed to tackle anticlustering problems,
 and their performance is generally very satisfying.  However,
 heuristics do not investigate all possible group assignments and
 therefore do not (necessarily) find the
-"globally optimal solution", i.e., a partitioning that has best
+"globally optimal solution", i.e., a partitioning that has the best
 possible value for the objective that is optimized.  Enumerating
 all possible partitions in order to find the best solution,
 however, quickly becomes impossible with increasing N, and
@@ -252,11 +263,10 @@ between sets.  The grouping variables indicated by
 \code{categories} will be balanced out across anticlusters. This
 functionality is only available for the classical exchange
 procedures, that is, for \code{method = "exchange"} and
-\code{method = "local-maximum"}.
-
-Note that when \code{categories} has multiple columns (i.e., each element is
-assigned to multiple columns), each combination of categories is
-treated as a distinct category by the exchange method. This behaviour may lead
+\code{method = "local-maximum"}. When \code{categories} has multiple columns 
+(i.e., there are multiple categorical variables), each combination of categories is
+treated as a distinct category by the exchange method (i.e., the multiple columns
+are "merged" into a single column). This behaviour may lead
 to less than optimal results on the level of each single categorical variable.
 
 \strong{Optimize a custom objective function}
@@ -279,7 +289,7 @@ as well.
 }
 \examples{
 
-# Optimize the cluster editing (diversity) criterion
+# Optimize the default diversity criterion
 anticlusters <- anticlustering(
   schaper2019[, 3:6],
   K = 3,
@@ -323,26 +333,6 @@ table(anticlusters, schaper2019$room)
 by(schaper2019[, 3:6], anticlusters, function(x) round(colMeans(x), 2))
 by(schaper2019[, 3:6], anticlusters, function(x) round(apply(x, 2, sd), 2))
 
-
-## Use preclustering and variance (k-means) criterion on large data set
-N <- 1000
-K = 2
-lds <- data.frame(f1 = rnorm(N), f2 = rnorm(N))
-ac <- anticlustering(
-  lds, 
-  K = K,
-  objective = "variance",
-  preclustering = TRUE
-)
-
-# The following is equivalent to setting `preclustering = TRUE`:
-cl <- balanced_clustering(lds, K = N / K)
-ac <- anticlustering(
-  lds, 
-  K = K,
-  objective = "variance",
-  categories = cl
-)
 
 }
 \references{
