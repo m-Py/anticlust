@@ -240,6 +240,9 @@ is conducted using a call to \code{\link{matching}}. When using
 \code{method = "ilp"}, the preclustering optimally finds groups of
 minimum pairwise distance by solving the integer linear program
 described in Papenberg and Klau (2021; (8) - (10), (12) - (13)).
+Note that when combining preclustering restrictions with \code{method = "ilp"},
+the anticlustering result is no longer guaranteed to be globally optimal, but
+only optimal given the preclustering restrictions.
 
 \strong{Categorical variables}
 
