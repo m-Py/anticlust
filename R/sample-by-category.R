@@ -133,7 +133,7 @@ gcd_set <- function(x) {
     if (all(x == x[1])) {
       gdc_found <- TRUE
     }
-    if (any(x == 1)) { # cannot find a greated common denominator!
+    if (any(x == 1)) { # cannot find a greatest common denominator!
       return(1)
     }
   }
