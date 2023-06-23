@@ -1,0 +1,177 @@
+---
+title: "Using categorical variables with anticlustering"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using categorical variables with anticlustering}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(anticlust)
+```
+
+In this vignette I explore two ways to incorporate categorical variables with anticlustering. The main function of `anticlust` is `anticlustering()`, and it has an argument `categories`. It can be used easily enough: We just pass the numeric variables as first argument (`x`) and our categorical variable(s) to `categories`. I will use the penguin data set from the `palmerpenguins` package to illustrate this: 
+
+```{r}
+library(palmerpenguins)
+# First exclude cases with missing values
+df <- na.omit(penguins)
+head(df)
+nrow(df)
+```
+
+Let's call `anticlustering()` to divide the `r nrow(df)` penguins into 3 groups, using the penguins' sex as categorical variable:
+
+```{r}
+numeric_vars <- df[, c("bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g")]
+groups <- anticlustering(
+  numeric_vars, 
+  K = 3,
+  categories = df$sex,
+  method = "local-maximum", # optimization algorithm
+  objective = "variance" # k-plus anticlustering
+)
+```
+
+Let's check out how well our categorical variables are balanced:
+
+```{r}
+# 1. Define function to compute relative frequency of category by group
+row_margins <- function(tab) {
+  prop.table(tab, 1) |> round(2)
+}
+table(groups, df$sex) # absolute values
+row_margins(table(groups, df$sex)) # relative values
+```
+
+A perfect split! Similarly, we could use the species as categorical variable: 
+
+```{r}
+groups <- anticlustering(
+  numeric_vars, 
+  K = 3,
+  categories = df$species,
+  method = "local-maximum", 
+  objective = "variance" 
+)
+
+table(groups, df$species) # absolute values
+row_margins(table(groups, df$species)) # relative values
+```
+
+As good as it could be! Now, let's use both categorical variables at the same time:
+
+```{r}
+groups <- anticlustering(
+  numeric_vars, 
+  K = 3,
+  categories = df[, c("species", "sex")],
+  method = "local-maximum", 
+  objective = "variance" 
+)
+
+table(groups, df$sex)
+table(groups, df$species) 
+row_margins(table(groups, df$sex))
+row_margins(table(groups, df$species)) 
+```
+
+We see that the results for each categorical variable are worse than when we only considered one variable. This is because when giving multiple variable to `categories`, all columns are "merged" into a single column, and each combination of sex / species is treated as a separate category. Some information on the original variables is lost, and the results may become less optimal (while still pretty okay here). 
+
+The problem can get worse when our groups have different sizes: 
+
+```{r}
+groups <- anticlustering(
+  numeric_vars, 
+  K = c(200, 40, 93),
+  categories = df[, c("species", "sex")],
+  method = "local-maximum", 
+  objective = "variance"
+)
+
+table(groups, df$sex)
+table(groups, df$species)
+row_margins(table(groups, df$sex))
+row_margins(table(groups, df$species)) 
+```
+
+But the results are still quite okay. However, using categories, we cannot become better than this; the categorical variables are included as so called "hard constraints" in the optimization process and `anticlustering()` does not attempt to improve the initial balancing of the categories across groups. 
+
+Another possibility is to use the categorical variables as part of the optimization criterion (i.e., as part of the argument `x`). This works as follows: We convert the categorical variables into a binary representation ("dummy coding"), and use these variables in k-means anticlustering. This works because k-means anticlustering makes the mean of variables as similar as possible between groups, and the mean of a binary categorical variable is the proportion of elements having that category -- and this is exactly what should be similar between groups. Let's try this out: 
+
+```{r}
+
+binary_categories <- categories_to_binary(df[, c("species", "sex")], use_combinations = )
+
+groups <- anticlustering(
+  cbind(binary_categories, numeric_vars), 
+  K = c(200, 40, 93),
+  standardize = TRUE,
+  method = "local-maximum", 
+  objective = "variance" ,
+  repetitions = 10
+)
+
+table(groups, df$sex)
+table(groups, df$species)
+row_margins(table(groups, df$sex))
+row_margins(table(groups, df$species)) 
+```
+
+This is better than before using `categories`. There is one problem, which is that within each species, the sex distribution is not the same: 
+
+```{r}
+row_margins(table(groups, df$species, df$sex)) 
+```
+
+It is possible to also consider the combination of categorical variables by changing the argument `use_combinations` in `categories_to_binary()`: 
+
+```{r}
+binary_categories <- categories_to_binary(df[, c("species", "sex")], use_combinations = TRUE)
+
+groups <- anticlustering(
+  cbind(binary_categories, numeric_vars), 
+  K = c(200, 40, 93),
+  standardize = TRUE,
+  method = "local-maximum", 
+  objective = "variance" ,
+  repetitions = 10
+)
+row_margins(table(groups, df$species, df$sex)) 
+```
+
+Better! If we have multiple categorical variables and / or unequal-sized groups, it may be useful to try out the "optimization" in version of including categorical variables. 
+
+## K-plus anticlustering
+
+K-means anticlustering offers the possibility to distribute categorical variables evenly between groups. But otherwise, we would prefer other anticlustering criteria, k-means only leads to similar means and ignores other data characteristics such as the variances. Using the following code, we can use k-plus anticlustering while at the same time incorporating the categorical variables through k-means anticlustering:
+
+```{r}
+# Compute variable to incorporate categorical variables as well as k-plus variables,
+# so we can use the standard k-means criterion:
+binary_categories <- categories_to_binary(df[, c("species", "sex")], use_combinations = TRUE)
+kplus_vars <- kplus_moment_variables(numeric_vars, T = 2)
+
+groups <- anticlustering(
+  cbind(binary_categories, kplus_vars), 
+  K = 3,
+  standardize = TRUE,
+  method = "local-maximum", 
+  objective = "variance" ,
+  repetitions = 10
+)
+table(groups, df$sex)
+table(groups, df$species)
+table(groups, df$species, df$sex)
+mean_sd_tab(numeric_vars, groups)
+```
+
+The results are quite convincing.
