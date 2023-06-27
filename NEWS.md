@@ -13,7 +13,17 @@ DONE:
 TODOs: 
 
 - Fixed a bug in `kplus_anticlustering()` that did not correctly implement `preclustering = TRUE`
-- X new vignettes are now distributed with `anticlust`
+  * Split up the anticlustering wrapper method into a part that deals with preclustering / categorical constraints and the rest
+- Maybe: Implement additional methods for dealing with categorical variables? (problem is the intertwinement with preclustering .. probably becomes too complex in anticlustering(), let users deal with it themselves, the function is there now, and I will introduce a vignette)
+- Vignettes
+  * State of the art of anticlustering
+  * Dealing with NAs
+  * Restricting cluster membership
+    * `K` + categories = must link constraint
+    * cannot link constraint via optimizing dispersion + user defined function (outlook: proper support in anticlustering())
+-
+
+
 
 # anticlust 0.6.4-1 / 0.6.4-2 / 0.6.4-3
 
