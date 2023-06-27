@@ -181,7 +181,7 @@
 #' heuristics do not investigate all possible group assignments and
 #' therefore do not (necessarily) find the
 #' "globally optimal solution", i.e., a partitioning that has the best
-#' possible value for the objective that is optimized.  Enumerating
+#' possible value with regard to the objective that is optimized.  Enumerating
 #' all possible partitions in order to find the best solution,
 #' however, quickly becomes impossible with increasing N, and
 #' therefore it is not possible to find a global optimum this
