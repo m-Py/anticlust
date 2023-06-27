@@ -34,10 +34,12 @@ Description: The method of anticlustering partitions a pool of elements
     sum of pairwise distances within clusters.  The function
     anticlustering() implements exact and heuristic anticlustering
     algorithms as described in Papenberg and Klau (2021;
-    <doi:10.1037/met0000301>). The exact algorithms require that the GNU
+    <doi:10.1037/met0000301>). The exact algorithms require that an integer 
+    linear programming solver is installed, either the GNU
     linear programming kit (<https://www.gnu.org/software/glpk/glpk.html>)
-    is available and the R package 'Rglpk'
-    (<https://cran.R-project.org/package=Rglpk>) is installed. A
+    and the R package 'Rglpk' (<https://cran.R-project.org/package=Rglpk>),
+    or the SYMPHONY MILP solver (<https://github.com/coin-or/SYMPHONY>) and the 
+    R package ''. A
     bicriterion anticlustering method proposed by Brusco et al.  (2020;
     <doi:10.1111/bmsp.12186>) is available through the function
     bicriterion_anticlustering(), kplus_anticlustering() implements the
