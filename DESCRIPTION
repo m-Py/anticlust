@@ -28,14 +28,15 @@ Description: The method of anticlustering partitions a pool of elements
     into groups (i.e., anticlusters) with the goal of maximizing
     between-group similarity or within-group heterogeneity.  The
     anticlustering approach thereby reverses the logic of cluster analysis
-    that strives for high within-group homogeneity and separation between
-    groups.  Computationally, anticlustering is accomplished by maximizing
-    instead of minimizing a clustering objective function, such as the
-    intra-cluster variance (used in k-means clustering) or the sum of
-    pairwise distances within clusters. The main function anticlustering()
-    gives access to exact and heuristic anticlustering methods as
-    described in Papenberg and Klau (2021; <doi:10.1037/met0000301>),
-    Brusco et al. (2020; <doi:10.1111/bmsp.12186>), and Papenberg (2023;
+    that strives for high within-group homogeneity and clear separation
+    between groups.  Computationally, anticlustering is accomplished by
+    maximizing instead of minimizing a clustering objective function, such
+    as the intra-cluster variance (used in k-means clustering) or the sum
+    of pairwise distances within clusters. The main function
+    anticlustering() gives access to exact and heuristic anticlustering
+    methods described in Papenberg and Klau (2021;
+    <doi:10.1037/met0000301>), Brusco et al. (2020;
+    <doi:10.1111/bmsp.12186>), and Papenberg (2023;
     <doi:10.31234/osf.io/7jw6v>). The exact algorithms require that an
     integer linear programming solver is installed, either the GNU linear
     programming kit (<https://www.gnu.org/software/glpk/glpk.html>)
