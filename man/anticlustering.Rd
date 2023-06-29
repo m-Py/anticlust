@@ -195,7 +195,7 @@ and their performance is generally very satisfying.  However,
 heuristics do not investigate all possible group assignments and
 therefore do not (necessarily) find the
 "globally optimal solution", i.e., a partitioning that has the best
-possible value for the objective that is optimized.  Enumerating
+possible value with regard to the objective that is optimized.  Enumerating
 all possible partitions in order to find the best solution,
 however, quickly becomes impossible with increasing N, and
 therefore it is not possible to find a global optimum this
@@ -217,11 +217,11 @@ linear programming. In order to use the ILP methods, set
 diversity was described in Papenberg & Klau, (2021; (8) -
 (12)). The documentation of the function
 \code{\link{optimal_dispersion}} has more information on the
-optimal maximization of the dispersion (it is called internally by
+optimal maximization of the dispersion (this is the function that is called internally by
 anticlustering() when using \code{objective = "dispersion"} and
 \code{method = "ilp"}). The ILP methods either require the R
 package \code{Rglpk} and the GNU linear programming kit
-(<http://www.gnu.org/software/glpk/>) or the R package
+(<http://www.gnu.org/software/glpk/>), or the R package
 \code{Rsymphony} and the COIN-OR SYMPHONY solver libraries
 (<https://github.com/coin-or/SYMPHONY>). The function will try to
 find the GLPK or SYMPHONY solver and throw an error if none is

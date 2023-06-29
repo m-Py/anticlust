@@ -203,11 +203,11 @@
 #' diversity was described in Papenberg & Klau, (2021; (8) -
 #' (12)). The documentation of the function
 #' \code{\link{optimal_dispersion}} has more information on the
-#' optimal maximization of the dispersion (it is called internally by
+#' optimal maximization of the dispersion (this is the function that is called internally by
 #' anticlustering() when using \code{objective = "dispersion"} and
 #' \code{method = "ilp"}). The ILP methods either require the R
 #' package \code{Rglpk} and the GNU linear programming kit
-#' (<http://www.gnu.org/software/glpk/>) or the R package
+#' (<http://www.gnu.org/software/glpk/>), or the R package
 #' \code{Rsymphony} and the COIN-OR SYMPHONY solver libraries
 #' (<https://github.com/coin-or/SYMPHONY>). The function will try to
 #' find the GLPK or SYMPHONY solver and throw an error if none is
