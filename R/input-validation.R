@@ -353,15 +353,20 @@ input_validation_matching <- function(
 
 # Check if a solver package can be used
 check_if_solver_is_available <- function() {
-  if (!requireNamespace("Rglpk", quietly = TRUE)) {
-    stop("\n\nAn exact method was requested, but the package 'Rglpk' is not \n",
-         "available. Possibly, you have to install the GNU linear \nprogramming kit first: \n\n",
+  glpk_available <- requireNamespace("Rglpk", quietly = TRUE)
+  symphony_available <- requireNamespace("Rsymphony", quietly = TRUE)
+  no_solver_available <- !glpk_available && !symphony_available
+  
+  if (no_solver_available) {
+    stop("\n\nAn exact method was requested, but no ILP solver is ",
+         "available. For example, you could install the GNU linear programming kit: \n\n",
          "- On windows, visit ",
          "http://gnuwin32.sourceforge.net/packages/glpk.htm \n\n",
          "- Use homebrew to install it on mac, 'brew install glpk' \n\n",
          "- 'sudo apt install libglpk-dev' on Ubuntu ",
          "\n\nThen, install the Rglpk package via ",
-         "`install.packages('Rglpk')`.")
+         "`install.packages('Rglpk')`.\n \n Another possibilty is to install the R package 'Rsymphony' ",
+         "and the SYMPHONY ILP solver (https://github.com/coin-or/SYMPHONY).")
   }
   return(invisible(NULL))
 }
