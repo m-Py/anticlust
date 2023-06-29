@@ -58,11 +58,22 @@ system.time(anticlustering(iris[, -5], K = K, method = "local-maximum", repetiti
 
 In this case, sticking with the default leads to run times that are much much faster. Still, if your data set is not too large, using several repetitions may be useful (but you can judge yourself via the results). The good news is that fewer exchanges may be enough in large data sets: anticlustering generally becomes easier with more data. 
 
-### Getting fast
+### Getting fast: Using fewer exchange partners
 
-If the default exchange method is not fast enough for your taste, there is an additional "hidden" method to make the `anticlustering()` function run faster. This approach is documented here. 
+If the default exchange method is not fast enough for your taste, it is possible to use fewer exchange partners during the anticlustering process. By default, the exchange method evaluates each possible exchange with all elements that are currently assigned to a different cluster, leading to $O(N^2)$ exchanges. If we only use a fixed number of exchange partners per element, we can reduce the number of exchanges to $O(N)$, corresponding to a gain of an order of magnitude in terms of run time. Using fewer exchange partners for each element may decrease the quality of the results, and is generally only recommended for (very) large data sets. But the run time will be considerably faster.
 
-For the exchange method to terminate faster, it is possible to reduce the number of attempted exchanges per element. By default, the exchange method evaluates each possible exchange with all elements that are currently assigned to a different cluster. We can restrict the number of exchanges on a fixed value using the following "hack". 
+One way of doing using fewer exchange partners is by including "preclustering" restrictions (see `?anticlustering`). When setting `preclustering = TRUE`, the optimization restricts the number of exchange partners to `K - 1` (very similar) elements. Note that the preclustering algorithm itself has $O(N^2)$ run time, which has to be performed prior to the anticlustering algorithm. Thus, we have to use a larger data set to see the improvement in running time:
+
+```{r}
+N <- 1000
+M <- 5
+K <- 3
+data <- matrix(rnorm(N*M), ncol = M)
+system.time(anticlustering(data, K = K))
+system.time(anticlustering(data, K = K, preclustering = TRUE))
+```
+
+As we can see, for N = `r N`, the speedup is enormous. There is also an additional "hidden" method to make the `anticlustering()` function run faster. This method also relies on using fewer exchange partners during the exchange process, but does not use preclustering. This approach is documented here and mostly relies on a dirty "hack" involving the `anticlustering()` argument `categories`:
 
 The first step that I am using here is not strictly necessary---in the next section, we will learn more about what this accomplishes---but let's create the initial clusters before calling `anticlustering()`. This grouping is the basis on which the exchange procedure starts to improve the anticlustering:
 
@@ -109,7 +120,7 @@ The speedup is enormous! Note that this approach even reduces the theoretical ru
 
 ### Including categorical variables
 
-The approach to speed up the anticlustering by requiring fewer exchange partners used the `categories` argument. We should now reflect how this was accomplished, and first note that the `categories` argument usually has a different purpose: It is used to evenly distribute a categorical variable across groups---we did not care for that in the previous example. 
+The previous approach to speed up the anticlustering by requiring fewer exchange partners used the `categories` argument. We should now reflect how this was accomplished, and first note that the `categories` argument usually has a different purpose: It is used to evenly distribute a categorical variable across groups---we did not care for that in the previous example. 
 
 For example, coming back to the iris data set, we may require to evenly distribute the species of the iris plants across 5 groups of plants: 
 
