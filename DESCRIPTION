@@ -66,6 +66,7 @@ Imports:
     RANN (>= 2.6.0)
 Suggests: 
     knitr,
+    palmerpenguins,
     Rglpk,
     rmarkdown,
     Rsymphony,
