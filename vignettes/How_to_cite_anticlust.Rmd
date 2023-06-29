@@ -7,5 +7,5 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, child="../HOW_TO_CITE_ANTICLUST.md"}
+```{r, child="../inst/HOW_TO_CITE_ANTICLUST.md"}
 ```

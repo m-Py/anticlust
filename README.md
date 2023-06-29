@@ -36,7 +36,7 @@ cite the following reference:
 
 Depending on which `anticlust` functions you are using, including other
 references may also be fair. [Here you can find out in detail how to
-cite `anticlust`](HOW_TO_CITE_ANTICLUST.md).
+cite `anticlust`](./inst/HOW_TO_CITE_ANTICLUST.md).
 
 Another great way of showing your appreciation of `anticlust` is to
 leave a star on this Github repository.
