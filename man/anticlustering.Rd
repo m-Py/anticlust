@@ -341,15 +341,17 @@ diversity and dispersion criteria for anticlustering: A bicriterion
 approach. British Journal of Mathematical and Statistical
 Psychology, 73, 275-396. https://doi.org/10.1111/bmsp.12186
 
-Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
-for a clustering problem. Mathematical Programming, 45, 59-96.
+Fernández, E., Kalcsics, J., & Nickel, S. (2013). The maximum dispersion problem. 
+Omega, 41 (4), 721–730. https://doi.org/10.1016/j.omega.2012.09.005
 
 Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition 
 data sets into equivalent parts. Psychological Methods, 26(2), 
 161–174. https://doi.org/10.1037/met0000301.
 
-Papenberg, M. (2023). k-plus Anticlustering: An Improved k-means Criterion 
-for Maximizing Between-Group Similarity. Retrieved from psyarxiv.com/7jw6v 
+Papenberg, M. (2023). k-plus Anticlustering: An Improved K-means Criterion 
+for Maximizing Between-Group Similarity. British Journal of Mathematical 
+and Statistical Psychology. Advance online publication. 
+https://doi.org/10.1111/bmsp.12315
 
 Späth, H. (1986). Anticlustering: Maximizing the variance criterion.
 Control and Cybernetics, 15, 213-218.

@@ -85,7 +85,7 @@ This function implements the unweighted sum approach for k-plus
     call \code{\link{anticlustering}} directly). Any arguments that are
     not explicitly changed here (i.e., \code{standardize = TRUE}) receive the 
     default given in \code{\link{anticlustering}} 
-    (e.g., `method = "exchange"`.)
+    (e.g., \code{method = "exchange"}.)
 }
 \examples{
 
@@ -128,6 +128,8 @@ all(x1 == x2)
 
 }
 \references{
-Papenberg, M. (2023). k-plus Anticlustering: An Improved k-means Criterion 
-for Maximizing Between-Group Similarity. Retrieved from psyarxiv.com/7jw6v
+Papenberg, M. (2023). k-plus Anticlustering: An Improved K-means Criterion 
+for Maximizing Between-Group Similarity. British Journal of Mathematical 
+and Statistical Psychology. Advance online publication. 
+https://doi.org/10.1111/bmsp.12315
 }
