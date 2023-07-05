@@ -9,21 +9,18 @@ DONE:
   * Offers some additional flexibility as compared to calling `kplus_anticlustering()`, which generates these variables internally
 - `categories_to_binary()` is a new exported function that converts one or several categorical variables into a binary representation
   * Can be used to include categorical variables as part of the optimization criterion in k-means / k-plus anticlustering
+- X new vignettes have been added to the `anticlust` documentation
   
 TODOs: 
 
 - Fixed a bug in `kplus_anticlustering()` that did not correctly implement `preclustering = TRUE`
   * Split up the anticlustering wrapper method into a part that deals with preclustering / categorical constraints and the rest
-- Maybe: Implement additional methods for dealing with categorical variables? (problem is the intertwinement with preclustering .. probably becomes too complex in anticlustering(), let users deal with it themselves, the function is there now, and I will introduce a vignette)
 - Vignettes
   * State of the art of anticlustering
   * Dealing with NAs
   * Restricting cluster membership
     * `K` + categories = must link constraint
     * cannot link constraint via optimizing dispersion + user defined function (outlook: proper support in anticlustering())
--
-
-
 
 # anticlust 0.6.4-1 / 0.6.4-2 / 0.6.4-3
 
