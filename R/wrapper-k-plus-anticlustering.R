@@ -60,7 +60,7 @@
 #'     call \code{\link{anticlustering}} directly). Any arguments that are
 #'     not explicitly changed here (i.e., \code{standardize = TRUE}) receive the 
 #'     default given in \code{\link{anticlustering}} 
-#'     (e.g., `method = "exchange"`.)
+#'     (e.g., \code{method = "exchange"}.)
 #'     
 #' @examples 
 #' 
