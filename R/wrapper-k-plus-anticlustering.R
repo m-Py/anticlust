@@ -128,6 +128,16 @@ kplus_anticlustering <- function(
   M <- ncol(x) 
   feature_bools <- c(variance, skew, kurtosis)
   
+  # Unfortunately, I have to extract all ellipsis arguments by hand because
+  # preclustering / categories must be used here before calling anticlustering()...
+  # (I know this is really ugly...)
+  preclustering <- get_argument_from_ellipsis("preclustering", ...)
+  preclustering <- ifelse(is.null(preclustering), FALSE, preclustering) # default = FALSE
+  categories <- get_argument_from_ellipsis("categories", ...) # default = NULL
+  categories <- get_categorical_constraints(x, K, preclustering, categories)
+  method <- get_argument_from_ellipsis("method", ...) 
+  method <- ifelse(is.null(method), "exchange", method) # default = "exchange"
+  repetitions <- get_argument_from_ellipsis("repetitions", ...) # default = NULL
 
   if (is.null(T)) {
     moments <- (2:4)[feature_bools]
@@ -156,10 +166,57 @@ kplus_anticlustering <- function(
     augmented_data, 
     K = K, 
     standardize = standardize, 
-    objective = "variance", ...
+    objective = "variance", 
+    categories = categories,
+    method = method,
+    repetitions = repetitions
   )
-
 }
+
+# function to compute features for variance
+# moment = 2 -> variance; 3 = skew; 4 = kurtosis
+moment_features <- function(data, moment = 2) {
+  apply(data, 2, function(x) (x - mean(x))^moment)
+}
+
+# Compute k-covariances features for an original number of M features.
+# That is choose(M, 2) additional features, i.e., O(M^2) additional features.
+
+covariance_features <- function(data) {
+  M <- ncol(data)
+  if (M < 2) {
+    stop("k-covariances can only be used when at least two features are present.")
+  }
+  feature_combinations <- t(combn(M, 2))
+  # store new features in matrix
+  cov_feature_matrix <- matrix(ncol = nrow(feature_combinations), nrow = nrow(data))
+  for (i in 1:nrow(feature_combinations)) {
+    f1 <- feature_combinations[i, 1]
+    f2 <- feature_combinations[i, 2]
+    cov_feature_matrix[, i] <- (data[, f1] - mean(data[, f1])) * (data[, f2] - mean(data[, f2]))
+  }
+  cov_feature_matrix
+}
+
+#' Get argument from ellipsis
+#' @param argument Name of the argument
+#' @param ... The list of additional arguments
+#' @examples
+#' 
+#' get_argument_from_ellipsis(argument = "moep", objective = 1:4)
+#' get_argument_from_ellipsis(argument = "objective", objective = 1:4)
+#' 
+#' @noRd
+#' 
+
+get_argument_from_ellipsis <- function(argument, ...) {
+  args <- as.list(substitute(list(...)))[-1L]
+  if (!argument %in% names(args)) {
+    return(NULL)
+  }
+  eval(args[[argument]])
+}
+
 
 validate_input_kplus <- function(x, K, variance, skew, kurtosis, covariances, T, standardize, ...) {
   validate_data_matrix(x)
