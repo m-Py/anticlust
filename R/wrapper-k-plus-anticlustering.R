@@ -126,6 +126,16 @@ kplus_anticlustering <- function(
   M <- ncol(x) 
   feature_bools <- c(variance, skew, kurtosis)
   
+  # Unfortunately, I have to extract all ellipsis arguments by hand because
+  # preclustering / categories must be used here before calling anticlustering()...
+  # (I know this is really ugly...)
+  preclustering <- get_argument_from_ellipsis("preclustering", ...)
+  preclustering <- ifelse(is.null(preclustering), FALSE, preclustering)
+  categories <- get_argument_from_ellipsis("categories", ...)
+  categories <- get_categorical_constraints(x, K, preclustering, categories)
+  method <- get_argument_from_ellipsis("method", ...)
+  method <- ifelse(is.null(method), "exchange", method)
+  repetitions <- get_argument_from_ellipsis("repetitions", ...)
 
   if (is.null(T)) {
     moments <- (2:4)[feature_bools]
@@ -154,9 +164,11 @@ kplus_anticlustering <- function(
     augmented_data, 
     K = K, 
     standardize = standardize, 
-    objective = "variance", ...
+    objective = "variance", 
+    categories = categories,
+    method = method,
+    repetitions = repetitions
   )
-
 }
 
 # function to compute features for variance
@@ -183,6 +195,26 @@ covariance_features <- function(data) {
   }
   cov_feature_matrix
 }
+
+#' Get argument from ellipsis
+#' @param argument Name of the argument
+#' @param ... The list of additional arguments
+#' @examples
+#' 
+#' get_argument_from_ellipsis(argument = "moep", objective = 1:4)
+#' get_argument_from_ellipsis(argument = "objective", objective = 1:4)
+#' 
+#' @noRd
+#' 
+
+get_argument_from_ellipsis <- function(argument, ...) {
+  args <- as.list(substitute(list(...)))[-1L]
+  if (!argument %in% names(args)) {
+    return(NULL)
+  }
+  eval(args[[argument]])
+}
+
 
 
 validate_input_kplus <- function(x, K, variance, skew, kurtosis, covariances, T, standardize, ...) {

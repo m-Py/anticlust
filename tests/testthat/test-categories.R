@@ -146,3 +146,19 @@ test_that("balanced categorical output for all anticlustering combinations", {
   )
   expect_true(all(table(ac, categories) == 16))
 })
+
+test_that("Categories argument works with kplus_anticlustering()", {
+  # kplus_anticlustering must work as well 
+  features <- schaper2019[, 3:6]
+  anticlusters <- kplus_anticlustering(features, K = 3, categories = schaper2019$room)
+
+  expect_true(all(table(schaper2019$room, anticlusters) == 16))
+  
+  # does preclustering work at the same time as well?
+  
+  anticlusters <- kplus_anticlustering(features, K = 3, categories = schaper2019$room, preclustering = TRUE)
+  matches <- matching(features, p = 3, match_within = schaper2019$room)
+  expect_true(all(table(schaper2019$room, anticlusters) == 16))
+  expect_true(all(table(matches, anticlusters) == 1))
+
+})

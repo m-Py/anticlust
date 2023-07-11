@@ -20,7 +20,7 @@ test_that("Preclustering works with all criteria", {
   }
   
   # kplus_anticlustering must work as well 
-  anticlusters <- kplus_anticlustering(features, K = 3)
+  anticlusters <- kplus_anticlustering(features, K = 3, preclustering = TRUE)
   
   expect_true(all(table(matches, anticlusters) == 1))
   
