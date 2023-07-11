@@ -244,10 +244,9 @@ system.time(fast_anticlustering(data, K = initial_clusters, k_neighbours = n_exc
 
 ## References
 
-Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition data sets into equivalent parts. Psychological Methods, 26(2), 161–174. https://doi.org/10.1037/met0000301.
+Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition data sets into equivalent parts. *Psychological Methods, 26*(2), 161--174. https://doi.org/10.1037/met0000301.
 
 Papenberg, M. (2023). K-plus Anticlustering: An Improved k-means Criterion for Maximizing Between-Group Similarity. *British Journal of Mathematical and Statistical Psychology*. Advance online publication. https://doi.org/10.1111/bmsp.12315
 
 Weitz, R., & Lakshminarayanan, S. (1998). An empirical comparison of heuristic methods
-for creating maximally diverse groups. Journal of the Operational Research Society,
-49 (6), 635–646. https://doi.org/10.1057/palgrave.jors.2600510
+for creating maximally diverse groups. *Journal of the Operational Research Society, 49*(6), 635--646. https://doi.org/10.1057/palgrave.jors.2600510
