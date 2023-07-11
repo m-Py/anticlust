@@ -8,16 +8,14 @@ DONE:
 -  `kplus_moment_variables()` is a new exported function that generates k-plus variables from a data set
   * Offers some additional flexibility as compared to calling `kplus_anticlustering()`, which generates these variables internally
 - `categories_to_binary()` is a new exported function that converts one or several categorical variables into a binary representation
-  * Can be used to include categorical variables as part of the optimization criterion in k-means / k-plus anticlustering
+  * Can be used to include categorical variables as part of the optimization criterion in k-means / k-plus anticlustering, see new vignette "Using categorical variables with anticlustering"
 - X new vignettes have been added to the `anticlust` documentation
   
 TODOs: 
 
 - Fixed a bug in `kplus_anticlustering()` that did not correctly implement `preclustering = TRUE`
-  * Split up the anticlustering wrapper method into a part that deals with preclustering / categorical constraints and the rest
 - Vignettes
-  * State of the art of anticlustering
-  * Dealing with NAs
+  * Best practices with Anticlustering
   * Restricting cluster membership
     * `K` + categories = must link constraint
     * cannot link constraint via optimizing dispersion + user defined function (outlook: proper support in anticlustering())
@@ -28,7 +26,7 @@ TODOs:
 [some](https://github.com/m-Py/anticlust/commit/9bb8275cad) 
 [fixes](https://github.com/m-Py/anticlust/commit/33cee784cb392a) in the 
 internal function `gdc_set()` that finds the greatest common denominator in a 
-set of numbers. The fixes prevent `anticlustering()` from potentially running 
+set of numbers. The fixes prevent `categorical_sampling()` (which is also called by `anticlustering()` when using the `categories` argument) from potentially running 
 into an infinite loop when combining uneven group sizes via `K` with a 
 `categories` argument.
 
