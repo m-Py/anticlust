@@ -27,8 +27,8 @@ represent pairwise dissimilarities.}
 of length \code{nrow(x)} describing how elements are assigned
 to anticlusters before the optimization starts.}
 
-\item{R}{The desired number of restarts for the BILS algorithm. By
-default, both phases of the BILS algorithm are performed once.}
+\item{R}{The desired number of restarts for the algorithm. By
+default, both phases (MBPI + BILS) of the algorithm are performed once.}
 
 \item{W}{Optional argument, a vector of weights defining the
 relative importance of dispersion and diversity (0 <= W <=
@@ -43,14 +43,14 @@ A \code{matrix} of anticlustering partitions (i.e., the
     each column corresponds to an input element.
 }
 \description{
-This function implements the bicriterion iterated local search
-heuristic (BILS) for anticlustering by Brusco, Cradit, and Steinley
-(2020; <doi:10.1111/bmsp.12186>). The description of the algorithm is given in Section 3 of
-their paper (in particular, see the pseudocode in their Figure 2).
+This function implements the bicriterion for anticlustering by Brusco, 
+Cradit, and Steinley (2020; <doi:10.1111/bmsp.12186>). The description of 
+the algorithm is given in Section 3 of their paper (in particular, see the 
+pseudocode in their Figure 2).
 }
 \details{
 The bicriterion algorithm by Brusco, Cradit, and Steinley (2020)
-aims to simultaneously optimize the two anticlustering criteria:
+aims to simultaneously optimize two anticlustering criteria:
 the \code{\link{diversity_objective}} and the
 \code{\link{dispersion_objective}}. It returns a list of partitions
 that approximate the pareto set of efficient solutions across both
@@ -68,8 +68,11 @@ al. used `G` to denote the number of groups. However, note that
 groups, but also to specify group sizes, as in
 \code{\link{anticlustering}}.
 
+This function implements the combined bicriterion algorithm MBPI + BILS.
 The argument \code{R} denotes the number of restarts of the search
-heuristic. The argument \code{W} denotes the possible weights given
+heuristic. Half of the repetitions perform MBPI and the other half perform 
+BILS, as suggested by Brusco et al. The argument \code{W} denotes the possible
+weights given
 to the diversity criterion in a given run of the search
 heuristic. In each run, the a weight is randomly selected from the
 vector \code{W}. As default values, we use the weights that Brusco
@@ -80,13 +83,14 @@ whereas smaller values indicate that dispersion is more important;
 argument \code{Xi} is the probability that an element is swapped
 during the iterated local search (specifically, Xi has to be a
 vector of length 2, denoting the range of a uniform distribution
-from which the probability of swapping is selected).
+from which the probability of swapping is selected). For \code{Xi}, the default
+is selected consistent with the analyses by Brusco et al. 
 
 If the data input \code{x} is a feature matrix (that is: each row
 is a "case" and each column is a "variable"), a matrix of the
 Euclidean distances is computed as input to the algorithm. If a
 different measure of dissimilarity is preferred, you may pass a
-self-generated dissimiliarity matrix via the argument \code{x}.
+self-generated dissimilarity matrix via the argument \code{x}.
 }
 \note{
 For technical reasons, the pareto set returned by this function has
