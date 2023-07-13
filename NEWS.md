@@ -40,7 +40,7 @@ into an infinite loop when combining uneven group sizes via `K` with a
 **Major changes**
 
 * This release adds a new exported function and removes two others (I very much doubt anyone used those, though -- see below -- if your code is affected, please email me).
-  - `kplus_anticlustering()` is a new exported function: A new interface function to k-plus anticlustering, implementing the k-plus method as described in "k-plus Anticlustering: An Improved K-means Criterion for Maximizing Between-Group Similarity" (Papenberg, 2023; https://doi.org/10.31234/osf.io/7jw6v). Using `anticlustering(x, K, objective = "kplus")` is still supported and remains unchanged. The new function `kplus_anticlustering()`, however, offers more functionality and nuance with regard to optimizing the k-plus objective family.
+  - `kplus_anticlustering()` is a new exported function: A new interface function to k-plus anticlustering, implementing the k-plus method as described in "K-plus Anticlustering: An Improved K-means Criterion for Maximizing Between-Group Similarity" (Papenberg, 2023; https://doi.org/10.1111/bmsp.12315). Using `anticlustering(x, K, objective = "kplus")` is still supported and remains unchanged. The new function `kplus_anticlustering()`, however, offers more functionality and nuance with regard to optimizing the k-plus objective family.
   - The function `kplus_objective()` was removed. 
   - The function `mean_sd_obj()` was removed. 
   

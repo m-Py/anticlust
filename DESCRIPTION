@@ -37,7 +37,7 @@ Description: The method of anticlustering partitions a pool of elements
     methods described in Papenberg and Klau (2021;
     <doi:10.1037/met0000301>), Brusco et al. (2020;
     <doi:10.1111/bmsp.12186>), and Papenberg (2023;
-    <doi:10.31234/osf.io/7jw6v>). The exact algorithms require that an
+    <doi:10.1111/bmsp.12315>). The exact algorithms require that an
     integer linear programming solver is installed, either the GNU linear
     programming kit (<https://www.gnu.org/software/glpk/glpk.html>)
     together with the interface package 'Rglpk'
@@ -45,8 +45,8 @@ Description: The method of anticlustering partitions a pool of elements
     solver (<https://github.com/coin-or/SYMPHONY>) together with the
     interface package 'Rsymphony'
     (<https://cran.r-project.org/package=Rsymphony>). Full access to the
-    bicriterion anticlustering method proposed by Brusco et al.  (2020) is
-    given via the function bicriterion_anticlustering(),
+    bicriterion anticlustering method proposed by Brusco et al. (2020) is
+    given via the function bicriterion_anticlustering(), while
     kplus_anticlustering() implements the full functionality of the k-plus
     anticlustering approach proposed by Papenberg (2023). Some other
     functions are available to solve classical clustering problems. The

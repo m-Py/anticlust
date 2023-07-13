@@ -69,7 +69,7 @@ maximizing instead of minimizing a clustering objective function.
 Implements anticlustering methods as described in Papenberg and
 Klau (2021; <doi:10.1037/met0000301>), Brusco et al. 
 (2020; <doi:10.1111/bmsp.12186>), and Papenberg (2023; 
-<doi:10.31234/osf.io/7jw6v>).
+<doi:10.1111/bmsp.12315>).
 }
 \details{
 This function is used to solve anticlustering. That is, the data

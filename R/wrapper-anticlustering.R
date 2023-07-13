@@ -8,7 +8,7 @@
 #' Implements anticlustering methods as described in Papenberg and
 #' Klau (2021; <doi:10.1037/met0000301>), Brusco et al. 
 #' (2020; <doi:10.1111/bmsp.12186>), and Papenberg (2023; 
-#' <doi:10.31234/osf.io/7jw6v>).
+#' <doi:10.1111/bmsp.12315>).
 #'
 #' @param x The data input. Can be one of two structures: (1) A
 #'     feature matrix where rows correspond to elements and columns

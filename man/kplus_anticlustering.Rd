@@ -55,7 +55,7 @@ arguments are supported except for \code{objective}.}
 \description{
 Perform anticlustering using the k-plus objective to maximize between-group 
 similarity. This function implements the k-plus anticlustering method described 
-in Papenberg (2023; <doi:10.31234/osf.io/7jw6v>).
+in Papenberg (2023; <doi:10.1111/bmsp.12315>).
 }
 \details{
 This function implements the unweighted sum approach for k-plus 

@@ -2,7 +2,7 @@
 #' 
 #' Perform anticlustering using the k-plus objective to maximize between-group 
 #' similarity. This function implements the k-plus anticlustering method described 
-#' in Papenberg (2023; <doi:10.31234/osf.io/7jw6v>).
+#' in Papenberg (2023; <doi:10.1111/bmsp.12315>).
 #'
 #' @param x A feature matrix where rows correspond to elements and columns
 #'     correspond to variables (a single numeric variable can be
