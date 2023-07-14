@@ -173,6 +173,7 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
     stop("Argument `K` is misspecified.")
   }
   
+  # `target_groups` is primarily needed for unequal sized groups
   target_groups <- sort(table(initialize_clusters(N, K, NULL)), decreasing = TRUE)
   K <- length(target_groups)
   dispersion_found <- FALSE
