@@ -31,10 +31,9 @@
 #'
 #'   The dispersion is the minimum distance between two elements
 #'   within the same group. This function implements an optimal method
-#'   to maximize the dispersion by assigning the elements to \code{K}
-#'   equal-sized groups. If the data input \code{x} is a feature
+#'   to maximize the dispersion. If the data input \code{x} is a feature
 #'   matrix and not a dissimilarity matrix, the pairwise Euclidean
-#'   distance is used.  It uses the algorithm presented in Max
+#'   distance is used. It uses the algorithm presented in Max
 #'   Diekhoff's Bachelor thesis at the Computer Science Department at
 #'   the Heinrich Heine University Düsseldorf.
 #'
