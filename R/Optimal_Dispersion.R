@@ -117,6 +117,29 @@
 #'   OPT = dispersion_objective(distances, opt$groups),
 #'   HEURISTIC = dispersion_objective(distances, groups_heuristic)
 #' )
+#' 
+#' # Induce cannot-link constraints by maximizing the dispersion:
+#' solvable <- matrix(1, ncol = 6, nrow = 6)
+#' solvable[2, 1] <- -1
+#' solvable[3, 1] <- -1
+#' solvable[4, 1] <- -1
+#' solvable <- as.dist(solvable)
+#' solvable
+#' 
+#' # An optimal solution has to put item 1 in a different group than 
+#' # items 2, 3 and 4 -> this is possible for K = 2
+#' optimal_dispersion(solvable, K = 2)$groups
+#' 
+#' # It no longer works when item 1 can also not be linked with item 5
+#' # (this throws an error!):
+#' unsolvable <- as.matrix(solvable)
+#' unsolvable[5, 1] <- -1
+#' unsolvable <- as.dist(unsolvable)
+#' unsolvable
+#' \donttest{
+#' optimal_dispersion(unsolvable, K = 2)
+#' }
+#' 
 #'
 
 optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = NULL) {
@@ -149,6 +172,7 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
   all_nns_reordered_last <- NULL
   dispersions_considered <- NULL
   counter <- 1
+  MINIMUM_DISTANCE <- min(distances)
   while (!dispersion_found) {
     dispersion <- min(distances)
     if (dispersion >= max_dispersion_considered) {
@@ -172,6 +196,9 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
     counter <- counter + 1
     # Take out distances that have been investigated to proceed
     distances[ids_of_nearest_neighbours] <- Inf 
+  }
+  if (dispersion == MINIMUM_DISTANCE) {
+    stop("Could not return a solution: \nThe maximum dispersion corresponds to the minimum distance in the data set. \nEach possible grouping has the same dispersion and no improvement is possible.")
   }
   # Calculate anticlusters from the last iteration with a K-coloring
   groups <- groups_from_k_coloring_mapping(

@@ -111,6 +111,29 @@ c(
   HEURISTIC = dispersion_objective(distances, groups_heuristic)
 )
 
+# Induce cannot-link constraints by maximizing the dispersion:
+solvable <- matrix(1, ncol = 6, nrow = 6)
+solvable[2, 1] <- -1
+solvable[3, 1] <- -1
+solvable[4, 1] <- -1
+solvable <- as.dist(solvable)
+solvable
+
+# An optimal solution has to put item 1 in a different group than 
+# items 2, 3 and 4 -> this is possible for K = 2
+optimal_dispersion(solvable, K = 2)$groups
+
+# It no longer works when item 1 can also not be linked with item 5
+# (this throws an error!):
+unsolvable <- as.matrix(solvable)
+unsolvable[5, 1] <- -1
+unsolvable <- as.dist(unsolvable)
+unsolvable
+\donttest{
+optimal_dispersion(unsolvable, K = 2)
+}
+
+
 }
 \references{
 Diekhoff (2023). Maximizing dispersion for anticlustering. Retrieved from 
