@@ -341,9 +341,6 @@ diversity and dispersion criteria for anticlustering: A bicriterion
 approach. British Journal of Mathematical and Statistical
 Psychology, 73, 275-396. https://doi.org/10.1111/bmsp.12186
 
-Fernández, E., Kalcsics, J., & Nickel, S. (2013). The maximum dispersion problem. 
-Omega, 41 (4), 721–730. https://doi.org/10.1016/j.omega.2012.09.005
-
 Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition 
 data sets into equivalent parts. Psychological Methods, 26(2), 
 161–174. https://doi.org/10.1037/met0000301.
