@@ -17,6 +17,8 @@
 #' done in \code{\link{anticlustering}}. This can be useful when there are several
 #' categorical variables or when the group sizes are unequal (or both).
 #' See examples.
+#' 
+#' @importFrom stats as.formula
 #'
 #'
 #' @author
