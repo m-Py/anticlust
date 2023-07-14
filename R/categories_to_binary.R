@@ -26,9 +26,10 @@
 #'
 #' @references
 #' 
-#' Papenberg, M. (in press). k-plus Anticlustering: An Improved k-means 
-#' Criterion for Maximizing Between-Group Similarity. British Journal of 
-#' Mathematical and Statistical Psychology.
+#' Papenberg, M. (2023). K-plus Anticlustering: An Improved k-means Criterion 
+#' for Maximizing Between-Group Similarity. British Journal of Mathematical 
+#' and Statistical Psychology. Advance online publication. 
+#' https://doi.org/10.1111/bmsp.12315
 #' 
 #' 
 #' @importFrom stats model.matrix
