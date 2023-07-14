@@ -240,7 +240,7 @@ k_coloring_ilp <- function(all_nns_reordered, N, K){
   equality_signs <- equality_identifiers()
   
   # Construct ILP constraint matrix
-  constraints <- sparse_constraints_dispersion(all_nns_reordered, nr_of_nodes, nr_of_edges, max_group_size, K)
+  constraints <- sparse_constraints_dispersion(all_nns_reordered, nr_of_nodes, nr_of_edges, K)
   colnames(constraints) <- constraint_names(nr_of_nodes, K)
   
   # Directions of the constraints:
@@ -257,8 +257,6 @@ k_coloring_ilp <- function(all_nns_reordered, N, K){
   names(obj_function) <- colnames(constraints)
   
   instance <- list()
-  instance$n_groups     <- K
-  instance$group_size   <- max_group_size
   instance$constraints  <- constraints
   instance$equalities   <- equalities
   instance$rhs          <- rhs
@@ -272,15 +270,14 @@ k_coloring_ilp <- function(all_nns_reordered, N, K){
 #
 # @param all_nns_reordered A data frame where every row defines an edge in the graph
 # @param nr_of_nodes The number of nodes in the graph
-# @param max_group_size The maximum group size which corresponds the the maximum nr of nodes that are allowed to be assigned the same color
 # @param K The maximum number of colors to be used
 #
 # @return A sparse matrix representing the left-hand side of the ILP (A in Ax ~ b)
 #
-sparse_constraints_dispersion <- function(all_nns_reordered, nr_of_nodes, nr_of_edges, max_group_size, K) {
+sparse_constraints_dispersion <- function(all_nns_reordered, nr_of_nodes, nr_of_edges, K) {
   node <- node_constraints(nr_of_nodes, K)
   edge <- edge_constraints(all_nns_reordered, nr_of_nodes, nr_of_edges, K)
-  group <- group_constraints_dispersion(nr_of_nodes, nr_of_edges, max_group_size, K)
+  group <- group_constraints_dispersion(nr_of_nodes, nr_of_edges, K)
   Matrix::sparseMatrix(c(node$i, edge$i, group$i), c(node$j, edge$j, group$j), x = c(node$x, edge$x, group$x))
 }
 
@@ -311,7 +308,7 @@ edge_constraints <- function(all_nns, nr_of_nodes, nr_of_edges, K) {
 }
 
 # Indices for sparse matrix representation of group size constraints
-group_constraints_dispersion <- function(nr_of_nodes, nr_of_edges, max_group_size, K)  {
+group_constraints_dispersion <- function(nr_of_nodes, nr_of_edges, K)  {
   col_start <- nr_of_nodes+(nr_of_edges * K)+1
   col_end <- nr_of_nodes+(nr_of_edges * K)+K
   col_indices <- rep(col_start:col_end, each=nr_of_nodes)
