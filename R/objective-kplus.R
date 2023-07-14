@@ -25,7 +25,7 @@
 #' the mean of the respective column. All columns are then included---in
 #' addition to the original data---in standard k-means
 #' anticlustering. The logic is readily extended towards higher order moments,
-#' see Papenberg (in press). This function gives users the possibility to generate
+#' see Papenberg (2023). This function gives users the possibility to generate
 #' k-plus variables themselves, which offers some additional flexibility when
 #' conducting k-plus anticlustering.
 #'

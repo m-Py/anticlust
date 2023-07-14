@@ -8,8 +8,8 @@ such as the intra-cluster variance (used in k-means clustering) or the
 sum of pairwise distances within clusters. The package `anticlust`
 implements anticlustering methods as described in Papenberg and Klau
 (2021; <https://doi.org/10.1037/met0000301>), Brusco et al. (2020;
-<https://doi.org/10.1111/bmsp.12186>), and Papenberg (in press;
-preprint: <https://doi.org/10.31234/osf.io/7jw6v>).
+<https://doi.org/10.1111/bmsp.12186>), and Papenberg (2023;
+<https://doi.org/10.1111/bmsp.12315>).
 
 ## Installation
 
