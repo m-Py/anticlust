@@ -41,7 +41,7 @@ Description: The method of anticlustering partitions a pool of elements
     integer linear programming solver is installed, either the GNU linear
     programming kit (<https://www.gnu.org/software/glpk/glpk.html>)
     together with the interface package 'Rglpk'
-    (<https://cran.R-project.org/package=Rglpk>), or the SYMPHONY MILP
+    (<https://cran.R-project.org/package=Rglpk>), or the SYMPHONY ILP
     solver (<https://github.com/coin-or/SYMPHONY>) together with the
     interface package 'Rsymphony'
     (<https://cran.r-project.org/package=Rsymphony>). Full access to the
