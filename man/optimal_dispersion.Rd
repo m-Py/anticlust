@@ -27,12 +27,13 @@ is returned.}
 }
 \value{
 A list with three elements:  
-   \code{dispersion}: The optimal dispersion; 
-   \code{groups}: A possible assignment to groups (vector);
-   \code{edges}: A matrix of 2 columns. Each row contains the indices of 
+   \item{dispersion}{The optimal dispersion}
+   \item{groups}{An assignment of elements to groups (vector)}
+   \item{edges}{A matrix of 2 columns. Each row contains the indices of 
    elements that had to be investigated to find the dispersion (i.e., each pair
    of elements cannot be part of the same group in order to achieve maximum 
-   dispersion).
+   dispersion).}
+   \item{dispersions_considered}{All distances that were tested until the dispersion was found.}
 }
 \description{
 Maximize dispersion for K groups
@@ -74,6 +75,10 @@ The dispersion is the minimum distance between two elements
   In the output, the element \code{edges} defines which elements must be in separate 
   clusters in order to achieve maximum dispersion. All elements not listed here
   can be changed arbitrarily between clusters without reducing the dispersion.
+  If the maximum possible dispersion corresponds to the minimum dispersion
+  in the data set, the output elements \code{edges} and \code{groups} are set to
+  \code{NULL} because all possible groupings have the same value of dispersion.
+  In this case the output element \code{dispersions_considered} has length 1.
 }
 \note{
 If the SYMPHONY solver is used, an unfortunate
@@ -123,15 +128,13 @@ solvable
 # items 2, 3 and 4 -> this is possible for K = 2
 optimal_dispersion(solvable, K = 2)$groups
 
-# It no longer works when item 1 can also not be linked with item 5
-# (this throws an error!):
+# It no longer works when item 1 can also not be linked with item 5:
+# (check out output!)
 unsolvable <- as.matrix(solvable)
 unsolvable[5, 1] <- -1
 unsolvable <- as.dist(unsolvable)
 unsolvable
-\donttest{
 optimal_dispersion(unsolvable, K = 2)
-}
 
 
 }
