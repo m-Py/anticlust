@@ -163,6 +163,8 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
                    objmode = "numeric", len = 1, not_na = TRUE, not_function = TRUE)
   }
 
+  
+  
   distances <- convert_to_distances(x)
   diag(distances) <- Inf
   N <- nrow(distances)
@@ -222,7 +224,7 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
   return(
     list(
       dispersion = dispersion, 
-      groups = groups$groups,
+      groups = groups,
       edges = unname(all_nns), # rownames can be quite ugly here
       dispersions_considered = c(dispersions_considered, dispersion)
     )
@@ -371,11 +373,16 @@ solve_ilp_graph_colouring <- function(ilp, solver) {
 
 # Restore a grouping from the solved ilp
 groups_from_k_coloring_mapping <- function(result_value, result_x, all_nns, all_nns_reordered, N, K) {
+  target_groups <- sort(table(initialize_clusters(N, K, NULL)), decreasing = TRUE)
+  K <- length(target_groups)
+  
   # Retrieve assigned colors from the x_v,i ILP variables
   mapping <- rep(NA, max(all_nns_reordered))
   matrix <- matrix(result_x[-(1:K)], nrow=K)
+  # sort labeling by frequency of occurrence
+  matrix <- matrix[order(rowSums(matrix), decreasing = TRUE), ]
   for(l in 1:ncol(matrix)){
-    mapping[l] <- which.max(matrix[,l])
+    mapping[l] <- which.max(matrix[,l]) # mapping is the groups, now retrieve original indices
   }
   
   df <- data.frame(
@@ -386,17 +393,15 @@ groups_from_k_coloring_mapping <- function(result_value, result_x, all_nns, all_
   # create vector with groupings
   groups_new <- rep(NA, N)
   groups_new[df$id] <- df$mapping
+  # now we have the original indices, assign remaining elements randomly to groups
   # how many are not yet assigned
-  freq_not_assigned <- rep(N / K, K)
+  freq_not_assigned <- target_groups - table(groups_new)
   assigned <- table(groups_new)
   # Randomly fill other groups that are not yet full
   if (sum(assigned) < N) {
-    for(i in 1:result_value){
-      freq_not_assigned[i] <- freq_not_assigned[i] - assigned[i]
-    }
     groups_new[is.na(groups_new)] <- sample_(rep(1:K, freq_not_assigned))
   }
-  list(groups = groups_new, edges = df)
+  groups_new
 }
 
 # Function that takes an edge list with any integer indices and remaps
