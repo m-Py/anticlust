@@ -26,7 +26,7 @@ is equal to or exceeds this value, a solution having the previous best dispersio
 is returned.}
 }
 \value{
-A list with three elements:  
+A list with four elements:  
    \item{dispersion}{The optimal dispersion}
    \item{groups}{An assignment of elements to groups (vector)}
    \item{edges}{A matrix of 2 columns. Each row contains the indices of 

@@ -18,7 +18,7 @@
 #'
 #' @export
 #' 
-#' @return A list with three elements:  
+#' @return A list with four elements:  
 #'    \item{dispersion}{The optimal dispersion}
 #'    \item{groups}{An assignment of elements to groups (vector)}
 #'    \item{edges}{A matrix of 2 columns. Each row contains the indices of 
