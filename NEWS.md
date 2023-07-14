@@ -1,14 +1,15 @@
 # anticlust 0.7.0
 
-- An exact ILP method is now available for maximizing the dispersion
+- An exact ILP method is now available for maximizing the dispersion, contributed by Max Diekhoff.
   * `optimal_dispersion()` is a new exported function implementing the method
   * `anticlustering()` makes it available when using `method = "ilp"` and `objective = "dispersion"`
 -  `kplus_moment_variables()` is a new exported function that generates k-plus variables from a data set
   * Offers some additional flexibility as compared to calling `kplus_anticlustering()`, which generates these variables internally (e.g., use k-plus augmentation on some variables but not all -- such as binary variables)
 - `categories_to_binary()` is a new exported function that converts one or several categorical variables into a binary representation
   * Can be used to include categorical variables as part of the optimization criterion in k-means / k-plus anticlustering, see new vignette "Using categorical variables with anticlustering"
-- X new vignettes have been added to the `anticlust` documentation
+- 3 new vignettes have been added to the `anticlust` documentation
 - Fixed a bug in `kplus_anticlustering()` that did not correctly implement `preclustering = TRUE`
+- It is now possible to use the SYMPHONY solver as backend for the optimal ILP methods.
 
 # anticlust 0.6.4-1 / 0.6.4-2 / 0.6.4-3
 
