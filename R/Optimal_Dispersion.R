@@ -130,15 +130,13 @@
 #' # items 2, 3 and 4 -> this is possible for K = 2
 #' optimal_dispersion(solvable, K = 2)$groups
 #' 
-#' # It no longer works when item 1 can also not be linked with item 5
-#' # (this throws an error!):
+#' # It no longer works when item 1 can also not be linked with item 5:
+#' # (check out output!)
 #' unsolvable <- as.matrix(solvable)
 #' unsolvable[5, 1] <- -1
 #' unsolvable <- as.dist(unsolvable)
 #' unsolvable
-#' \donttest{
 #' optimal_dispersion(unsolvable, K = 2)
-#' }
 #' 
 #'
 
@@ -197,8 +195,15 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
     # Take out distances that have been investigated to proceed
     distances[ids_of_nearest_neighbours] <- Inf 
   }
-  if (dispersion == MINIMUM_DISTANCE) {
-    stop("Could not return a solution: \nThe maximum dispersion corresponds to the minimum distance in the data set. \nEach possible grouping has the same dispersion and no improvement is possible.")
+  if (dispersion == MINIMUM_DISTANCE) { # no improvement for dispersion is possible; first test fails
+    return(
+      list(
+        dispersion = MINIMUM_DISTANCE, 
+        groups = NULL,
+        edges = NULL, 
+        dispersions_considered = MINIMUM_DISTANCE
+      )
+    )
   }
   # Calculate anticlusters from the last iteration with a K-coloring
   groups <- groups_from_k_coloring_mapping(
