@@ -9,7 +9,7 @@
 #'     \code{\link{dist}} or \code{\link{as.dist}}) or a \code{matrix}
 #'     where the entries of the upper and lower triangular matrix
 #'     represent pairwise dissimilarities.
-#' @param K The number of groups.
+#' @param K The number of groups or a vector describing the size of each group.
 #' @param solver Optional argument; if passed, has to be either "glpk" or
 #'   "symphony". See details.
 #' @param max_dispersion_considered Optional argument used for early stopping. If the dispersion found
@@ -123,6 +123,9 @@
 #'   HEURISTIC = dispersion_objective(distances, groups_heuristic)
 #' )
 #' 
+#' # Different group sizes are possible:
+#' table(optimal_dispersion(distances, K = c(15, 10, 5))$groups)
+#' 
 #' # Induce cannot-link constraints by maximizing the dispersion:
 #' solvable <- matrix(1, ncol = 6, nrow = 6)
 #' solvable[2, 1] <- -1
@@ -163,11 +166,15 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
                    objmode = "numeric", len = 1, not_na = TRUE, not_function = TRUE)
   }
 
-  
-  
   distances <- convert_to_distances(x)
   diag(distances) <- Inf
   N <- nrow(distances)
+  if (!(length(K) == 1 || sum(K) == N)) {
+    stop("Argument `K` is misspecified.")
+  }
+  
+  target_groups <- sort(table(initialize_clusters(N, K, NULL)), decreasing = TRUE)
+  K <- length(target_groups)
   dispersion_found <- FALSE
   # Data frame to keep track of previous nearest neighbours (init as NULL)
   all_nns <- NULL
@@ -189,7 +196,7 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
     # of relevant edges (Better for creating K-coloring ILP).
     all_nns_reordered <- reorder_edges(all_nns)
     # Construct graph from all previous edges (that had low distances)
-    ilp <- k_coloring_ilp(all_nns_reordered, N, K)
+    ilp <- k_coloring_ilp(all_nns_reordered, N, K, target_groups)
     solution <- solve_ilp_graph_colouring(ilp, solver)
     dispersion_found <- solution$status != 0 
     if (!dispersion_found){
@@ -219,7 +226,8 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
     all_nns = all_nns_last,
     all_nns_reordered = all_nns_reordered_last,
     N = N,
-    K = K
+    K = K, 
+    target_groups = target_groups
   )
   return(
     list(
@@ -231,12 +239,11 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
   )
 }
 
-k_coloring_ilp <- function(all_nns_reordered, N, K){
+k_coloring_ilp <- function(all_nns_reordered, N, K, target_groups) {
   # Initialize some constant variables
   nr_of_nodes <- max(all_nns_reordered)
   nr_of_edges <- nrow(all_nns_reordered)
   nr_of_x_variables <- nr_of_nodes * K
-  max_group_size <- ceiling(N / K)
   equality_signs <- equality_identifiers()
   
   # Construct ILP constraint matrix
@@ -248,7 +255,7 @@ k_coloring_ilp <- function(all_nns_reordered, N, K){
                   rep(equality_signs$l, (nr_of_edges +1) * K))
   
   # Right-hand-side of ILP
-  rhs <- c(rep(1, nr_of_nodes), rep(0, nr_of_edges * K), rep(max_group_size, K))
+  rhs <- c(rep(1, nr_of_nodes), rep(0, nr_of_edges * K), target_groups)
   
   # Objective function of the ILP
   obj_function <- c(rep(1, K), rep(0, nr_of_x_variables))
@@ -369,9 +376,7 @@ solve_ilp_graph_colouring <- function(ilp, solver) {
 
 
 # Restore a grouping from the solved ilp
-groups_from_k_coloring_mapping <- function(result_value, result_x, all_nns, all_nns_reordered, N, K) {
-  target_groups <- sort(table(initialize_clusters(N, K, NULL)), decreasing = TRUE)
-  K <- length(target_groups)
+groups_from_k_coloring_mapping <- function(result_value, result_x, all_nns, all_nns_reordered, N, K, target_groups) {
   
   # Retrieve assigned colors from the x_v,i ILP variables
   mapping <- rep(NA, max(all_nns_reordered))

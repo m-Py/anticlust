@@ -16,7 +16,7 @@ can be an object of class \code{dist} (e.g., returned by
 where the entries of the upper and lower triangular matrix
 represent pairwise dissimilarities.}
 
-\item{K}{The number of groups.}
+\item{K}{The number of groups or a vector describing the size of each group.}
 
 \item{solver}{Optional argument; if passed, has to be either "glpk" or
 "symphony". See details.}
@@ -115,6 +115,9 @@ c(
   OPT = dispersion_objective(distances, opt$groups),
   HEURISTIC = dispersion_objective(distances, groups_heuristic)
 )
+
+# Different group sizes are possible:
+table(optimal_dispersion(distances, K = c(15, 10, 5))$groups)
 
 # Induce cannot-link constraints by maximizing the dispersion:
 solvable <- matrix(1, ncol = 6, nrow = 6)

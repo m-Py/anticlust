@@ -20,10 +20,8 @@ test_that("Output format is as expected for optimal_dispersion()", {
   )
   expect_true(dispersion_objective(distances, opt$groups) >= dispersion_objective(distances, groups_heuristic))
   
-  expect_equal(
-    sort(table(opt$groups)), 
-    sort(table(initialize_clusters(N, K, NULL)))
-  )
+  expect_true(all(sort(table(opt$groups)) == sort(table(initialize_clusters(N, K, NULL)))))
+  
   
   # test for unequal group sizes (groups differ by 1 at most)
   N <- 28
@@ -42,10 +40,38 @@ test_that("Output format is as expected for optimal_dispersion()", {
     repetitions = 10
   )
   expect_true(dispersion_objective(distances, opt$groups) >= dispersion_objective(distances, groups_heuristic))
-  expect_equal(
-    sort(table(opt$groups)), 
-    sort(table(initialize_clusters(N, K, NULL)))
+  expect_true(all(sort(table(opt$groups)) == sort(table(initialize_clusters(N, K, NULL)))))
+
+
+  # now "truly" unequal group sizes 
+  K <- c(10, 12, 6)
+  opt <- optimal_dispersion(distances, K = K)
+  
+  groups_heuristic <- anticlustering(
+    distances, 
+    K = K,
+    method = "local-maximum", 
+    objective = "dispersion", 
+    repetitions = 10
   )
   
+  expect_true(dispersion_objective(distances, opt$groups) >= dispersion_objective(distances, groups_heuristic))
+  expect_true(all(sort(table(opt$groups)) == sort(K)))
+  
+  # another grouping, more extreme case
+  K <- c(2, 2, 24)
+  opt <- optimal_dispersion(distances, K = K)
+  
+  groups_heuristic <- anticlustering(
+    distances, 
+    K = K,
+    method = "local-maximum", 
+    objective = "dispersion", 
+    repetitions = 10
+  )
+  
+  expect_true(dispersion_objective(distances, opt$groups) >= dispersion_objective(distances, groups_heuristic))
+  expect_true(all(sort(table(opt$groups)) == sort(K)))
   
 })
+  
