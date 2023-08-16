@@ -102,12 +102,13 @@ fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL, bac
   init <- initialize_clusters(nrow(x), K, categories)
 
   if (backend == "C") {
-    exchange_partners <- ifelse(
-      is.list(exchange_partners), 
-      t(t(as.data.frame(exchange_partners)) - 1),
-      t(exchange_partners - 1) # random method, is already a matrix # column major order; each person is column
-    )
-    return(c_anticlustering(x, init, categories = NULL, objective = "fast-kmeans", exchange_partners))
+    if (is.list(exchange_partners)) {
+      exchange_partners <- t(t(as.data.frame(exchange_partners)))
+    } else {
+      #  column major order; each person is column
+      exchange_partners <- t(exchange_partners)
+    }
+    return(c_anticlustering(x, init, categories = NULL, objective = "fast-kmeans", exchange_partners - 1))
   }
 
   fast_exchange_(x, init, exchange_partners)
