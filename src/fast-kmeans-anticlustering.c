@@ -107,9 +107,13 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
           double best_obj = 0;
           copy_matrix(k, m, CENTERS, best_centers);
           copy_array(k, OBJ_BY_CLUSTER, best_objs);
+          size_t j;
           /* 2. Level: Iterate through the exchange partners */
-          for (size_t j = 0; j < n; j++) {
+          for (size_t u = 0; u < kn; u++) {
             // Get index of current exchange partner
+            j = partners[id_current_exch_partner];
+            id_current_exch_partner++; // this just counts upwards across all exchange partners, ignores matrix-like structure
+            
             int cl2 = clusters[j];
             // no swapping attempt if in the same cluster:
             if (cl1 == cl2) { 
@@ -159,7 +163,6 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
             copy_matrix(k, m, best_centers, CENTERS);
             copy_array(k, best_objs, OBJ_BY_CLUSTER);
           }
-          id_current_exch_partner++;
         }
         return;
 }
