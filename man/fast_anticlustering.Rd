@@ -4,7 +4,14 @@
 \alias{fast_anticlustering}
 \title{Fast anticlustering}
 \usage{
-fast_anticlustering(x, K, k_neighbours = Inf, categories = NULL)
+fast_anticlustering(
+  x,
+  K,
+  k_neighbours = Inf,
+  categories = NULL,
+  backend = "R",
+  nn_method = "RANN"
+)
 }
 \arguments{
 \item{x}{A numeric vector, matrix or data.frame of data

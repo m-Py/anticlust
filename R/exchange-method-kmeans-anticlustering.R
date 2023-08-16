@@ -86,7 +86,7 @@
 #' by(features, ac_fast, function(x) round(colMeans(x), 2))
 #'
 
-fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL) {
+fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL, backend = "R", nn_method = "RANN") {
   input_validation_anticlustering(x, K, "variance",
                                 "exchange", FALSE, categories, NULL)
   categories <- merge_into_one_variable(categories)
@@ -95,8 +95,24 @@ fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL) {
                    must_be_integer = TRUE, greater_than = 0, not_na = TRUE)
   }
   x <- as.matrix(x)
-  exchange_partners <- all_exchange_partners(x, k_neighbours, categories)
+  if (nn_method == "random") {
+    k_neighbours <- min(k_neighbours, N)
+    exchange_partners <- sample(1:N, size = k_neighbours * N, replace = TRUE)
+    exchange_partners <- matrix(exchange_partners, ncol = k_neighbours)
+  } else {
+    exchange_partners <- all_exchange_partners(x, k_neighbours, categories)
+  }
   init <- initialize_clusters(nrow(x), K, categories)
+
+  if (backend == "C") {
+    exchange_partners <- ifelse(
+      is.list(exchange_partners), 
+      t(t(as.data.frame(exchange_partners)) - 1),
+      t(exchange_partners - 1) # random method, is already a matrix # column major order; each person is column
+    )
+    return(c_anticlustering(x, K, categories = NULL, objective = "fast-kmeans", exchange_partners))
+  }
+
   fast_exchange_(x, init, exchange_partners)
 }
 

@@ -100,3 +100,23 @@ void update_centers(size_t k, size_t m, double CENTERS[k][m],
                 CENTERS[cl2][i] = CENTERS[cl2][i] + added_to_cl2;
         }
 }
+
+/* Update cluster centers after a swap between two nodes in two cluster lists */
+void fast_update_centers(size_t i, size_t j, size_t n, size_t m, size_t k, double data[n][m], 
+                         int cl1, int cl2, double CENTERS[k][m], int *frequencies) {
+
+  for (int u = 0; u < m; u++) {
+    double added_to_cl1 = data[j][u] / frequencies[cl1];
+    double removed_from_cl1 = data[i][u] / frequencies[cl1];
+    
+    double added_to_cl2 = data[i][u] / frequencies[cl2];
+    double removed_from_cl2 = data[j][u] / frequencies[cl2];
+    
+    // Update first cluster center
+    CENTERS[cl1][u] = CENTERS[cl1][u] + added_to_cl1;
+    CENTERS[cl1][u] = CENTERS[cl1][u] - removed_from_cl1;
+    // Update second cluster center
+    CENTERS[cl2][u] = CENTERS[cl2][u] - removed_from_cl2;
+    CENTERS[cl2][u] = CENTERS[cl2][u] + added_to_cl2;
+  }
+}

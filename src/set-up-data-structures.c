@@ -43,7 +43,6 @@ int fill_data_points(double *data, size_t n, size_t m, struct element POINTS[n],
         }
         return 0;
 }
- 
 
 /* After creation, initialize the HEAD of each cluster list
  * 

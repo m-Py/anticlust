@@ -50,6 +50,7 @@ void compute_center(
         struct node *HEAD, 
         int frequency
 );
+
 int fill_data_points(
         double *data, 
         size_t n, 
@@ -111,6 +112,7 @@ int fill_cluster_lists(
         struct node *PTR_NODES[n], 
         struct node *PTR_CLUSTER_HEADS[k]
 );
+
 void objective_by_cluster(
         size_t m, 
         size_t k, 
@@ -118,6 +120,7 @@ void objective_by_cluster(
         double CENTERS[k][m], 
         struct node *HEADS[k]
 );
+
 double array_sum(
         size_t k, 
         double ARRAY[k]
@@ -218,3 +221,20 @@ int has_node_dispersion(
         int after
 );
 
+// Declare Functions
+void fast_kmeans_anticlustering(
+        double *data,
+        int *N,
+        int *M,
+        int *K,
+        int *frequencies,
+        int *clusters,
+        int *partners,
+        int *k_neighbours,
+        int *mem_error
+);
+void fast_compute_centers(size_t N, size_t M, size_t K, int *frequencies, double data_pts[N][M], int *clusters, double centers[K][M]);
+
+void fast_update_centers(size_t i, size_t j, size_t n, size_t m, size_t k, double data[n][m], 
+                         int cl1, int cl2, double CENTERS[k][m], int *frequencies);
+void fast_swap(int *clusters, size_t i, size_t j);
