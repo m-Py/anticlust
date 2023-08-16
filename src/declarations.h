@@ -238,3 +238,4 @@ void fast_update_centers(size_t i, size_t j, size_t n, size_t m, size_t k, doubl
                          int cl1, int cl2, double CENTERS[k][m], int *frequencies);
 void fast_swap(int *clusters, size_t i, size_t j);
 void print_matrix(size_t N, size_t M, double matrix[N][M]);
+size_t one_dim_index(size_t i, size_t j, size_t n);

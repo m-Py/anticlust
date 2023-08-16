@@ -50,6 +50,7 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
                         data_pts[i][j] = data[m_ptr[j]++];
                 }
         }
+        
 
         /* INITIALIZE OBJECTIVE */
         
@@ -67,6 +68,7 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
             CENTERS[clusters[i]][j] += data_pts[i][j];
           }
         }
+        
         // To get cluster centers: Divide by number of elements 
         for (size_t i = 0; i < k; i++) { // excuse my reuse of indices, I hate this
           for (size_t j = 0; j < m; j++) {
@@ -74,13 +76,18 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
           }
         }
         
+        
         /* SUM OF SQUARES BY CLUSTER */
         double OBJ_BY_CLUSTER[k]; 
         for (size_t i = 0; i < k; i++) {
           OBJ_BY_CLUSTER[i] = 0; // init as zero
         }
         for (size_t i = 0; i < n; i++) {
-          OBJ_BY_CLUSTER[clusters[i]] += euclidean_squared(data_pts[i], CENTERS[clusters[i]], m);
+          double distance = 0;
+          for (size_t j = 0; j < m; j++) {
+            distance = data_pts[i][j] - CENTERS[clusters[i]][j];
+            OBJ_BY_CLUSTER[clusters[i]] += distance * distance;
+          }
         }
 
         /* SUM OF SQUARES ACROSS ALL CLUSTERS */
@@ -88,6 +95,7 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
         for (size_t i = 0; i < k; i++) {
           SUM_OBJECTIVE += OBJ_BY_CLUSTER[i];
         }
+
 
         /* Some variables for bookkeeping during the optimization */
         size_t best_partner;
@@ -99,6 +107,7 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
         
         /* Start main iteration loop for exchange procedure */
         size_t id_current_exch_partner = 0;
+        
         /* 1. Level: Iterate through `n` data points */
         for (size_t i = 0; i < n; i++) {
           int cl1 = clusters[i];
