@@ -15,9 +15,6 @@
  * param *clusters: An initial assignment of elements to clusters,
  *         array of length *N (has to consists of integers between 0 and (K-1) 
  *         - this has to be guaranteed by the caller)
- * param *mem_error: This is passed with value 0 and only receives the value 1 
- *       if a memory error occurs when executing this function. The caller needs
- *       to test if this value is 1 after execution.
  * 
  * The return value is assigned to the argument `clusters`, via pointer
  * 
@@ -31,17 +28,8 @@
 */
 
 void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
-        int *clusters, int *partners, int *k_neighbours, int *mem_error) {
+        int *clusters, int *partners, int *k_neighbours) {
         
-        /* 
-        * - Free strategy: each function cleans its own mess
-        *   + free in low-level function when possible (i.e., when an allocation error 
-        *     occurs within this function)
-        *   + Free in high-level function when previously, memory was allocated successfully,
-        *     but then an allocation error occured
-        *   + TODO use a safe-free function instead of just `free()`
-        */ 
-    
         const size_t n = (size_t) *N; // number of data points
         const size_t m = (size_t) *M; // number of variables per data point
         const size_t k = (size_t) *K; // number of clusters
@@ -100,9 +88,9 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
         for (size_t i = 0; i < k; i++) {
           SUM_OBJECTIVE += OBJ_BY_CLUSTER[i];
         }
-        printf("Variance is %g \n", SUM_OBJECTIVE);
 
         /* Some variables for bookkeeping during the optimization */
+        size_t best_partner;
         double tmp_centers[k][m];
         double best_centers[k][m];
         double tmp_objs[k];
@@ -119,11 +107,9 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
           double best_obj = 0;
           copy_matrix(k, m, CENTERS, best_centers);
           copy_array(k, OBJ_BY_CLUSTER, best_objs);
-          size_t j;
           /* 2. Level: Iterate through the exchange partners */
-          for (size_t u = 0; u < n; u++) {
+          for (size_t j = 0; j < n; j++) {
             // Get index of current exchange partner
-            j = u;
             int cl2 = clusters[j];
             // no swapping attempt if in the same cluster:
             if (cl1 == cl2) { 
@@ -139,6 +125,7 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
               tmp_centers, 
               frequencies
             );
+
             fast_swap(clusters, i, j);
             // Update objective
             /* SUM OF SQUARES BY CLUSTER */

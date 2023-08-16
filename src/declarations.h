@@ -230,11 +230,11 @@ void fast_kmeans_anticlustering(
         int *frequencies,
         int *clusters,
         int *partners,
-        int *k_neighbours,
-        int *mem_error
+        int *k_neighbours
 );
 void fast_compute_centers(size_t N, size_t M, size_t K, int *frequencies, double data_pts[N][M], int *clusters, double centers[K][M]);
 
 void fast_update_centers(size_t i, size_t j, size_t n, size_t m, size_t k, double data[n][m], 
                          int cl1, int cl2, double CENTERS[k][m], int *frequencies);
 void fast_swap(int *clusters, size_t i, size_t j);
+void print_matrix(size_t N, size_t M, double matrix[N][M]);
