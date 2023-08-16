@@ -1,12 +1,9 @@
 
 #' Fast anticlustering
 #'
-#' Anticlustering via optimizing the k-means variance criterion with an
+#' Anticlustering via optimizing the k-means criterion with an
 #' adjusted exchange method where the number of exchange partners can be 
-#' specified. Note that this function is no longer the fastest way to solve
-#' anticlustering, because the exchange method used in \code{\link{anticlustering}}
-#' and \code{\link{kplus_anticlustering}} has been reimplemented in C,
-#' while \code{fast_anticlustering} still uses a plain R implementation. 
+#' specified. 
 #'
 #' @param x A numeric vector, matrix or data.frame of data
 #'     points.  Rows correspond to elements and columns correspond to
@@ -34,7 +31,7 @@
 #' @details
 #'
 #' This function was created to make anticlustering applicable
-#' to large data sets (e.g., 100,000 elements). It optimizes the k-means
+#' to large data sets (e.g., more than 100,000 elements). It optimizes the k-means
 #' variance objective because computing all pairwise as is done when optimizing 
 #' the diversity is not feasible for very large data sets (like for about N > 30000). 
 #' Additionally, this function employs a
@@ -56,12 +53,6 @@
 #' \code{categories} has multiple columns (i.e., each element is
 #' assigned to multiple columns), each combination of categories is
 #' treated as a distinct category by the exchange method.
-#' 
-#' Note that in the recent versions of anticlust, the function \code{\link{anticlustering}}
-#' is actually faster than \code{fast_anticlustering} because the exchange method
-#' there has been implemented in C instead of plain R. In most cases it is therefore
-#' not recommended to call \code{fast_anticlustering}, instead use \code{\link{anticlustering}}
-#' or \code{\link{kplus_anticlustering}}.
 #'
 #' @examples
 #'
@@ -86,6 +77,12 @@
 #' by(features, ac_fast, function(x) round(colMeans(x), 2))
 #'
 
+
+## TODO: 
+#   * `categories` must work with C implementation
+#   * create nn_method = "random" for R implementation (?)
+#   * Correctly pass 
+
 fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL, backend = "R", nn_method = "RANN") {
   input_validation_anticlustering(x, K, "variance",
                                 "exchange", FALSE, categories, NULL)
@@ -95,7 +92,7 @@ fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL, bac
                    must_be_integer = TRUE, greater_than = 0, not_na = TRUE)
   }
   x <- as.matrix(x)
-  if (nn_method == "random") {
+  if (nn_method == "random" & backend == "C") {
     k_neighbours <- min(k_neighbours, N)
     exchange_partners <- sample(1:N, size = k_neighbours * N, replace = TRUE)
     exchange_partners <- matrix(exchange_partners, ncol = k_neighbours)
@@ -110,7 +107,7 @@ fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL, bac
       t(t(as.data.frame(exchange_partners)) - 1),
       t(exchange_partners - 1) # random method, is already a matrix # column major order; each person is column
     )
-    return(c_anticlustering(x, K, categories = NULL, objective = "fast-kmeans", exchange_partners))
+    return(c_anticlustering(x, init, categories = NULL, objective = "fast-kmeans", exchange_partners))
   }
 
   fast_exchange_(x, init, exchange_partners)
