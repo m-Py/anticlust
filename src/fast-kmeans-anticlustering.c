@@ -157,6 +157,7 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
               best_obj = tmp_obj;
               copy_matrix(k, m, tmp_centers, best_centers);
               copy_array(k, tmp_objs, best_objs);
+              best_partner = j;
             }
             
             // Swap back to test next exchange partner
@@ -165,7 +166,7 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
           
           // Only if objective is improved: Do the swap
           if (best_obj > SUM_OBJECTIVE) {
-            fast_swap(clusters, i, j);
+            fast_swap(clusters, i, best_partner);
             // Update the "global" variables
             SUM_OBJECTIVE = best_obj;
             copy_matrix(k, m, best_centers, CENTERS);
@@ -173,6 +174,7 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
           }
           id_current_exch_partner++;
         }
+        return;
 }
 
 
