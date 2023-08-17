@@ -6,7 +6,7 @@ test_that("New k-means C implementation yields same results as other implementat
 
   M <- 5
   N <- 180
-  K <- 3
+  K <- 4
   features <- matrix(rnorm(N*M), ncol = M)
   init <- sample(rep_len(1:K, nrow(features)))
   
