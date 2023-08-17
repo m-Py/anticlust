@@ -5,8 +5,10 @@
 #include "declarations.h"
 
 /* Exchange Method for K-Means Anticlustering
- * param *data: vector of data points (in R, this is a data frame,
- *         the matrix structure must be restored in C)
+ * param *data: vector of data points (in R, this is a data frame / matrix,
+ *         but it is passed as a pointer array (vector) to C; here, we use
+ *         "clever" indexing on the one-dimensional vector to address the correct 
+ *         data)
  * param *N: The number of elements (i.e., number of "rows" in *data)
  * param *M: The number of features (i.e., number of "cols" in *data)
  * param *K: The number of clusters
@@ -27,16 +29,22 @@
  * 
  * ============================ Some explanations ============================
  * 
- * This is a slightly different version of kmeans_anticlustering(), which does not
- * use categorical restrictions but has exchange partners for each element (which must be
- * passed to the function and are not generated here).
+ * This is a somewhat different version of kmeans_anticlustering(), which does not
+ * use categorical restrictions but can be passed specific exchange partners 
+ * for each element (they must be
+ * passed to the function and are not generated here). This function uses less 
+ * memory than the other C functions for anticlustering, and therefore does not 
+ * have any "clever" data structures that facilitate computations. Instead,
+ * it is mostly a lot of for-loops running through the data.
  * 
- * The code is horrible because it tries to reduce additional function calls, 
- * which seemed to terminate my R sessions for really large data (and it should be
- * usable for really large data sets). Probably it was not the function calls,
- * but me writing additional (and not necessarily needed data), but here we are.
+ * The code is horrible because it tries to reduce the number function calls, 
+ * - the C implementation has stack problems for large N and it was very unclear to me why -
+ * which seemed to terminate my R sessions for really large data - and it should be
+ * usable for really large data sets. After finding a code that works, I admit it 
+ * was not probably not the number of the function calls,
+ * but me writing additional (and unneeded) data), but here we are.
  * Now it works, even for N > 250000 (where the old C implementation failed), 
- * and I am quite unwilling to change a lot.
+ * and I am quite unwilling to change a lot about it. 
  * ===========================================================================
 */
 
