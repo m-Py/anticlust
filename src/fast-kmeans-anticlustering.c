@@ -4,7 +4,7 @@
 #include <stdlib.h> 
 #include "declarations.h"
 
-/* Exchange Method for Anticlustering
+/* Exchange Method for K-Means Anticlustering
  * param *data: vector of data points (in R, this is a data frame,
  *         the matrix structure must be restored in C)
  * param *N: The number of elements (i.e., number of "rows" in *data)
@@ -15,6 +15,11 @@
  * param *clusters: An initial assignment of elements to clusters,
  *         array of length *N (has to consists of integers between 0 and (K-1) 
  *         - this has to be guaranteed by the caller)
+ * param *partners: A pointer array of length N * k_neighbours, indicating for each 
+ *        element which other elements are exchange partners. The first `k_neighbours`
+ *        entries are the exchange partners of element 1, the next belong to element
+ *        2, and so forth. 
+ * param *k_neighbours: The number of exchange partners per element.
  * 
  * The return value is assigned to the argument `clusters`, via pointer
  * 
@@ -25,9 +30,12 @@
  * use categorical restrictions but has exchange partners for each element (which must be
  * passed to the function and are not generated here).
  * 
- * The code is horrible because it does not use additional function call, 
- * which terminated my R sessions for really large data (and it should be
- * usable for really large data sets).
+ * The code is horrible because it tries to reduce additional function calls, 
+ * which seemed to terminate my R sessions for really large data (and it should be
+ * usable for really large data sets). Probably it was not the function calls,
+ * but me writing additional (and not necessarily needed data), but here we are.
+ * Now it works, even for N > 250000 (where the old C implementation failed), 
+ * and I am quite unwilling to change a lot.
  * ===========================================================================
 */
 
@@ -39,10 +47,6 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
         const size_t k = (size_t) *K; // number of clusters
         const size_t kn = (size_t) *k_neighbours; // number of clusters
         
-        // Do the same for the original data points
-        
-        
-
         /* INITIALIZE OBJECTIVE */
         
         /* CLUSTER CENTERS */
@@ -57,7 +61,8 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
         /* SUM UP FEATURE VALUES BY CLUSTER */
         for (size_t i = 0; i < n; i++) {
           for (size_t j = 0; j < m; j++) {
-            CENTERS[clusters[i]][j] += data[n * j + i];
+            // data[n * j + i] == data[i, j] in the original matrix, but in C we only have a 1-dim pointer
+            CENTERS[clusters[i]][j] += data[n * j + i];  
           }
         }
         /* To get cluster centers: Divide by number of elements */
@@ -66,7 +71,6 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
             CENTERS[i][j] = CENTERS[i][j] / frequencies[i];
           }
         }
-        print_matrix(k, m, CENTERS);
 
         /* SUM OF SQUARES BY CLUSTER */
         double OBJ_BY_CLUSTER[k]; 
@@ -77,7 +81,7 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
         for (size_t i = 0; i < n; i++) {
           double distance_squared = 0;
           for (size_t j = 0; j < m; j++) {
-            double diff = data[n * j + i] - CENTERS[clusters[i]][j]; // data[n * j + i] == data[i, j] in the original matrix, but here we only have a 1-dim pointer
+            double diff = data[n * j + i] - CENTERS[clusters[i]][j];
             distance_squared += diff * diff;
           }
           OBJ_BY_CLUSTER[clusters[i]] += distance_squared;
