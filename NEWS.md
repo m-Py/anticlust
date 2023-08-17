@@ -1,6 +1,8 @@
 # devel
 
-- `fast_anticlustering()` has been re-implemented in C, which is much faster than the previous R implementation, and which does not crash the computer for about N > 250000 elements (as done by [`anticlustering()`](https://github.com/m-Py/anticlust/issues/50)).
+- `fast_anticlustering()` has been re-implemented in C, which is much faster than the previous R implementation, and which does not crash the computer for about N > 250000 elements, as done by [`anticlustering()`](https://github.com/m-Py/anticlust/issues/50)).
+
+TODO: Rewrite 2 vignettes due to the rewrite of `fast_anticlustering()`
 
 # anticlust 0.7.0
 
