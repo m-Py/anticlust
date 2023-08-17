@@ -18,7 +18,8 @@
  * param *partners: A pointer array of length N * k_neighbours, indicating for each 
  *        element which other elements are exchange partners. The first `k_neighbours`
  *        entries are the exchange partners of element 1, the next belong to element
- *        2, and so forth. 
+ *        2, and so forth. If an entry is N, the element is skipped (only indices up to N-1 work, 
+ *        so N is used to indicate that no exchange partners follow).
  * param *k_neighbours: The number of exchange partners per element.
  * 
  * The return value is assigned to the argument `clusters`, via pointer
@@ -129,6 +130,9 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
           for (size_t u = 0; u < kn; u++) {
             // Get index of current exchange partner
             j = partners[id_current_exch_partner];
+            if (j == n) { // no exchange partners any more
+              continue;
+            }
             id_current_exch_partner++; // this just counts upwards across all exchange partners, ignores matrix-like structure
             
             int cl2 = clusters[j];

@@ -97,11 +97,12 @@ fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL, bac
   init <- initialize_clusters(nrow(x), K, categories)
   if (backend == "C") {
     # convert list of exchange partners to matrix for C; 
-    # when doing that, possibly "fill" empty entries with "-1", if some
+    # when doing that, possibly "fill" empty entries with "N+1" (in C -> N), if some
     # list elements are shorter than others (if categorical variables have been used and are
     # unevenly distributed)
     max_exchanges_partners <- max(lengths(exchange_partners))
-    exchange_partners <- lapply(exchange_partners, function(x) c(x[1:length(x)], rep(-1, max(0, max_exchanges_partners - length(x)))))
+    N <- nrow(x)
+    exchange_partners <- lapply(exchange_partners, function(x) c(x[1:length(x)], rep(N+1, max(0, max_exchanges_partners - length(x)))))
     exchange_partners <- unname(t(t(as.data.frame(exchange_partners))))
     return(c_anticlustering(x, init, categories = NULL, objective = "fast-kmeans", exchange_partners - 1))
   }
