@@ -20,5 +20,18 @@ test_that("New k-means C implementation yields same results as other implementat
   ac_exchangeR <- fast_anticlustering(features, K = init, backend = "R", k_neighbours = 20, nn_method = "RANN")
 
   expect_true(all(ac_exchangeC == ac_exchangeR))
-
+  
+  # Also test with categorical restrictions
+  features <- schaper2019[, 3:6]
+  categories <- schaper2019$room
+  init <- initialize_clusters(nrow(features), K = 3, categories)
+  ac_exchangeC <- fast_anticlustering(features, K = init, backend = "C", k_neighbours = Inf, categories = categories)
+  ac_exchangeC2 <- anticlustering(features, K = init, objective = "variance", categories = categories)
+  expect_true(all(ac_exchangeC == ac_exchangeC2))
+  
+  # Use reduced exchange partners
+  ac_exchangeC <- fast_anticlustering(features, K = init, backend = "C", k_neighbours = 10, categories = categories)
+  ac_exchangeR <- fast_anticlustering(features, K = init, backend = "R", k_neighbours = 10, categories = categories)
+  expect_true(all(ac_exchangeC == ac_exchangeR))
+  
 })
