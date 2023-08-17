@@ -4,14 +4,7 @@
 \alias{fast_anticlustering}
 \title{Fast anticlustering}
 \usage{
-fast_anticlustering(
-  x,
-  K,
-  k_neighbours = Inf,
-  categories = NULL,
-  backend = "R",
-  nn_method = "RANN"
-)
+fast_anticlustering(x, K, k_neighbours = Inf, categories = NULL, backend = "R")
 }
 \arguments{
 \item{x}{A numeric vector, matrix or data.frame of data
@@ -30,7 +23,8 @@ several categorical constraints.}
 \description{
 Anticlustering via optimizing the k-means criterion with an
 adjusted exchange method where the number of exchange partners can be 
-specified.
+specified. Using fewer exchange partners can speed up the computation 
+and make anticlustering applicable to quite large data sets.
 }
 \details{
 This function was created to make anticlustering applicable

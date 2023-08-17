@@ -3,7 +3,8 @@ library("anticlust")
 context("New C implementation")
 
 test_that("New k-means C implementation yields same results as other implementations", {
-
+  
+  set.seed(123)
   M <- 5
   N <- 180
   K <- 4
@@ -16,8 +17,8 @@ test_that("New k-means C implementation yields same results as other implementat
 
   expect_true(all(ac_exchangeC == ac_exchangeC2))
   
-  ac_exchangeC <- fast_anticlustering(features, K = init, backend = "C", k_neighbours = 20, nn_method = "RANN")
-  ac_exchangeR <- fast_anticlustering(features, K = init, backend = "R", k_neighbours = 20, nn_method = "RANN")
+  ac_exchangeC <- fast_anticlustering(features, K = init, backend = "C", k_neighbours = 20)
+  ac_exchangeR <- fast_anticlustering(features, K = init, backend = "R", k_neighbours = 20)
 
   expect_true(all(ac_exchangeC == ac_exchangeR))
   
@@ -30,6 +31,13 @@ test_that("New k-means C implementation yields same results as other implementat
   expect_true(all(ac_exchangeC == ac_exchangeC2))
   
   # Use reduced exchange partners
+  ac_exchangeC <- fast_anticlustering(features, K = init, backend = "C", k_neighbours = 10, categories = categories)
+  ac_exchangeR <- fast_anticlustering(features, K = init, backend = "R", k_neighbours = 10, categories = categories)
+  expect_true(all(ac_exchangeC == ac_exchangeR))
+  
+  # What if `k_neighbours` is greater than the number of elements in the group with fewest members?
+  categories <- merge_into_one_variable(cbind(schaper2019$syllables, schaper2019$room))
+  init <- initialize_clusters(nrow(features), K = 3, categories)
   ac_exchangeC <- fast_anticlustering(features, K = init, backend = "C", k_neighbours = 10, categories = categories)
   ac_exchangeR <- fast_anticlustering(features, K = init, backend = "R", k_neighbours = 10, categories = categories)
   expect_true(all(ac_exchangeC == ac_exchangeR))

@@ -3,7 +3,8 @@
 #'
 #' Anticlustering via optimizing the k-means criterion with an
 #' adjusted exchange method where the number of exchange partners can be 
-#' specified. 
+#' specified. Using fewer exchange partners can speed up the computation 
+#' and make anticlustering applicable to quite large data sets.
 #'
 #' @param x A numeric vector, matrix or data.frame of data
 #'     points.  Rows correspond to elements and columns correspond to
@@ -83,7 +84,7 @@
 #   * create nn_method = "random" for R implementation (?)
 #   * Correctly pass 
 
-fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL, backend = "R", nn_method = "RANN") {
+fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL, backend = "R") {
   input_validation_anticlustering(x, K, "variance",
                                 "exchange", FALSE, categories, NULL)
   categories <- merge_into_one_variable(categories)
@@ -92,25 +93,18 @@ fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL, bac
                    must_be_integer = TRUE, greater_than = 0, not_na = TRUE)
   }
   x <- as.matrix(x)
-  if (nn_method == "random" & backend == "C") {
-    k_neighbours <- min(k_neighbours, N)
-    exchange_partners <- sample(1:N, size = k_neighbours * N, replace = TRUE)
-    exchange_partners <- matrix(exchange_partners, ncol = k_neighbours)
-  } else {
-    exchange_partners <- all_exchange_partners(x, k_neighbours, categories)
-  }
+  exchange_partners <- all_exchange_partners(x, k_neighbours, categories)
   init <- initialize_clusters(nrow(x), K, categories)
-
   if (backend == "C") {
-    if (is.list(exchange_partners)) {
-      exchange_partners <- t(t(as.data.frame(exchange_partners)))
-    } else {
-      #  column major order; each person is column
-      exchange_partners <- t(exchange_partners)
-    }
+    # convert list of exchange partners to matrix for C; 
+    # when doing that, possibly "fill" empty entries with "-1", if some
+    # list elements are shorter than others (if categorical variables have been used and are
+    # unevenly distributed)
+    max_exchanges_partners <- max(lengths(exchange_partners))
+    exchange_partners <- lapply(exchange_partners, function(x) c(x[1:length(x)], rep(-1, max(0, max_exchanges_partners - length(x)))))
+    exchange_partners <- unname(t(t(as.data.frame(exchange_partners))))
     return(c_anticlustering(x, init, categories = NULL, objective = "fast-kmeans", exchange_partners - 1))
   }
-
   fast_exchange_(x, init, exchange_partners)
 }
 
