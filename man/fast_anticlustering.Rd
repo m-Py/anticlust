@@ -4,21 +4,28 @@
 \alias{fast_anticlustering}
 \title{Fast anticlustering}
 \usage{
-fast_anticlustering(x, K, k_neighbours = Inf, categories = NULL, backend = "R")
+fast_anticlustering(x, K, k_neighbours = Inf, categories = NULL, backend = "C")
 }
 \arguments{
 \item{x}{A numeric vector, matrix or data.frame of data
 points.  Rows correspond to elements and columns correspond to
 features. A vector represents a single numeric feature.}
 
-\item{K}{How many anticlusters should be created.}
+\item{K}{How many anticlusters should be created. Alternatively:
+(a) A vector describing the size of each group, or (b) a vector
+of length \code{nrow(x)} describing how elements are assigned
+to anticlusters before the optimization starts.}
 
 \item{k_neighbours}{The number of neighbours that serve as exchange
-partner for each element. Defaults to Inf, i.e., each element
+partner for each element. Defaults to Inf, implying that each element
 is exchanged with each element in other groups.}
 
 \item{categories}{A vector, data.frame or matrix representing one or
 several categorical constraints.}
+
+\item{backend}{Either "C" or "R", to use a C or R implementation of the
+anticlustering optimization algorithm. Since \code{anticlust} version 
+0.7.1, the faster C implementation is the default.}
 }
 \description{
 Anticlustering via optimizing the k-means criterion with an
@@ -28,11 +35,13 @@ and make anticlustering applicable to quite large data sets.
 }
 \details{
 This function was created to make anticlustering applicable
-to large data sets (e.g., more than 100,000 elements). It optimizes the k-means
-variance objective because computing all pairwise as is done when optimizing 
-the diversity is not feasible for very large data sets (like for about N > 30000). 
+to large data sets (e.g., several 100,000 elements). It optimizes the k-means
+objective because computing all pairwise as is done when optimizing 
+the diversity is not feasible for very large data sets (for about N > 20000 on my 
+personal computer). 
 Additionally, this function employs a
-speed-optimized exchange method. For each element, the potential
+speed-optimized exchange method because not all other elements serve as exchange partners. 
+Instead, for each element, the potential
 exchange partners are generated using a nearest neighbor search with the
 function \code{\link[RANN]{nn2}} from the \code{RANN} package. The nearest
 neighbors then serve as exchange partners. This approach is inspired by the
@@ -49,10 +58,11 @@ When setting the \code{categories} argument, exchange partners will
 be generated from the same category. Note that when
 \code{categories} has multiple columns (i.e., each element is
 assigned to multiple columns), each combination of categories is
-treated as a distinct category by the exchange method.
+treated as a distinct category by the exchange method. You can use 
+\code{\link{categories_to_binary}} to improve results for several categorical
+variables.
 }
 \examples{
-
 
 features <- iris[, - 5]
 
@@ -70,12 +80,21 @@ start <- Sys.time()
 ac_fast <- fast_anticlustering(features, K = 3, k_neighbours = 10)
 Sys.time() - start
 
-by(features, ac_exchange, function(x) round(colMeans(x), 2))
-by(features, ac_fast, function(x) round(colMeans(x), 2))
+# Use k-plus anticlustering with this function is straight forward,
+# just use kplus_moment_variables() on the numeric input:
+kplus_anticlusters <- fast_anticlustering(kplus_moment_variables(features, T = 2), K = 3)
+mean_sd_tab(features, kplus_anticlusters)
+
+# Working on several 1000 elements is incredibly fast (Here n = 5000)
+data <- matrix(rnorm(5000 * 2), ncol = 2)
+groups <- fast_anticlustering(data, K = 2, k_neighbours = 2)
+mean_sd_tab(data, groups)
 
 }
 \seealso{
 \code{\link{anticlustering}}
+
+\code{\link{kplus_moment_variables}}
 
 \code{\link{variance_objective}}
 }
