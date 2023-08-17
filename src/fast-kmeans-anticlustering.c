@@ -82,12 +82,14 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
         for (size_t i = 0; i < k; i++) {
           OBJ_BY_CLUSTER[i] = 0; // init as zero
         }
+        /* Compute Squared Euclidean Distance between each data point and its center -> sum up */
         for (size_t i = 0; i < n; i++) {
-          double distance = 0;
+          double distance_squared = 0;
           for (size_t j = 0; j < m; j++) {
-            distance = data_pts[i][j] - CENTERS[clusters[i]][j];
-            OBJ_BY_CLUSTER[clusters[i]] += distance * distance;
+            double diff = data_pts[i][j] - CENTERS[clusters[i]][j];
+            distance_squared += diff * diff;
           }
+          OBJ_BY_CLUSTER[clusters[i]] += distance_squared;
         }
 
         /* SUM OF SQUARES ACROSS ALL CLUSTERS */
