@@ -23,7 +23,11 @@
  * 
  * This is a slightly different version of kmeans_anticlustering(), which does not
  * use categorical restrictions but has exchange partners for each element (which must be
- * passed to the function and are not generated here)
+ * passed to the function and are not generated here).
+ * 
+ * The code is horrible because it does not use additional function call, 
+ * which terminated my R sessions for really large data (and it should be
+ * usable for really large data sets).
  * ===========================================================================
 */
 
@@ -36,20 +40,7 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
         const size_t kn = (size_t) *k_neighbours; // number of clusters
         
         // Do the same for the original data points
-        double data_pts[n][m];
-        int m_ptr[m];
         
-        // Column offsets (to convert one-dimensional array to Row/Col major)
-        for(int i = 0; i < m; i++) {
-                m_ptr[i] = i * n;
-        }
-        
-        // Reconstruct the data points as N x M matrix
-        for(int i = 0; i < n; i++) {
-                for(int j = 0; j < m; j++) {
-                        data_pts[i][j] = data[m_ptr[j]++];
-                }
-        }
         
 
         /* INITIALIZE OBJECTIVE */
@@ -63,20 +54,20 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
             CENTERS[i][j] = 0; 
           }
         }
+        /* SUM UP FEATURE VALUES BY CLUSTER */
         for (size_t i = 0; i < n; i++) {
           for (size_t j = 0; j < m; j++) {
-            CENTERS[clusters[i]][j] += data_pts[i][j];
+            CENTERS[clusters[i]][j] += data[n * j + i];
           }
         }
-        
-        // To get cluster centers: Divide by number of elements 
+        /* To get cluster centers: Divide by number of elements */
         for (size_t i = 0; i < k; i++) { // excuse my reuse of indices, I hate this
           for (size_t j = 0; j < m; j++) {
             CENTERS[i][j] = CENTERS[i][j] / frequencies[i];
           }
         }
-        
-        
+        print_matrix(k, m, CENTERS);
+
         /* SUM OF SQUARES BY CLUSTER */
         double OBJ_BY_CLUSTER[k]; 
         for (size_t i = 0; i < k; i++) {
@@ -86,18 +77,19 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
         for (size_t i = 0; i < n; i++) {
           double distance_squared = 0;
           for (size_t j = 0; j < m; j++) {
-            double diff = data_pts[i][j] - CENTERS[clusters[i]][j];
+            double diff = data[n * j + i] - CENTERS[clusters[i]][j]; // data[n * j + i] == data[i, j] in the original matrix, but here we only have a 1-dim pointer
             distance_squared += diff * diff;
           }
           OBJ_BY_CLUSTER[clusters[i]] += distance_squared;
         }
+        
 
         /* SUM OF SQUARES ACROSS ALL CLUSTERS */
         double SUM_OBJECTIVE = 0;
         for (size_t i = 0; i < k; i++) {
           SUM_OBJECTIVE += OBJ_BY_CLUSTER[i];
         }
-
+        
 
         /* Some variables for bookkeeping during the optimization */
         size_t best_partner;
@@ -114,12 +106,22 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
         for (size_t i = 0; i < n; i++) {
           int cl1 = clusters[i];
           
-          // Initialize `best` variable for the i'th item
+          // Initialize `best` variables (alas not by function call for really large data)
           double best_obj = 0;
-          copy_matrix(k, m, CENTERS, best_centers);
-          copy_array(k, OBJ_BY_CLUSTER, best_objs);
+          // Best Center matrix
+          for (int i2 = 0; i2 < k; i2++) {
+            for (int j2 = 0; j2 < m; j2++) {
+              best_centers[i2][j2] = CENTERS[i2][j2];
+            }
+          }
+          // Best objectives by cluster
+          for (int i3 = 0; i3 < k; i3++) { // WTF indices...
+            best_objs[i3] = OBJ_BY_CLUSTER[i3];
+          }
+          
           size_t j;
           /* 2. Level: Iterate through the exchange partners */
+
           for (size_t u = 0; u < kn; u++) {
             // Get index of current exchange partner
             j = partners[id_current_exch_partner];
@@ -127,16 +129,21 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
             
             int cl2 = clusters[j];
             // no swapping attempt if in the same cluster:
-            if (cl1 == cl2) { 
+            if (cl1 == cl2) {
               continue;
             }
             
             // Initialize `tmp` variables for the exchange partner:
-            copy_matrix(k, m, CENTERS, tmp_centers);
+            // Center matrix, is updated after swap
+            for (int i3 = 0; i3 < k; i3++) {
+              for (int j3 = 0; j3 < m; j3++) {
+                tmp_centers[i3][j3] = CENTERS[i3][j3];
+              }
+            }
 
             fast_update_centers(
               i, j, n, m, k,
-              data_pts, cl1, cl2,
+              data, cl1, cl2,
               tmp_centers, 
               frequencies
             );
@@ -148,8 +155,12 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
               tmp_objs[f] = 0; // init as zero
             }
             for (size_t f = 0; f < n; f++) {
-              // do not compute if clusters[f] is cl1 or cl2; optimization for later
-              tmp_objs[clusters[f]] += euclidean_squared(data_pts[f], tmp_centers[clusters[f]], m);
+              double distance_squared = 0;
+              for (size_t f2 = 0; f2 < m; f2++) {
+                double diff = data[one_dim_index(f, f2, n)] - tmp_centers[clusters[f]][f2];
+                distance_squared += diff * diff;
+              }
+              tmp_objs[clusters[f]] += distance_squared;
             }
 
             tmp_obj = array_sum(k, tmp_objs);
@@ -201,3 +212,8 @@ void print_matrix(size_t N, size_t M, double matrix[N][M]) {
   printf("number of rows: %zu \nnumber of columns: %zu \n\n",
          N, M);
 }
+
+size_t one_dim_index(size_t i, size_t j, size_t n) {
+  return n * j + i;
+}
+
