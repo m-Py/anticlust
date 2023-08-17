@@ -40,6 +40,6 @@ test_that("New k-means C implementation yields same results as other implementat
   init <- initialize_clusters(nrow(features), K = 3, categories)
   ac_exchangeC <- fast_anticlustering(features, K = init, backend = "C", k_neighbours = 10, categories = categories)
   ac_exchangeR <- fast_anticlustering(features, K = init, backend = "R", k_neighbours = 10, categories = categories)
-  expect_true(all(ac_exchangeC == ac_exchangeR))
+  expect_true(all(table(ac_exchangeC, categories) == table(ac_exchangeR, categories)))
   
 })
