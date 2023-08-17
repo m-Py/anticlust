@@ -45,7 +45,7 @@
 #' the diversity is not feasible for very large data sets (for about N > 20000 on my 
 #' personal computer). 
 #' Additionally, this function employs a
-#' speed-optimized exchange method because not all other elements serve as exchange partners. 
+#' speed-optimized exchange method by (possibly) not using each element as exchange partner. 
 #' Instead, for each element, the potential
 #' exchange partners are generated using a nearest neighbor search with the
 #' function \code{\link[RANN]{nn2}} from the \code{RANN} package. The nearest
