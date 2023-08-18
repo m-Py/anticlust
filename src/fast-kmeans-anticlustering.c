@@ -138,59 +138,57 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
           for (size_t u = 0; u < kn; u++) {
             // Get index of current exchange partner
             j = partners[id_current_exch_partner];
-            if (j == n) { // no exchange partners any more
-              continue;
-            }
             id_current_exch_partner++; // this just counts upwards across all exchange partners, ignores matrix-like structure
-            
-            int cl2 = clusters[j];
-            // no swapping attempt if in the same cluster:
-            if (cl1 == cl2) {
-              continue;
-            }
-            
-            // Initialize `tmp` variables for the exchange partner:
-            // Center matrix, is updated after swap
-            for (int i3 = 0; i3 < k; i3++) {
-              for (int j3 = 0; j3 < m; j3++) {
-                tmp_centers[i3][j3] = CENTERS[i3][j3];
+            if (j != n) { // no exchange partners any more
+              int cl2 = clusters[j];
+              // no swapping attempt if in the same cluster:
+              if (cl1 == cl2) {
+                continue;
               }
-            }
-
-            fast_update_centers(
-              i, j, n, m, k,
-              data, cl1, cl2,
-              tmp_centers, 
-              frequencies
-            );
-
-            fast_swap(clusters, i, j);
-            // Update objective
-            /* SUM OF SQUARES BY CLUSTER */
-            for (size_t f = 0; f < k; f++) {
-              tmp_objs[f] = 0; // init as zero
-            }
-            for (size_t f = 0; f < n; f++) {
-              double distance_squared = 0;
-              for (size_t f2 = 0; f2 < m; f2++) {
-                double diff = data[one_dim_index(f, f2, n)] - tmp_centers[clusters[f]][f2];
-                distance_squared += pow(diff, 2);
+              
+              // Initialize `tmp` variables for the exchange partner:
+              // Center matrix, is updated after swap
+              for (int i3 = 0; i3 < k; i3++) {
+                for (int j3 = 0; j3 < m; j3++) {
+                  tmp_centers[i3][j3] = CENTERS[i3][j3];
+                }
               }
-              tmp_objs[clusters[f]] += distance_squared;
+              
+              fast_update_centers(
+                i, j, n, m, k,
+                data, cl1, cl2,
+                tmp_centers, 
+                frequencies
+              );
+              
+              fast_swap(clusters, i, j);
+              // Update objective
+              /* SUM OF SQUARES BY CLUSTER */
+              for (size_t f = 0; f < k; f++) {
+                tmp_objs[f] = 0; // init as zero
+              }
+              for (size_t f = 0; f < n; f++) {
+                double distance_squared = 0;
+                for (size_t f2 = 0; f2 < m; f2++) {
+                  double diff = data[one_dim_index(f, f2, n)] - tmp_centers[clusters[f]][f2];
+                  distance_squared += pow(diff, 2);
+                }
+                tmp_objs[clusters[f]] += distance_squared;
+              }
+              
+              tmp_obj = array_sum(k, tmp_objs);
+              
+              // Update `best` variables if objective was improved
+              if (tmp_obj > best_obj) {
+                best_obj = tmp_obj;
+                copy_matrix(k, m, tmp_centers, best_centers);
+                copy_array(k, tmp_objs, best_objs);
+                best_partner = j;
+              }
+              
+              // Swap back to test next exchange partner
+              fast_swap(clusters, i, j);
             }
-
-            tmp_obj = array_sum(k, tmp_objs);
-            
-            // Update `best` variables if objective was improved
-            if (tmp_obj > best_obj) {
-              best_obj = tmp_obj;
-              copy_matrix(k, m, tmp_centers, best_centers);
-              copy_array(k, tmp_objs, best_objs);
-              best_partner = j;
-            }
-            
-            // Swap back to test next exchange partner
-            fast_swap(clusters, i, j);
           }
           
           // Only if objective is improved: Do the swap
