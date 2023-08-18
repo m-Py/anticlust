@@ -177,7 +177,7 @@ fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL,
   } else {
     exchange_partners <- all_exchange_partners(x, k_neighbours, categories)
   }
-  init <- initialize_clusters(nrow(x), K, categories)
+  init <- initialize_clusters(N, K, categories)
   if (backend == "C") {
     # convert list of exchange partners to matrix for C; 
     # when doing that, possibly "fill" empty entries with "N+1" (in C -> N), if some
