@@ -1,10 +1,11 @@
 
 #' Fast anticlustering
 #'
-#' Anticlustering via optimizing the k-means criterion with an
-#' adjusted exchange method where the number of exchange partners can be 
-#' specified. Using fewer exchange partners can speed up the computation 
-#' and make anticlustering applicable to quite large data sets.
+#' Increasing the speed of (k-means / k-plus) anticlustering by using fewer 
+#' exchanges during the optimization. This function uses an 
+#' adjusted exchange method in which the number of exchange partners can be 
+#' specified. Using fewer exchange partners can make anticlustering 
+#' applicable to quite large data sets.
 #'
 #' @param x A numeric vector, matrix or data.frame of data
 #'     points.  Rows correspond to elements and columns correspond to
@@ -29,6 +30,8 @@
 #' \code{\link{anticlustering}}
 #' 
 #' \code{\link{kplus_moment_variables}}
+#' 
+#' \code{\link{categories_to_binary}}
 #'
 #' \code{\link{variance_objective}}
 #'
@@ -45,27 +48,37 @@
 #' the diversity is not feasible for very large data sets (for about N > 20000 on my 
 #' personal computer). 
 #' Additionally, this function employs a
-#' speed-optimized exchange method by (possibly) not using each element as exchange partner. 
+#' speed-optimized exchange method (i.e., method = "exchange", not method = "local-maximum" 
+#' in \code{\link{anticlustering}}) by (possibly) not using each element as exchange partner. 
 #' Instead, for each element, the potential
-#' exchange partners are generated using a nearest neighbor search with the
-#' function \code{\link[RANN]{nn2}} from the \code{RANN} package. The nearest
-#' neighbors then serve as exchange partners. This approach is inspired by the
-#' preclustering heuristic according to which good solutions are found
-#' when similar elements are in different sets---by swapping nearest
-#' neighbors, this will often be the case. The number of exchange partners
+#' exchange partners are generated using a nearest neighbour search with the
+#' function \code{\link[RANN]{nn2}} from the \code{RANN} package. Only the nearest
+#' neighbours then serve as exchange partners. The number of exchange partners
 #' per element has to be set using the argument \code{k_neighbours}; by
 #' default, it is set to \code{Inf}, meaning that all possible swaps are
-#' tested. This default must be changed by the user for large data sets.
-#' More exchange partners generally improve the output, but also increase
-#' run time.
+#' tested. This default must be changed by the user for large data sets. If the default
+#' is not changed, you can also just use the function \code{\link{anticlustering}}.
+#' More exchange partners generally improve the quality of the results, but also increase
+#' run time. Note that for very large data sets, anticlustering generally becomes "easier" (even 
+#' a random split may yield satisfactory results), so using few exchange partners
+#' is usually not a problem. 
+#' 
+#' For a fixed number of exchange partners (specified using the argument \code{k_neighbours})
+#' the approximate run time of this function is in O(N^2 * M), where N is the total 
+#' number of elements and M is the number of variables. The nearest neighbour search which is done
+#' in the beginning only has O(N log(N)) run time and therefore does not strongly
+#' contribute to the overall run time. The algorithm \code{method = "exchange"} 
+#' in \code{\link{\anticlustering}} has a run time of O(N^3 * M) because for each element, 
+#' all other elements serve as exchange partners. Thus, this function can improve the run time 
+#' by an order of magnitude.
 #'
-#' When setting the \code{categories} argument, exchange partners will
-#' be generated from the same category. Note that when
+#' When setting the \code{categories} argument, exchange partners (i.e., nearest neighbours) 
+#' will be generated from the same category. Note that when
 #' \code{categories} has multiple columns (i.e., each element is
 #' assigned to multiple columns), each combination of categories is
-#' treated as a distinct category by the exchange method. You can use 
+#' treated as a distinct category by the exchange method. You can also use 
 #' \code{\link{categories_to_binary}} to improve results for several categorical
-#' variables. 
+#' variables, instead of using the argument \code{categories}.
 #'
 #' @examples
 #'
