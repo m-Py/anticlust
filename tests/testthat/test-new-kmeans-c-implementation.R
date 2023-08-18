@@ -53,6 +53,14 @@ test_that("New k-means C implementation yields same results as other implementat
   ac_exchangeR <- fast_anticlustering(features, K = init, backend = "R", exchange_partners = exchange_partners)
   expect_true(all(ac_exchangeC == ac_exchangeR))
   
+  # Remove some exchange partners to test if an unequal number of exchange partners works
+  exchange_partners[[1]] <- exchange_partners[[1]][-(1:3)]
+  exchange_partners[[10]] <- exchange_partners[[10]][-2]
+  exchange_partners[[23]] <- exchange_partners[[23]][-(10:7)]
+  ac_exchangeC <- fast_anticlustering(features, K = init, backend = "C", exchange_partners = exchange_partners)
+  ac_exchangeR <- fast_anticlustering(features, K = init, backend = "R", exchange_partners = exchange_partners)
+  expect_true(all(ac_exchangeC == ac_exchangeR))
+  
   # Does the argument `exchange_partners` really do the same as `k_neighbours`?
   nn_exchange_partners <- RANN::nn2(features, k = k_neighbours + 1)$nn.idx #+1 because the element itself is also returned by nn2
   ac1 <- fast_anticlustering(features, K = init, exchange_partners = matrix_to_list(nn_exchange_partners))
