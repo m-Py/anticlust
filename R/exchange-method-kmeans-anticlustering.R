@@ -7,25 +7,27 @@
 #' can be specified. Using fewer exchange partners can make
 #' anticlustering applicable to quite large data sets.
 #'
-#' @param x A numeric vector, matrix or data.frame of data
-#'     points.  Rows correspond to elements and columns correspond to
+#' @param x A numeric vector, matrix or data.frame of data points.
+#'     Rows correspond to elements and columns correspond to
 #'     features. A vector represents a single numeric feature.
 #' @param K How many anticlusters should be created. Alternatively:
 #'     (a) A vector describing the size of each group, or (b) a vector
 #'     of length \code{nrow(x)} describing how elements are assigned
 #'     to anticlusters before the optimization starts.
 #' @param k_neighbours The number of neighbours that serve as exchange
-#'     partner for each element. Defaults to \code{Inf}, implying that each element
-#'     is exchanged with each element in other groups.
-#' @param categories A vector, data.frame or matrix representing one or
-#'     several categorical constraints.
-#' @param exchange_partners Optional argument. A list of length \code{NROW(x)}
-#'     specifying for each element the indices of the elements that
-#'     serve as exchange partners. If used, this argument overrides the 
-#'     \code{k_neighbours} argument. See examples. 
-#' @param backend  Either "C" or "R", to use a C or R implementation of the
-#'     anticlustering optimization algorithm. Since \code{anticlust} version 
-#'     0.7.1, the faster C implementation is the default. 
+#'     partner for each element. Defaults to \code{Inf}, implying that
+#'     each element is exchanged with each element in other groups.
+#' @param categories A vector, data.frame or matrix representing one
+#'     or several categorical constraints.
+#' @param exchange_partners Optional argument. A list of length
+#'     \code{NROW(x)} specifying for each element the indices of the
+#'     elements that serve as exchange partners. If used, this
+#'     argument overrides the \code{k_neighbours} argument. See
+#'     examples.
+#' @param backend Either "C" or "R", to use a C or R implementation of
+#'     the anticlustering optimization algorithm. Since
+#'     \code{anticlust} version 0.7.1, the faster C implementation is
+#'     the default.
 #'
 #' @importFrom RANN nn2
 #'
@@ -62,15 +64,16 @@
 #'
 #' This function was created to make anticlustering applicable to
 #' large data sets (e.g., several 100,000 elements). It optimizes the
-#' k-means objective because computing all pairwise as is done when
-#' optimizing the diversity is not feasible for very large data sets
-#' (for about N > 20000 on my personal computer). Extending this function to
-#' k-plus anticlustering is rather straight forward by applying
-#' \code{\link{kplus_moment_variables}} on the input (see
-#' examples). 
+#' k-means objective because computing all pairwise distances as is
+#' done when optimizing the "diversity" (the default in
+#' \code{\link{anticlustering}} is not feasible for very large data
+#' sets (for about N > 20000 on my personal computer). Extending this
+#' function to k-plus anticlustering is rather straight forward by
+#' applying \code{\link{kplus_moment_variables}} on the input (see
+#' examples).
 #' 
-#' This function employs a speed-optimized exchange method,
-#' which is basically equivalent to \code{method = "exchange"} in
+#' This function employs a speed-optimized exchange method, which is
+#' basically equivalent to \code{method = "exchange"} in
 #' \code{\link{anticlustering}}, but possibly reduces the number of
 #' exchanges that are investigated for each input element. For each
 #' element, the potential exchange partners are generated using a
@@ -90,14 +93,17 @@
 #' For a fixed number of exchange partners (specified using the
 #' argument \code{k_neighbours}) the approximate run time of
 #' \code{fast_anticlustering} is in O(M N^2), where N is the total
-#' number of elements and M is the number of variables. The nearest
-#' neighbour search, which is done in the beginning only has O(N
-#' log(N)) run time and therefore does not strongly contribute to the
-#' overall run time. The algorithm \code{method = "exchange"} in
-#' \code{\link{anticlustering}} has a run time of O(M N^3) because for
-#' each element, all other elements serve as exchange partners. Thus,
-#' \code{fast_anticlustering} can improve the run time by an order of
-#' magnitude as compared to the standard exchange algorithm.
+#' number of elements and M is the number of variables. The algorithm
+#' \code{method = "exchange"} in \code{\link{anticlustering}} has a
+#' run time of O(M N^3) because for each element, all other elements
+#' serve as exchange partners. Thus, \code{fast_anticlustering} can
+#' improve the run time by an order of magnitude as compared to the
+#' standard exchange algorithm. The nearest neighbour search, which is
+#' done in the beginning, only has O(N log(N)) run time and therefore
+#' does not strongly contribute to the overall run time. It is
+#' possible to suppress the nearest neighbour search by passing custom
+#' exchange partners using the \code{exchange_partners} argument (the
+#' examples show how to generate random exchange partners).
 #'
 #' When setting the \code{categories} argument, exchange partners
 #' (i.e., nearest neighbours) will be generated from the same
@@ -164,7 +170,7 @@ fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL,
     validate_input(k_neighbours, "k_neighbours", objmode = "numeric", len = 1,
                    must_be_integer = TRUE, greater_than = 0, not_na = TRUE)
   }
-  x <- as.matrix(x)     
+  x <- as.matrix(x)
   N <- nrow(x)
   if (argument_exists(exchange_partners)) {
     validate_exchange_partners(exchange_partners, categories, N)
