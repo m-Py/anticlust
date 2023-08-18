@@ -1,4 +1,5 @@
 library("anticlust")
+library("RANN")
 
 context("New C implementation")
 
@@ -25,7 +26,7 @@ test_that("New k-means C implementation yields same results as other implementat
   # Also test with categorical restrictions
   features <- schaper2019[, 3:6]
   categories <- schaper2019$room
-  init <- initialize_clusters(nrow(features), K = 3, categories)
+  init <- categorical_sampling(categories, K = 3)
   ac_exchangeC <- fast_anticlustering(features, K = init, backend = "C", k_neighbours = Inf, categories = categories)
   ac_exchangeC2 <- anticlustering(features, K = init, objective = "variance", categories = categories)
   expect_true(all(ac_exchangeC == ac_exchangeC2))
@@ -37,9 +38,25 @@ test_that("New k-means C implementation yields same results as other implementat
   
   # What if `k_neighbours` is greater than the number of elements in the group with fewest members?
   categories <- merge_into_one_variable(cbind(schaper2019$syllables, schaper2019$room))
-  init <- initialize_clusters(nrow(features), K = 3, categories)
+  init <- categorical_sampling(categories, K = 3)
   ac_exchangeC <- fast_anticlustering(features, K = init, backend = "C", k_neighbours = 10, categories = categories)
   ac_exchangeR <- fast_anticlustering(features, K = init, backend = "R", k_neighbours = 10, categories = categories)
   expect_true(all(table(ac_exchangeC, categories) == table(ac_exchangeR, categories)))
+  
+  # test custom exchange partners
+  N <- nrow(features)
+  # random exchange partners
+  k_neighbours <- 10
+  exchange_partners <- lapply(rep(N, N), function(x) sample(1:x)[1:k_neighbours])
+  # R and C implementation the same?
+  ac_exchangeC <- fast_anticlustering(features, K = init, backend = "C", exchange_partners = exchange_partners)
+  ac_exchangeR <- fast_anticlustering(features, K = init, backend = "R", exchange_partners = exchange_partners)
+  expect_true(all(ac_exchangeC == ac_exchangeR))
+  
+  # Does the argument `exchange_partners` really do the same as `k_neighbours`?
+  nn_exchange_partners <- RANN::nn2(features, k = k_neighbours + 1)$nn.idx #+1 because the element itself is also returned by nn2
+  ac1 <- fast_anticlustering(features, K = init, exchange_partners = matrix_to_list(nn_exchange_partners))
+  ac2 <- fast_anticlustering(features, K = init, k_neighbours = k_neighbours)
+  expect_true(all(ac1 == ac2))
 
 })
