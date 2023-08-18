@@ -1,10 +1,10 @@
 
 #' Fast anticlustering
 #'
-#' Increasing the speed of (k-means / k-plus) anticlustering by conducting
-#' fewer exchanges during the optimization. This function uses an
-#' adjusted exchange method in which the number of exchange partners
-#' can be specified. Using fewer exchange partners can make
+#' Increasing the speed of (k-means / k-plus) anticlustering by
+#' conducting fewer exchanges during the optimization. This function
+#' uses an adjusted exchange method in which the number of exchange
+#' partners can be specified. Using fewer exchange partners can make
 #' anticlustering applicable to quite large data sets.
 #'
 #' @param x A numeric vector, matrix or data.frame of data points.
@@ -65,30 +65,31 @@
 #' This function was created to make anticlustering applicable to
 #' large data sets (e.g., several 100,000 elements). It optimizes the
 #' k-means objective because computing all pairwise distances as is
-#' done when optimizing the "diversity" (the default in
-#' \code{\link{anticlustering}} is not feasible for very large data
-#' sets (for about N > 20000 on my personal computer). Extending this
-#' function to k-plus anticlustering is rather straight forward by
-#' applying \code{\link{kplus_moment_variables}} on the input (see
+#' done when optimizing the "diversity" (i.e., the default in
+#' \code{\link{anticlustering}}) is not feasible for very large data
+#' sets (for about N > 20000 on my personal computer). Extending
+#' \code{fast_anticlustering} to k-plus anticlustering is rather straight
+#' forward by applying \code{\link{kplus_moment_variables}} on the input (see
 #' examples).
 #' 
-#' This function employs a speed-optimized exchange method, which is
-#' basically equivalent to \code{method = "exchange"} in
-#' \code{\link{anticlustering}}, but possibly reduces the number of
-#' exchanges that are investigated for each input element. For each
-#' element, the potential exchange partners are generated using a
-#' nearest neighbour search with the function \code{\link[RANN]{nn2}}
-#' from the \code{RANN} package. Only the nearest neighbours then
-#' serve as exchange partners. The number of exchange partners per
-#' element has to be set using the argument \code{k_neighbours}; by
-#' default, it is set to \code{Inf}, meaning that all possible swaps
-#' are tested. This default must be changed by the user for large data
-#' sets. If the default is not changed, you can also just use the
-#' function \code{\link{anticlustering}}. More exchange partners
-#' generally improve the quality of the results, but also increase run
-#' time. Note that for very large data sets, anticlustering generally
-#' becomes "easier" (even a random split may yield satisfactory
-#' results), so using few exchange partners is usually not a problem.
+#' The function \code{fast_anticlustering} employs a speed-optimized
+#' exchange method, which is basically equivalent to \code{method =
+#' "exchange"} in \code{\link{anticlustering}}, but (possibly) reduces
+#' the number of exchanges that are investigated for each input
+#' element. For each element, the potential exchange partners are
+#' generated using a nearest neighbour search with the function
+#' \code{\link[RANN]{nn2}} from the \code{RANN} package. Only the
+#' nearest neighbours then serve as exchange partners. The number of
+#' exchange partners per element has to be set using the argument
+#' \code{k_neighbours}; by default, it is set to \code{Inf}, meaning
+#' that all possible swaps are tested. This default must be changed by
+#' the user for large data sets. If the default is not changed, you
+#' can also just use the function \code{\link{anticlustering}}. More
+#' exchange partners generally improve the quality of the results, but
+#' also increase run time. Note that for very large data sets,
+#' anticlustering generally becomes "easier" (even a random split may
+#' yield satisfactory results), so using few exchange partners is
+#' usually not a problem.
 #' 
 #' For a fixed number of exchange partners (specified using the
 #' argument \code{k_neighbours}) the approximate run time of
@@ -102,8 +103,12 @@
 #' done in the beginning, only has O(N log(N)) run time and therefore
 #' does not strongly contribute to the overall run time. It is
 #' possible to suppress the nearest neighbour search by passing custom
-#' exchange partners using the \code{exchange_partners} argument (the
-#' examples show how to generate random exchange partners).
+#' exchange partners using the \code{exchange_partners} argument. The
+#' examples show how to generate random exchange partners. When using
+#' \code{exchange_partners}, it is not necessary that each element has
+#' the same number of exchange partners (this is why the argument
+#' \code{exchange_partners} has to be a list instead of matrix / data
+#' frame).
 #'
 #' When setting the \code{categories} argument, exchange partners
 #' (i.e., nearest neighbours) will be generated from the same
@@ -144,7 +149,6 @@
 #' n_exchange_partners <- 10
 #' features <- matrix(rnorm(N * M), ncol = M)
 #' exchange_partners <- lapply(rep(N, N), function(x) 1:x)
-#' exchange_partners[1:3]
 #' # remove the index of the element itself, so we ensure that each element has 
 #' # 10 exchange partners excluding itself
 #' exchange_partners <- lapply(1:N, function(i) exchange_partners[[i]][-i])
