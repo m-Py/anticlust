@@ -177,10 +177,8 @@ fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL,
     # when doing that, possibly "fill" empty entries with "N+1" (in C -> N), if some
     # list elements are shorter than others (if categorical variables have been used and are
     # unevenly distributed)
-    if (argument_exists(categories)) {
-      max_exchanges_partners <- max(lengths(exchange_partners))
-      exchange_partners <- lapply(exchange_partners, function(x) c(x[1:length(x)], rep(N+1, max(0, max_exchanges_partners - length(x)))))
-    }
+    max_exchanges_partners <- max(lengths(exchange_partners))
+    exchange_partners <- lapply(exchange_partners, function(x) c(x[1:length(x)], rep(N+1, max(0, max_exchanges_partners - length(x)))))
     exchange_partners <- unname(t(t(as.data.frame(exchange_partners))))
     # `exchange_partners` is passed as matrix to C; there it is converted to a 1-dimensional "vector".
     # Here we pass it as a matrix where elements = columns; cols = exchange partners.
