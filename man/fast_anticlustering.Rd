@@ -4,7 +4,14 @@
 \alias{fast_anticlustering}
 \title{Fast anticlustering}
 \usage{
-fast_anticlustering(x, K, k_neighbours = Inf, categories = NULL, backend = "C")
+fast_anticlustering(
+  x,
+  K,
+  k_neighbours = Inf,
+  categories = NULL,
+  exchange_partners = NULL,
+  backend = "C"
+)
 }
 \arguments{
 \item{x}{A numeric vector, matrix or data.frame of data
@@ -17,11 +24,16 @@ of length \code{nrow(x)} describing how elements are assigned
 to anticlusters before the optimization starts.}
 
 \item{k_neighbours}{The number of neighbours that serve as exchange
-partner for each element. Defaults to Inf, implying that each element
+partner for each element. Defaults to \code{Inf}, implying that each element
 is exchanged with each element in other groups.}
 
 \item{categories}{A vector, data.frame or matrix representing one or
 several categorical constraints.}
+
+\item{exchange_partners}{Optional argument. A list of length \code{NROW(x)}
+specifying for each element the indices of the elements that
+serve as exchange partners. If used, this argument overrides the 
+\code{k_neighbours} argument. See examples.}
 
 \item{backend}{Either "C" or "R", to use a C or R implementation of the
 anticlustering optimization algorithm. Since \code{anticlust} version 
@@ -105,6 +117,27 @@ mean_sd_tab(features, kplus_anticlusters) # Means and SDs are similar
 data <- matrix(rnorm(5000 * 2), ncol = 2)
 groups <- fast_anticlustering(data, K = 2, k_neighbours = 2)
 mean_sd_tab(data, groups)
+
+# "Advanced" usage: Use custom exchange partners, here: 10 random exchange partners for each element
+
+N <- 600
+M <- 5
+n_exchange_partners <- 10
+features <- matrix(rnorm(N * M), ncol = M)
+exchange_partners <- lapply(rep(N, N), function(x) 1:x)
+exchange_partners[1:3]
+# remove the index of the element itself, so we ensure that each element has 
+# 10 exchange partners excluding itself
+exchange_partners <- lapply(1:N, function(i) exchange_partners[[i]][-i])
+all(lengths(exchange_partners) == N-1)
+exchange_partners <- lapply(exchange_partners, function(x) sample(x)[1:n_exchange_partners])
+exchange_partners[1:3] # check out for the first 3 elements
+
+groups_nn_partners <- fast_anticlustering(features, K = 6, k_neighbours = n_exchange_partners)
+groups_rnd_partners <- fast_anticlustering(features, K = 6, exchange_partners = exchange_partners)
+
+variance_objective(features, groups_nn_partners)
+variance_objective(features, groups_rnd_partners)
 
 }
 \references{

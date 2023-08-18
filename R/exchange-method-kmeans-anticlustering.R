@@ -15,10 +15,14 @@
 #'     of length \code{nrow(x)} describing how elements are assigned
 #'     to anticlusters before the optimization starts.
 #' @param k_neighbours The number of neighbours that serve as exchange
-#'     partner for each element. Defaults to Inf, implying that each element
+#'     partner for each element. Defaults to \code{Inf}, implying that each element
 #'     is exchanged with each element in other groups.
 #' @param categories A vector, data.frame or matrix representing one or
 #'     several categorical constraints.
+#' @param exchange_partners Optional argument. A list of length \code{NROW(x)}
+#'     specifying for each element the indices of the elements that
+#'     serve as exchange partners. If used, this argument overrides the 
+#'     \code{k_neighbours} argument. See examples. 
 #' @param backend  Either "C" or "R", to use a C or R implementation of the
 #'     anticlustering optimization algorithm. Since \code{anticlust} version 
 #'     0.7.1, the faster C implementation is the default. 
@@ -126,9 +130,31 @@
 #' data <- matrix(rnorm(5000 * 2), ncol = 2)
 #' groups <- fast_anticlustering(data, K = 2, k_neighbours = 2)
 #' mean_sd_tab(data, groups)
+#' 
+#' # "Advanced" usage: Use custom exchange partners, here: 10 random exchange partners for each element
+#' 
+#' N <- 600
+#' M <- 5
+#' n_exchange_partners <- 10
+#' features <- matrix(rnorm(N * M), ncol = M)
+#' exchange_partners <- lapply(rep(N, N), function(x) 1:x)
+#' exchange_partners[1:3]
+#' # remove the index of the element itself, so we ensure that each element has 
+#' # 10 exchange partners excluding itself
+#' exchange_partners <- lapply(1:N, function(i) exchange_partners[[i]][-i])
+#' all(lengths(exchange_partners) == N-1)
+#' exchange_partners <- lapply(exchange_partners, function(x) sample(x)[1:n_exchange_partners])
+#' exchange_partners[1:3] # check out for the first 3 elements
+#' 
+#' groups_nn_partners <- fast_anticlustering(features, K = 6, k_neighbours = n_exchange_partners)
+#' groups_rnd_partners <- fast_anticlustering(features, K = 6, exchange_partners = exchange_partners)
+#' 
+#' variance_objective(features, groups_nn_partners)
+#' variance_objective(features, groups_rnd_partners)
 #'
 
-fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL, backend = "C") {
+fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL, 
+                                exchange_partners = NULL, backend = "C") {
   input_validation_anticlustering(x, K, "variance",
                                 "exchange", FALSE, categories, NULL)
   validate_input(backend, "backend", objmode = "character", len = 1,
@@ -138,8 +164,13 @@ fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL, bac
     validate_input(k_neighbours, "k_neighbours", objmode = "numeric", len = 1,
                    must_be_integer = TRUE, greater_than = 0, not_na = TRUE)
   }
-  x <- as.matrix(x)
-  exchange_partners <- all_exchange_partners(x, k_neighbours, categories)
+  x <- as.matrix(x)     
+  N <- nrow(x)
+  if (argument_exists(exchange_partners)) {
+    validate_exchange_partners(exchange_partners, categories, N)
+  } else {
+    exchange_partners <- all_exchange_partners(x, k_neighbours, categories)
+  }
   init <- initialize_clusters(nrow(x), K, categories)
   if (backend == "C") {
     # convert list of exchange partners to matrix for C; 
@@ -148,7 +179,6 @@ fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL, bac
     # unevenly distributed)
     if (argument_exists(categories)) {
       max_exchanges_partners <- max(lengths(exchange_partners))
-      N <- nrow(x)
       exchange_partners <- lapply(exchange_partners, function(x) c(x[1:length(x)], rep(N+1, max(0, max_exchanges_partners - length(x)))))
     }
     exchange_partners <- unname(t(t(as.data.frame(exchange_partners))))
@@ -160,6 +190,33 @@ fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL, bac
   }
   fast_exchange_(x, init, exchange_partners)
 }
+
+validate_exchange_partners <- function(exchange_partners, categories, N) {
+  if (!inherits(exchange_partners, "list")) {
+    stop("Argument `exchange_partners` must be a list.")
+  }
+  if (argument_exists(categories)) {
+    stop("Cannot use arguments `exchange_partners` and `categories` at the same time.")
+  }
+  if (length(exchange_partners) != N) {
+    stop("If used, argument `exchange_partners` must have the same length as you have data points.")
+  }
+  if (any(lengths(exchange_partners)) > N) {
+    stop("Argument `exchange_partners` has problems: Some elements have more exchange partners than there are data points.")
+  }
+  unlisted <- unlist(exchange_partners)
+  if (any(unlisted) > N) {
+    stop("Argument `exchange_partners` has problems: The maximum index is larger than the number of elements.")
+  }
+  if (any(unlisted) < 1) {
+    stop("Argument `exchange_partners` has problems: Some indices are lower than 1.")
+  }
+  if (any(as.integer(unlisted) != unlisted)) {
+    stop("Argument `exchange_partners` has problems: Only integer indices are allowed.")
+  }
+}
+
+
 
 #' Solve anticlustering using the fast exchange method
 #'
