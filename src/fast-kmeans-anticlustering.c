@@ -91,7 +91,7 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
           double distance_squared = 0;
           for (size_t j = 0; j < m; j++) {
             double diff = data[n * j + i] - CENTERS[clusters[i]][j];
-            distance_squared += diff * diff;
+            distance_squared += pow(diff, 2);
           }
           OBJ_BY_CLUSTER[clusters[i]] += distance_squared;
         }
@@ -174,7 +174,7 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
               double distance_squared = 0;
               for (size_t f2 = 0; f2 < m; f2++) {
                 double diff = data[one_dim_index(f, f2, n)] - tmp_centers[clusters[f]][f2];
-                distance_squared += diff * diff;
+                distance_squared += pow(diff, 2);
               }
               tmp_objs[clusters[f]] += distance_squared;
             }
