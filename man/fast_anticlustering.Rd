@@ -28,79 +28,94 @@ anticlustering optimization algorithm. Since \code{anticlust} version
 0.7.1, the faster C implementation is the default.}
 }
 \description{
-Increasing the speed of (k-means / k-plus) anticlustering by using fewer 
-exchanges during the optimization. This function uses an 
-adjusted exchange method in which the number of exchange partners can be 
-specified. Using fewer exchange partners can make anticlustering 
-applicable to quite large data sets.
+Increasing the speed of (k-means / k-plus) anticlustering by conducting
+fewer exchanges during the optimization. This function uses an
+adjusted exchange method in which the number of exchange partners
+can be specified. Using fewer exchange partners can make
+anticlustering applicable to quite large data sets.
 }
 \details{
-This function was created to make anticlustering applicable
-to large data sets (e.g., several 100,000 elements). It optimizes the k-means
-objective because computing all pairwise as is done when optimizing 
-the diversity is not feasible for very large data sets (for about N > 20000 on my 
-personal computer). 
-Additionally, this function employs a
-speed-optimized exchange method (i.e., method = "exchange", not method = "local-maximum" 
-in \code{\link{anticlustering}}) by (possibly) not using each element as exchange partner. 
-Instead, for each element, the potential
-exchange partners are generated using a nearest neighbour search with the
-function \code{\link[RANN]{nn2}} from the \code{RANN} package. Only the nearest
-neighbours then serve as exchange partners. The number of exchange partners
-per element has to be set using the argument \code{k_neighbours}; by
-default, it is set to \code{Inf}, meaning that all possible swaps are
-tested. This default must be changed by the user for large data sets. If the default
-is not changed, you can also just use the function \code{\link{anticlustering}}.
-More exchange partners generally improve the quality of the results, but also increase
-run time. Note that for very large data sets, anticlustering generally becomes "easier" (even 
-a random split may yield satisfactory results), so using few exchange partners
-is usually not a problem. 
+This function was created to make anticlustering applicable to
+large data sets (e.g., several 100,000 elements). It optimizes the
+k-means objective because computing all pairwise as is done when
+optimizing the diversity is not feasible for very large data sets
+(for about N > 20000 on my personal computer). Extending this function to
+k-plus anticlustering is rather straight forward by applying
+\code{\link{kplus_moment_variables}} on the input (see
+examples). 
 
-For a fixed number of exchange partners (specified using the argument \code{k_neighbours})
-the approximate run time of this function is in O(N^2 * M), where N is the total 
-number of elements and M is the number of variables. The nearest neighbour search which is done
-in the beginning only has O(N log(N)) run time and therefore does not strongly
-contribute to the overall run time. The algorithm \code{method = "exchange"} 
-in \code{\link{\anticlustering}} has a run time of O(N^3 * M) because for each element, 
-all other elements serve as exchange partners. Thus, this function can improve the run time 
-by an order of magnitude.
+This function employs a speed-optimized exchange method,
+which is basically equivalent to \code{method = "exchange"} in
+\code{\link{anticlustering}}, but possibly reduces the number of
+exchanges that are investigated for each input element. For each
+element, the potential exchange partners are generated using a
+nearest neighbour search with the function \code{\link[RANN]{nn2}}
+from the \code{RANN} package. Only the nearest neighbours then
+serve as exchange partners. The number of exchange partners per
+element has to be set using the argument \code{k_neighbours}; by
+default, it is set to \code{Inf}, meaning that all possible swaps
+are tested. This default must be changed by the user for large data
+sets. If the default is not changed, you can also just use the
+function \code{\link{anticlustering}}. More exchange partners
+generally improve the quality of the results, but also increase run
+time. Note that for very large data sets, anticlustering generally
+becomes "easier" (even a random split may yield satisfactory
+results), so using few exchange partners is usually not a problem.
 
-When setting the \code{categories} argument, exchange partners (i.e., nearest neighbours) 
-will be generated from the same category. Note that when
-\code{categories} has multiple columns (i.e., each element is
-assigned to multiple columns), each combination of categories is
-treated as a distinct category by the exchange method. You can also use 
-\code{\link{categories_to_binary}} to improve results for several categorical
-variables, instead of using the argument \code{categories}.
+For a fixed number of exchange partners (specified using the
+argument \code{k_neighbours}) the approximate run time of
+\code{fast_anticlustering} is in O(M N^2), where N is the total
+number of elements and M is the number of variables. The nearest
+neighbour search, which is done in the beginning only has O(N
+log(N)) run time and therefore does not strongly contribute to the
+overall run time. The algorithm \code{method = "exchange"} in
+\code{\link{anticlustering}} has a run time of O(M N^3) because for
+each element, all other elements serve as exchange partners. Thus,
+\code{fast_anticlustering} can improve the run time by an order of
+magnitude as compared to the standard exchange algorithm.
+
+When setting the \code{categories} argument, exchange partners
+(i.e., nearest neighbours) will be generated from the same
+category. Note that when \code{categories} has multiple columns
+(i.e., each element is assigned to multiple columns), each
+combination of categories is treated as a distinct category by the
+exchange method. You can also use
+\code{\link{categories_to_binary}} to improve results for several
+categorical variables, instead of using the argument
+\code{categories}.
 }
 \examples{
 
 features <- iris[, - 5]
 
-start <- Sys.time()
 ac_exchange <- fast_anticlustering(features, K = 3)
-Sys.time() - start
 
-## The following call is equivalent to the call above:
-start <- Sys.time()
+## The following call is (quasi) equivalent to the call above:
 ac_exchange <- anticlustering(features, K = 3, objective = "variance")
-Sys.time() - start
 
 ## Improve run time by using fewer exchange partners:
-start <- Sys.time()
 ac_fast <- fast_anticlustering(features, K = 3, k_neighbours = 10)
-Sys.time() - start
 
-# Use k-plus anticlustering with this function is straight forward,
+# Applying k-plus anticlustering with this function is straight forward,
 # just use kplus_moment_variables() on the numeric input:
 kplus_anticlusters <- fast_anticlustering(kplus_moment_variables(features, T = 2), K = 3)
-mean_sd_tab(features, kplus_anticlusters)
+mean_sd_tab(features, kplus_anticlusters) # Means and SDs are similar
 
-# Working on several 1000 elements is incredibly fast (Here n = 5000)
+# Working on several 1000 elements is very fast (Here n = 5000)
 data <- matrix(rnorm(5000 * 2), ncol = 2)
 groups <- fast_anticlustering(data, K = 2, k_neighbours = 2)
 mean_sd_tab(data, groups)
 
+}
+\references{
+Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition 
+data sets into equivalent parts. Psychological Methods, 26(2), 
+161–174. https://doi.org/10.1037/met0000301.
+
+Papenberg, M. (2023). K-plus Anticlustering: An Improved k-means Criterion 
+for Maximizing Between-Group Similarity. British Journal of Mathematical 
+and Statistical Psychology. Advance online publication. 
+https://doi.org/10.1111/bmsp.12315
 }
 \seealso{
 \code{\link{anticlustering}}
