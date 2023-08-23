@@ -71,7 +71,8 @@
 #' \code{\link{anticlustering}}) is not feasible for very large data
 #' sets (for about N > 20000 on my personal computer). Extending
 #' \code{fast_anticlustering} to k-plus anticlustering is rather straight
-#' forward by applying \code{\link{kplus_moment_variables}} on the input (see
+#' forward by applying \code{\link{kplus_moment_variables}} on the input 
+#' and possibly using the argument \code{exchange_partners} (see
 #' examples).
 #' 
 #' The function \code{fast_anticlustering} employs a speed-optimized
@@ -135,10 +136,30 @@
 #' ## Improve run time by using fewer exchange partners:
 #' ac_fast <- fast_anticlustering(features, K = 3, k_neighbours = 10)
 #'
-#' # Applying k-plus anticlustering with this function is straight forward,
+#' # Apply k-plus anticlustering with this function is straight forward,
 #' # just use kplus_moment_variables() on the numeric input:
 #' kplus_anticlusters <- fast_anticlustering(kplus_moment_variables(features, T = 2), K = 3)
 #' mean_sd_tab(features, kplus_anticlusters) # Means and SDs are similar
+#' 
+#' # Some care is needed when applying k-plus using a reduced number of exchange partners
+#' # via nearest neighbour search. Then we:
+#' # 1) use kplus_moment_variables() on the numeric input
+#' # 2) generate custom exchange_partners because otherwise nearest neighbours are 
+#' #    internally selected based on the extended k-plus variables (which does not make sense)
+#' kplus_anticlusters <- fast_anticlustering(
+#'   kplus_moment_variables(features, T = 2), 
+#'   K = 3,
+#'   exchange_partners = generate_exchange_partners(30, features = features, method = "RANN")
+#' )
+#' mean_sd_tab(features, kplus_anticlusters)
+#' # Or use random exchange partners: 
+#' kplus_anticlusters <- fast_anticlustering(
+#'   kplus_moment_variables(features, T = 2), 
+#'   K = 3,
+#'   exchange_partners = generate_exchange_partners(30, N = nrow(features), method = "random")
+#' )
+#' mean_sd_tab(features, kplus_anticlusters)
+#' 
 #' 
 #' # Working on several 1000 elements is very fast (Here n = 5000)
 #' data <- matrix(rnorm(5000 * 2), ncol = 2)
@@ -161,6 +182,7 @@
 #' 
 #' # compare with using nearest neighbours as exchange partners (i.e., the default)
 #' groups_nn_partners <- fast_anticlustering(features, K = init, k_neighbours = n_exchange_partners)
+#' # ... and using all elements as exchange partners: 
 #' groups_all_partners <- fast_anticlustering(features, K = init)
 #' 
 #' variance_objective(features, groups_nn_partners)
