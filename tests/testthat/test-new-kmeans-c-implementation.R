@@ -68,7 +68,7 @@ test_that("New k-means C implementation yields same results as other implementat
   expect_true(all(ac1 == ac2))
   
   # ensure that using exchange_partners does the same as not using it, when combining with new function generate_exchange_partners()
-  ac1 <- fast_anticlustering(features, K = init, exchange_partners = generate_exchange_partners(5, features, method = "RANN"))
+  ac1 <- fast_anticlustering(features, K = init, exchange_partners = generate_exchange_partners(5, features = features, method = "RANN"))
   ac2 <- fast_anticlustering(features, K = init, k_neighbours = 5)
   expect_true(all(ac1 == ac2))
   

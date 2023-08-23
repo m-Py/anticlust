@@ -8,7 +8,7 @@ generate_exchange_partners(
   n_exchange_partners,
   N = NULL,
   features = NULL,
-  method = "RANN",
+  method = "random",
   categories = NULL
 )
 }
@@ -61,6 +61,6 @@ generate_exchange_partners(
 # return the ID of the element itself as neighbour)
 generate_exchange_partners(5, features = schaper2019[, 3:5], method = "RANN")[1:3]
 # compare with RANN directly:
-RANN::nn2(schaper2019[, 3:5], k = 5)$nn.idx[1:3, ]
+RANN::nn2(schaper2019[, 3:5], k = 6)$nn.idx[1:3, ] # note k = 6
 
 }

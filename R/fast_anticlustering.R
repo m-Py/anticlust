@@ -384,9 +384,9 @@ update_centers <- function(centers, features, i, j, cluster_i, cluster_j, tab) {
 #' # return the ID of the element itself as neighbour)
 #' generate_exchange_partners(5, features = schaper2019[, 3:5], method = "RANN")[1:3]
 #' # compare with RANN directly:
-#' RANN::nn2(schaper2019[, 3:5], k = 5)$nn.idx[1:3, ]
+#' RANN::nn2(schaper2019[, 3:5], k = 6)$nn.idx[1:3, ] # note k = 6
 #' 
-generate_exchange_partners <- function(n_exchange_partners, N = NULL, features = NULL, method = "RANN", categories = NULL) {
+generate_exchange_partners <- function(n_exchange_partners, N = NULL, features = NULL, method = "random", categories = NULL) {
   if (argument_exists(features)) {
     N <- NROW(features)
   }
@@ -407,7 +407,7 @@ generate_exchange_partners <- function(n_exchange_partners, N = NULL, features =
     return(completely_random_exchange_partners(N, n_exchange_partners))
   }
   else {
-    stop("Argument method must be 'RANN' or 'random' or 'restricted_random.\n'",
+    stop("Argument method must be 'RANN' or 'random' or 'restricted_random'.\n'",
          "When method is 'RANN', the argument 'features' must be used.\n'",
          "When method is 'random', you cannot use the argument 'categories'.")
   }
