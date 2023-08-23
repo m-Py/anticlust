@@ -37,7 +37,7 @@ int get_cat_frequencies(int *USE_CATS, int *CAT_frequencies, size_t n) {
  * serve as exchange partners).
  * 
  */
-int get_indices_by_category(size_t n, size_t c, size_t *CATEGORY_HEADS[c], 
+int get_indices_by_category(size_t n, size_t c, size_t **CATEGORY_HEADS, 
                             int *USE_CATS, 
                             int *categories, int *CAT_frequencies, 
                             struct element POINTS[n]) {
@@ -64,10 +64,11 @@ int get_indices_by_category(size_t n, size_t c, size_t *CATEGORY_HEADS[c],
  * to a cluster. Then, proceeds to read out the indices of all elements by category. 
  */
 int set_up_categories_list(size_t n, size_t c, struct element POINTS[n], 
-                     size_t *CATEGORY_HEADS[c], int *categories, 
+                     size_t **CATEGORY_HEADS, int *categories, 
                      int *CAT_frequencies) {
         
-        struct node *HEADS[c]; // used for filling `CATEGORY_HEADS` 
+        struct node **HEADS; // used for filling `CATEGORY_HEADS` 
+        *HEADS = malloc(c * sizeof(size_t*));
         if (initialize_cluster_heads(c, HEADS) == 1) {
                 return 1; 
         }

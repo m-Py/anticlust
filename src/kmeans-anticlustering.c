@@ -137,7 +137,8 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         /* SET UP CLUSTER STRUCTURE */
         
         // Set up array of pointer-to-cluster-heads
-        struct node *CLUSTER_HEADS[k];
+        struct node **CLUSTER_HEADS;
+        *CLUSTER_HEADS = malloc(k * sizeof(size_t));
         mem_error_cluster_heads = initialize_cluster_heads(k, CLUSTER_HEADS);
         
         if (mem_error_cluster_heads == 1) {
@@ -148,7 +149,7 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         }
 
         // Set up array of pointers-to-nodes, return if memory runs out
-        struct node *PTR_NODES[n];
+        struct node *PTR_NODES[n]; // use pointer to pointer as well
         mem_error_cluster_lists = fill_cluster_lists(
             n, k, clusters, 
             POINTS, PTR_NODES, CLUSTER_HEADS
