@@ -57,7 +57,7 @@ done when optimizing the "diversity" (i.e., the default in
 sets (for about N > 20000 on my personal computer). Extending
 \code{fast_anticlustering} to k-plus anticlustering is rather straight
 forward by applying \code{\link{kplus_moment_variables}} on the input 
-and possibly using the argument \code{exchange_partners} (see
+(and possibly using the argument \code{exchange_partners}, see
 examples).
 
 The function \code{fast_anticlustering} employs a speed-optimized
@@ -154,7 +154,7 @@ mean_sd_tab(data, groups)
 # Use custom exchange partners, here: 10 random exchange partners for each element
 features <- matrix(rnorm(500 * 5), ncol = 5)
 n_exchange_partners <- 10
-K <- 100
+K <- 100 # here the exchange partners make some difference
 init <- sample(rep_len(1:K, nrow(features)))
 groups_rnd_partners <- fast_anticlustering(
   features, 
