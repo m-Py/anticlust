@@ -6,8 +6,8 @@
 \usage{
 generate_exchange_partners(
   n_exchange_partners,
-  features = NULL,
   N = NULL,
+  features = NULL,
   method = "RANN",
   categories = NULL
 )
@@ -15,11 +15,13 @@ generate_exchange_partners(
 \arguments{
 \item{n_exchange_partners}{The number of exchange partners per element}
 
-\item{features}{The features for which nearest neighbours are sought. May be NULL if random exchange partners are generated.}
+\item{N}{The number of elements for which exchange partners; can be \code{NULL} 
+if \code{features} is passed (it is ignored if \code{features} is passed).}
 
-\item{N}{The number of elements for which exchange partners; can be \code{NULL} if \code{features} is passed (it is ignored if \code{features} is passed).}
+\item{features}{The features for which nearest neighbours are sought if \code{method = "RANN"}.
+May be NULL if random exchange partners are generated.}
 
-\item{method}{Currently supports "RANN" and "random"}
+\item{method}{Currently supports "random" (default), "RANN" and "restricted_random". See details.}
 
 \item{categories}{A vector, data.frame or matrix representing one
 or several categorical constraints.}
@@ -31,12 +33,32 @@ A list of length \code{N}. Is usually used as input to the argument \code{exchan
 \description{
 Get exchange partners for fast_anticlustering()
 }
+\details{
+The \code{method = "RANN"} generates exchange partners using a nearest neighbour search 
+via \code{\link[RANN]{nn2}} from the \code{RANN} package; \code{methode = "restricted_random"}
+generates random exchange partners but ensures that for each element, no duplicates
+are generated and that the element itself does not occur as exchange partner (this is the slowest 
+method, and I would not recommend it for large N);
+\code{method = "random"} (default) does not impose these restrictions and generates unrescricted random 
+partners (it may therefore generate duplicates and the element itself as exchange partner).
+}
 \examples{
 
+# Restricted random method generates no duplicates per element and cannot return 
+# the element itself as exchange partner
+generate_exchange_partners(5, N = 10, method = "restricted_random")
+# "random" simply randomizes with replacement and without restrictions
+# (categorical restrictions are also not possible; is much faster for large data sets)
 generate_exchange_partners(5, N = 10, method = "random")
-# may return less than 5 exchange partners if there are not enough members of the same category: 
-generate_exchange_partners(5, N = 10, method = "random", categories = cbind(schaper2019$room, schaper2019$frequency))
-# using nearest neighbour search (unlike RANN::nn2, this does not return the ID of the element itself as neighbour)
+# May return less than 5 exchange partners if there are not enough members 
+# of the same category: 
+generate_exchange_partners(
+  5, N = 10, 
+  method = "restricted_random", 
+  categories = cbind(schaper2019$room, schaper2019$frequency)
+)
+# using nearest neighbour search (unlike RANN::nn2, this does not 
+# return the ID of the element itself as neighbour)
 generate_exchange_partners(5, features = schaper2019[, 3:5], method = "RANN")[1:3]
 # compare with RANN directly:
 RANN::nn2(schaper2019[, 3:5], k = 5)$nn.idx[1:3, ]
