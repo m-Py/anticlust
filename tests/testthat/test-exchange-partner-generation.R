@@ -80,7 +80,7 @@ test_that("Exchange partners are generatede correctly for fast k-means method", 
   )
   test_idx(partners, categories)
   ## ensure correct order of the output 
-  expect_true(all(sapply(partners, function(x) x[1]) == 1:N))
+  expect_true(all(lengths(partners) == k_neighbours))
   
   # Case 2: no restriction on number of exchange partners
   partners <- all_exchange_partners(
@@ -99,15 +99,22 @@ test_that("Exchange partners are generatede correctly for fast k-means method", 
     k_neighbours = k_neighbours,
     categories = NULL
   )
-  expect_true(all(sapply(partners, length) == k_neighbours + 1))
-  ## ensure correct order of the output 
-  expect_true(all(sapply(partners, function(x) x[1]) == 1:N))
-  
+  expect_true(all(lengths(partners) == k_neighbours))
+
   # Case 2: no restriction on number of exchange partners
   partners <- all_exchange_partners(
     features = features,
     k_neighbours = Inf,
     categories = NULL
   )
-  expect_true(all(sapply(partners, length) == N))
+  expect_true(all(lengths(partners) == N))
 })
+
+test_that("remove_self() function works as intended in exchange partner generation", {
+ expect_true(
+   identical(
+     remove_self(list(c(2, 1), c(3, 2), c(4, 3))), list(2, 3, 4)
+    )
+  )
+})
+

@@ -66,5 +66,23 @@ test_that("New k-means C implementation yields same results as other implementat
   ac1 <- fast_anticlustering(features, K = init, exchange_partners = matrix_to_list(nn_exchange_partners))
   ac2 <- fast_anticlustering(features, K = init, k_neighbours = k_neighbours)
   expect_true(all(ac1 == ac2))
-
+  
+  # ensure that using exchange_partners does the same as not using it, when combining with new function generate_exchange_partners()
+  ac1 <- fast_anticlustering(features, K = init, exchange_partners = generate_exchange_partners(5, features, method = "RANN"))
+  ac2 <- fast_anticlustering(features, K = init, k_neighbours = 5)
+  expect_true(all(ac1 == ac2))
+  
+  # again, using a different data set
+  features <- iris[,-5]
+  init <- initialize_clusters(K = 75, N = nrow(features), NULL)
+  n_exchange_partners <- 10
+  groups1 <- fast_anticlustering(
+    features,
+    K = init,
+    exchange_partners = generate_exchange_partners(n_exchange_partners, features = features, method = "RANN")
+  )
+  # compare with using nearest neighbours as exchange partners:
+  groups2 <- fast_anticlustering(features, K = init, k_neighbours = n_exchange_partners)
+  expect_true(all(groups1 == groups2))
+  
 })

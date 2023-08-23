@@ -19,7 +19,7 @@
 #'     each element is exchanged with each element in other groups.
 #' @param categories A vector, data.frame or matrix representing one
 #'     or several categorical constraints.
-#' @param exchange_partners Optional argument. A list of length
+#' @param Optional argument. A list of length
 #'     \code{NROW(x)} specifying for each element the indices of the
 #'     elements that serve as exchange partners. If used, this
 #'     argument overrides the \code{k_neighbours} argument. See
@@ -40,6 +40,8 @@
 #' \code{\link{categories_to_binary}}
 #'
 #' \code{\link{variance_objective}}
+#' 
+#' \code{\link{generate_exchange_partners}}
 #'
 #' @export
 #'
@@ -142,25 +144,26 @@
 #' groups <- fast_anticlustering(data, K = 2, k_neighbours = 2)
 #' mean_sd_tab(data, groups)
 #' 
-#' # "Advanced" usage: Use custom exchange partners, here: 10 random exchange partners for each element
-#' 
-#' N <- 600
-#' M <- 5
+#' # Use custom exchange partners, here: 10 random exchange partners for each element
 #' n_exchange_partners <- 10
-#' features <- matrix(rnorm(N * M), ncol = M)
-#' exchange_partners <- lapply(rep(N, N), function(x) 1:x)
-#' # remove the index of the element itself, so we ensure that each element has 
-#' # 10 exchange partners excluding itself
-#' exchange_partners <- lapply(1:N, function(i) exchange_partners[[i]][-i])
-#' all(lengths(exchange_partners) == N-1)
-#' exchange_partners <- lapply(exchange_partners, function(x) sample(x)[1:n_exchange_partners])
-#' exchange_partners[1:3] # check out for the first 3 elements
+#' K <- 10
+#' init <- sample(rep_len(1:K, nrow(features)))
+#' groups_rnd_partners <- fast_anticlustering(
+#'   features, 
+#'   K = init, 
+#'   exchange_partners = generate_exchange_partners(
+#'     n_exchange_partners, 
+#'     features = features, method = "random"
+#'   )
+#' )
 #' 
-#' groups_nn_partners <- fast_anticlustering(features, K = 6, k_neighbours = n_exchange_partners)
-#' groups_rnd_partners <- fast_anticlustering(features, K = 6, exchange_partners = exchange_partners)
+#' # compare with using nearest neighbours as exchange partners (i.e., the default)
+#' groups_nn_partners <- fast_anticlustering(features, K = init, k_neighbours = n_exchange_partners)
+#' groups_all_partners <- fast_anticlustering(features, K = init)
 #' 
 #' variance_objective(features, groups_nn_partners)
 #' variance_objective(features, groups_rnd_partners)
+#' variance_objective(features, groups_all_partners)
 #'
 
 fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL, 
@@ -189,6 +192,8 @@ fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL,
     # unevenly distributed)
     max_exchanges_partners <- max(lengths(exchange_partners))
     exchange_partners <- lapply(exchange_partners, function(x) c(x[1:length(x)], rep(N+1, max(0, max_exchanges_partners - length(x)))))
+    # remove potential NAs
+    exchange_partners <- lapply(exchange_partners, function(x) x[!is.na(x)]) 
     exchange_partners <- unname(t(t(as.data.frame(exchange_partners))))
     # `exchange_partners` is passed as matrix to C; there it is converted to a 1-dimensional "vector".
     # Here we pass it as a matrix where elements = columns; cols = exchange partners.
@@ -332,6 +337,56 @@ update_centers <- function(centers, features, i, j, cluster_i, cluster_j, tab) {
   centers
 }
 
+#' Get exchange partners for fast_anticlustering()
+#' 
+#' @param n_exchange_partners The number of exchange partners per element
+#' @param features The features for which nearest neighbours are sought. May be NULL if random exchange partners are generated.
+#' @param N The number of elements for which exchange partners; can be \code{NULL} if \code{features} is passed (it is ignored if \code{features} is passed).
+#' @param method Currently supports "RANN" and "random" 
+#' @param categories A vector, data.frame or matrix representing one
+#'     or several categorical constraints.
+#'
+#' @return A list of length \code{N}. Is usually used as input to the argument \code{exchange_partners} in \code{\link{fast_anticlustering}}.
+#'   Then, the i'th element of the list contains the indices of the exchange partners that are used for the i'th element.
+#' 
+#' @export
+#' 
+#' @examples
+#' 
+#' generate_exchange_partners(5, N = 10, method = "random")
+#' # may return less than 5 exchange partners if there are not enough members 
+#' # of the same category: 
+#' generate_exchange_partners(
+#'   5, N = 10, 
+#'   method = "random", 
+#'   categories = cbind(schaper2019$room, schaper2019$frequency)
+#' )
+#' # using nearest neighbour search (unlike RANN::nn2, this does not 
+#' # return the ID of the element itself as neighbour)
+#' generate_exchange_partners(5, features = schaper2019[, 3:5], method = "RANN")[1:3]
+#' # compare with RANN directly:
+#' RANN::nn2(schaper2019[, 3:5], k = 5)$nn.idx[1:3, ]
+#' 
+generate_exchange_partners <- function(n_exchange_partners, features = NULL, N = NULL, method = "RANN", categories = NULL) {
+  if (argument_exists(features)) {
+    N <- NROW(features)
+  }
+  categories <- merge_into_one_variable(categories)
+  validate_input(n_exchange_partners, "n_exchange_partners", objmode = "numeric", len = 1,
+                 must_be_integer = TRUE, greater_than = 0, not_na = TRUE)
+  if (argument_exists(features) && method == "RANN") {
+    return(nearest_neighbours(features, n_exchange_partners, categories))
+  } else if (method == "random") {
+    init_list <- NULL
+    if (argument_exists(categories)) {
+      init_list <- list_idx_by_category(categories)
+    }
+    return(random_exchange_partners(N, n_exchange_partners, init_list))
+  } else {
+    stop("Argument method must be 'RANN' or 'random'. When method is 'RANN', the argument 'features' must be used.")
+  }
+}
+
 #' Get exchange partners for k-means anticlustering 
 #'
 #' @details
@@ -360,11 +415,15 @@ all_exchange_partners <- function(features, k_neighbours, categories) {
 all_exchange_partners_ <- function(N, categories) {
   # Case 1: Exchange partners are from the same category
   if (argument_exists(categories)) {
-    category_ids <- lapply(1:max(categories), function(i) which(categories == i))
-    return(category_ids[categories])
+    return(list_idx_by_category(categories))
   }
   # Case 2: Everyone is potential exchange partner
   rep(list(1:N), N) 
+}
+
+list_idx_by_category <- function(categories) {
+  category_ids <- lapply(1:max(categories), function(i) which(categories == i))
+  category_ids[categories]
 }
 
 # Generate exchange partners via nearest neighbor search using RANN::nn2
@@ -398,7 +457,7 @@ nearest_neighbours <- function(features, k_neighbours, categories) {
     idx <- idx[original_order]
   }
   # return as list
-  idx
+  remove_self(idx)
 }
 
 # Convert a matrix to list - each row becomes list element
@@ -410,3 +469,25 @@ matrix_to_list <- function(x) {
 merge_lists <- function(list_of_lists) {
   do.call(c, list_of_lists)
 }
+
+
+# generate list of random exchange partners; will not generate itself as exchange partner
+random_exchange_partners <- function(N, n_exchange_partners, init_partners = NULL) {
+  if (is.null(init_partners)) {
+    init_partners <- rep(list(1:N), N) 
+  }
+  init_partners <- remove_self(init_partners)
+  partners <- lapply(init_partners, function(x) sample_(x)[1:n_exchange_partners])
+  # possibly remove NAs
+  lapply(partners, function(x) x[!is.na(x)]) 
+}
+
+# remove in a list for each element the ID of the list elements position 
+remove_self <- function(idx_list) {
+  N <- length(idx_list)
+  lapply(1:N, function(i) idx_list[[i]][idx_list[[i]] != i])
+}
+
+
+#' # remove the index of the element itself, so we ensure that each element has 
+#' # 10 exchange partners excluding itself
