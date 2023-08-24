@@ -8,7 +8,7 @@
  * changed through this function. 
  */
 void objective_by_cluster(size_t m, size_t k, double OBJ_BY_CLUSTER[k], 
-                          double CENTERS[k][m], struct node *HEADS[k]) {
+                          double CENTERS[k][m], struct node **HEADS) {
         for (size_t i = 0; i < k; i++) {
                 OBJ_BY_CLUSTER[i] = cluster_var(m, HEADS[i], CENTERS[i]);
         }

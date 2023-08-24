@@ -12,7 +12,7 @@
 *     fails during setup. (the same logic holds for the below free 
 *     functions that target different data structures)
 */
-void free_cluster_list(size_t k, struct node *PTR_CLUSTER_HEADS[k], size_t i) {
+void free_cluster_list(size_t k, struct node **PTR_CLUSTER_HEADS, size_t i) {
         struct node *ptr;
         struct node *prev; // using temp pointer for freeing
         for (size_t j = 0; j < i; j++) {
@@ -28,7 +28,7 @@ void free_cluster_list(size_t k, struct node *PTR_CLUSTER_HEADS[k], size_t i) {
 }
 
 /* Free index array for categories */
-void free_category_indices(size_t c, size_t *CATEGORY_HEADS[c], size_t i) {
+void free_category_indices(size_t c, size_t **CATEGORY_HEADS, size_t i) {
     for (size_t j = 0; j < i; j++) {
         free(CATEGORY_HEADS[j]);
     }
@@ -45,7 +45,7 @@ void free_distances(size_t n, double *DISTANCES[n], size_t i) {
  * param `struct element POINTS[n]`: Array containing data points
  * param `size_t i`: The index up to which data points are freed
  */
-void free_points(size_t n, struct element POINTS[n], size_t i) {
+void free_points(size_t n, struct element *POINTS, size_t i) {
         for (size_t j = 0; j < i; j++) {
                 free(POINTS[j].values);
         }
