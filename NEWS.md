@@ -1,6 +1,7 @@
 # devel
 
-- `fast_anticlustering()` has been re-implemented in C, which is much faster than the previous R implementation, and which does not crash the computer for about N > 250000 elements, as done by [`anticlustering()`](https://github.com/m-Py/anticlust/issues/50)).
+- `anticlustering()` received internal changes to ensure that it [no longer crashes the computer for about N > 250000 elements](https://github.com/m-Py/anticlust/issues/50)).
+- `fast_anticlustering()` has been re-implemented in C, which is much faster than the previous R implementation
 - `fast_anticlustering()` now has an additional argument `exchange_partners`, which can be used to pass custom exchange partners instead of using the default nearest neighbour search
 - new exported function `generate_exchange_partners()`, can be used to address the new argument `exchange_partners` in `fast_anticlustering()`
 - The vignette "Speeding up anticlustering" has been rewritten to reflect that `fast_anticlustering()` is now again a suitable choice for the fast processing of large data sets

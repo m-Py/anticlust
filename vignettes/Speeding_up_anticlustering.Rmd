@@ -274,7 +274,7 @@ K-plus anticlustering can also be conducted with `fast_anticlustering()`. Here, 
 groups <- fast_anticlustering(kplus_moment_variables(data, T = 2), K = K, k_neighbours = n_exchange_partners)
 ```
 
-Quite ironically, `anticlustering()` is usually faster than `fast_anticlustering()`. For the specifications in this example, there is a discrepancy of about 2-3s (`anticlustering()`) versus about 35s (`fast_anticlustering()`) on my computer. This is because `anticlustering()` internally uses a C implementation that is "clever" by creating custom data structures that fit a cluster structure neatly. In particular, it becomes faster with an increasing number of clusters, for which reason I chose a rather large number of clusters ($K = 50$) However, for $N > 250000$, the `anticlustering()` implementation tends to crash the R session, while `fast_anticlustering()` still works---which does not try to be clever. 
+Quite ironically, `anticlustering()` is usually faster than `fast_anticlustering()`. For the specifications in this example, there is a discrepancy of about 2-3s (`anticlustering()`) versus about 35s (`fast_anticlustering()`) on my computer. This is because `anticlustering()` internally uses a C implementation that is "clever" by creating custom data structures that fit a cluster structure neatly. In particular, it becomes faster with an increasing number of clusters, for which reason I chose a rather large number of clusters ($K = 50$). 
 
 ## References
 
