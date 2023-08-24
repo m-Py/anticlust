@@ -21,6 +21,7 @@ int fill_data_points(double *data, size_t n, size_t m, struct element *POINTS,
         }
         
         // Size of a data vector per element:
+        size_t data_size = m * sizeof(POINTS[0].values[0]);
 
         for (size_t i = 0; i < n; i++) {
                 POINTS[i].cluster = clusters[i];
@@ -31,7 +32,7 @@ int fill_data_points(double *data, size_t n, size_t m, struct element *POINTS,
                 }
                 POINTS[i].ID = i;
                 
-                POINTS[i].values = malloc(m * sizeof(double));
+                POINTS[i].values = malloc(data_size);
                 if (POINTS[i].values == NULL) {
                         free_points(n, POINTS, i);
                         return 1;

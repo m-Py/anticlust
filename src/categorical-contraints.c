@@ -49,6 +49,7 @@ int get_indices_by_category(size_t n, size_t c, size_t **CATEGORY_HEADS,
                 }
                 return 0;
         }
+        // here, we just set up a single array of indices (if categories are not used)
         CATEGORY_HEADS[0] = (size_t*) malloc(n * sizeof(size_t));
         if (CATEGORY_HEADS[0] == NULL) {
                 return 1;
@@ -68,7 +69,7 @@ int set_up_categories_list(size_t n, size_t c, struct element *POINTS,
                      int *CAT_frequencies) {
         
         struct node **HEADS; // used for filling `CATEGORY_HEADS` 
-        *HEADS = malloc(c * sizeof(size_t*));
+        HEADS = malloc(c * sizeof(*HEADS));
         if (initialize_cluster_heads(c, HEADS) == 1) {
                 return 1; 
         }
@@ -77,10 +78,10 @@ int set_up_categories_list(size_t n, size_t c, struct element *POINTS,
         
         // Set up array of pointers-to-nodes, return if memory runs out
         struct node **PTR_NODES;
-        *PTR_NODES = malloc(n * sizeof(struct node*));
+        PTR_NODES = malloc(n * sizeof(*PTR_NODES));
         if (fill_cluster_lists(n, c, categories, POINTS, PTR_NODES, HEADS) == 1) {
                 free_cluster_list(c, HEADS, c);
-                free(*PTR_NODES);
+                free(PTR_NODES);
                 return 1;
         }
         
@@ -107,6 +108,6 @@ int set_up_categories_list(size_t n, size_t c, struct element *POINTS,
 
         // free temporary category lists
         free_cluster_list(c, HEADS, c);
-        free(*PTR_NODES);
+        free(PTR_NODES);
         return 0;
 }

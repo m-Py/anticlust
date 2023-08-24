@@ -112,22 +112,26 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
                 data, n, m, POINTS, clusters, 
                 USE_CATS, categories
         );
-        return;
         
+
         if (mem_error_points == 1) {
                 *mem_error = 1;
                 return;
         }
+        
         
         /* CATEGORICAL RESTRICTIONS 
          * Write the pointer of arrays `CATEGORY_HEADS`
         */
         
         size_t c = number_of_categories(USE_CATS, C);
+        
         *CAT_frequencies = get_cat_frequencies(USE_CATS, CAT_frequencies, n);
+        
         size_t **CATEGORY_HEADS;
-        *CATEGORY_HEADS = malloc(c * sizeof(size_t*));
+        CATEGORY_HEADS = malloc(c * sizeof(*CATEGORY_HEADS)); // c * pointer to array of indices
         //TODO: Test NULL / Free
+        
         
         mem_error_categories = get_indices_by_category(
                 n, c, CATEGORY_HEADS, USE_CATS, categories, CAT_frequencies, POINTS
@@ -143,7 +147,7 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         
         // Set up array of pointer-to-cluster-heads
         struct node **CLUSTER_HEADS;
-        *CLUSTER_HEADS = malloc(k * sizeof(struct node*));
+        CLUSTER_HEADS = malloc(k * sizeof(*CLUSTER_HEADS)); // k * pointer to cluster lists
         //TODO: Test NULL / Free
         mem_error_cluster_heads = initialize_cluster_heads(k, CLUSTER_HEADS); // TODO: k no longer needed as parameter
         
@@ -156,8 +160,8 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
 
         // Set up array of pointers-to-nodes, return if memory runs out
         struct node **PTR_NODES; // use pointer to pointer as well
-        *PTR_NODES = malloc(n * sizeof(struct node*));
-        // TODO: TEst / free
+        PTR_NODES = malloc(n * sizeof(*PTR_NODES));
+        // TODO: Test / free
         mem_error_cluster_lists = fill_cluster_lists(
             n, k, clusters, 
             POINTS, PTR_NODES, CLUSTER_HEADS
