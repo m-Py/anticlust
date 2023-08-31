@@ -7,10 +7,6 @@
 -  `generate_exchange_partners()` is a new exported function that can be used to address the new argument `exchange_partners` in `fast_anticlustering()`
 - The vignette "Speeding up anticlustering" has been rewritten to reflect that `fast_anticlustering()` is now again a suitable choice for processing large data sets
 
-TODOs: 
-
-- Use standard C implementation for k-means anticlustering in fast_anticlustering() (but use the new code to incorporate exchange partners)
-
 # anticlust 0.7.0
 
 - An exact ILP method is now available for maximizing the dispersion, contributed by Max Diekhoff.
