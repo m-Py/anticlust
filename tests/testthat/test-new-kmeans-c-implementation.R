@@ -13,34 +13,38 @@ test_that("New k-means C implementation yields same results as other implementat
   init <- sample(rep_len(1:K, nrow(features)))
   
 
-  ac_exchangeC <- fast_anticlustering(features, K = init, backend = "C", k_neighbours = Inf)
+  # fast_anticlustering() does the same as anticlustering()?
+  ac_exchangeC <- fast_anticlustering(
+    features, K = init, exchange_partners = rep(list(1:N), N) # -> everyone is exchange partner
+  )
   ac_exchangeC2 <- anticlustering(features, K = init, objective = "variance")
 
   expect_true(all(ac_exchangeC == ac_exchangeC2))
   
-  ac_exchangeC <- fast_anticlustering(features, K = init, backend = "C", k_neighbours = 20)
-  ac_exchangeR <- fast_anticlustering(features, K = init, backend = "R", k_neighbours = 20)
-
+  # new C fast_anticlustering() implementation does the same as old R implementation?
+  ac_exchangeC <- fast_anticlustering(features, K = init, k_neighbours = 20)
+  ac_exchangeR <- fast_exchange_(features, init, nearest_neighbours(features, 20, NULL))
   expect_true(all(ac_exchangeC == ac_exchangeR))
   
   # Also test with categorical restrictions
-  features <- schaper2019[, 3:6]
+  features <- as.matrix(schaper2019[, 3:6])
   categories <- schaper2019$room
-  init <- categorical_sampling(categories, K = 3)
-  ac_exchangeC <- fast_anticlustering(features, K = init, backend = "C", k_neighbours = Inf, categories = categories)
-  ac_exchangeC2 <- anticlustering(features, K = init, objective = "variance", categories = categories)
-  expect_true(all(ac_exchangeC == ac_exchangeC2))
+  N <- nrow(features)
+  ac_exchangeC <- fast_anticlustering(features, K = 4, k_neighbours = N-1, categories = categories)
+  ac_exchangeC2 <- anticlustering(features, K = 4, objective = "variance", categories = categories)
+  expect_true(all(table(ac_exchangeC, categories)  == table(ac_exchangeC2, categories)))
   
   # Use reduced exchange partners
-  ac_exchangeC <- fast_anticlustering(features, K = init, backend = "C", k_neighbours = 10, categories = categories)
-  ac_exchangeR <- fast_anticlustering(features, K = init, backend = "R", k_neighbours = 10, categories = categories)
+  init <- initialize_clusters(N, 3, categories)
+  ac_exchangeC <- fast_anticlustering(features, K = init, k_neighbours = 20, categories = categories)
+  ac_exchangeR <- fast_exchange_(features, init, nearest_neighbours(features, 20, to_numeric(categories)))
   expect_true(all(ac_exchangeC == ac_exchangeR))
   
   # What if `k_neighbours` is greater than the number of elements in the group with fewest members?
   categories <- merge_into_one_variable(cbind(schaper2019$syllables, schaper2019$room))
   init <- categorical_sampling(categories, K = 3)
-  ac_exchangeC <- fast_anticlustering(features, K = init, backend = "C", k_neighbours = 10, categories = categories)
-  ac_exchangeR <- fast_anticlustering(features, K = init, backend = "R", k_neighbours = 10, categories = categories)
+  ac_exchangeC <- fast_anticlustering(features, K = init, k_neighbours = 10, categories = categories)
+  ac_exchangeR <- fast_exchange_(features, init, nearest_neighbours(features, 10, categories))
   expect_true(all(table(ac_exchangeC, categories) == table(ac_exchangeR, categories)))
   
   # test custom exchange partners
@@ -49,16 +53,16 @@ test_that("New k-means C implementation yields same results as other implementat
   k_neighbours <- 10
   exchange_partners <- lapply(rep(N, N), function(x) sample(1:x)[1:k_neighbours])
   # R and C implementation the same?
-  ac_exchangeC <- fast_anticlustering(features, K = init, backend = "C", exchange_partners = exchange_partners)
-  ac_exchangeR <- fast_anticlustering(features, K = init, backend = "R", exchange_partners = exchange_partners)
+  ac_exchangeC <- fast_anticlustering(features, K = init, exchange_partners = exchange_partners)
+  ac_exchangeR <- fast_exchange_(features, init, exchange_partners)
   expect_true(all(ac_exchangeC == ac_exchangeR))
   
   # Remove some exchange partners to test if an unequal number of exchange partners works
   exchange_partners[[1]] <- exchange_partners[[1]][-(1:3)]
   exchange_partners[[10]] <- exchange_partners[[10]][-2]
   exchange_partners[[23]] <- exchange_partners[[23]][-(10:7)]
-  ac_exchangeC <- fast_anticlustering(features, K = init, backend = "C", exchange_partners = exchange_partners)
-  ac_exchangeR <- fast_anticlustering(features, K = init, backend = "R", exchange_partners = exchange_partners)
+  ac_exchangeC <- fast_anticlustering(features, K = init, exchange_partners = exchange_partners)
+  ac_exchangeR <- fast_exchange_(features, init, exchange_partners)
   expect_true(all(ac_exchangeC == ac_exchangeR))
   
   # Does the argument `exchange_partners` really do the same as `k_neighbours`?
