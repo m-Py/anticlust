@@ -88,7 +88,7 @@ c_anticlustering <- function(data, K, categories = NULL, objective, exchange_par
     )
   } else if (objective == "fast-kmeans") {
     results <- .C(
-      "fast_kmeans_anticlustering",
+      "fast_kmeans_anticlustering2",
       as.double(data),
       as.integer(N),
       as.integer(M),
