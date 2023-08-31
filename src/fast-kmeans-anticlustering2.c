@@ -158,41 +158,43 @@ void fast_kmeans_anticlustering2(double *data, int *N, int *M, int *K, int *freq
                         // this just counts upwards across all exchange partners, 
                         // ignores matrix-like structure:
                         id_current_exch_partner++;
-                        size_t cl2 = PTR_NODES[j]->data->cluster;
-                        // no swapping attempt if in the same cluster:
-                        if (cl1 == cl2) { 
-                                continue;
+                        if (j != n) { // no exchange partners any more; coded as index = N
+                                size_t cl2 = PTR_NODES[j]->data->cluster;
+                                // no swapping attempt if in the same cluster:
+                                if (cl1 == cl2) { 
+                                  continue;
+                                }
+                                
+                                // Initialize `tmp` variables for the exchange partner:
+                                copy_matrix(k, m, CENTERS, tmp_centers);
+                                copy_array(k, OBJ_BY_CLUSTER, tmp_objs);
+                                
+                                update_centers(
+                                  k, m, 
+                                  tmp_centers, 
+                                  PTR_NODES[i],
+                                           PTR_NODES[j],
+                                                    frequencies
+                                );
+                                swap(i, j, PTR_NODES);
+                                // Update objective
+                                tmp_objs[cl1] = cluster_var(m, CLUSTER_HEADS[cl1],
+                                                            tmp_centers[cl1]);
+                                tmp_objs[cl2] = cluster_var(m, CLUSTER_HEADS[cl2],
+                                                            tmp_centers[cl2]);
+                                tmp_obj = array_sum(k, tmp_objs);
+                                
+                                // Update `best` variables if objective was improved
+                                if (tmp_obj > best_obj) {
+                                  best_obj = tmp_obj;
+                                  copy_matrix(k, m, tmp_centers, best_centers);
+                                  copy_array(k, tmp_objs, best_objs);
+                                  best_partner = j;
+                                }
+                                
+                                // Swap back to test next exchange partner
+                                swap(i, j, PTR_NODES);
                         }
-
-                        // Initialize `tmp` variables for the exchange partner:
-                        copy_matrix(k, m, CENTERS, tmp_centers);
-                        copy_array(k, OBJ_BY_CLUSTER, tmp_objs);
-                        
-                        update_centers(
-                                k, m, 
-                                tmp_centers, 
-                                PTR_NODES[i],
-                                PTR_NODES[j],
-                                frequencies
-                        );
-                        swap(i, j, PTR_NODES);
-                        // Update objective
-                        tmp_objs[cl1] = cluster_var(m, CLUSTER_HEADS[cl1],
-                                                    tmp_centers[cl1]);
-                        tmp_objs[cl2] = cluster_var(m, CLUSTER_HEADS[cl2],
-                                                    tmp_centers[cl2]);
-                        tmp_obj = array_sum(k, tmp_objs);
-                        
-                        // Update `best` variables if objective was improved
-                        if (tmp_obj > best_obj) {
-                                best_obj = tmp_obj;
-                                copy_matrix(k, m, tmp_centers, best_centers);
-                                copy_array(k, tmp_objs, best_objs);
-                                best_partner = j;
-                        }
-                        
-                        // Swap back to test next exchange partner
-                        swap(i, j, PTR_NODES);
                 }
                 
                 // Only if objective is improved: Do the swap
