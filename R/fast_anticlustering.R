@@ -254,113 +254,6 @@ validate_exchange_partners <- function(exchange_partners, categories, N) {
 
 
 
-#### THIS IS AN OLD AN OBSOLETE R IMPLEMENTATION; I AM KEEPING IT FOR THE TEST FILES
-#' Solve anticlustering using the fast exchange method
-#'
-#' @param data the data -- an N x M table of item features
-#' @param clusters An initial cluster assignment
-#' @param all_exchange_partners A list of exchange partners
-#'
-#' @return The anticluster assignment
-#'
-#' @noRd
-#'
-
-fast_exchange_ <- function(data, clusters, all_exchange_partners) {
-  N <- nrow(data)
-  best_total <- variance_objective_(clusters, data)
-  centers <- cluster_centers(data, clusters)
-  distances <- dist_from_centers(data, centers, squared = TRUE)
-  
-  ## frequencies of each cluster are required for updating cluster centers:
-  tab <- c(table(clusters))
-  for (i in 1:N) {
-    # cluster of current item
-    cluster_i <- clusters[i]
-    # get exchange partners for item i
-    exchange_partners <- all_exchange_partners[[i]]
-    # exchange partners are not in the same cluster:
-    exchange_partners <- exchange_partners[clusters[exchange_partners] != clusters[i]]
-    # Sometimes an exchange cannot take place
-    if (length(exchange_partners) == 0) {
-      next
-    }
-    # container to store objectives associated with each exchange of item i:
-    comparison_objectives <- rep(NA, length(exchange_partners))
-    for (j in seq_along(exchange_partners)) {
-      ## Swap item i with all legal exchange partners and check out objective
-      # (a) Determine clusters of to-be-swapped elements
-      tmp_clusters <- clusters
-      tmp_swap <- exchange_partners[j]
-      cluster_j <- tmp_clusters[tmp_swap]
-      # (b) Swap the elements
-      tmp_clusters[i] <- cluster_j
-      tmp_clusters[tmp_swap] <- cluster_i
-      # (c) Update cluster centers after swap
-      tmp_centers <- update_centers(centers, data, i, tmp_swap, cluster_i, cluster_j, tab)
-      # (d) Update distances from centers after swap
-      tmp_distances <- update_distances(data, tmp_centers, distances, cluster_i, cluster_j)
-      # (e) Compute objective after swap
-      comparison_objectives[j] <- sum(tmp_distances[cbind(1:nrow(tmp_distances), tmp_clusters)])
-    }
-    ## If an improvement of the objective occured, do the swap
-    best_this_round <- max(comparison_objectives)
-    if (best_this_round > best_total) {
-      # which element has to be swapped
-      swap <- exchange_partners[comparison_objectives == best_this_round][1]
-      # Update cluster centers
-      centers <- update_centers(centers, data, i, swap, clusters[i], clusters[swap], tab)
-      # Update distances
-      distances <- update_distances(data, centers, distances, cluster_i, clusters[swap])
-      # Actually swap the elements - i.e., update clusters
-      clusters[i] <- clusters[swap]
-      clusters[swap] <- cluster_i
-      # Update best solution
-      best_total <- best_this_round
-    }
-  }
-  clusters
-}
-
-#' Recompute distances from cluster centers after swapping two elements
-#' @param distances distances from cluster centers per element (old)
-#' @param cluster_i the cluster of element i
-#' @param cluster_j the cluster of element j
-#' @return The new distances
-#' @noRd
-update_distances <- function(features, centers, distances, cluster_i, cluster_j) {
-  for (k in c(cluster_i, cluster_j)) {
-    distances[, k] <- colSums((t(features) - centers[k,])^2)
-  }
-  distances
-}
-
-#' Update a cluster center after swapping two elements
-#'
-#' @param centers The current cluster centers
-#' @param features The features
-#' @param i the index of the first element to be swapped
-#' @param j the index of the second element to be swapped
-#' @param cluster_i the cluster of element i
-#' @param cluster_j the cluster of element j
-#' @param tab A table of the cluster frequencies
-#'
-#' @details
-#'
-#' This should make the fast exchange method much faster, because
-#' most time is spent on finding the cluster centers. After swapping
-#' only two elements, it should be possible to update the two centers
-#' very fast
-#' @noRd
-
-update_centers <- function(centers, features, i, j, cluster_i, cluster_j, tab) {
-  ## First cluster: item i is removed, item j is added
-  centers[cluster_i, ] <- centers[cluster_i, ] - (features[i, ] / tab[cluster_i]) + (features[j, ] / tab[cluster_i])
-  ## Other cluster: item j is removed, item i is added
-  centers[cluster_j, ] <- centers[cluster_j, ] + (features[i, ] / tab[cluster_j]) - (features[j, ] / tab[cluster_j])
-  centers
-}
-
 #' Get exchange partners for fast_anticlustering()
 #' 
 #' @param n_exchange_partners The number of exchange partners per element
@@ -506,3 +399,115 @@ remove_self <- function(idx_list) {
   N <- length(idx_list)
   lapply(1:N, function(i) idx_list[[i]][idx_list[[i]] != i])
 }
+
+
+
+
+#### THIS IS AN OLD AN OBSOLETE R IMPLEMENTATION; I AM KEEPING IT FOR THE TEST FILES
+#' Solve anticlustering using the fast exchange method
+#'
+#' @param data the data -- an N x M table of item features
+#' @param clusters An initial cluster assignment
+#' @param all_exchange_partners A list of exchange partners
+#'
+#' @return The anticluster assignment
+#'
+#' @noRd
+#'
+
+fast_exchange_ <- function(data, clusters, all_exchange_partners) {
+  N <- nrow(data)
+  best_total <- variance_objective_(clusters, data)
+  centers <- cluster_centers(data, clusters)
+  distances <- dist_from_centers(data, centers, squared = TRUE)
+  
+  ## frequencies of each cluster are required for updating cluster centers:
+  tab <- c(table(clusters))
+  for (i in 1:N) {
+    # cluster of current item
+    cluster_i <- clusters[i]
+    # get exchange partners for item i
+    exchange_partners <- all_exchange_partners[[i]]
+    # exchange partners are not in the same cluster:
+    exchange_partners <- exchange_partners[clusters[exchange_partners] != clusters[i]]
+    # Sometimes an exchange cannot take place
+    if (length(exchange_partners) == 0) {
+      next
+    }
+    # container to store objectives associated with each exchange of item i:
+    comparison_objectives <- rep(NA, length(exchange_partners))
+    for (j in seq_along(exchange_partners)) {
+      ## Swap item i with all legal exchange partners and check out objective
+      # (a) Determine clusters of to-be-swapped elements
+      tmp_clusters <- clusters
+      tmp_swap <- exchange_partners[j]
+      cluster_j <- tmp_clusters[tmp_swap]
+      # (b) Swap the elements
+      tmp_clusters[i] <- cluster_j
+      tmp_clusters[tmp_swap] <- cluster_i
+      # (c) Update cluster centers after swap
+      tmp_centers <- update_centers(centers, data, i, tmp_swap, cluster_i, cluster_j, tab)
+      # (d) Update distances from centers after swap
+      tmp_distances <- update_distances(data, tmp_centers, distances, cluster_i, cluster_j)
+      # (e) Compute objective after swap
+      comparison_objectives[j] <- sum(tmp_distances[cbind(1:nrow(tmp_distances), tmp_clusters)])
+    }
+    ## If an improvement of the objective occured, do the swap
+    best_this_round <- max(comparison_objectives)
+    if (best_this_round > best_total) {
+      # which element has to be swapped
+      swap <- exchange_partners[comparison_objectives == best_this_round][1]
+      # Update cluster centers
+      centers <- update_centers(centers, data, i, swap, clusters[i], clusters[swap], tab)
+      # Update distances
+      distances <- update_distances(data, centers, distances, cluster_i, clusters[swap])
+      # Actually swap the elements - i.e., update clusters
+      clusters[i] <- clusters[swap]
+      clusters[swap] <- cluster_i
+      # Update best solution
+      best_total <- best_this_round
+    }
+  }
+  clusters
+}
+
+#' Recompute distances from cluster centers after swapping two elements
+#' @param distances distances from cluster centers per element (old)
+#' @param cluster_i the cluster of element i
+#' @param cluster_j the cluster of element j
+#' @return The new distances
+#' @noRd
+update_distances <- function(features, centers, distances, cluster_i, cluster_j) {
+  for (k in c(cluster_i, cluster_j)) {
+    distances[, k] <- colSums((t(features) - centers[k,])^2)
+  }
+  distances
+}
+
+#' Update a cluster center after swapping two elements
+#'
+#' @param centers The current cluster centers
+#' @param features The features
+#' @param i the index of the first element to be swapped
+#' @param j the index of the second element to be swapped
+#' @param cluster_i the cluster of element i
+#' @param cluster_j the cluster of element j
+#' @param tab A table of the cluster frequencies
+#'
+#' @details
+#'
+#' This should make the fast exchange method much faster, because
+#' most time is spent on finding the cluster centers. After swapping
+#' only two elements, it should be possible to update the two centers
+#' very fast
+#' @noRd
+
+update_centers <- function(centers, features, i, j, cluster_i, cluster_j, tab) {
+  ## First cluster: item i is removed, item j is added
+  centers[cluster_i, ] <- centers[cluster_i, ] - (features[i, ] / tab[cluster_i]) + (features[j, ] / tab[cluster_i])
+  ## Other cluster: item j is removed, item i is added
+  centers[cluster_j, ] <- centers[cluster_j, ] + (features[i, ] / tab[cluster_j]) - (features[j, ] / tab[cluster_j])
+  centers
+}
+
+############ END OLD OBSOLETE IMPLEMENTATION
