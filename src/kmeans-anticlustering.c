@@ -5,7 +5,7 @@
 
 /* Exchange Method for Anticlustering
  * param *data: vector of data points (in R, this is a data frame,
- *         the matrix structure must be restored in C)
+ *         here, it is a vector)
  * param *N: The number of elements (i.e., number of "rows" in *data)
  * param *M: The number of features (i.e., number of "cols" in *data)
  * param *K: The number of clusters
@@ -33,7 +33,7 @@
  * 
  * Throughout this method, some data structures are defined that are used
  * throughout. The function works by first initializing the required data 
- * structures on which an exchange optimization algorithm is concuted.
+ * structures on which an exchange optimization algorithm is conducted.
  * 
  * These are the data structures that are "global" throughout the function:
  * 
