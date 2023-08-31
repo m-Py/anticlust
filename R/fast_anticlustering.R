@@ -117,17 +117,21 @@
 #'
 #' @examples
 #'
+#' ## Use fewer or more exchange partners to adjust speed (vs. quality tradeoff)
 #' features <- iris[, - 5]
-#'
-#' groups1 <- fast_anticlustering(features, K = 3)
-#'
-#' ## Use fewer or more exchange partners (speed / quality tradeoff)
-#' groups2 <- fast_anticlustering(features, K = 3, k_neighbours = 100)
-#' groups3 <- fast_anticlustering(features, K = 3, k_neighbours = 3)
+#' N <- nrow(features)
+#' init <- sample(rep_len(1:3, N)) # same starting point for all calls:
+#' groups1 <- fast_anticlustering(features, K = init, k_neighbours = N-1) # all exchanges
+#' groups2 <- fast_anticlustering(features, K = init, k_neighbours = 20) #default
+#' groups3 <- fast_anticlustering(features, K = init, k_neighbours = 2)
+#' 
+#' variance_objective(features, groups1)
+#' variance_objective(features, groups2)
+#' variance_objective(features, groups3)
 #'
 #' # Some care is needed when applying k-plus using with this function 
-#' # with a reduced number of exchange partners via nearest neighbour search. 
-#' # Then we:
+#' # while using a reduced number of exchange partners generated in the 
+#' # nearest neighbour search. Then we:
 #' # 1) Use kplus_moment_variables() on the numeric input
 #' # 2) Generate custom exchange_partners because otherwise nearest 
 #' #    neighbours are internally selected based on the extended k-plus 
@@ -150,8 +154,9 @@
 #' 
 #' # Working on several 1000 elements is very fast (Here n = 5000)
 #' data <- matrix(rnorm(5000 * 2), ncol = 2)
+#' start <- Sys.time()
 #' groups <- fast_anticlustering(data, K = 2, k_neighbours = 2)
-#' mean_sd_tab(data, groups)
+#' Sys.time() - start 
 #' 
 #' # Use custom exchange partners. Here: 10 random exchange partners
 #' features <- matrix(rnorm(500 * 5), ncol = 5)
