@@ -90,7 +90,7 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         *   + free in low-level function when possible (i.e., when an allocation error 
         *     occurs within this function)
         *   + Free in high-level function when previously, memory was allocated successfully,
-        *     but then an allocation error occured
+        *     but then an allocation error occurred
         *   + TODO use a safe-free function instead of just `free()`
         */ 
     
@@ -106,15 +106,23 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         
         // Set up array of data points, fill it, return if memory runs out
         struct element *POINTS;
-        POINTS = malloc(n * sizeof(*POINTS));
-        //TODO: test if NULL
-        mem_error_points = fill_data_points(
+        POINTS = malloc(n * sizeof(*POINTS)); // free() is included below
+        if (POINTS == NULL) { 
+                *mem_error = 1;
+                return; 
+        };
+
+        /* The following is quite irritating, because the return value just 
+         encodes if a memory error occurs; the actual work is done as side effects
+         in fill_data_points() 
+          (this is also true for some of the following function calls) */
+        mem_error_points = fill_data_points( 
                 data, n, m, POINTS, clusters, 
                 USE_CATS, categories
         );
-        
 
-        if (mem_error_points == 1) {
+        if (mem_error_points == 1) { // test if all memory was allocated successfully
+                free(POINTS);
                 *mem_error = 1;
                 return;
         }
@@ -129,8 +137,13 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         *CAT_frequencies = get_cat_frequencies(USE_CATS, CAT_frequencies, n);
         
         size_t **CATEGORY_HEADS;
-        CATEGORY_HEADS = malloc(c * sizeof(*CATEGORY_HEADS)); // c * pointer to array of indices
-        //TODO: Test NULL / Free
+        CATEGORY_HEADS = malloc(c * sizeof(*CATEGORY_HEADS));
+        if (CATEGORY_HEADS == NULL) { 
+                free_points(n, POINTS, n);
+                free(POINTS);
+                *mem_error = 1;
+                return; 
+        };
         
         
         mem_error_categories = get_indices_by_category(
@@ -139,6 +152,8 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         
         if (mem_error_categories == 1) {
                 free_points(n, POINTS, n);
+                free(POINTS);
+                free(CATEGORY_HEADS);
                 *mem_error = 1;
                 return; 
         }
@@ -148,12 +163,25 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         // Set up array of pointer-to-cluster-heads
         struct node **CLUSTER_HEADS;
         CLUSTER_HEADS = malloc(k * sizeof(*CLUSTER_HEADS)); // k * pointer to cluster lists
-        //TODO: Test NULL / Free
+        if (CLUSTER_HEADS == NULL) {
+                free_category_indices(c, CATEGORY_HEADS, c); //TODO: c no longer needed as parameter
+                free(CATEGORY_HEADS);
+                free_points(n, POINTS, n);
+                free(POINTS);
+                *mem_error = 1;
+                return; 
+        }
+        
+        
+        
         mem_error_cluster_heads = initialize_cluster_heads(k, CLUSTER_HEADS); // TODO: k no longer needed as parameter
         
         if (mem_error_cluster_heads == 1) {
-                free_points(n, POINTS, n);
+                free(CLUSTER_HEADS);
                 free_category_indices(c, CATEGORY_HEADS, c); //TODO: c no longer needed as parameter
+                free(CATEGORY_HEADS);
+                free_points(n, POINTS, n);
+                free(POINTS);
                 *mem_error = 1;
                 return; 
         }
@@ -161,16 +189,29 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         // Set up array of pointers-to-nodes, return if memory runs out
         struct node **PTR_NODES; // use pointer to pointer as well
         PTR_NODES = malloc(n * sizeof(*PTR_NODES));
-        // TODO: Test / free
+        if (PTR_NODES == NULL) {
+                free(CLUSTER_HEADS);
+                free_category_indices(c, CATEGORY_HEADS, c); //TODO: c no longer needed as parameter
+                free(CATEGORY_HEADS);
+                free_points(n, POINTS, n);
+                free(POINTS);
+                *mem_error = 1;
+                return; 
+        }
+
         mem_error_cluster_lists = fill_cluster_lists(
             n, k, clusters, 
             POINTS, PTR_NODES, CLUSTER_HEADS
         );
         
         if (mem_error_cluster_lists == 1) {
-                free_points(n, POINTS, n);
-                free_category_indices(c, CATEGORY_HEADS, c);
                 free_cluster_list(k, CLUSTER_HEADS, k);
+                free(CLUSTER_HEADS);
+                free_category_indices(c, CATEGORY_HEADS, c); //TODO: c no longer needed as parameter
+                free(CATEGORY_HEADS);
+                free(PTR_NODES);
+                free_points(n, POINTS, n);
+                free(POINTS);
                 *mem_error = 1;
                 return;
         }
@@ -268,8 +309,11 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         free_points(n, POINTS, n);
         free_category_indices(c, CATEGORY_HEADS, c);
         free_cluster_list(k, CLUSTER_HEADS, k);
+        free(CLUSTER_HEADS);
+        free(PTR_NODES);
+        free(CATEGORY_HEADS);
+        free(POINTS);
         
-        // TODO: free some more memory (all that was previously an array and is now a pointer)
 }
 
 /* 

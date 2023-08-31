@@ -61,7 +61,7 @@ int get_indices_by_category(size_t n, size_t c, size_t **CATEGORY_HEADS,
 }
 
 /* This function actually does the work of creating the index arrays pointed
- * to by `C_HEADS`. Sets up a cluster structure where each category corresponds
+ * to by `CATEGORY_HEADS`. Sets up a cluster structure where each category corresponds
  * to a cluster. Then, proceeds to read out the indices of all elements by category. 
  */
 int set_up_categories_list(size_t n, size_t c, struct element *POINTS, 
@@ -70,8 +70,12 @@ int set_up_categories_list(size_t n, size_t c, struct element *POINTS,
         
         struct node **HEADS; // used for filling `CATEGORY_HEADS` 
         HEADS = malloc(c * sizeof(*HEADS));
-        if (initialize_cluster_heads(c, HEADS) == 1) {
+        if (HEADS == NULL) {
                 return 1; 
+        }
+        if (initialize_cluster_heads(c, HEADS) == 1) {
+                free(HEADS);
+                return 1;
         }
         
         /* I really forgot why the following is done, seems wasteful to me... */
@@ -79,8 +83,13 @@ int set_up_categories_list(size_t n, size_t c, struct element *POINTS,
         // Set up array of pointers-to-nodes, return if memory runs out
         struct node **PTR_NODES;
         PTR_NODES = malloc(n * sizeof(*PTR_NODES));
+        if (PTR_NODES == NULL) {
+                free(HEADS);
+                return 1; 
+        }
         if (fill_cluster_lists(n, c, categories, POINTS, PTR_NODES, HEADS) == 1) {
                 free_cluster_list(c, HEADS, c);
+                free(HEADS);
                 free(PTR_NODES);
                 return 1;
         }
@@ -93,6 +102,8 @@ int set_up_categories_list(size_t n, size_t c, struct element *POINTS,
                 if (CATEGORY_HEADS[i] == NULL) {
                         free_category_indices(c, CATEGORY_HEADS, i);
                         free_cluster_list(c, HEADS, c);
+                        free(HEADS);
+                        free(PTR_NODES);
                         return 1;
                 }
                 // Now write `CATEGORY_HEADS`! Fills all `c` arrays with indices, 
@@ -109,5 +120,6 @@ int set_up_categories_list(size_t n, size_t c, struct element *POINTS,
         // free temporary category lists
         free_cluster_list(c, HEADS, c);
         free(PTR_NODES);
+        free(HEADS);
         return 0;
 }
