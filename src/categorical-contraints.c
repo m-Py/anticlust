@@ -87,8 +87,8 @@ int set_up_categories_list(size_t n, size_t c, struct element *POINTS,
                 free(HEADS);
                 return 1; 
         }
-        if (fill_cluster_lists(n, c, categories, POINTS, PTR_NODES, HEADS) == 1) {
-                free_cluster_list(c, HEADS, c);
+        if (fill_cluster_lists(n, categories, POINTS, PTR_NODES, HEADS) == 1) {
+                free_cluster_list(HEADS, c);
                 free(HEADS);
                 free(PTR_NODES);
                 return 1;
@@ -100,8 +100,8 @@ int set_up_categories_list(size_t n, size_t c, struct element *POINTS,
                 size_t n_cats = (size_t) CAT_frequencies[i];
                 CATEGORY_HEADS[i] = (size_t*) malloc(n_cats * sizeof(size_t));
                 if (CATEGORY_HEADS[i] == NULL) {
-                        free_category_indices(c, CATEGORY_HEADS, i);
-                        free_cluster_list(c, HEADS, c);
+                        free_category_indices(CATEGORY_HEADS, i);
+                        free_cluster_list(HEADS, c);
                         free(HEADS);
                         free(PTR_NODES);
                         return 1;
@@ -118,7 +118,7 @@ int set_up_categories_list(size_t n, size_t c, struct element *POINTS,
         }
 
         // free temporary category lists
-        free_cluster_list(c, HEADS, c);
+        free_cluster_list(HEADS, c);
         free(PTR_NODES);
         free(HEADS);
         return 0;

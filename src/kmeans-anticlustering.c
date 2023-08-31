@@ -139,7 +139,7 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         size_t **CATEGORY_HEADS;
         CATEGORY_HEADS = malloc(c * sizeof(*CATEGORY_HEADS));
         if (CATEGORY_HEADS == NULL) { 
-                free_points(n, POINTS, n);
+                free_points(POINTS, n);
                 free(POINTS);
                 *mem_error = 1;
                 return; 
@@ -151,7 +151,7 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         );
         
         if (mem_error_categories == 1) {
-                free_points(n, POINTS, n);
+                free_points(POINTS, n);
                 free(POINTS);
                 free(CATEGORY_HEADS);
                 *mem_error = 1;
@@ -164,9 +164,9 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         struct node **CLUSTER_HEADS;
         CLUSTER_HEADS = malloc(k * sizeof(*CLUSTER_HEADS)); // k * pointer to cluster lists
         if (CLUSTER_HEADS == NULL) {
-                free_category_indices(c, CATEGORY_HEADS, c); //TODO: c no longer needed as parameter
+                free_category_indices(CATEGORY_HEADS, c);
                 free(CATEGORY_HEADS);
-                free_points(n, POINTS, n);
+                free_points(POINTS, n);
                 free(POINTS);
                 *mem_error = 1;
                 return; 
@@ -174,13 +174,13 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         
         
         
-        mem_error_cluster_heads = initialize_cluster_heads(k, CLUSTER_HEADS); // TODO: k no longer needed as parameter
+        mem_error_cluster_heads = initialize_cluster_heads(k, CLUSTER_HEADS);
         
         if (mem_error_cluster_heads == 1) {
                 free(CLUSTER_HEADS);
-                free_category_indices(c, CATEGORY_HEADS, c); //TODO: c no longer needed as parameter
+                free_category_indices(CATEGORY_HEADS, c);
                 free(CATEGORY_HEADS);
-                free_points(n, POINTS, n);
+                free_points(POINTS, n);
                 free(POINTS);
                 *mem_error = 1;
                 return; 
@@ -191,26 +191,26 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         PTR_NODES = malloc(n * sizeof(*PTR_NODES));
         if (PTR_NODES == NULL) {
                 free(CLUSTER_HEADS);
-                free_category_indices(c, CATEGORY_HEADS, c); //TODO: c no longer needed as parameter
+                free_category_indices(CATEGORY_HEADS, c);
                 free(CATEGORY_HEADS);
-                free_points(n, POINTS, n);
+                free_points(POINTS, n);
                 free(POINTS);
                 *mem_error = 1;
                 return; 
         }
 
         mem_error_cluster_lists = fill_cluster_lists(
-            n, k, clusters, 
+            n, clusters,
             POINTS, PTR_NODES, CLUSTER_HEADS
         );
         
         if (mem_error_cluster_lists == 1) {
-                free_cluster_list(k, CLUSTER_HEADS, k);
+                free_cluster_list(CLUSTER_HEADS, k);
                 free(CLUSTER_HEADS);
-                free_category_indices(c, CATEGORY_HEADS, c); //TODO: c no longer needed as parameter
+                free_category_indices(CATEGORY_HEADS, c);
                 free(CATEGORY_HEADS);
                 free(PTR_NODES);
-                free_points(n, POINTS, n);
+                free_points(POINTS, n);
                 free(POINTS);
                 *mem_error = 1;
                 return;
@@ -270,7 +270,7 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
                                 PTR_NODES[j],
                                 frequencies
                         );
-                        swap(n, i, j, PTR_NODES);
+                        swap(i, j, PTR_NODES);
                         // Update objective
                         tmp_objs[cl1] = cluster_var(m, CLUSTER_HEADS[cl1],
                                                     tmp_centers[cl1]);
@@ -287,12 +287,12 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
                         }
                         
                         // Swap back to test next exchange partner
-                        swap(n, i, j, PTR_NODES);
+                        swap(i, j, PTR_NODES);
                 }
                 
                 // Only if objective is improved: Do the swap
                 if (best_obj > SUM_OBJECTIVE) {
-                        swap(n, i, best_partner, PTR_NODES);
+                        swap(i, best_partner, PTR_NODES);
                         // Update the "global" variables
                         SUM_OBJECTIVE = best_obj;
                         copy_matrix(k, m, best_centers, CENTERS);
@@ -306,14 +306,13 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
         }
         
         // in the end, free allocated memory:
-        free_points(n, POINTS, n);
-        free_category_indices(c, CATEGORY_HEADS, c);
-        free_cluster_list(k, CLUSTER_HEADS, k);
+        free_points(POINTS, n);
+        free_category_indices(CATEGORY_HEADS, c);
+        free_cluster_list(CLUSTER_HEADS, k);
         free(CLUSTER_HEADS);
         free(PTR_NODES);
         free(CATEGORY_HEADS);
         free(POINTS);
-        
 }
 
 /* 
@@ -326,7 +325,7 @@ void kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequencie
  * 
  */
 
-void swap(size_t n, size_t i, size_t j, struct node **PTR_NODES) {
+void swap(size_t i, size_t j, struct node **PTR_NODES) {
         
         struct node *one = PTR_NODES[i];
         struct node *two = PTR_NODES[j];

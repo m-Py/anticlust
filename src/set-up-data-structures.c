@@ -34,7 +34,7 @@ int fill_data_points(double *data, size_t n, size_t m, struct element *POINTS,
                 
                 POINTS[i].values = malloc(data_size);
                 if (POINTS[i].values == NULL) {
-                        free_points(n, POINTS, i);
+                        free_points(POINTS, i);
                         return 1;
                 } 
                 
@@ -67,7 +67,7 @@ int initialize_cluster_heads(size_t k, struct node **HEADS) {
         for (size_t i = 0; i < k; i++) {
                 HEADS[i] = (struct node*) malloc(sizeof(struct node));
                 if (HEADS[i] == NULL) {
-                        free_cluster_list(k, HEADS, i);
+                        free_cluster_list(HEADS, i);
                         return 1;
                 }
                 HEADS[i]->next = NULL;
@@ -80,7 +80,7 @@ int initialize_cluster_heads(size_t k, struct node **HEADS) {
  * (a) add each data point as a node to a cluster list,
  * (b) store the pointer to each node in the array `PTR_NODES`
  */
-int fill_cluster_lists(size_t n, size_t k, int *clusters,
+int fill_cluster_lists(size_t n, int *clusters,
                        struct element *POINTS, struct node **PTR_NODES,
                        struct node **PTR_CLUSTER_HEADS) {
         for (size_t i = 0; i < n; i++) {

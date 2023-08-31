@@ -69,7 +69,7 @@ void distance_anticlustering(double *data, int *N, int *K, int *clusters,
                 n, c, CATEGORY_HEADS, USE_CATS, categories, CAT_frequencies, POINTS
         );
         if (mem_error_categories == 1) {
-                free_points(n, POINTS, n);
+                free_points(POINTS, n);
                 *mem_error = 1;
                 return; 
         }
@@ -79,8 +79,8 @@ void distance_anticlustering(double *data, int *N, int *K, int *clusters,
         mem_error_cluster_heads = initialize_cluster_heads(k, CLUSTER_HEADS);
         
         if (mem_error_cluster_heads == 1) {
-                free_points(n, POINTS, n);
-                free_category_indices(c, CATEGORY_HEADS, c);
+                free_points(POINTS, n);
+                free_category_indices(CATEGORY_HEADS, c);
                 *mem_error = 1;
                 return; 
         }
@@ -88,13 +88,13 @@ void distance_anticlustering(double *data, int *N, int *K, int *clusters,
         // Set up array of pointers-to-nodes, return if memory runs out
         struct node *PTR_NODES[n];
         mem_error_cluster_lists = fill_cluster_lists(
-                n, k, clusters, 
+                n, clusters,
                 POINTS, PTR_NODES, CLUSTER_HEADS
         );
         if (mem_error_cluster_lists == 1) {
-                free_points(n, POINTS, n);
-                free_category_indices(c, CATEGORY_HEADS, c);
-                free_cluster_list(k, CLUSTER_HEADS, k);
+                free_points(POINTS, n);
+                free_category_indices(CATEGORY_HEADS, c);
+                free_cluster_list(CLUSTER_HEADS, k);
                 *mem_error = 1;
                 return;
         }
@@ -108,9 +108,9 @@ void distance_anticlustering(double *data, int *N, int *K, int *clusters,
                 DISTANCES[i] = (double*) malloc(sizeof(double) * n);
                 if (DISTANCES[i] == NULL) {
                         free_distances(n, DISTANCES, i);
-                        free_points(n, POINTS, n);
-                        free_category_indices(c, CATEGORY_HEADS, c);
-                        free_cluster_list(k, CLUSTER_HEADS, k);
+                        free_points(POINTS, n);
+                        free_category_indices(CATEGORY_HEADS, c);
+                        free_cluster_list(CLUSTER_HEADS, k);
                         *mem_error = 1;
                         return;
                 }
@@ -181,7 +181,7 @@ void distance_anticlustering(double *data, int *N, int *K, int *clusters,
                                 j
                         );
                         // Now swap the elements in the cluster list
-                        swap(n, i, j, PTR_NODES);
+                        swap(i, j, PTR_NODES);
                         // Cluster 1: Gains distances to element j
                         // (here, element i is no longer in cluster 1, so
                         // we do not accidentally include d_ij, and the 
@@ -207,12 +207,12 @@ void distance_anticlustering(double *data, int *N, int *K, int *clusters,
                                 best_partner = j;
                         }
                         // Swap back to test next exchange partner
-                        swap(n, i, j, PTR_NODES);
+                        swap(i, j, PTR_NODES);
                 }
                 
                 // Only if objective is improved: Do the swap
                 if (best_obj > SUM_OBJECTIVE) {
-                        swap(n, i, best_partner, PTR_NODES);
+                        swap(i, best_partner, PTR_NODES);
                         // Update the "global" variables
                         SUM_OBJECTIVE = best_obj;
                         copy_array(k, best_objs, OBJ_BY_CLUSTER);
@@ -225,9 +225,9 @@ void distance_anticlustering(double *data, int *N, int *K, int *clusters,
         }
         
         // in the end, free allocated memory:
-        free_points(n, POINTS, n);
-        free_category_indices(c, CATEGORY_HEADS, c);
-        free_cluster_list(k, CLUSTER_HEADS, k);
+        free_points(POINTS, n);
+        free_category_indices(CATEGORY_HEADS, c);
+        free_cluster_list(CLUSTER_HEADS, k);
         free_distances(n, DISTANCES, n);
 }
 

@@ -66,7 +66,6 @@ double cluster_var(
         double center[m]
 );
 void swap(
-        size_t n, 
         size_t i, 
         size_t j, 
         struct node **PTR_NODES
@@ -106,7 +105,6 @@ int initialize_cluster_heads(
 
 int fill_cluster_lists(
         size_t n, 
-        size_t k,
         int *clusters,
         struct element *POINTS,
         struct node **PTR_NODES, 
@@ -146,20 +144,17 @@ int set_up_categories_list(
 
 /* Free functions */
 void free_points(
-        size_t n, 
-        struct element POINTS[n],
+        struct element *POINTS,
         size_t i
 );
 
 void free_cluster_list(
-        size_t k, 
-        struct node *PTR_CLUSTER_HEADS[k],
+        struct node **PTR_CLUSTER_HEADS,
         size_t i
 );
 
 void free_category_indices(
-        size_t c, 
-        size_t *CATEGORY_HEADS[c], 
+        size_t **CATEGORY_HEADS,
         size_t i
 );
 
