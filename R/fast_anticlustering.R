@@ -190,14 +190,14 @@ fast_anticlustering <- function(x, K, k_neighbours = min(20, NROW(data)), catego
   validate_data_matrix(x)
   x <- as.matrix(x)
   N <- nrow(x)
-  validate_input(
-    k_neighbours, "k_neighbours", objmode = "numeric", len = 1,
-    must_be_integer = TRUE, greater_than = 0, not_na = TRUE, smaller_than = N
-  )
   
   if (argument_exists(exchange_partners)) {
     validate_exchange_partners(exchange_partners, categories, N)
   } else {
+    validate_input(
+      k_neighbours, "k_neighbours", objmode = "numeric", len = 1,
+      must_be_integer = TRUE, greater_than = 0, not_na = TRUE, smaller_than = N
+    )
     exchange_partners <- nearest_neighbours(x, k_neighbours, categories)
   }
   exchange_partners <- cleanup_exchange_partners(exchange_partners, N)
