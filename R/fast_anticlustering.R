@@ -14,9 +14,8 @@
 #'     (a) A vector describing the size of each group, or (b) a vector
 #'     of length \code{nrow(x)} describing how elements are assigned
 #'     to anticlusters before the optimization starts.
-#' @param k_neighbours The number of neighbours that serve as exchange
-#'     partner for each element. Defaults to \code{Inf}, implying that
-#'     each element is exchanged with each element in other groups.
+#' @param k_neighbours The number of nearest neighbours that serve as exchange
+#'     partner for each element. Defaults to 20.
 #' @param categories A vector, data.frame or matrix representing one
 #'     or several categorical constraints.
 #' @param exchange_partners Optional argument. A list of length
@@ -24,10 +23,6 @@
 #'     elements that serve as exchange partners. If used, this
 #'     argument overrides the \code{k_neighbours} argument. See
 #'     examples.
-#' @param backend Either "C" or "R", to use a C or R implementation of
-#'     the anticlustering optimization algorithm. Since
-#'     \code{anticlust} version 0.7.1, the faster C implementation is
-#'     the default.
 #'
 #' @importFrom RANN nn2
 #'
@@ -69,27 +64,23 @@
 #' k-means objective because computing all pairwise distances as is
 #' done when optimizing the "diversity" (i.e., the default in
 #' \code{\link{anticlustering}}) is not feasible for very large data
-#' sets (for about N > 20000 on my personal computer). Extending
-#' \code{fast_anticlustering} to k-plus anticlustering is rather straight
-#' forward by applying \code{\link{kplus_moment_variables}} on the input 
-#' (and possibly using the argument \code{exchange_partners}, see
-#' examples).
+#' sets (for about N > 20000 on my personal computer). Using
+#' \code{fast_anticlustering} for k-plus anticlustering is also possible
+#' by applying \code{\link{kplus_moment_variables}} on the input 
+#' and by using the argument \code{exchange_partners} (see
+#' Examples).
 #' 
 #' The function \code{fast_anticlustering} employs a speed-optimized
 #' exchange method, which is basically equivalent to \code{method =
-#' "exchange"} in \code{\link{anticlustering}}, but (possibly) reduces
+#' "exchange"} in \code{\link{anticlustering}}, but reduces
 #' the number of exchanges that are investigated for each input
 #' element. For each element, the potential exchange partners are
 #' generated using a nearest neighbour search with the function
 #' \code{\link[RANN]{nn2}} from the \code{RANN} package. Only the
 #' nearest neighbours then serve as exchange partners. The number of
 #' exchange partners per element has to be set using the argument
-#' \code{k_neighbours}; by default, it is set to \code{Inf}, meaning
-#' that all possible swaps are tested. This default must be changed by
-#' the user for large data sets. If the default is not changed, you
-#' can also just use the function \code{\link{anticlustering}}. More
-#' exchange partners generally improve the quality of the results, but
-#' also increase run time. Note that for very large data sets,
+#' \code{k_neighbours}. More exchange partners can improve the quality of the 
+#' results, but also increase run time. Note that for very large data sets,
 #' anticlustering generally becomes "easier" (even a random split may
 #' yield satisfactory results), so using few exchange partners is
 #' usually not a problem.
@@ -128,35 +119,31 @@
 #'
 #' features <- iris[, - 5]
 #'
-#' ac_exchange <- fast_anticlustering(features, K = 3)
+#' groups1 <- fast_anticlustering(features, K = 3)
 #'
-#' ## The following call is (quasi) equivalent to the call above:
-#' ac_exchange <- anticlustering(features, K = 3, objective = "variance")
+#' ## Use fewer or more exchange partners (speed / quality tradeoff)
+#' groups2 <- fast_anticlustering(features, K = 3, k_neighbours = 100)
+#' groups3 <- fast_anticlustering(features, K = 3, k_neighbours = 3)
 #'
-#' ## Improve run time by using fewer exchange partners:
-#' ac_fast <- fast_anticlustering(features, K = 3, k_neighbours = 10)
-#'
-#' # Apply k-plus anticlustering with this function is straight forward,
-#' # just use kplus_moment_variables() on the numeric input:
-#' kplus_anticlusters <- fast_anticlustering(kplus_moment_variables(features, T = 2), K = 3)
-#' mean_sd_tab(features, kplus_anticlusters) # Means and SDs are similar
-#' 
-#' # Some care is needed when applying k-plus using a reduced number of exchange partners
-#' # via nearest neighbour search. Then we:
-#' # 1) use kplus_moment_variables() on the numeric input
-#' # 2) generate custom exchange_partners because otherwise nearest neighbours are 
-#' #    internally selected based on the extended k-plus variables (which does not make sense)
+#' # Some care is needed when applying k-plus using with this function 
+#' # with a reduced number of exchange partners via nearest neighbour search. 
+#' # Then we:
+#' # 1) Use kplus_moment_variables() on the numeric input
+#' # 2) Generate custom exchange_partners because otherwise nearest 
+#' #    neighbours are internally selected based on the extended k-plus 
+#' #    variables returned by kplus_moment_variables() 
+#' #    (which does not really make sense)
 #' kplus_anticlusters <- fast_anticlustering(
 #'   kplus_moment_variables(features, T = 2), 
 #'   K = 3,
-#'   exchange_partners = generate_exchange_partners(30, features = features, method = "RANN")
+#'   exchange_partners = generate_exchange_partners(120, features = features, method = "RANN")
 #' )
 #' mean_sd_tab(features, kplus_anticlusters)
-#' # Or use random exchange partners: 
+#' # Or we use random exchange partners: 
 #' kplus_anticlusters <- fast_anticlustering(
 #'   kplus_moment_variables(features, T = 2), 
 #'   K = 3,
-#'   exchange_partners = generate_exchange_partners(30, N = nrow(features), method = "random")
+#'   exchange_partners = generate_exchange_partners(120, N = nrow(features), method = "random")
 #' )
 #' mean_sd_tab(features, kplus_anticlusters)
 #' 
@@ -166,7 +153,7 @@
 #' groups <- fast_anticlustering(data, K = 2, k_neighbours = 2)
 #' mean_sd_tab(data, groups)
 #' 
-#' # Use custom exchange partners, here: 10 random exchange partners for each element
+#' # Use custom exchange partners. Here: 10 random exchange partners
 #' features <- matrix(rnorm(500 * 5), ncol = 5)
 #' n_exchange_partners <- 10
 #' K <- 100 # here the exchange partners make some difference
@@ -180,52 +167,63 @@
 #'   )
 #' )
 #' 
-#' # compare with using nearest neighbours as exchange partners (i.e., the default)
-#' groups_nn_partners <- fast_anticlustering(features, K = init, k_neighbours = n_exchange_partners)
+#' # Compare with using nearest neighbours as exchange partners (the default)
+#' groups_nn_partners <- fast_anticlustering(
+#'   features, 
+#'   K = init, 
+#'   k_neighbours = n_exchange_partners
+#' )
 #' # ... and using all elements as exchange partners: 
-#' groups_all_partners <- fast_anticlustering(features, K = init)
+#' groups_all_partners <- anticlustering(features, K = init, objective = "variance")
 #' 
 #' variance_objective(features, groups_nn_partners)
 #' variance_objective(features, groups_rnd_partners)
 #' variance_objective(features, groups_all_partners)
 #'
 
-fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL, 
-                                exchange_partners = NULL, backend = "C") {
-  input_validation_anticlustering(x, K, "variance",
-                                "exchange", FALSE, categories, NULL)
-  validate_input(backend, "backend", objmode = "character", len = 1,
-                 not_na = TRUE, not_function = TRUE, input_set = c("R", "C"))
+fast_anticlustering <- function(x, K, k_neighbours = min(20, NROW(data)), categories = NULL, 
+                                exchange_partners = NULL) {
+  input_validation_anticlustering(
+    x, K, "variance", "exchange", FALSE, categories, NULL
+  )
   categories <- merge_into_one_variable(categories)
-  if (!isTRUE(k_neighbours == Inf)) {
-    validate_input(k_neighbours, "k_neighbours", objmode = "numeric", len = 1,
-                   must_be_integer = TRUE, greater_than = 0, not_na = TRUE)
-  }
+  validate_data_matrix(x)
   x <- as.matrix(x)
   N <- nrow(x)
+  validate_input(
+    k_neighbours, "k_neighbours", objmode = "numeric", len = 1,
+    must_be_integer = TRUE, greater_than = 0, not_na = TRUE, smaller_than = N
+  )
+  
   if (argument_exists(exchange_partners)) {
     validate_exchange_partners(exchange_partners, categories, N)
   } else {
-    exchange_partners <- all_exchange_partners(x, k_neighbours, categories)
+    exchange_partners <- nearest_neighbours(x, k_neighbours, categories)
   }
-  init <- initialize_clusters(N, K, categories)
-  if (backend == "C") {
-    # convert list of exchange partners to matrix for C; 
-    # when doing that, possibly "fill" empty entries with "N+1" (in C -> N), if some
-    # list elements are shorter than others (if categorical variables have been used and are
-    # unevenly distributed)
-    max_exchanges_partners <- max(lengths(exchange_partners))
-    exchange_partners <- lapply(exchange_partners, function(x) c(x[1:length(x)], rep(N+1, max(0, max_exchanges_partners - length(x)))))
-    # remove potential NAs
-    exchange_partners <- lapply(exchange_partners, function(x) x[!is.na(x)]) 
-    exchange_partners <- unname(t(t(as.data.frame(exchange_partners))))
-    # `exchange_partners` is passed as matrix to C; there it is converted to a 1-dimensional "vector".
-    # Here we pass it as a matrix where elements = columns; cols = exchange partners.
-    # Ususally it would be the other way around, e.g. RANN returns the standard "N x k_neighbours"
-    # format, but I pass a "k_neighbours x N" matrix to C, which is more easily handled there.
-    return(c_anticlustering(x, init, categories = NULL, objective = "fast-kmeans", exchange_partners - 1))
-  }
-  fast_exchange_(x, init, exchange_partners)
+  exchange_partners <- cleanup_exchange_partners(exchange_partners, N)
+
+  c_anticlustering(
+    x, initialize_clusters(N, K, categories), 
+    categories = NULL, objective = "fast-kmeans", 
+    exchange_partners - 1
+  )
+}
+
+# convert list of exchange partners to matrix for C; 
+# when doing that, possibly "fill" empty entries with "N+1" (in C -> N), if some
+# list elements are shorter than others (if categorical variables have been used and are
+# unevenly distributed)
+cleanup_exchange_partners <- function(exchange_partners, N) {
+  max_exchanges_partners <- max(lengths(exchange_partners))
+  exchange_partners <- lapply(exchange_partners, function(x) c(x[1:length(x)], rep(N+1, max(0, max_exchanges_partners - length(x)))))
+  # remove potential NAs
+  exchange_partners <- lapply(exchange_partners, function(x) x[!is.na(x)]) 
+  exchange_partners <- unname(t(t(as.data.frame(exchange_partners))))
+  # `exchange_partners` is passed as matrix to C; there it is converted to a 1-dimensional "vector".
+  # Here we pass it as a matrix where elements = columns; cols = exchange partners.
+  # Usually it would be the other way around, e.g. RANN returns the standard "N x k_neighbours"
+  # format, but I pass a "k_neighbours x N" matrix to C, which is more easily handled there.
+  exchange_partners
 }
 
 validate_exchange_partners <- function(exchange_partners, categories, N) {
@@ -255,6 +253,8 @@ validate_exchange_partners <- function(exchange_partners, categories, N) {
 
 
 
+
+#### THIS IS AN OLD AN OBSOLETE R IMPLEMENTATION; I AM KEEPING IT FOR THE TEST FILES
 #' Solve anticlustering using the fast exchange method
 #'
 #' @param data the data -- an N x M table of item features
@@ -435,40 +435,6 @@ generate_exchange_partners <- function(n_exchange_partners, N = NULL, features =
   }
 }
 
-#' Get exchange partners for k-means anticlustering 
-#'
-#' @details
-#'
-#' Computes the k nearest neighbours for each input element using
-#' RANN::nn2. If no nearest neighbours are required, argument 
-#' `k_neighbours` will be `Inf`. May compute nearest neighbors within
-#' categories. 
-#' 
-#' @return A list of length `N`. Each element is a vector
-#'    of exchange partners (that may be nearest neighbors).
-#'
-#' @noRd
-
-
-all_exchange_partners <- function(features, k_neighbours, categories) {
-  # Case 1: no nearest neighbor search needed
-  if (is.infinite(k_neighbours)) { 
-    return(all_exchange_partners_(nrow(features), categories))
-  }
-  # Case 2: NN search needed
-  return(nearest_neighbours(features, k_neighbours, categories))
-}
-
-# Generate all possible exchange partners 
-all_exchange_partners_ <- function(N, categories) {
-  # Case 1: Exchange partners are from the same category
-  if (argument_exists(categories)) {
-    return(list_idx_by_category(categories))
-  }
-  # Case 2: Everyone is potential exchange partner
-  rep(list(1:N), N) 
-}
-
 list_idx_by_category <- function(categories) {
   category_ids <- lapply(1:max(categories), function(i) which(categories == i))
   category_ids[categories]
@@ -540,7 +506,3 @@ remove_self <- function(idx_list) {
   N <- length(idx_list)
   lapply(1:N, function(i) idx_list[[i]][idx_list[[i]] != i])
 }
-
-
-#' # remove the index of the element itself, so we ensure that each element has 
-#' # 10 exchange partners excluding itself
