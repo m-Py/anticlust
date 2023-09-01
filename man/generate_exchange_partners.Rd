@@ -13,40 +13,52 @@ generate_exchange_partners(
 )
 }
 \arguments{
-\item{n_exchange_partners}{The number of exchange partners per element}
+\item{n_exchange_partners}{The number of exchange partners per
+element}
 
-\item{N}{The number of elements for which exchange partners; can be \code{NULL} 
-if \code{features} is passed (it is ignored if \code{features} is passed).}
+\item{N}{The number of elements for which exchange partners; can be
+\code{NULL} if \code{features} is passed (it is ignored if
+\code{features} is passed).}
 
-\item{features}{The features for which nearest neighbours are sought if \code{method = "RANN"}.
-May be NULL if random exchange partners are generated.}
+\item{features}{The features for which nearest neighbours are
+sought if \code{method = "RANN"}.  May be NULL if random
+exchange partners are generated.}
 
-\item{method}{Currently supports "random" (default), "RANN" and "restricted_random". See details.}
+\item{method}{Currently supports "random" (default), "RANN" and
+"restricted_random". See details.}
 
 \item{categories}{A vector, data.frame or matrix representing one
 or several categorical constraints.}
 }
 \value{
-A list of length \code{N}. Is usually used as input to the argument \code{exchange_partners} in \code{\link{fast_anticlustering}}.
-  Then, the i'th element of the list contains the indices of the exchange partners that are used for the i'th element.
+A list of length \code{N}. Is usually used as input to the
+    argument \code{exchange_partners} in
+    \code{\link{fast_anticlustering}}.  Then, the i'th element of
+    the list contains the indices of the exchange partners that are
+    used for the i'th element.
 }
 \description{
 Get exchange partners for fast_anticlustering()
 }
 \details{
-The \code{method = "RANN"} generates exchange partners using a nearest neighbour search 
-via \code{\link[RANN]{nn2}} from the \code{RANN} package; \code{methode = "restricted_random"}
-generates random exchange partners but ensures that for each element, no duplicates
-are generated and that the element itself does not occur as exchange partner (this is the slowest 
-method, and I would not recommend it for large N);
-\code{method = "random"} (default) does not impose these restrictions and generates unrescricted random 
-partners (it may therefore generate duplicates and the element itself as exchange partner).
+The \code{method = "RANN"} generates exchange partners using a
+nearest neighbour search via \code{\link[RANN]{nn2}} from the
+\code{RANN} package; \code{methode = "restricted_random"} generates
+random exchange partners but ensures that for each element, no
+duplicates are generated and that the element itself does not occur
+as exchange partner (this is the slowest method, and I would not
+recommend it for large N); \code{method = "random"} (default) does
+not impose these restrictions and generates unrescricted random
+partners (it may therefore generate duplicates and the element
+itself as exchange partner).
 
-When setting the \code{categories} argument and using \code{method = "RANN"}, exchange partners
-(i.e., nearest neighbours) will be generated from the same category; \code{methode = "restricted_random"}
-will also adhere to categorical constraints induced via \code{categories} (i.e. each element only
-receives exchange partners from the same category as itself); \code{methode = "random"} cannot
-incoorporate categorical restrictions.
+When setting the \code{categories} argument and using \code{method
+= "RANN"}, exchange partners (i.e., nearest neighbours) will be
+generated from the same category; \code{methode =
+"restricted_random"} will also adhere to categorical constraints
+induced via \code{categories} (i.e. each element only receives
+exchange partners from the same category as itself); \code{methode
+= "random"} cannot incoorporate categorical restrictions.
 }
 \examples{
 
