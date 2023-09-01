@@ -200,7 +200,6 @@ fast_anticlustering <- function(x, K, k_neighbours = min(20, NROW(x)-1), categor
     x, K, "variance", "exchange", FALSE, categories, NULL
   )
   categories <- merge_into_one_variable(categories)
-  validate_data_matrix(x)
   x <- as.matrix(x)
   N <- nrow(x)
   
