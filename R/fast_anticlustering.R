@@ -287,8 +287,12 @@ validate_exchange_partners <- function(exchange_partners, categories, N) {
 #' method, and I would not recommend it for large N);
 #' \code{method = "random"} (default) does not impose these restrictions and generates unrescricted random 
 #' partners (it may therefore generate duplicates and the element itself as exchange partner).
+#' 
 #' When setting the \code{categories} argument and using \code{method = "RANN"}, exchange partners
-#' (i.e., nearest neighbours) will be generated from the same category.
+#' (i.e., nearest neighbours) will be generated from the same category; \code{methode = "restricted_random"}
+#' will also adhere to categorical constraints induced via \code{categories} (i.e. each element only
+#' receives exchange partners from the same category as itself); \code{methode = "random"} cannot
+#' incoorporate categorical restrictions.
 #' 
 #' 
 #' @examples
