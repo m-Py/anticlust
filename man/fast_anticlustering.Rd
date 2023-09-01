@@ -7,7 +7,7 @@
 fast_anticlustering(
   x,
   K,
-  k_neighbours = min(20, NROW(data)),
+  k_neighbours = min(20, NROW(x) - 1),
   categories = NULL,
   exchange_partners = NULL
 )

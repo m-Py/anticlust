@@ -190,9 +190,8 @@
 #' variance_objective(features, groups_all_partners)
 #'
 
-fast_anticlustering <- function(x, K, k_neighbours = min(20, NROW(data)), categories = NULL, 
+fast_anticlustering <- function(x, K, k_neighbours = min(20, NROW(x)-1), categories = NULL, 
                                 exchange_partners = NULL) {
-  print(k_neighbours)
   input_validation_anticlustering(
     x, K, "variance", "exchange", FALSE, categories, NULL
   )
