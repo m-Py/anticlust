@@ -318,7 +318,8 @@ validate_exchange_partners <- function(exchange_partners, N) {
 #' 
 generate_exchange_partners <- function(n_exchange_partners, N = NULL, features = NULL, method = "random", categories = NULL) {
   if (argument_exists(features)) {
-    N <- NROW(features)
+      validate_data_matrix(features)
+      N <- NROW(features)
   }
   categories <- merge_into_one_variable(categories)
   validate_input(n_exchange_partners, "n_exchange_partners", objmode = "numeric", len = 1,
