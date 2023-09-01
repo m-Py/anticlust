@@ -5,7 +5,7 @@
 - In `fast_anticlustering()`, the default value of argument `k_neighbours` is now 20.
 - `fast_anticlustering()` now has an additional argument `exchange_partners`, which can be used to pass custom exchange partners instead of using the default nearest neighbour search.
 -  `generate_exchange_partners()` is a new exported function that can be used to address the new argument `exchange_partners` in `fast_anticlustering()`.
-- The vignette "Speeding up anticlustering" has been rewritten to reflect that `fast_anticlustering()` is now again a suitable choice for processing large data sets-
+- The vignette "Speeding up anticlustering" has been rewritten to reflect that `fast_anticlustering()` is now again a suitable choice for processing large data sets.
 
 # anticlust 0.7.0
 
