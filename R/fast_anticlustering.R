@@ -201,7 +201,7 @@ fast_anticlustering <- function(x, K, k_neighbours = min(20, NROW(x)-1), categor
   N <- nrow(x)
   
   if (argument_exists(exchange_partners)) {
-    validate_exchange_partners(exchange_partners, categories, N)
+    validate_exchange_partners(exchange_partners, N)
   } else {
     validate_input(
       k_neighbours, "k_neighbours", objmode = "numeric", len = 1,
@@ -235,12 +235,9 @@ cleanup_exchange_partners <- function(exchange_partners, N) {
   exchange_partners
 }
 
-validate_exchange_partners <- function(exchange_partners, categories, N) {
+validate_exchange_partners <- function(exchange_partners, N) {
   if (!inherits(exchange_partners, "list")) {
     stop("Argument `exchange_partners` must be a list.")
-  }
-  if (argument_exists(categories)) {
-    stop("Cannot use arguments `exchange_partners` and `categories` at the same time.")
   }
   if (length(exchange_partners) != N) {
     stop("If used, argument `exchange_partners` must have the same length as you have data points.")
