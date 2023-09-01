@@ -89,4 +89,8 @@ test_that("New k-means C implementation yields same results as other implementat
   groups2 <- fast_anticlustering(features, K = init, k_neighbours = n_exchange_partners)
   expect_true(all(groups1 == groups2))
   
+  ## Test that new default for k_neighbours works (and if N < 20, it still works!)
+  expect_length(fast_anticlustering(1:6, K = 2), 6)
+  expect_length(fast_anticlustering(1:20, K = 2), 20)
+  expect_length(fast_anticlustering(1:21, K = 2), 21)
 })
