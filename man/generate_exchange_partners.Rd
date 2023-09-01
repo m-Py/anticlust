@@ -41,6 +41,8 @@ are generated and that the element itself does not occur as exchange partner (th
 method, and I would not recommend it for large N);
 \code{method = "random"} (default) does not impose these restrictions and generates unrescricted random 
 partners (it may therefore generate duplicates and the element itself as exchange partner).
+When setting the \code{categories} argument and using \code{method = "RANN"}, exchange partners
+(i.e., nearest neighbours) will be generated from the same category.
 }
 \examples{
 
