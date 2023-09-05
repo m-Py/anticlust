@@ -29,22 +29,10 @@
  * 
  * ============================ Some explanations ============================
  * 
- * This is a somewhat different version of kmeans_anticlustering(), which does not
- * use categorical restrictions but can be passed specific exchange partners 
- * for each element (they must be
- * passed to the function and are not generated here). This function uses less 
- * memory than the other C functions for anticlustering, and therefore does not 
- * have any "clever" data structures that facilitate computations. Instead,
- * it is mostly a lot of for-loops running through the data.
- * 
- * The code is horrible because it tries to reduce the number function calls, 
- * - the C implementation has stack problems for large N and it was very unclear to me why -
- * which seemed to terminate my R sessions for really large data - and it should be
- * usable for really large data sets. After finding a code that works, I admit it 
- * was not probably not the number of the function calls,
- * but me writing additional (and unneeded) data), but here we are.
- * Now it works, even for N > 250000 (where the old C implementation failed), 
- * and I am quite unwilling to change a lot about it. 
+ * This is a new implementation of k-means anticlustering that uses an alternative
+ * computation of the k-means objective: Sum of squared Euclidean 
+ * distances between cluster centers and overall centroid; it should
+ * be minimized.
  * ===========================================================================
 */
 
@@ -57,52 +45,23 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
         const size_t kn = (size_t) *k_neighbours; // number of clusters
         
         /* INITIALIZE OBJECTIVE */
+        // 1 OVERALL CENTROID
+        double OVERALL_CENTROID[m];
+        init_overall_centroid(m, n, OVERALL_CENTROID, data);
         
-        /* CLUSTER CENTERS */
+        /* K CLUSTER CENTERS */
         // Set up matrix of cluster centers
         double CENTERS[k][m];
-        // Init as Zero // It seems I cannot use functions here due to Stack Overflow for large N, so all is in the main function...
-        for (size_t i = 0; i < k; i++) {
-          for (size_t j = 0; j < m; j++) {
-            CENTERS[i][j] = 0; 
-          }
-        }
-        /* SUM UP FEATURE VALUES BY CLUSTER */
-        for (size_t i = 0; i < n; i++) {
-          for (size_t j = 0; j < m; j++) {
-            // data[n * j + i] == data[i, j] in the original matrix, but in C we only have a 1-dim pointer
-            CENTERS[clusters[i]][j] += data[n * j + i];  
-          }
-        }
-        /* To get cluster centers: Divide by number of elements */
-        for (size_t i = 0; i < k; i++) { // excuse my reuse of indices, I hate this
-          for (size_t j = 0; j < m; j++) {
-            CENTERS[i][j] = CENTERS[i][j] / frequencies[i];
-          }
-        }
-
-        /* SUM OF SQUARES BY CLUSTER */
+        init_centers(k, m, n, CENTERS, clusters, frequencies, data);
+        
+        /* DISTANCES BETWEEN CLUSTER CENTERS AND OVERALL CENTROID */
         double OBJ_BY_CLUSTER[k]; 
         for (size_t i = 0; i < k; i++) {
-          OBJ_BY_CLUSTER[i] = 0; // init as zero
+          OBJ_BY_CLUSTER[i] = euclidean_squared(OVERALL_CENTROID, CENTERS[i], m);
         }
-        /* Compute Squared Euclidean Distance between each data point and its center -> sum up */
-        for (size_t i = 0; i < n; i++) {
-          double distance_squared = 0;
-          for (size_t j = 0; j < m; j++) {
-            double diff = data[n * j + i] - CENTERS[clusters[i]][j];
-            distance_squared += pow(diff, 2);
-          }
-          OBJ_BY_CLUSTER[clusters[i]] += distance_squared;
-        }
-        
-
-        /* SUM OF SQUARES ACROSS ALL CLUSTERS */
-        double SUM_OBJECTIVE = 0;
-        for (size_t i = 0; i < k; i++) {
-          SUM_OBJECTIVE += OBJ_BY_CLUSTER[i];
-        }
-        
+        /* K-means objective in this setting: Sum of squared Euclidean 
+         * distances between cluster centers and overall centroid */
+        double SUM_OBJECTIVE = array_sum(k, OBJ_BY_CLUSTER); 
 
         /* Some variables for bookkeeping during the optimization */
         size_t best_partner;
@@ -115,26 +74,19 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
         /* Start main iteration loop for exchange procedure */
         size_t id_current_exch_partner = 0;
         
+        
         /* 1. Level: Iterate through `n` data points */
         for (size_t i = 0; i < n; i++) {
           int cl1 = clusters[i];
           
-          // Initialize `best` variables (alas not by function call for really large data)
-          double best_obj = 0;
-          // Best Center matrix
-          for (int i2 = 0; i2 < k; i2++) {
-            for (int j2 = 0; j2 < m; j2++) {
-              best_centers[i2][j2] = CENTERS[i2][j2];
-            }
-          }
-          // Best objectives by cluster
-          for (int i3 = 0; i3 < k; i3++) { // WTF indices...
-            best_objs[i3] = OBJ_BY_CLUSTER[i3];
-          }
+          // Initialize `best` variable for the i'th item
+          double best_obj = SUM_OBJECTIVE + 1; // we have a minimization problem; init as large value
+          copy_matrix(k, m, CENTERS, best_centers);
+          copy_array(k, OBJ_BY_CLUSTER, best_objs);
           
           size_t j;
           /* 2. Level: Iterate through the exchange partners */
-
+          
           for (size_t u = 0; u < kn; u++) {
             // Get index of current exchange partner
             j = partners[id_current_exch_partner];
@@ -148,11 +100,9 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
               
               // Initialize `tmp` variables for the exchange partner:
               // Center matrix, is updated after swap
-              for (int i3 = 0; i3 < k; i3++) {
-                for (int j3 = 0; j3 < m; j3++) {
-                  tmp_centers[i3][j3] = CENTERS[i3][j3];
-                }
-              }
+              // Initialize `tmp` variables for the exchange partner:
+              copy_matrix(k, m, CENTERS, tmp_centers);
+              copy_array(k, OBJ_BY_CLUSTER, tmp_objs);
               
               fast_update_centers(
                 i, j, n, m, k,
@@ -161,48 +111,98 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
                 frequencies
               );
               
-              fast_swap(clusters, i, j);
               // Update objective
-              /* SUM OF SQUARES BY CLUSTER */
-              for (size_t f = 0; f < k; f++) {
-                tmp_objs[f] = 0; // init as zero
-              }
-              for (size_t f = 0; f < n; f++) {
-                double distance_squared = 0;
-                for (size_t f2 = 0; f2 < m; f2++) {
-                  double diff = data[one_dim_index(f, f2, n)] - tmp_centers[clusters[f]][f2];
-                  distance_squared += pow(diff, 2);
-                }
-                tmp_objs[clusters[f]] += distance_squared;
-              }
-              
+              tmp_objs[cl1] = euclidean_squared(OVERALL_CENTROID, tmp_centers[cl1], m);
+              tmp_objs[cl2] = euclidean_squared(OVERALL_CENTROID, tmp_centers[cl2], m);
               tmp_obj = array_sum(k, tmp_objs);
               
+              
               // Update `best` variables if objective was improved
-              if (tmp_obj > best_obj) {
+              if (tmp_obj < best_obj) {
                 best_obj = tmp_obj;
                 copy_matrix(k, m, tmp_centers, best_centers);
                 copy_array(k, tmp_objs, best_objs);
                 best_partner = j;
               }
-              
-              // Swap back to test next exchange partner
-              fast_swap(clusters, i, j);
             }
           }
           
           // Only if objective is improved: Do the swap
-          if (best_obj > SUM_OBJECTIVE) {
+          if (best_obj < SUM_OBJECTIVE) {
             fast_swap(clusters, i, best_partner);
             // Update the "global" variables
             SUM_OBJECTIVE = best_obj;
             copy_matrix(k, m, best_centers, CENTERS);
             copy_array(k, best_objs, OBJ_BY_CLUSTER);
+            // here for local-maximum method: set flag that an improvement occurred!
           }
+          
         }
         return;
 }
 
+
+/* Update cluster centers for simpler implementation not using cluster lists */
+void fast_update_centers(size_t i, size_t j, size_t n, size_t m, size_t k, double *data, 
+                         int cl1, int cl2, double CENTERS[k][m], int *frequencies) {
+  
+  for (int u = 0; u < m; u++) {
+    double added_to_cl1 = data[one_dim_index(j, u, n)] / frequencies[cl1];
+    double removed_from_cl1 = data[one_dim_index(i, u, n)] / frequencies[cl1];
+    
+    double added_to_cl2 = data[one_dim_index(i, u, n)] / frequencies[cl2];
+    double removed_from_cl2 = data[one_dim_index(j, u, n)] / frequencies[cl2];
+    
+    // Update first cluster center
+    CENTERS[cl1][u] = CENTERS[cl1][u] + added_to_cl1;
+    CENTERS[cl1][u] = CENTERS[cl1][u] - removed_from_cl1;
+    // Update second cluster center
+    CENTERS[cl2][u] = CENTERS[cl2][u] - removed_from_cl2;
+    CENTERS[cl2][u] = CENTERS[cl2][u] + added_to_cl2;
+  }
+}
+
+
+void init_overall_centroid(size_t m, size_t n, double OVERALL_CENTROID[m], double* data) {
+  // Init as Zero
+  for (size_t j = 0; j < m; j++) {
+    OVERALL_CENTROID[j] = 0; 
+  }
+  /* NOW JUST SUM UP ALL VALUES */
+  for (size_t i = 0; i < n; i++) {
+    for (size_t j = 0; j < m; j++) {
+      OVERALL_CENTROID[j] += data[one_dim_index(i, j, n)];  
+    }
+  }
+  /* DIVIDE BY N */
+  for (size_t j = 0; j < m; j++) {
+    OVERALL_CENTROID[j] = OVERALL_CENTROID[j] / n;  
+  }
+}
+
+  
+  
+void init_centers(size_t k, size_t m, size_t n, double CENTERS[k][m], int* clusters, int* frequencies, double* data) {
+  // Init as Zero
+  for (size_t i = 0; i < k; i++) {
+    for (size_t j = 0; j < m; j++) {
+      CENTERS[i][j] = 0; 
+    }
+  }
+  /* SUM UP FEATURE VALUES BY CLUSTER */
+  for (size_t i = 0; i < n; i++) {
+    for (size_t j = 0; j < m; j++) {
+      // data[n * j + i] == data[i, j] in the original matrix, but in C we only have a 1-dim pointer
+      CENTERS[clusters[i]][j] += data[one_dim_index(i, j, n)];  
+    }
+  }
+  /* To get cluster centers: Divide by number of elements */
+  for (size_t i = 0; i < k; i++) {
+    for (size_t j = 0; j < m; j++) {
+      CENTERS[i][j] = CENTERS[i][j] / frequencies[i];
+    }
+  }
+}
 
 void fast_swap(int *clusters, size_t i, size_t j) {
   int tmp = clusters[i];

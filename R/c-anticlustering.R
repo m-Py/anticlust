@@ -88,7 +88,7 @@ c_anticlustering <- function(data, K, categories = NULL, objective, exchange_par
     )
   } else if (objective == "fast-kmeans") {
     results <- .C(
-      "fast_kmeans_anticlustering2",
+      "fast_kmeans_anticlustering",
       as.double(data),
       as.integer(N),
       as.integer(M),
@@ -97,9 +97,9 @@ c_anticlustering <- function(data, K, categories = NULL, objective, exchange_par
       clusters = as.integer(clusters),
       as.integer(exchange_partners),
       as.integer(nrow(exchange_partners)),
-      mem_error = as.integer(0),
       PACKAGE = "anticlust"
     )
+    results[["mem_error"]] <- 0
   }
 
   if (results[["mem_error"]] == 1) {
