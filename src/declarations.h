@@ -227,8 +227,6 @@ void fast_kmeans_anticlustering(
         int *partners,
         int *k_neighbours
 );
-void fast_kmeans_anticlustering2(double *data, int *N, int *M, int *K, int *frequencies,
-                                 int *clusters, int *partners, int *k_neighbours, int *mem_error);
 void fast_update_centers(size_t i, size_t j, size_t n, size_t m, size_t k, double *data, 
                          int cl1, int cl2, double CENTERS[k][m], int *frequencies);
 
