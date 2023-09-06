@@ -112,7 +112,7 @@
 #' \code{fast_anticlustering} uses a different - but equivalent -
 #' formulation of the k-means objective, where the re-computation of
 #' the objective only depends on K and M, but no longer on N. In
-#' particular, it minimizes the sum of squared distances between
+#' particular, it minimizes the weighted sum of squared distances between
 #' cluster centroids and the overall data centroid; the distances
 #' between all individual data points and their cluster center are not
 #' computed. Using the changed objective reduces the run time by an
