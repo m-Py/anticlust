@@ -236,3 +236,4 @@ void init_overall_centroid(size_t m, size_t n, double OVERALL_CENTROID[m], doubl
 void fast_swap(int *clusters, size_t i, size_t j);
 void print_matrix(size_t N, size_t M, double matrix[N][M]);
 size_t one_dim_index(size_t i, size_t j, size_t n);
+double weighted_array_sum(size_t k, int* frequencies, double ARRAY[k]);

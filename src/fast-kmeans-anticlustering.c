@@ -61,7 +61,7 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
         }
         /* K-means objective in this setting: Sum of squared Euclidean 
          * distances between cluster centers and overall centroid */
-        double SUM_OBJECTIVE = array_sum(k, OBJ_BY_CLUSTER); 
+        double SUM_OBJECTIVE = weighted_array_sum(k, frequencies, OBJ_BY_CLUSTER); 
 
         /* Some variables for bookkeeping during the optimization */
         size_t best_partner;
@@ -114,8 +114,7 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
               // Update objective
               tmp_objs[cl1] = euclidean_squared(OVERALL_CENTROID, tmp_centers[cl1], m);
               tmp_objs[cl2] = euclidean_squared(OVERALL_CENTROID, tmp_centers[cl2], m);
-              tmp_obj = array_sum(k, tmp_objs);
-              
+              tmp_obj = weighted_array_sum(k, frequencies, tmp_objs);
               
               // Update `best` variables if objective was improved
               if (tmp_obj < best_obj) {
