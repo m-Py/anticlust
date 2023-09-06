@@ -7,7 +7,7 @@
 fast_anticlustering(
   x,
   K,
-  k_neighbours = min(20, NROW(x) - 1),
+  k_neighbours = Inf,
   categories = NULL,
   exchange_partners = NULL
 )
@@ -60,9 +60,11 @@ of exchanges that are investigated for each input element. For each
 element, the potential exchange partners are generated using a
 nearest neighbour search with the function \code{\link[RANN]{nn2}}
 from the \code{RANN} package. Only the nearest neighbours then
-serve as exchange partners. The number of exchange partners per
-element has to be set using the argument \code{k_neighbours}
-(default = 20). More exchange partners can improve the quality of
+serve as exchange partners. The number of exchange partners
+per element has to be set using the argument \code{k_neighbours}; by
+default, it is set to \code{Inf}, meaning that all possible swaps are
+tested. This default must be changed by the user for large data sets.
+More exchange partners can improve the quality of
 the results, but also increase run time. Note that for very large
 data sets, anticlustering generally becomes "easier" (even a random
 split may yield satisfactory results), so using few exchange
@@ -84,17 +86,17 @@ taken when combining the arguments \code{exchange_partners} and
 
 For a fixed number of exchange partners (specified using the
 argument \code{k_neighbours}) the approximate run time of
-\code{fast_anticlustering} is in O(M N^2), where N is the total
+\code{fast_anticlustering} is in O(M N K) (probably!), where N is the total
 number of elements and M is the number of variables. The algorithm
 \code{method = "exchange"} in \code{\link{anticlustering}} has a
 run time of O(M N^3) because for each element, all other elements
 serve as exchange partners. Thus, \code{fast_anticlustering} can
-improve the run time by an order of magnitude as compared to the
+improve the run time by two orders of magnitude as compared to the
 standard exchange algorithm. The nearest neighbour search, which is
 done in the beginning, only has O(N log(N)) run time and therefore
-does not strongly contribute to the overall run time. It is nevertheless
-possible to suppress the nearest neighbour search by using the
-\code{exchange_partners} argument.
+does not strongly contribute to the overall run time (and it is extremely 
+fast in practice). It is nevertheless possible to suppress the nearest 
+neighbour search by using the \code{exchange_partners} argument.
 
 When setting the \code{categories} argument, exchange partners
 (i.e., nearest neighbours) will be generated from the same
@@ -111,13 +113,21 @@ for several categorical variables, instead of using the argument
 features <- iris[, - 5]
 N <- nrow(features)
 init <- sample(rep_len(1:3, N)) # same starting point for all calls:
-groups1 <- fast_anticlustering(features, K = init, k_neighbours = N-1) # all exchanges
-groups2 <- fast_anticlustering(features, K = init, k_neighbours = 20) # default
+groups1 <- fast_anticlustering(features, K = init) # default: all exchanges
+groups2 <- fast_anticlustering(features, K = init, k_neighbours = 20) 
 groups3 <- fast_anticlustering(features, K = init, k_neighbours = 2)
 
 variance_objective(features, groups1)
 variance_objective(features, groups2)
 variance_objective(features, groups3)
+
+# K-plus anticlustering is straight forward when sticking with the default
+# for k_neighbours
+kplus_anticlusters <- fast_anticlustering(
+  kplus_moment_variables(features, T = 2), 
+  K = 3
+)
+mean_sd_tab(features, kplus_anticlusters)
 
 # Some care is needed when applying k-plus using with this function 
 # while using a reduced number of exchange partners generated in the 
@@ -131,9 +141,8 @@ kplus_anticlusters <- fast_anticlustering(
   kplus_moment_variables(features, T = 2), 
   K = 3,
   exchange_partners = generate_exchange_partners(120, features = features, method = "RANN")
-)
+ )
 mean_sd_tab(features, kplus_anticlusters)
-
 # Or we use random exchange partners: 
 kplus_anticlusters <- fast_anticlustering(
   kplus_moment_variables(features, T = 2), 
