@@ -23,7 +23,7 @@ of length \code{nrow(x)} describing how elements are assigned
 to anticlusters before the optimization starts.}
 
 \item{k_neighbours}{The number of nearest neighbours that serve as
-exchange partner for each element. Defaults to 20.}
+exchange partner for each element. See details.}
 
 \item{categories}{A vector, data.frame or matrix representing one
 or several categorical constraints.}
@@ -35,11 +35,10 @@ argument overrides the \code{k_neighbours} argument. See
 examples.}
 }
 \description{
-Increasing the speed of (k-means / k-plus) anticlustering by
-conducting fewer exchanges during the optimization. This function
-uses an adjusted exchange method in which the number of exchange
-partners can be specified. Using fewer exchange partners can make
-anticlustering applicable to quite large data sets.
+Increasing the speed of (k-means / k-plus) anticlustering by (1) 
+conducting fewer exchanges during the optimization and (2) using an alternative
+formulation of the k-means objective. Makes anticlustering applicable to 
+quite large data sets.
 }
 \details{
 This function was created to make anticlustering applicable to
@@ -68,11 +67,12 @@ More exchange partners can improve the quality of
 the results, but also increase run time. Note that for very large
 data sets, anticlustering generally becomes "easier" (even a random
 split may yield satisfactory results), so using few exchange
-partners is usually not a problem. It is also possible to specify
-custom exchange partners using the argument
-\code{exchange_partners} instead of relying on the default nearest
-neighbour search.  When using \code{exchange_partners}, it is not
-necessary that each element has the same number of exchange
+partners is usually not a problem. 
+
+It is possible to specify custom exchange partners using the
+argument \code{exchange_partners} instead of relying on the default
+nearest neighbour search.  When using \code{exchange_partners}, it
+is not necessary that each element has the same number of exchange
 partners; this is why the argument \code{exchange_partners} has to
 be a \code{list} instead of a \code{matrix} or
 \code{data.frame}. Exchange partners can for example be generated
@@ -84,18 +84,31 @@ exchanges between members of different categories, so care must be
 taken when combining the arguments \code{exchange_partners} and
 \code{categories}.
 
-For a fixed number of exchange partners (specified using the
-argument \code{k_neighbours}) the approximate run time of
-\code{fast_anticlustering} is in O(M N K) (probably!), where N is the total
-number of elements and M is the number of variables. The algorithm
-\code{method = "exchange"} in \code{\link{anticlustering}} has a
-run time of O(M N^3) because for each element, all other elements
-serve as exchange partners. Thus, \code{fast_anticlustering} can
-improve the run time by two orders of magnitude as compared to the
-standard exchange algorithm. The nearest neighbour search, which is
-done in the beginning, only has O(N log(N)) run time and therefore
-does not strongly contribute to the overall run time (and it is extremely 
-fast in practice). It is nevertheless possible to suppress the nearest 
+In \code{anticlustering(..., objective = "variance")}, the run time
+of computing the k-means objective is in O(M N), where N is the
+total number of elements and M is the number of variables. This is
+because the variance is computed as the sum of squared distances
+between all data points and their cluster centers.  The function
+\code{fast_anticlustering} uses a different - but equivalent -
+formulation of the k-means objective, where the re-computation of
+the objective only depends on K and M, but no longer on N. In
+particular, it minimizes the sum of squared distances between
+cluster centroids and the overall data centroid; the distances
+between all individual data points and their cluster center are not
+computed. Using the changed objective reduces the run time by an
+order of magnitude and makes k-means anticlustering applicable to
+very large data sets (even in the millions). For a fixed number of
+exchange partners (specified using the argument
+\code{k_neighbours}), the approximate run time of
+\code{fast_anticlustering} is in O(M N K). The algorithm
+\code{method = "exchange"} in \code{\link{anticlustering}} with
+\code{objective = "variance"} has a run time of O(M N^3). 
+Thus, \code{fast_anticlustering} can improve the run time
+by two orders of magnitude as compared to the standard exchange
+algorithm. The nearest neighbour search, which is done in the
+beginning, only has O(N log(N)) run time and does not strongly
+contribute to the overall run time (and it is extremely fast in
+practice). It is nevertheless possible to suppress the nearest
 neighbour search by using the \code{exchange_partners} argument.
 
 When setting the \code{categories} argument, exchange partners
@@ -152,38 +165,11 @@ kplus_anticlusters <- fast_anticlustering(
 mean_sd_tab(features, kplus_anticlusters)
 
 
-# Working on several 1000 elements is very fast (Here n = 5000)
-data <- matrix(rnorm(5000 * 2), ncol = 2)
+# Working on several 1000 elements is very fast (Here n = 10000, m = 2)
+data <- matrix(rnorm(10000 * 2), ncol = 2)
 start <- Sys.time()
-groups <- fast_anticlustering(data, K = 2, k_neighbours = 2)
+groups <- fast_anticlustering(data, K = 5, k_neighbours = 5)
 Sys.time() - start 
-
-# Use custom exchange partners. Here: 10 random exchange partners
-features <- matrix(rnorm(500 * 5), ncol = 5)
-n_exchange_partners <- 10
-K <- 100 # here the exchange partners make some difference
-init <- sample(rep_len(1:K, nrow(features)))
-groups_rnd_partners <- fast_anticlustering(
-  features, 
-  K = init, 
-  exchange_partners = generate_exchange_partners(
-    n_exchange_partners, 
-    features = features, method = "random"
-  )
-)
-
-# Compare with using nearest neighbours as exchange partners (the default)
-groups_nn_partners <- fast_anticlustering(
-  features, 
-  K = init, 
-  k_neighbours = n_exchange_partners
-)
-# ... and using all elements as exchange partners: 
-groups_all_partners <- anticlustering(features, K = init, objective = "variance")
-
-variance_objective(features, groups_nn_partners)
-variance_objective(features, groups_rnd_partners)
-variance_objective(features, groups_all_partners)
 
 }
 \references{
@@ -191,10 +177,13 @@ Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition
 data sets into equivalent parts. Psychological Methods, 26(2), 
 161–174. https://doi.org/10.1037/met0000301.
 
-Papenberg, M. (2023). K-plus Anticlustering: An Improved k-means Criterion 
-for Maximizing Between-Group Similarity. British Journal of Mathematical 
-and Statistical Psychology. Advance online publication. 
-https://doi.org/10.1111/bmsp.12315
+Papenberg, M. (2023). K-plus Anticlustering: An Improved k-means
+Criterion for Maximizing Between-Group Similarity. British Journal
+of Mathematical and Statistical Psychology. Advance online
+publication.  https://doi.org/10.1111/bmsp.12315
+
+Späth, H. (1986). Anticlustering: Maximizing the variance criterion.
+Control and Cybernetics, 15, 213-218.
 }
 \seealso{
 \code{\link{anticlustering}}
