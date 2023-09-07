@@ -115,7 +115,8 @@
 #' particular, it minimizes the weighted sum of squared distances between
 #' cluster centroids and the overall data centroid; the distances
 #' between all individual data points and their cluster center are not
-#' computed. Using the changed objective reduces the run time by an
+#' computed (Späth, 1986). Using the different objective formulation 
+#' reduces the run time by an
 #' order of magnitude and makes k-means anticlustering applicable to
 #' very large data sets (even in the millions). For a fixed number of
 #' exchange partners (specified using the argument
