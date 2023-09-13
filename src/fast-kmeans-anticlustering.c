@@ -209,23 +209,6 @@ void fast_swap(int *clusters, size_t i, size_t j) {
   clusters[j] = tmp;
 }
 
-/* Function to print a matrix
- * @param N Number of rows in `matrix`
- * @param M Number of columns in `matrix`
- * @param matrix The matrix to be transposed, has dimension N x M
- * @return VOID
- */ 
-void print_matrix(size_t N, size_t M, double matrix[N][M]) {
-  for (size_t i = 0; i < N; i++) {
-    for (size_t j = 0; j < M; j++) {
-      printf(" %10g ", matrix[i][j]);
-    }
-    printf("\n");
-  }
-  printf("number of rows: %zu \nnumber of columns: %zu \n\n",
-         N, M);
-}
-
 size_t one_dim_index(size_t i, size_t j, size_t n) {
   return n * j + i;
 }
