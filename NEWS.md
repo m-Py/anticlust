@@ -1,4 +1,4 @@
-# devel (target anticlust 0.8.0)
+# anticlust 0.8.0
 
 ## New features
 
