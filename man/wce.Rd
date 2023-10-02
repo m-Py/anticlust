@@ -4,7 +4,7 @@
 \alias{wce}
 \title{Exact weighted cluster editing}
 \usage{
-wce(x, solver = NULL)
+wce(x, solver = NULL, solve_sequentially = FALSE)
 }
 \arguments{
 \item{x}{A N x N similarity matrix. Larger values indicate stronger
@@ -12,6 +12,10 @@ agreement / similarity between a pair of data points}
 
 \item{solver}{Optional argument; if passed, has to be either "glpk" or
 "symphony". See details.}
+
+\item{solve_sequentially}{Logical (default FALSE). Should the ILP be solved 
+sequentially, meaning that triangular constraints are only added to the model
+if they are violated, and then the ILP is solved again.}
 }
 \value{
 An integer vector representing the cluster affiliation of each data point
@@ -21,8 +25,9 @@ Optimally solves weighted cluster editing (also known as »correlation clusterin
 »clique partitioning problem«).
 }
 \details{
-Finds the clustering that maximizes the sum of pairwise similarities within clusters. 
-In the input some similarities should be negative (indicating dissimilarity) because 
+Finds the clustering that maximizes the sum of pairwise similarities within clusters
+according to the model by Grötschel and Wakabayashi (1989), using integer linear
+programming (ILP). In the input some similarities should be negative (indicating dissimilarity) because 
 otherwise the maximum sum of similarities is obtained by simply joining all elements 
 within a single big cluster. If the argument \code{solver} is not specified, the function
 will try to find the GLPK or SYMPHONY solver by itself (it prioritizes using SYMPHONY if both are
@@ -45,6 +50,8 @@ hist(distances)
 agreements <- ifelse(as.matrix(distances) < 3, 1, -1)
 clusters <- wce(agreements)
 plot(swiss, col = clusters, pch = 19)
+clusters2 <- wce(agreements, solve_sequentially = TRUE)
+clusters1 == clusters2
 }
 
 }
