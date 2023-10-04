@@ -4,7 +4,7 @@
 \alias{wce}
 \title{Exact weighted cluster editing}
 \usage{
-wce(x, solver = NULL)
+wce(x, solver = NULL, method = "ilp")
 }
 \arguments{
 \item{x}{A N x N similarity matrix. Larger values indicate stronger
@@ -12,6 +12,8 @@ agreement / similarity between a pair of data points}
 
 \item{solver}{Optional argument; if passed, has to be either "glpk" or
 "symphony". See details.}
+
+\item{method}{Either "ilp" or "heuristic".}
 }
 \value{
 An integer vector representing the cluster affiliation of each data point

@@ -8,6 +8,7 @@
 #'     agreement / similarity between a pair of data points
 #' @param solver Optional argument; if passed, has to be either "glpk" or
 #'   "symphony". See details.
+#' @param method Either "ilp" or "heuristic".
 #'   
 #' @return An integer vector representing the cluster affiliation of each data point
 #' 
@@ -63,7 +64,7 @@
 #' 419–420. 
 #'
 
-wce <- function(x, solver = NULL) {
+wce <- function(x, solver = NULL, method = "ilp") {
 
   if (argument_exists(solver)) {
     validate_input(solver, "solver", objmode = "character", len = 1,
@@ -79,7 +80,23 @@ wce <- function(x, solver = NULL) {
   }
   
   x <- as.matrix(x)
-  ilp <- anticlustering_ilp(x, K = 0, FALSE) # k is irrelevant
-  solution <- solve_ilp_diversity(ilp, "max", solver)
-  ilp_to_groups(solution, nrow(x))
+  N <- nrow(x)
+  if (method == "heuristic") {
+    results <- .C(
+      "wce_heuristic", 
+      as.double(x),
+      as.integer(N),
+      clusters = as.integer(0:(N-1)),
+      mem_error = as.integer(0),
+      PACKAGE = "anticlust"
+    )
+    if (results[["mem_error"]] == 1) {
+      stop("Could not allocate enough memory.")
+    }
+    return(order_cluster_vector(results[["clusters"]] + 1))
+  } else {
+    ilp <- anticlustering_ilp(x, K = 0, FALSE) # k is irrelevant
+    solution <- solve_ilp_diversity(ilp, "max", solver)
+    return(ilp_to_groups(solution, nrow(x)))
+  }
 }
