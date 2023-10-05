@@ -110,9 +110,18 @@ wce <- function(x, solver = NULL, method = "ilp", repetitions = NULL) {
     stop("The input via argument `weights` is not a similarity matrix, ",
          "the upper and lower triangulars of your matrix differ.")
   }
+  validate_input(
+    method, "method", input_set = c("ilp", "local-maximum"), 
+    not_na = TRUE, not_function = TRUE, len = 1, objmode = "character"
+  )
   
   x <- as.matrix(x)
   if (method == "local-maximum") {
+    if (argument_exists(repetitions)) {
+      validate_input(repetitions, "repetitions", objmode = "numeric", len = 1, 
+                     greater_than = 0, must_be_integer = TRUE, not_na = TRUE,
+                     not_function = TRUE)
+    }
     repetitions <- ifelse(is.null(repetitions), 1, repetitions)
     if (repetitions > 1) {
       solutions <- lapply(1:repetitions, heuristic_wce, x = x)
