@@ -137,7 +137,7 @@ void wce_heuristic(double *data, int *N, int *clusters, int *mem_error) {
                                 // Swap!
                                 swap_wce(
                                         n, i, cl1, cl2, 
-                                        PTR_NODES, CLUSTER_HEADS
+                                        CLUSTER_HEADS
                                 );
                                 
                                 // Other cluster: Gains distances to element 1
@@ -157,7 +157,7 @@ void wce_heuristic(double *data, int *N, int *clusters, int *mem_error) {
                                 // Swap back to test next exchange partner
                                 swap_wce(
                                         n, i, cl2, cl1,
-                                        PTR_NODES, CLUSTER_HEADS
+                                        CLUSTER_HEADS
                                 );
                         }
                         
@@ -165,7 +165,7 @@ void wce_heuristic(double *data, int *N, int *clusters, int *mem_error) {
                         if (best_obj > SUM_OBJECTIVE) {
                                 swap_wce(
                                         n, i, cl1, best_cluster,
-                                        PTR_NODES, CLUSTER_HEADS
+                                        CLUSTER_HEADS
                                 );
                                 // Update the "global" variables
                                 SUM_OBJECTIVE = best_obj;
@@ -190,7 +190,7 @@ void wce_heuristic(double *data, int *N, int *clusters, int *mem_error) {
 // swap procedure for swapping with different cluster label, not with element in other cluster
 // i = current item
 // cl2 = cluster with which it is swapped
-int swap_wce(size_t n, size_t i, size_t cl1, size_t cl2, struct node *PTR_NODES[n], struct node *CLUSTER_HEADS[n]) {
+void swap_wce(size_t n, size_t i, size_t cl1, size_t cl2, struct node *CLUSTER_HEADS[n]) {
         // iterate through current cluster of i
         struct node *tmp = CLUSTER_HEADS[cl1];
         while (tmp != NULL) {
@@ -202,9 +202,9 @@ int swap_wce(size_t n, size_t i, size_t cl1, size_t cl2, struct node *PTR_NODES[
                         CLUSTER_HEADS[cl2]->next = COPY; // ADDED
                         CLUSTER_HEADS[cl2]->next->data->cluster = cl2; // UPDATED CLUSTER
                         CLUSTER_HEADS[cl2]->next->next = COPY2; // LINKED TO PREVIOUS LIST
-                        return 0; // job's done
+                        return; // job's done
                 }
                 tmp = tmp->next;
         }
-        return 0; // should not come here
+        return; // should not come here
 }
