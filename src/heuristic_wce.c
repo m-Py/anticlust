@@ -122,9 +122,22 @@ void wce_heuristic(double *data, int *N, int *clusters, int *mem_error) {
                         double best_obj = 0;
                         copy_array(n, OBJ_BY_CLUSTER, best_objs);
                         
+                        int singleton_tried = 0;
+                        
                         for (size_t u = 0; u < n; u++) {
                                 // recode exchange partner index
                                 size_t cl2 = u; // OTHER CLUSTER THAT IS TRIED OUT
+                                // is it necessary to test the other cluster?
+                                if (cl1 == cl2) {
+                                        continue;
+                                }
+                                if (CLUSTER_HEADS[cl2]->next == NULL) { // empty cluster
+                                        if (singleton_tried == 1) {
+                                                continue;
+                                        }
+                                        singleton_tried = 1;
+                                }
+                          
                                 // Initialize `tmp` variable for the exchange partner:
                                 copy_array(n, OBJ_BY_CLUSTER, tmp_objs);
                                 // Update objective
