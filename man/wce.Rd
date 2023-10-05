@@ -2,38 +2,74 @@
 % Please edit documentation in R/weighted-cluster-editing.R
 \name{wce}
 \alias{wce}
-\title{Exact weighted cluster editing}
+\title{Weighted cluster editing / Clique partitioning}
 \usage{
-wce(x, solver = NULL, method = "ilp")
+wce(x, solver = NULL, method = "ilp", repetitions = NULL)
 }
 \arguments{
 \item{x}{A N x N similarity matrix. Larger values indicate stronger
 agreement / similarity between a pair of data points}
 
-\item{solver}{Optional argument; if passed, has to be either "glpk" or
-"symphony". See details.}
+\item{solver}{Optional argument; if passed, has to be either "glpk"
+or "symphony". See details.}
 
-\item{method}{Either "ilp" or "heuristic".}
+\item{method}{Either "ilp" (default) or "local-maximum".}
+
+\item{repetitions}{Number of repetitions when using \code{method =
+"local-maximum"}.}
 }
 \value{
-An integer vector representing the cluster affiliation of each data point
+An integer vector representing the cluster affiliation of
+    each data point
 }
 \description{
-Optimally solves weighted cluster editing (also known as »correlation clustering« or
-»clique partitioning problem«).
+Optimally solves the weighted cluster editing problem, also known as
+»correlation clustering« or »clique partitioning problem«.
 }
 \details{
-Finds the clustering that maximizes the sum of pairwise similarities within clusters. 
-In the input some similarities should be negative (indicating dissimilarity) because 
-otherwise the maximum sum of similarities is obtained by simply joining all elements 
-within a single big cluster. If the argument \code{solver} is not specified, the function
-will try to find the GLPK or SYMPHONY solver by itself (it prioritizes using SYMPHONY if both are
-available).
+Finds the clustering that maximizes the sum of pairwise
+similarities within clusters. In the input \code{x}, some
+similarities should be negative (indicating dissimilarity) because
+otherwise the maximum sum of similarities is obtained by simply
+joining all elements within a single big cluster. The cluster
+editing / clique partitioning method has the advantage that the
+number of clusters does not need to be specified by the user
+(unlike, for example, in k-means or p-medoids clustering) and
+instead is found by the algorithm. However, the solution depends on
+the classification of pairwise similarity versus dissimilarity,
+indicated by positive and negative values in the similarity matrix
+\code{x}. Different ways of obtaining a suitable similarity matrix
+are available (e.g., Brusco & Köhn, 2009; Wittkop et al., 2010).
+
+By default, an optimal ILP method is used, implementing the model
+by Grötschel and Wakabayashi (1989). If the argument \code{solver}
+is not specified, the function will try to find the GLPK or
+SYMPHONY solver by itself (it prioritizes using SYMPHONY if both
+are available).
+
+The \code{method = "local-maximum"} implements an adaptation of the
+local neighbourhood search that Späth (1986) proposed for
+maximizing the k-means criterion. However, the initial clustering
+is not chosen randomly, but instead each element starts as a
+separate "singleton" cluster. After that, each element is
+sequentially assigned all possible cluster labels (that is,
+\code{nrow(x)} cluster labels), and for each element, the best
+exchange is realized with regard to the increasing the
+within-cluster sum of similarities (see
+\code{\link{diversity_objective}}). The search terminates when no
+improvement can occur by exchanging the cluster label of an
+element. When specifying the argument \code{repetitions}, the local
+maximum search is repeated, but the order in which the elements are
+processed is changed randomly each time. Note that this algorithm
+is not deterministic - even when the \code{repetitions} argument is
+not specified - because the order in which elements are processed is
+always chosen randomly.
 }
 \note{
-This function either requires the R package \code{Rglpk} and the GNU linear 
-programming kit (<http://www.gnu.org/software/glpk/>) or the R package 
-\code{Rsymphony} and the COIN-OR SYMPHONY solver libraries 
+When using \code{method = "ilp"}, this function either requires the
+R package \code{Rglpk} and the GNU linear programming kit
+(<http://www.gnu.org/software/glpk/>) or the R package
+\code{Rsymphony} and the COIN-OR SYMPHONY solver libraries
 (<https://github.com/coin-or/SYMPHONY>).
 }
 \examples{
@@ -54,15 +90,20 @@ plot(swiss, col = clusters, pch = 19)
 Bansal, N., Blum, A., & Chawla, S. (2004). Correlation clustering. 
 Machine Learning, 56, 89–113. 
 
-Böcker, S., & Baumbach, J. (2013). Cluster editing. In Conference on 
-Computability in Europe (pp. 33–44).
+Brusco, M. J., & Köhn, H. F. (2009). Clustering qualitative data
+based on binary equivalence relations: neighborhood search
+heuristics for the clique partitioning problem. Psychometrika, 74,
+685–703.
 
 Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
 for a clustering problem. Mathematical Programming, 45, 59-96.
 
-Wittkop, T., Emig, D., Lange, S., Rahmann, S., Albrecht, M., Morris, J. H., ..., Baumbach,
-J. (2010). Partitioning biological data with transitivity clustering. Nature Methods, 7,
-419–420.
+Späth, H. (1986). Anticlustering: Maximizing the variance criterion.
+Control and Cybernetics, 15, 213-218.
+
+Wittkop, T., Emig, D., Lange, S., Rahmann, S., Albrecht, M.,
+Morris, J. H., ..., Baumbach, J. (2010). Partitioning biological
+data with transitivity clustering. Nature Methods, 7, 419–420.
 }
 \author{
 Martin Papenberg \email{martin.papenberg@hhu.de}
