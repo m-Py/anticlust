@@ -112,7 +112,7 @@ wce <- function(x, solver = NULL, method = "ilp", repetitions = NULL) {
   }
   
   x <- as.matrix(x)
-  if (method == "heuristic") {
+  if (method == "local-maximum") {
     repetitions <- ifelse(is.null(repetitions), 1, repetitions)
     if (repetitions > 1) {
       solutions <- lapply(1:repetitions, heuristic_wce, x = x)
