@@ -191,18 +191,17 @@ void wce_heuristic(double *data, int *N, int *clusters, int *mem_error) {
 // i = current item
 // cl2 = cluster with which it is swapped
 int swap_wce(size_t n, size_t i, size_t cl1, size_t cl2, struct node *PTR_NODES[n], struct node *CLUSTER_HEADS[n]) {
-        struct node *current = PTR_NODES[i];
-        current->data->cluster = cl2; // change cluster 
-        PTR_NODES[i] = append_to_cluster(CLUSTER_HEADS[cl2], current->data);
-        if (PTR_NODES[i] == NULL) { // failed to allocate memory
-              return 1;
-        }
-        // remove item i from previous cluster
+        // iterate through current cluster of i
         struct node *tmp = CLUSTER_HEADS[cl1];
         while (tmp != NULL) {
-                if (tmp->next->data->ID == i) {
-                        tmp->next = tmp->next->next;
-                        //free(tmp->next);
+                if (tmp->next && tmp->next->data->ID == i) {
+                        struct node *COPY = tmp->next;
+                        tmp->next = tmp->next->next; // REMOVAL
+                        // Add to new cluster, next to HEAD; store previous next of HEAD
+                        struct node *COPY2 = CLUSTER_HEADS[cl2]->next;
+                        CLUSTER_HEADS[cl2]->next = COPY; // ADDED
+                        CLUSTER_HEADS[cl2]->next->data->cluster = cl2; // UPDATED CLUSTER
+                        CLUSTER_HEADS[cl2]->next->next = COPY2; // LINKED TO PREVIOUS LIST
                         return 0; // job's done
                 }
                 tmp = tmp->next;
