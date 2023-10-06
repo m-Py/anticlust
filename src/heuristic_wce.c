@@ -100,18 +100,19 @@ void wce_heuristic(double *data, int *N, int *clusters, int *mem_error) {
         for (size_t i = 0; i < n; i++) {
           OBJ_BY_CLUSTER[i] = 0;
         }
-        double SUM_OBJECTIVE = 0;
 
         /* Some variables for bookkeeping during the optimization */
         
         size_t best_cluster;
-        double tmp_objs[n];
+        double tmp_obj_cl1;
+        double tmp_obj_cl2;
         double best_objs[n];
-        double tmp_obj;
+        double tmp_improvement; // encode if an exchange leads to improvement
+
+        // does any improvement occur during exchange method? is used for finding local maximum
+        int improvement = 1; 
         
         /* Start main iteration loop for exchange procedure */
-        int improvement = 1;
-
         while (improvement == 1) {
                 improvement = 0;
                 /* 1. Level: Iterate through `n` data points */
@@ -119,10 +120,13 @@ void wce_heuristic(double *data, int *N, int *clusters, int *mem_error) {
                         size_t cl1 = PTR_NODES[i]->data->cluster;
                         
                         // Initialize `best` variable for the i'th item
-                        double best_obj = 0;
+                        double best_improvement = 0;
                         copy_array(n, OBJ_BY_CLUSTER, best_objs);
                         
+                        // encode if for element i, it was tested if it should be a singleton cluster
                         int singleton_tried = 0;
+                        
+                        int exchange_cluster_found = 0;
                         
                         for (size_t u = 0; u < n; u++) {
                                 // recode exchange partner index
@@ -138,34 +142,38 @@ void wce_heuristic(double *data, int *N, int *clusters, int *mem_error) {
                                         singleton_tried = 1;
                                 }
                           
-                                // Initialize `tmp` variable for the exchange partner:
-                                copy_array(n, OBJ_BY_CLUSTER, tmp_objs);
+                                // Initialize `tmp` variables for the exchange partner:
+                                tmp_obj_cl1 = OBJ_BY_CLUSTER[cl1];
+                                tmp_obj_cl2 = OBJ_BY_CLUSTER[cl2];
                                 // Update objective
                                 // Current cluster: Loses distances to element i
-                                tmp_objs[cl1] -= distances_one_element( // can be zero -> good!
+                                double sum_dists_i_cl1 = distances_one_element( // can be zero -> good!
                                         n, DISTANCES,
                                         CLUSTER_HEADS[cl1], i
                                 );
-                                
+                                tmp_improvement = -sum_dists_i_cl1;
+                                tmp_obj_cl1 -= sum_dists_i_cl1;
                                 // Swap!
                                 swap_wce(
                                         n, i, cl1, cl2, 
                                         CLUSTER_HEADS
                                 );
                                 
-                                // Other cluster: Gains distances to element 1
-                                tmp_objs[cl2] += distances_one_element(
+                                // Other cluster: Gains distances to element i
+                                double sum_dists_i_cl2 = distances_one_element(
                                         n, DISTANCES, 
                                         CLUSTER_HEADS[cl2], i
                                 );
+                                tmp_improvement += sum_dists_i_cl2;
+                                tmp_obj_cl2 += sum_dists_i_cl2;
 
-                                tmp_obj = array_sum(n, tmp_objs);
-                                
                                 // Update `best` variables if objective was improved
-                                if (tmp_obj > best_obj) {
-                                        best_obj = tmp_obj;
-                                        copy_array(n, tmp_objs, best_objs);
+                                if (tmp_improvement > best_improvement) {
+                                        best_objs[cl1] = tmp_obj_cl1;
+                                        best_objs[cl2] = tmp_obj_cl2;
+                                        best_improvement = tmp_improvement;
                                         best_cluster = cl2;
+                                        exchange_cluster_found = 1;
                                 }
                                 // Swap back to test next exchange partner
                                 swap_wce(
@@ -175,14 +183,14 @@ void wce_heuristic(double *data, int *N, int *clusters, int *mem_error) {
                         }
                         
                         // Only if objective is improved: Do the swap
-                        if (best_obj > SUM_OBJECTIVE) {
+                        if (exchange_cluster_found) {
                                 swap_wce(
                                         n, i, cl1, best_cluster,
                                         CLUSTER_HEADS
                                 );
                                 // Update the "global" variables
-                                SUM_OBJECTIVE = best_obj;
-                                copy_array(n, best_objs, OBJ_BY_CLUSTER);
+                                OBJ_BY_CLUSTER[cl1] = best_objs[cl1];
+                                OBJ_BY_CLUSTER[best_cluster] = best_objs[best_cluster];
                                 improvement = 1;
                         }
                 }
