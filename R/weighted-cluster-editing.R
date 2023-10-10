@@ -167,3 +167,33 @@ heuristic_wce <- function(X, x) {
   order_cluster_vector(clusters[order(rnd_order)])
 }
 
+#' Compute similarity values for the clique partitioning problem
+#' 
+#' @param x A N x M data frame / matrix of attributes
+#' @return An object of class dist
+#' 
+#' @export
+cpp_similarities <- function(x) {
+  N <- nrow(x)
+  M <- ncol(x)
+  output <- rep(0, choose(N, 2))
+  x <- apply(x, 2, to_numeric) # by column, convert to integer
+  results <- .C(
+    "cpp_similarities_", 
+    as.integer(x),
+    as.integer(N),
+    as.integer(M),
+    output = as.integer(output),
+    PACKAGE = "anticlust"
+  )
+  lower_tri_to_dist(results$output, N)
+}
+
+# convert a vector, filling only the lower triangular of a matrix to dist
+# the vector is filled by column (column major I guess)
+lower_tri_to_dist <- function(x, N) {
+  ret <- matrix(ncol = N, nrow = N)
+  ret[lower.tri(ret)] <- x
+  as.dist(ret)
+}
+

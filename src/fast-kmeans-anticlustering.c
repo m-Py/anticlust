@@ -209,6 +209,7 @@ void fast_swap(int *clusters, size_t i, size_t j) {
   clusters[j] = tmp;
 }
 
+// i = "row", j = "col", n = number of rows
 size_t one_dim_index(size_t i, size_t j, size_t n) {
   return n * j + i;
 }
