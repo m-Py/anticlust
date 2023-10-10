@@ -170,13 +170,18 @@ heuristic_wce <- function(X, x) {
 #' Compute similarity values for the clique partitioning problem
 #' 
 #' @param x A data frame / matrix of categorical (nomial / ordinal) attributes
+#' @param NAs_equal_each_other If two persons have missing values on the same
+#' attribute, does this count as agreement? Defaults to FALSE, in which case
+#' these attributes are ignored when computing the sum of agreements and disagreements.
 #' 
 #' @return An object of class \code{dist} representing pairwise similarity (not (DIS)similartiy!)
 #' 
 #' @details
 #' "the [...] values represent the number of attributes on which vertices
 #' [...] disagree, minus the number of attributes on which they agree." 
-#' (Brusco et al. 2009, p. 689)
+#' (Brusco et al. 2009, p. 689) By default, NAs are not thought to be equal
+#' to each other, as in \code{NA == NA}. Adjust the argument \code{NAs_equal_each_other}
+#' if two missing values indicate similarity.
 #' 
 #' @references 
 #' 
@@ -189,11 +194,16 @@ heuristic_wce <- function(X, x) {
 #' for a clustering problem. Mathematical Programming, 45, 59-96.
 #' 
 #' @export
-cpp_similarities <- function(x) {
+cpp_similarities <- function(x, NAs_equal_each_other = FALSE) {
   N <- nrow(x)
   M <- ncol(x)
   output <- rep(0, choose(N, 2))
   x <- apply(x, 2, to_numeric) # by column, convert to integer
+  if (NAs_equal_each_other) {
+    x[is.na(x)] <- max(x, na.rm = TRUE) + 1 # here: NA is distinct category
+  } else {
+    x[is.na(x)] <- -1 # In the C implementation, NAs are recognized as -1
+  }
   results <- .C(
     "cpp_similarities_", 
     as.integer(x),

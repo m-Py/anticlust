@@ -29,4 +29,15 @@ test_that("that C implementation of similarity computation is correct", {
   results1 <- sum_agreements(x)
   results2 <- cpp_similarities(x)
   expect_true(all(results1 == results2))
+  
+  # also use some NAs
+  
+  x[sample(N*M, size = 5)] <- NA
+  results1 <- sum_agreements(x)
+  results2 <- cpp_similarities(x)
+  expect_true(all(results1 == results2))
+  
+  results3 <- cpp_similarities(x, TRUE)
+  expect_false(all(results3 == results2))
+  
 })

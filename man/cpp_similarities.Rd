@@ -4,10 +4,14 @@
 \alias{cpp_similarities}
 \title{Compute similarity values for the clique partitioning problem}
 \usage{
-cpp_similarities(x)
+cpp_similarities(x, NAs_equal_each_other = FALSE)
 }
 \arguments{
 \item{x}{A data frame / matrix of categorical (nomial / ordinal) attributes}
+
+\item{NAs_equal_each_other}{If two persons have missing values on the same
+attribute, does this count as agreement? Defaults to FALSE, in which case
+these attributes are ignored when computing the sum of agreements and disagreements.}
 }
 \value{
 An object of class \code{dist} representing pairwise similarity (not (DIS)similartiy!)
@@ -18,7 +22,9 @@ Compute similarity values for the clique partitioning problem
 \details{
 "the [...] values represent the number of attributes on which vertices
 [...] disagree, minus the number of attributes on which they agree." 
-(Brusco et al. 2009, p. 689)
+(Brusco et al. 2009, p. 689) By default, NAs are not thought to be equal
+to each other, as in \code{NA == NA}. Adjust the argument \code{NAs_equal_each_other}
+if two missing values indicate similarity.
 }
 \references{
 Brusco, M. J., & Köhn, H. F. (2009). Clustering qualitative data
