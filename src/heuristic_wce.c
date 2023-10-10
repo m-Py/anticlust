@@ -118,7 +118,13 @@ void wce_heuristic(double *data, int *N, int *clusters, int *mem_error) {
                 /* 1. Level: Iterate through `n` data points */
                 for (size_t i = 0; i < n; i++) {
                         size_t cl1 = PTR_NODES[i]->data->cluster;
-                        
+                  
+                        // Current cluster: Loses distances to element i
+                        double sum_dists_i_cl1 = distances_one_element( // can be zero -> good!
+                                n, DISTANCES,
+                                CLUSTER_HEADS[cl1], i
+                        );
+
                         // Initialize `best` variable for the i'th item
                         double best_improvement = 0;
                         copy_array(n, OBJ_BY_CLUSTER, best_objs);
@@ -146,20 +152,10 @@ void wce_heuristic(double *data, int *N, int *clusters, int *mem_error) {
                                 tmp_obj_cl1 = OBJ_BY_CLUSTER[cl1];
                                 tmp_obj_cl2 = OBJ_BY_CLUSTER[cl2];
                                 // Update objective
-                                // Current cluster: Loses distances to element i
-                                double sum_dists_i_cl1 = distances_one_element( // can be zero -> good!
-                                        n, DISTANCES,
-                                        CLUSTER_HEADS[cl1], i
-                                );
                                 tmp_improvement = -sum_dists_i_cl1;
                                 tmp_obj_cl1 -= sum_dists_i_cl1;
-                                // Swap!
-                                swap_wce(
-                                        n, i, cl1, cl2, 
-                                        CLUSTER_HEADS
-                                );
-                                
-                                // Other cluster: Gains distances to element i
+                                // Other cluster: Gains distances to element i --
+                                // compute distances between item i and all items in cluster `cl2`
                                 double sum_dists_i_cl2 = distances_one_element(
                                         n, DISTANCES, 
                                         CLUSTER_HEADS[cl2], i
@@ -175,14 +171,12 @@ void wce_heuristic(double *data, int *N, int *clusters, int *mem_error) {
                                         best_cluster = cl2;
                                         exchange_cluster_found = 1;
                                 }
-                                // Swap back to test next exchange partner
-                                swap_wce(
-                                        n, i, cl2, cl1,
-                                        CLUSTER_HEADS
-                                );
+
                         }
                         
-                        // Only if objective is improved: Do the swap
+                          
+                        
+                        // Only if objective is improved: Actually *do* the swap
                         if (exchange_cluster_found) {
                                 swap_wce(
                                         n, i, cl1, best_cluster,
