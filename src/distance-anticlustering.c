@@ -261,7 +261,9 @@ double distances_one_element(size_t n, double *distances[n],
         struct node *tmp = start_node->next;
         double sum = 0;
         while (tmp != NULL) {
-                sum += distances[ID][tmp->data->ID];
+                if (ID != tmp->data->ID) { // do not add distance to itself
+                        sum += distances[ID][tmp->data->ID];
+                }
                 tmp = tmp->next;
         }
         return sum;
