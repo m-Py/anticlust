@@ -27,6 +27,6 @@ test_that("that C implementation of similarity computation is correct", {
   x <- sample(values, size = N * M, replace = TRUE)
   x <- matrix(x, ncol = M)
   results1 <- sum_agreements(x)
-  results2 <- compute_cpp_similarities(x)
+  results2 <- cpp_similarities(x)
   expect_true(all(results1 == results2))
 })
