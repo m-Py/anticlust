@@ -12,7 +12,9 @@ sum_agreements <- function(x) {
     for (j in (i+1):N) {
       # Brusco et al. (2009): "In this context, the c_uv values represent the number of attributes on which vertices u and v
       # disagree, minus the number of attributes on which they agree."
-      C_uv[j, i] <- M - 2 * sum(x[i, ] != x[j, ]) 
+      agreements <- sum(x[i, ] == x[j, ], na.rm = TRUE)
+      disagreements <- sum(x[i, ] != x[j, ], na.rm = TRUE)
+      C_uv[j, i] <- agreements - disagreements
     }
   }
   as.dist(C_uv)
