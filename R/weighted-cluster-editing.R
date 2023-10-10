@@ -169,8 +169,24 @@ heuristic_wce <- function(X, x) {
 
 #' Compute similarity values for the clique partitioning problem
 #' 
-#' @param x A N x M data frame / matrix of attributes
-#' @return An object of class dist
+#' @param x A data frame / matrix of categorical (nomial / ordinal) attributes
+#' 
+#' @return An object of class \code{dist} representing pairwise similarity (not (DIS)similartiy!)
+#' 
+#' @details
+#' "the [...] values represent the number of attributes on which vertices
+#' [...] disagree, minus the number of attributes on which they agree." 
+#' (Brusco et al. 2009, p. 689)
+#' 
+#' @references 
+#' 
+#' Brusco, M. J., & Köhn, H. F. (2009). Clustering qualitative data
+#' based on binary equivalence relations: neighborhood search
+#' heuristics for the clique partitioning problem. Psychometrika, 74,
+#' 685–703.
+#' 
+#' Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
+#' for a clustering problem. Mathematical Programming, 45, 59-96.
 #' 
 #' @export
 cpp_similarities <- function(x) {
