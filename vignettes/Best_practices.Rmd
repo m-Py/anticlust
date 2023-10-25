@@ -1,6 +1,7 @@
 ---
 title: "Some best practices for anticlustering"
 output: rmarkdown::html_vignette
+author: Martin Papenberg
 vignette: >
   %\VignetteIndexEntry{Some best practices for anticlustering}
   %\VignetteEngine{knitr::rmarkdown}
@@ -14,14 +15,9 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(anticlust)
-```
+This vignette documents some "best practices" for anticlustering using the R package `anticlust`. In many cases, the suggestions pertain to overriding the default values of arguments of `anticlustering()`, which seems to be a difficult decision for users. However, I advise you: Do not stick with the defaults; check out the results of different anticlustering specifications; repeat the process; play around; read the documentation (especially `?anticlustering`); change arguments arbitrarily; compare the output. Nothing can break.[^wellactually]
 
-
-This vignette documents some "best practices" for using the function `anticlustering()` (and they are mostly applicable to `kplus_anticlustering()` as well). In many cases, the suggestions pertain to overriding the default values of arguments, which seems to be a difficult decision for users. However, I advise you: Do not stick with the defaults; check out the results of different anticlustering specifications; repeat the process; play around; read the documentation (especially `?anticlustering`); change arguments arbitrarily; compare the output. Nothing can break.[^wellactually]
-
-[^wellactually]: Well, actually your R session can break if you use an optimal method (`method = "ilp"`) with a data set that is too large. 
+[^wellactually]: Well, actually your R session can break if you use an optimal method (`method = "ilp"`) with a data set that is too large.
 
 This document uses somewhat imperative language; nuance and explanations are given in the package documentation, the other vignettes, and the papers by Papenberg and Klau (2021; https://doi.org/10.1037/met0000301) and Papenberg (2023; https://doi.org/10.1111/bmsp.12315). Note that deciding which anticlustering objective to use usually requires substantial content considerations and cannot be reduced to "which one is better". However, some hints are given below. 
 
@@ -30,20 +26,19 @@ This document uses somewhat imperative language; nuance and explanations are giv
 - Use `standardize = TRUE` instead of the default `standardize = FALSE`.[^whydefault]
 - Do not use the default `objective = "diversity"` when the group sizes are not equal (preferably, use `objective = "kplus"`).
 - If you only care about similarity in mean values, use `objective = "variance"`.
-- **You should (probably) not only care about similarity in mean values**: prefer `objective = "kplus"` over `objective = "variance"` (or even better: check out the function `kplus_anticlustering()`).
+- **You should (probably) not only care about similarity in mean values**: prefer `objective = "kplus"` over `objective = "variance"` (or check out the function `kplus_anticlustering()`).
 - If you (only) care about similarity in means and standard deviations, use `objective = "kplus"` instead of the default `objective = "diversity"`.
 - With k-plus anticlustering, **always** use `standardize = TRUE`.
-- Do not use the function `fast_anticlustering()` (which is usually slower than `anticlustering()`).
+- If you want to apply anticlustering on a large data set, read the vignette "Speeding up Anticlustering".
+- If you have a very large[^whatisverylarge] data set, do not use the default `objective = "diversity"` because computing the distance matrix may overwhelm your computer. Instead use `objective = "variance"` or `objective = "kplus"`.
 - For the optimal anticlustering algorithms (i.e., `method = "ilp"`): Install the SYMPHONY solver instead of the GLPK solver. 
 - The `objective = "dispersion"` is the only objective where you should first try out the optimal method instead of a heuristic, i.e., use `method = "ilp"` or the function `optimal_dispersion()`.[^optdispersion]
-- If you have a very large[^whatisverylarge] data set, do not use the default `objective = "diversity"` because computing the distance matrix may overwhelm your computer. Instead use `objective = "variance"` or `objective = "kplus"`.
 
-[^whydefault]: You might ask why `standardize = TRUE` is not the default. Actually, there are two reasons. First, the argument was not always available in `anticlust` and changing the default behaviour of a function when releasing a new version is oftentimes undesirable. Second, it seems like a big decision to me to just change users' data by default. In doubt, just compare the results of using `standardize = TRUE` and `standardize = FALSE` and decide for yourself which you like best. Standardization may not be the best choice in all settings.
+[^whydefault]: You might ask why `standardize = TRUE` is not the default. Actually, there are two reasons. First, the argument was not always available in `anticlust` and changing the default behaviour of a function when releasing a new version is oftentimes undesirable. Second, it seems like a big decision to me to just change users' data by default (which is done when standardizing the data). In doubt, just compare the results of using `standardize = TRUE` and `standardize = FALSE` and decide for yourself which you like best. Standardization may not be the best choice in all settings.
 
 [^optdispersion]: The maximum dispersion problem can be solved optimally for rather large data sets, especially for $K = 2$. For $K = 3$ and $K = 4$, several 100 elements can usually be processed, especially when installing the SYMPHONY solver.
 
 [^whatisverylarge]: What is considered very large may depend on the specifications of your computer. I used to have problems computing a distance matrix for $N > 20000$.
-
 
 ## References 
 

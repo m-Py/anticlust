@@ -73,41 +73,36 @@ test_that("Exchange partners are generatede correctly for fast k-means method", 
   ### Using categorical restrictions
   # Case 1: restricted number of exchange partners (i.e., nearest neighbour search)
   
-  partners <- all_exchange_partners(
+  partners <- nearest_neighbours(
     features = features,
     k_neighbours = k_neighbours,
     categories = categories
   )
   test_idx(partners, categories)
   ## ensure correct order of the output 
-  expect_true(all(sapply(partners, function(x) x[1]) == 1:N))
+  expect_true(all(lengths(partners) == k_neighbours))
   
   # Case 2: no restriction on number of exchange partners
-  partners <- all_exchange_partners(
-    features = features,
-    k_neighbours = Inf,
-    categories = categories
-  )
+  partners <- list_idx_by_category(categories)
   test_idx(partners, categories)
   
   ### Not using categorical restrictions
   # Case 1: restricted number of exchange partners (i.e., nearest neighbour search)
   categories <- to_numeric(schaper2019$room)
   k_neighbours <- k_neighbours
-  partners <- all_exchange_partners(
+  partners <- nearest_neighbours(
     features = features,
     k_neighbours = k_neighbours,
     categories = NULL
   )
-  expect_true(all(sapply(partners, length) == k_neighbours + 1))
-  ## ensure correct order of the output 
-  expect_true(all(sapply(partners, function(x) x[1]) == 1:N))
-  
-  # Case 2: no restriction on number of exchange partners
-  partners <- all_exchange_partners(
-    features = features,
-    k_neighbours = Inf,
-    categories = NULL
-  )
-  expect_true(all(sapply(partners, length) == N))
+  expect_true(all(lengths(partners) == k_neighbours))
 })
+
+test_that("remove_self() function works as intended in exchange partner generation", {
+ expect_true(
+   identical(
+     remove_self(list(c(2, 1), c(3, 2), c(4, 3))), list(2, 3, 4)
+    )
+  )
+})
+

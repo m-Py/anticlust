@@ -4,6 +4,7 @@ output:
   rmarkdown::html_vignette:
     number_sections: false
     df_print: kable
+author: Martin Papenberg
 vignette: >
   %\VignetteIndexEntry{Using the R package anticlust for stimulus selection in experiments}
   %\VignetteEngine{knitr::rmarkdown}

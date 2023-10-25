@@ -218,3 +218,24 @@ int has_node_dispersion(
         int after
 );
 
+// Declare Functions
+void fast_kmeans_anticlustering(
+        double *data,
+        int *N,
+        int *M,
+        int *K,
+        int *frequencies,
+        int *clusters,
+        int *partners,
+        int *k_neighbours
+);
+void fast_update_centers(size_t i, size_t j, size_t n, size_t m, size_t k, double *data, 
+                         int cl1, int cl2, double CENTERS[k][m], int *frequencies);
+
+// for fast new k-means implementation
+void init_centers(size_t k, size_t m, size_t n, double CENTERS[k][m], int* clusters, int* frequencies, double* data);
+void init_overall_centroid(size_t m, size_t n, double OVERALL_CENTROID[m], double* data);
+void fast_swap(int *clusters, size_t i, size_t j);
+void print_matrix(size_t N, size_t M, double matrix[N][M]);
+size_t one_dim_index(size_t i, size_t j, size_t n);
+double weighted_array_sum(size_t k, int* frequencies, double ARRAY[k]);

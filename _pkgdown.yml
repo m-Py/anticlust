@@ -1,0 +1,7 @@
+navbar:
+  structure:
+    left: [reference, articles, news, blog]
+  components:
+    blog:
+      text: Blog
+      href: https://m-py.github.io/anticlust-blog

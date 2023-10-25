@@ -16,3 +16,4 @@ docs/*
 .radian_profile
 tags
 *.dll
+*.kate-swp
