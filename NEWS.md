@@ -1,3 +1,9 @@
+# anticlust 0.8.0-1
+
+## Internal changes
+
+- (Regression) `anticlustering(..., objective = "variance")` temporarily uses pre 0.8.0 implementation to fix some CRAN issues
+
 # anticlust 0.8.0
 
 ## New features
