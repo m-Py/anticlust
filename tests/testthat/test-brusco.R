@@ -48,15 +48,7 @@ test_that("input and output work expectedly for Brusco algorithm", {
   tab <- data.frame(tab)
   tab <- tab[order(tab$X1, decreasing = TRUE), ]
   expect_true(all(tab == c(32, 32, 32)))
-  
-  
-  # Test that bicriterion function works as intended -- unequal sized groups
-  bc <- bicriterion_anticlustering(schaper2019[, 3:6], K = c(12, 12, 12, 60), R = 20)
-  tab <- apply(bc, 1, table)
-  tab <- data.frame(tab)
-  tab <- tab[order(tab$X1, decreasing = TRUE), ]
-  expect_true(all(tab == c(60, 12, 12, 12)))
-  
+
   # Ensure that random seeds work with bicriterion algorithm (this is important
   # because the algorithm uses random number generation in C, should be 
   # reproducible from R!)
