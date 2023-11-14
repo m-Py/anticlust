@@ -1,4 +1,4 @@
-# anticlust 0.8.0-1
+# anticlust 0.8.2
 
 ## Internal changes
 
