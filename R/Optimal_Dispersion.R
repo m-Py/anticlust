@@ -350,26 +350,58 @@ solve_ilp_graph_colouring <- function(ilp, solver) {
   # solver_function = Rglpk::Rglpk_solve_LP OR Rsymphony::Rsymphony_solve_LP
   # name_opt (refers to the output of the function) = "objval" (GLPK) OR "optimum" (Symphony)
   # rest of the input is the same between the solver functions, which is nice
-  solver_function <- ifelse(solver == "symphony", Rsymphony::Rsymphony_solve_LP, Rglpk::Rglpk_solve_LP)
-  name_opt <- ifelse(solver == "symphony", "objval", "optimum")
-  ## TODO add gurobi solver!
+  solver_functions <- list(
+    symphony = Rsymphony::Rsymphony_solve_LP,
+    glpk = Rglpk::Rglpk_solve_LP,
+    gurobi = gurobi::gurobi
+  ) 
+  solver_function <- solver_functions[[solver]]
+  name_opt <- ifelse(solver %in% c("symphony", "gurobi"), "objval", "optimum")
+  name_solution <- ifelse(solver == "gurobi", "x", "solution")
   
-  ilp_solution <- solver_function(
-    obj = ilp$obj_function,
-    mat = ilp$constraints,
-    dir = ilp$equalities,
-    rhs = ilp$rhs,
-    types = "B",
-    max = FALSE
-  )
+  if (solver == "gurobi") {
+     ilp_solution <- solve_ilp_gurobi(ilp)
+  } else {
+    ilp_solution <- solver_function(
+      obj = ilp$obj_function,
+      mat = ilp$constraints,
+      dir = ilp$equalities,
+      rhs = ilp$rhs,
+      types = "B",
+      max = FALSE
+    )
+  }
 
   # return the optimal value and the variable assignment
   ret_list <- list() 
-  ret_list$x <- ilp_solution$solution
+  ret_list$x <- ilp_solution[[name_solution]]
   ret_list$obj <- ilp_solution[[name_opt]]
   ret_list$status <- ilp_solution$status
-  ## name the decision variables
-  names(ret_list$x) <- colnames(ilp$constraints)
+  ret_list
+}
+
+solve_ilp_gurobi <- function(ilp) {
+  model <- list()
+  model$A          <- ilp$constraints
+  model$obj        <- ilp$obj_function
+  model$rhs        <- ilp$rhs
+  model$sense      <- ilp$equalities
+  model$vtypes     <- "B"
+  ## solve
+  ilp_solution <- gurobi::gurobi(model, params = list(LogToConsole = 0))
+  ret_list <- list() 
+  if (ilp_solution$status == "INFEASIBLE"){
+    ret_list$x <- NULL
+    ret_list$objval <- 0
+    ret_list$status <- 1
+  } else {
+    # return the optimal value and the variable assignment
+    ret_list$x <- ilp_solution$x
+    names(ret_list$x) <- colnames(ilp$constraints)
+    ret_list$objval <- ilp_solution$objval
+    ret_list$status <- 0
+    ## name the decision variables
+  }
   ret_list
 }
 
