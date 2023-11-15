@@ -46,17 +46,17 @@
 #'   programming kit (<http://www.gnu.org/software/glpk/>) or the R package 
 #'   \code{Rsymphony} and the COIN-OR SYMPHONY solver libraries 
 #'   (<https://github.com/coin-or/SYMPHONY>), or the commercial 
-#'   gurobi solver (<https://www.gurobi.com/downloads/>), which distributes its own 
+#'   GUROBI solver (<https://www.gurobi.com/downloads/>), which distributes its own 
 #'   interface R packaged called 'gurobi'. If the argument \code{solver} is not 
 #'   specified, the function will try to find a solver by itself (it prioritizes
-#'   gurobi > SYMPHONY > GLPK).
+#'   GUROBI > SYMPHONY > GLPK).
 #' 
 #'   Optimally solving the maximum dispersion problem is NP-hard for K
 #'   > 2 and therefore computationally infeasible for larger data
 #'   sets. For K = 3 and K = 4, it seems that this approach scales up to several 100 elements, 
-#'   or even > 1000 for K = 3 (at least when using the Symphony solver). 
+#'   or even > 1000 for K = 3 (at least when using the Gurobi or Symphony solver). 
 #'   For larger data sets, use the heuristic approaches in \code{\link{anticlustering}} or
-#'   \code{\link{bicriterion_anticlustering}}. However, note that for K = 2, 
+#'   \code{\link{bicriterion_anticlustering}}. However, note that for K = 2 or 3,
 #'   the optimal approach is usually much faster than the heuristics.
 #'   
 #'   In the output, the element \code{edges} defines which elements must be in separate 

@@ -44,7 +44,7 @@
 #' programming kit (<http://www.gnu.org/software/glpk/>) or the R package 
 #' \code{Rsymphony} and the COIN-OR SYMPHONY solver libraries 
 #' (<https://github.com/coin-or/SYMPHONY>), or the commercial 
-#' gurobi solver (<https://www.gurobi.com/downloads/>), which distributes its own 
+#' GUROBI solver (<https://www.gurobi.com/downloads/>), which distributes its own 
 #' interface R packaged called 'gurobi'.
 #'
 #' @references

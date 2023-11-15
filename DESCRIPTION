@@ -77,6 +77,6 @@ SystemRequirements: The exact (anti)clustering algorithms require that
     either the GNU linear programming kit (GLPK library) is installed
     (<http://www.gnu.org/software/glpk/>) or the SYMPHONY open source MILP
     solver (<https://github.com/coin-or/SYMPHONY>), or the commercial software
-    gurobi (<https://www.gurobi.com/downloads/>), 
+    GUROBI (<https://www.gurobi.com/downloads/>), 
     which includes its own interface R package 'gurobi'. Rendering the vignette
     requires pandoc (<https://pandoc.org/>).
