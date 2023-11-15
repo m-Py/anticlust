@@ -15,21 +15,66 @@
 #'
 #' @noRd
 
-solve_ilp <- function(ilp, objective = "max") {
-  ## build model
-  model <- list()
-  model$A          <- ilp$constraints
-  model$obj        <- ilp$obj_function
-  model$modelsense <- objective
-  model$rhs        <- ilp$rhs
-  model$sense      <- ilp$equalities
-  model$vtypes     <- "B"
-  ## solve
-  ilp_solution <- gurobi::gurobi(model, params = list(LogToConsole = 0))
-  ret_list <- list()
-  ret_list$x <- ilp_solution$x
-  ret_list$obj <- ilp_solution$objval
+solve_ilp_diversity <- function(ilp, objective = "max", solver = NULL) {
+  if (objective == "max") {
+    max <- TRUE
+  } else {
+    max <- FALSE
+  }
+  
+  if (is.null(solver)) {
+    solver <- find_ilp_solver()
+  }
+  
+  solver_functions <- list(
+    symphony = Rsymphony::Rsymphony_solve_LP,
+    glpk = Rglpk::Rglpk_solve_LP,
+    gurobi = gurobi::gurobi
+  )
+  
+  solver_function <- solver_functions[[solver]]
+  name_opt <- ifelse(solver %in% c("symphony", "gurobi"), "objval", "optimum")
+  name_solution <- ifelse(solver == "gurobi", "x", "solution")
+  
+  if (solver == "gurobi") {
+    ## build model
+    model <- list()
+    model$A          <- ilp$constraints
+    model$obj        <- ilp$obj_function
+    model$modelsense <- objective
+    model$rhs        <- ilp$rhs
+    model$sense      <- ilp$equalities
+    model$vtypes     <- "B"
+    ## solve
+    ilp_solution <- solver_function(model, params = list(LogToConsole = 0))
+  } else {
+    ilp_solution <- solver_function(
+      obj = ilp$obj_function,
+      mat = ilp$constraints,
+      dir = ilp$equalities,
+      rhs = ilp$rhs,
+      types = "B",
+      max = max
+    )
+  }
+
+  # return the optimal value and the variable assignment
+  ret_list <- list() 
+  ret_list$x <- ilp_solution[[name_solution]]
+  ret_list$obj <- ilp_solution[[name_opt]]
   ## name the decision variables
   names(ret_list$x) <- colnames(ilp$constraints)
   ret_list
+}
+
+# Function to find a solver package
+find_ilp_solver <- function() {
+  if (requireNamespace("gurobi", quietly = TRUE)) {
+    return("gurobi")
+  } else if (requireNamespace("Rsymphony", quietly = TRUE)) {
+    return("symphony")
+  } else if (requireNamespace("Rglpk", quietly = TRUE)) {
+    return("glpk")
+  }
+  check_if_solver_is_available() # throws an error here!
 }

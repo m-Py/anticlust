@@ -1,0 +1,250 @@
+---
+title: "Speeding up anticlustering"
+output: rmarkdown::html_vignette
+author: Martin Papenberg
+vignette: >
+  %\VignetteIndexEntry{Speeding up anticlustering}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+set.seed(1234)
+```
+
+```{r setup}
+library(anticlust)
+```
+
+This vignette documents various ways by which the speed of the anticlustering method implemented in the `anticlust` package can be adjusted. Speedup is particularly useful for large data sets when the default anticlustering algorithm becomes too slow. A fast method may also be desirable for testing purposes, even if the final anticlustering is based on a slower method.
+
+## The exchange algorithm
+
+The default anticlustering algorithm works by exchanging data points between clusters in such a way that exchanges improve the anticlustering objective as much as possible. Details on the exchange method may also be found in Papenberg and Klau (2021; https://doi.org/10.1037/met0000301), Papenberg (2023; https://doi.org/10.1111/bmsp.12315), or the `anticlust` documentation (`?anticlustering`). Basically, running more exchanges tends to improve the results, but the improvements are diminishing with many repetitions---especially for large data sets. So, to speed up anticlustering, we can reduce the number of exchanges. Here we will learn how to do that. However, first we learn how to slow down anticlustering. Slowing down can lead to better results and is recommended if you have the time.
+
+## Slowing down
+
+The default exchange algorithm (`anticlustering(..., method = "exchange")`) iterates through all input elements and attempts to improve the anticlustering by swapping each input element with a element that is currently assigned to a different cluster. No swap is conducted if an element cannot be swapped in such a way that the anticlustering objective is improved. The process stops after all possible exchanges have been evaluated for each element. When the number of input elements is $N$, this process leads to approximately $N^2$---or $O(N^2)$---attempted exchanges, because each element is swapped with all elements that are currently assigned to a different cluster. To give a concrete example, when having $N = 100$ data points and $K = 4$ equal-sized groups, 75 swaps are evaluated for each element and the best swap is realized. This leads to 100 * 75 = `r 100 * 75` exchanges that have to be conducted during the entire exchange algorithm, and for each exchange the objective function has to be re-evaluated. This is less exchanges than $N^2 = 100^2 = 10000$ because we skip exchanges with the 25 elements that are currently in the same cluster (including itself). However, according to the [Big O notation](https://en.wikipedia.org/wiki/Big_O_notation), we would still classify the number of exchanges as $O(N^2)$, independent of the number of groups. Thus, the total theoretical run time of the exchange method is $O(N^2)$ multiplied with the effort needed to compute an anticlustering objective. 
+
+The results of the exchange method can be improved by not stopping after a single iteration through the data set; instead we may repeat the process until no single exchange is able to further improve the anticlustering objective, i.e., until a local maximum is found. This happens if we use `anticlustering(..., method = "local-maximum")`. This method corresponds to the algorithm "LCW" in  Weitz and Lakshminarayanan (1998). Using the local maximum method leads to more exchanges and thus to longer running time, but also better results than the default exchange method.  
+
+Let's compare the two exchange methods with regard to their running time, using the iris data set, which contains `r nrow(iris)` elements.
+
+```{r}
+
+K <- 3
+system.time(anticlustering(iris[, -5], K = K, method = "exchange"))
+system.time(anticlustering(iris[, -5], K = K, method = "local-maximum"))
+
+```
+
+Depending on how many iterations are needed, the default exchange method can be much faster than the local maximum method. Generally I would recommend to use `method = "local-maximum"` for better results, but if speed is an issue, stick with the default.
+
+To slow down even more: The exchange process may be restarted several times, each time using a different initial grouping of the elements. This is accomplished when specifying the `repetitions` argument, which defaults to 1 repetition of the exchange / local maximum algorithm. Thus, for better results, we may increase the number of repetitions:
+
+```{r}
+
+K <- 3
+system.time(anticlustering(iris[, -5], K = K, method = "exchange"))
+system.time(anticlustering(iris[, -5], K = K, method = "local-maximum"))
+system.time(anticlustering(iris[, -5], K = K, method = "local-maximum", repetitions = 10))
+
+```
+
+In this case, sticking with the default leads to run times that are much much faster. Still, if your data set is not too large, using several repetitions may be useful (but you can judge yourself via the results). The good news is that fewer exchanges may be enough in large data sets: anticlustering generally becomes easier with more data. 
+
+## Getting fast: Using fewer exchange partners
+
+If the default exchange method is not fast enough for your taste, it is possible to use fewer exchange partners during the anticlustering process. By default, the exchange method evaluates each possible exchange with all elements that are currently assigned to a different cluster, leading to $O(N^2)$ exchanges. If we only use a fixed number of exchange partners per element, we can reduce the number of exchanges to $O(N)$, corresponding to a gain of an order of magnitude in terms of run time. Using fewer exchange partners for each element may decrease the quality of the results, and is generally only recommended if speed is an issue, e.g. for large data sets. But the run time will be considerably faster. We will consider three possibilities of using fewer exchange partners  in `anticlust`: `fast_anticlustering()`, preclustering, and an additional secret hack. 
+
+### fast_anticlustering()
+
+In Papenberg and Klau (2021), we described the function `fast_anticlustering()` as a method to speed up the anticlustering process for large data sets. It optimizes the k-means objective because computing all pairwise distances as is done when optimizing the "diversity" (i.e., the default in `anticlustering()`) is not feasible for very large data sets (for about N > 20000 on my personal computer). Moreover, `fast_anticlustering()` directly takes as argument the number of exchange partners for each element, via the argument `k_neighbours`. In this case, the application is straight forward: 
+
+```{r}
+N <- 5000
+M <- 2
+data <- matrix(rnorm(N * M), ncol = M)
+start <- Sys.time()
+groups1 <- fast_anticlustering(data, K = 2)  # default uses all exchange partners
+Sys.time() - start 
+```
+
+The default behaviour in `fast_anticlustering()` is to use all exchange partners. Using fewer exchange partners can lead to much faster run time: 
+
+```{r}
+start <- Sys.time()
+groups2 <- fast_anticlustering(data, K = 2, k_neighbours = 20)
+Sys.time() - start 
+```
+
+Was there a cost to this speedup? 
+
+```{r}
+variance_objective(data, groups1)
+variance_objective(data, groups2)
+```
+
+Frankly, there is no observable difference with regard to the objective that was obtained, but the call to `fast_anticlustering()`, which used fewer exchange partners, was much faster. In general, for large data sets, using fewer exchange partners may not impair the results and instead lead to heavily reduced run times. *Sometimes, there is free lunch*.
+
+By default, `fast_anticlustering()` selects exchange partners though a nearest neighbour search when specifying `k_neighbours`: similar elements serve as exchange partners. The nearest neighbour search, which is done once in the beginning, only has O(N log(N)) run time and therefore does not strongly contribute to the overall run time. It is possible to suppress the nearest neighbour search by passing custom exchange partners using the `exchange_partners` argument of `fast_anticlustering()`. Exchange partners can for example be generated by `generate_exchange_partners()`, but a custom list may also be used. See the documentation (`?fast_anticlustering` and `?generate_exchange_partners()`) for more information.
+
+### Preclustering
+
+A second way of doing using fewer exchange partners is by including "preclustering" restrictions with the standard anticlustering function `anticlustering()`. Unlike `fast_anticlustering()`, preclustering works with all anticlustering objectives that are available in `anticlustering()` (e.g., the diversity). When setting `preclustering = TRUE`, the optimization restricts the number of exchange partners to `K - 1` (very similar) elements. While the logic is similar to the nearest neighbour approach in `fast_anticlustering()`, the difference is that the exchange partners consist of mutually exclusive groups when using preclustering. For example, the first, third and tenth element may only serve as exchange partners for each other, and none of them is exchanged with an "outsider" of this particular group. With `fast_anticlustering()`, each element has its own separate list of exchange partners, which can even be user generated when using the argument `exchange_partners`. In graph terms, with preclustering, the exchange partners form a clique, whereas with `fast_anticlustering()`, any (number of) connections are possible.
+
+Note that the preclustering algorithm, which has to be performed prior to the anticlustering algorithm, has $O(N^2)$ run time, which is slower than the nearest neighbour search in `fast_anticlustering()`. It nevertheless leads to strongly improved run times for larger data sets:
+
+```{r}
+N <- 1000
+M <- 5
+K <- 3
+data <- matrix(rnorm(N*M), ncol = M)
+system.time(anticlustering(data, K = K))
+system.time(anticlustering(data, K = K, preclustering = TRUE))
+```
+
+### Secret hack
+
+There is also an additional "hidden" method to make the `anticlustering()` function run faster. This method also relies on using fewer exchange partners during the exchange process, but does not use preclustering or the approach used in `fast_anticlustering()`. This approach is documented here and mostly relies on a dirty "hack" involving the `anticlustering()` argument `categories`. Since it works with `anticlustering()`, it can be used for all anticlustering objectives (unlike `fast_anticlustering()`). Let's see how it works:
+
+The first step that I am using here is not strictly necessary---in the next section, we will learn more about what this accomplishes---but let's create the initial clusters before calling `anticlustering()`. This grouping is the basis on which the exchange procedure starts to improve the anticlustering:
+
+```{r}
+N <- nrow(iris)
+K <- 3
+initial_clusters <- sample(rep_len(1:K, N))
+initial_clusters
+table(initial_clusters)
+```
+
+Now, the argument `categories` can be used to define which elements serve as exchange partners for each other. Lets create random groups of 10 elements that serve as exchange elements for each other: 
+
+```{r}
+exchange_partners <- sample(rep_len(1:(N/10), N)) #somewhat ugly but works
+exchange_partners
+table(exchange_partners)
+```
+
+The variable `exchange_partners` now defines groups of elements that are exchanged with each other: When passed to `categories`, only elements having the same value in `exchange_partners` serve as exchange partners for each other -- this is how the `categories` argument operates. Thus, each element is only swapped with 9 other elements instead of all `r N` elements. 
+
+Now let's call anticlustering using the exchange partners we just defined:
+
+```{r}
+system.time(anticlustering(iris[, -5], K = initial_clusters))
+system.time(anticlustering(iris[, -5], K = initial_clusters, categories = exchange_partners))
+```
+
+Well, there is not a lot going on here with this very small data set (N = 150), so let's do this for a larger data set with 1000 data points.
+
+```{r}
+N <- 1000
+M <- 2
+K <- 5
+data <- matrix(rnorm(M*N), ncol = M)
+
+initial_clusters <- sample(rep_len(1:K, N))
+exchange_partners <- sample(rep_len(1:(N/10), N))
+
+system.time(anticlustering(data, K = initial_clusters))
+system.time(anticlustering(data, K = initial_clusters, categories = exchange_partners))
+```
+
+The speedup is enormous! 
+
+### Including categorical variables
+
+The previous "hacky" approach to speed up anticlustering used the `categories` argument. We should now reflect how this was accomplished, and first note that the `categories` argument usually has a different purpose: It is used to evenly distribute a categorical variable across groups---we did not care for that in the previous example. 
+
+For example, coming back to the iris data set, we may require to evenly distribute the species of the iris plants across 5 groups of plants: 
+
+```{r}
+groups <- anticlustering(iris[, -5], K = 5, categories = iris$Species)
+table(groups, iris$Species)
+```
+
+How does the `categories` argument accomplish the even spread of the species? First, the initial grouping of the elements is not random, but instead a "stratified split", which ensures that a categorical variable occurs an equal number of times in each split. `anticlust` has the function `categorical_sampling()` for this purpose, which is called by `anticlustering()` internally before the exchange algorithm starts. After conducting the initial stratified split, only plants belonging to the same species serve as exchange partners for each other. This second purpose of the `categories` argument is the one that we used above to restrict the number of exchange partners to speed up anticlustering: Only elements that have the same value in `categories` serve as exchange partners for each other.
+
+In the example above, we prevented `anticlustering()` from conducting a stratified split on the basis of the `categories` argument because we passed the initial grouping of the variables ourselves. The insight that the `categories` argument has a twofold purpose---one of which can be shut down by using the `K` argument as the initial grouping vector---leads to the following approach, where I combine the speedup aspect of `categories` with the aspect of conducting a stratified split.
+
+First, we conduct a manual stratified split as the initial grouping vector for the `K` argument in `anticlustering()`:
+
+```{r}
+initial_groups <- categorical_sampling(iris$Species, K = 5)
+table(initial_groups, iris$Species) # even!
+```
+
+Next, as in the previous section, we generate a vector that defines groups of pairwise exchange partners.
+
+```{r}
+N <- nrow(iris)
+exchange_partners <- sample(rep_len(1:(N/10), N))
+```
+
+Now, and this is the crucial part, we pass to the argument `categories` a matrix that contains both the species as well as the `exchange_partners` vector, and to the argument `K` the vector that encodes the stratified split. This way we ensure that: 
+
+(a) the species is split evenly between groups at the start of the algorithm (argument `K`) 
+(b) the number of exchange partners is restricted to 9 elements (one column of the argument `categories`)
+(c) the exchange partners are from the same species, thereby ensuring that the species remains evenly distributed between groups (the other column of `categories`)
+
+```{r}
+groups <- anticlustering(
+  iris[, -5],
+  K = initial_groups, 
+  categories = cbind(iris$Species, exchange_partners)
+)
+```
+
+The groups are still balanced after `anticlustering()` was called:
+
+```{r}
+table(groups, iris$Species)
+```
+
+## Objective function
+
+The package `anticlust` primarily implements two objective functions for anticlustering: k-means and the diversity.[^kplusdispersion] The k-means criterion is well-known in cluster analysis and is computed as the sum of the squared Euclidean distances between all data points and the centroid of their respective cluster: the variance. The diversity is the overall sum of all pairwise distances between elements that are grouped in the same cluster (for details, see Papenberg & Klau, 2021). By default, `anticlustering()` optimizes the "Euclidean diversity": the diversity objective using the Euclidean distance as measure of pairwise dissimilarity.
+
+[^kplusdispersion]: Actually, four objectives are natively supported for the `anticlustering()` argument `objective`: `"diversity"`, `"variance"` (i.e, k-means), `"kplus"` and `"dispersion"`. However, the k-plus objective as implemented in `anticlust` effectively re-uses the original k-means criterion and just extends the input data internally. So, k-plus anticlustering will be somewhat slower than k-means anticlustering because the number of variables $M$ does contribute to the overall run time; however, the run time is usually dominated by $N$, the number of elements. The dispersion objective has a different goal than the other objectives as it does not strive for between-group similarity, so it cannot be used as an alternative to the other objectives.
+
+As explained in the previous section, the anticlustering algorithms recompute the objective function for each attempted exchange. Computing the objective is therefore the major contributor to overall run time. In `anticlust`, I exploit the fact that anticlustering objectives can be recomputed faster when only two items have swapped between clusters and the objective value prior to the exchange is known. For example, computing the diversity objective "from scratch" is in $O(N^2)$. When the cluster affiliation of only two items differs between swaps, it is however not necessary to spend the entire $O(N^2)$ time during each exchange. Instead, by "cleverly" updating the objective before and after the swap, the computation reduces to $O(N)$, leading to about $O(N^3)$ for the entire exchange method (instead of $O(N^4)$---this is a huge difference). When using a fixed number of exchange partners as described in the previous section, we are left with a run time of $O(N^2)$ *in total*. However, note that for very large data sets, using the diversity objective may not be feasible at all. The reason for this is that a quadratic matrix of between-item distances has to be computed and stored in memory. It is my experience that on a personal computer this becomes difficult for about > 20000 elements (where the distance matrix has 20000^2 = `r format(20000^2, scientific = FALSE)` elements).
+
+Computing the standard k-means objective (which is done when using `anticlustering(..., objective = "variance"`) is in $O(M \cdot N)$, where $M$ is the number of variables. The function `anticlustering()` uses some optimizations during the exchange process to prevent the entire re-computation of the cluster centroids for each exchange, which otherwise consumes most of the run time. However, this does not change the theoretical $O(M \cdot N)$ run time of the computation. The function `fast_anticlustering()` uses a different -- but equivalent -- formulation of the k-means objective where the re-computation of the objective only depends on $K$ and $M$, but no longer on $N$;[^minimization] this reduces the run time by an additional order of magnitude and makes k-means anticlustering applicable to very large data sets (even in the millions). 
+
+[^minimization]: `fast_anticlustering()` minimizes the weighted sum of squared distances between cluster centroids and the overall data centroid; the distances between all individual data points and their cluster center are no longer computed. 
+
+Because the k-means objective has some disadvantages for anticlustering (see Papenberg, 2023),[^kmeansbad] you may consider using the k-plus objective, which extends---and effectively re-uses---the k-means criterion. It can also be applied to very large data sets using `fast_anticlustering()`. For example, the following code---using $N = 100000$, $K = 5$, 3 features and 10 exchange partners per element---runs quite quickly:
+
+[^kmeansbad]: The primary disadvantage is that k-means anticlustering only leads to similarity in means, but not in standard deviations or any other distribution aspects; the k-plus criterion can be used to equalize any distribution moments between groups.
+
+```{r}
+N <- 100000
+M <- 3
+K <- 5
+data <- matrix(rnorm(M*N), ncol = M)
+
+start <- Sys.time()
+groups <- fast_anticlustering(
+  kplus_moment_variables(data, T = 2), 
+  K = K, 
+  exchange_partners = generate_exchange_partners(10, N = N)
+)
+Sys.time() - start
+mean_sd_tab(data, groups) # means and standard deviations are similar
+```
+
+When k-plus anticlustering is conducted with `fast_anticlustering()`, we have to augment the numeric input with so called k-plus variables to ensure that k-plus anticlustering is actually performed (because otherwise `fast_anticlustering()` just performs k-means anticlustering). We should also use the argument `exchange_partners` instead of relying on the default nearest neighbour search, because searching nearest neighbours based on the k-plus variables does not really make sense (even though it probably wouldn't hurt too much).
+
+## References
+
+Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition data sets into equivalent parts. *Psychological Methods, 26*(2), 161--174. https://doi.org/10.1037/met0000301.
+
+Papenberg, M. (2023). K-plus Anticlustering: An Improved k-means Criterion for Maximizing Between-Group Similarity. *British Journal of Mathematical and Statistical Psychology*. Advance online publication. https://doi.org/10.1111/bmsp.12315
+
+Weitz, R., & Lakshminarayanan, S. (1998). An empirical comparison of heuristic methods
+for creating maximally diverse groups. *Journal of the Operational Research Society, 49*(6), 635--646. https://doi.org/10.1057/palgrave.jors.2600510

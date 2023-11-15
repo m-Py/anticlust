@@ -126,11 +126,15 @@ gcd_all <- function(x) {
 }
 
 gcd_set <- function(x) {
+  x <- unique(x)
   gdc_found <- FALSE 
   while (!gdc_found) {
-    x <- gcd_all(x)
+    x <- unique(gcd_all(x))
     if (all(x == x[1])) {
       gdc_found <- TRUE
+    }
+    if (any(x == 1)) { # cannot find a greatest common denominator!
+      return(1)
     }
   }
   x[1]

@@ -27,19 +27,19 @@ of length \code{nrow(x)} describing how elements are assigned
 to anticlusters before the optimization starts.}
 
 \item{variance}{Boolean: Should the k-plus objective include a term to 
-maximizie between-group similarity with regard to the variance? 
+maximize between-group similarity with regard to the variance? 
 (Default = TRUE)}
 
 \item{skew}{Boolean: Should the k-plus objective include a term to 
-maximizie between-group similarity with regard to skewness? 
+maximize between-group similarity with regard to skewness? 
 (Default = FALSE)}
 
 \item{kurtosis}{Boolean: Should the k-plus objective include a term to 
-maximizie between-group similarity with regard to kurtosis? 
+maximize between-group similarity with regard to kurtosis? 
 (Default = FALSE)}
 
 \item{covariances}{Boolean: Should the k-plus objective include a term to 
-maximizie between-group similarity with regard to covariance structure? 
+maximize between-group similarity with regard to covariance structure? 
 (Default = FALSE)}
 
 \item{T}{Optional argument: An integer specifying how many
@@ -55,7 +55,7 @@ arguments are supported except for \code{objective}.}
 \description{
 Perform anticlustering using the k-plus objective to maximize between-group 
 similarity. This function implements the k-plus anticlustering method described 
-in Papenberg (2023; <doi:10.31234/osf.io/7jw6v>).
+in Papenberg (2023; <doi:10.1111/bmsp.12315>).
 }
 \details{
 This function implements the unweighted sum approach for k-plus 
@@ -85,7 +85,7 @@ This function implements the unweighted sum approach for k-plus
     call \code{\link{anticlustering}} directly). Any arguments that are
     not explicitly changed here (i.e., \code{standardize = TRUE}) receive the 
     default given in \code{\link{anticlustering}} 
-    (e.g., `method = "exchange"`.)
+    (e.g., \code{method = "exchange"}.)
 }
 \examples{
 
@@ -128,6 +128,8 @@ all(x1 == x2)
 
 }
 \references{
-Papenberg, M. (2023). k-plus Anticlustering: An Improved k-means Criterion 
-for Maximizing Between-Group Similarity. Retrieved from psyarxiv.com/7jw6v
+Papenberg, M. (2023). K-plus Anticlustering: An Improved k-means Criterion 
+for Maximizing Between-Group Similarity. British Journal of Mathematical 
+and Statistical Psychology. Advance online publication. 
+https://doi.org/10.1111/bmsp.12315
 }

@@ -1,5 +1,5 @@
 
-#' Construct the ILP represenation of a cluster editing instance
+#' Construct the ILP representation of a cluster editing instance
 #' 
 #' (Can be used to solve anticlustering and clustering problems)
 #'
@@ -8,16 +8,17 @@
 #' @param K The number of groups to be created
 #' @param group_restriction If FALSE, there is no restriction on the
 #'     group size, leading to a normal weighted cluster editing formulation
+#' @param solver "gurobi", "glpk" or "symphony"
 #'
 #' @return A list representing the ILP formulation of the instance
 #'
 #' @noRd
 #'
 
-anticlustering_ilp <- function(distances, K, group_restriction = TRUE) {
+anticlustering_ilp <- function(distances, K, group_restriction = TRUE, solver) {
 
   # Initialize some constant variables:
-  equality_signs <- equality_identifiers()
+  equality_signs <- equality_identifiers(solver)
   n        <- nrow(distances)
   group_size     <- n / K
   costs          <- vectorize_weights(distances)
@@ -68,8 +69,10 @@ anticlustering_ilp <- function(distances, K, group_restriction = TRUE) {
 # @return A list of three elements containing strings representing
 #     equality (e), lower (l), and greater (g) relationships
 #
-equality_identifiers <- function() {
-  equal_sign <- "="
+equality_identifiers <- function(solver) {
+  equal_signs <- c(gurobi = "=", glpk = "==", symphony = "==")
+  # default is one of the open source solvers, using "=="
+  equal_sign <- ifelse(is.null(solver), "==", equal_signs[solver])
   lower_sign <- "<="
   greater_sign <- ">="
   list(e = equal_sign, l = lower_sign, g = greater_sign)

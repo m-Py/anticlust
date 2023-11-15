@@ -13,7 +13,7 @@ input_validation_anticlustering <- function(x, K, objective, method,
                  input_set = c(TRUE, FALSE), not_na = TRUE, not_function = TRUE)
   
   if (argument_exists(repetitions)) {
-    validate_input(repetitions, "repetitions", objmode = "numeric", len = 1, 
+    validate_input(repetitions, "repetitions", objmode = "numeric", len = 1,
                    greater_than = 0, must_be_integer = TRUE, not_na = TRUE,
                    not_function = TRUE)
   }
@@ -87,6 +87,9 @@ input_validation_anticlustering <- function(x, K, objective, method,
 
   if (method == "ilp") {
     check_if_solver_is_available()
+    if (!objective %in% c("distance", "diversity", "dispersion")) {
+      stop("The ILP method is only available for the diversity and dispersion objectives.")
+    }
     if (argument_exists(repetitions)) {
       stop("Do not use argument `repetitions` when using the ILP method.")
     }
@@ -350,8 +353,22 @@ input_validation_matching <- function(
 
 # Check if a solver package can be used
 check_if_solver_is_available <- function() {
-  if (!requireNamespace("gurobi", quietly = TRUE)) {
-    stop("You are using the Github branch of anticlust that uses gurobi as ILP solver, but the R package gurobi does not seem to be installed.")
+  glpk_available <- requireNamespace("Rglpk", quietly = TRUE)
+  symphony_available <- requireNamespace("Rsymphony", quietly = TRUE)
+  gurobi_available <- requireNamespace("gurobi", quietly = TRUE)
+  no_solver_available <- !glpk_available && !symphony_available && !gurobi_available
+  
+  if (no_solver_available) {
+    stop("\n\nAn exact method was requested, but no ILP solver is ",
+         "available. For example, you could install the GNU linear programming kit: \n\n",
+         "- On windows, visit ",
+         "http://gnuwin32.sourceforge.net/packages/glpk.htm \n\n",
+         "- Use homebrew to install it on mac, 'brew install glpk' \n\n",
+         "- 'sudo apt install libglpk-dev' on Ubuntu ",
+         "\n\nThen, install the Rglpk package via ",
+         "`install.packages('Rglpk')`.\n \n Another possibilty is to install the R package 'Rsymphony' ",
+         "and the SYMPHONY ILP solver (https://github.com/coin-or/SYMPHONY), or the commercial ",
+         "gurobi solver (which distributes its own R packaged also called 'gurobi'.")
   }
   return(invisible(NULL))
 }

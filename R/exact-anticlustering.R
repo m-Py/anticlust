@@ -21,8 +21,8 @@ exact_anticlustering <- function(data, K, preclustering) {
   N <- nrow(distances)
 
   if (preclustering == TRUE) {
-    ilp <- anticlustering_ilp(distances, N / K)
-    solution <- solve_ilp(ilp, "min")
+    ilp <- anticlustering_ilp(distances, N / K, solver = find_ilp_solver())
+    solution <- solve_ilp_diversity(ilp, "min", solver = find_ilp_solver())
     preclusters <- ilp_to_groups(solution, N)
     ## Fix distances - ensures that the most similar items are assigned
     ## to different groups
@@ -32,15 +32,15 @@ exact_anticlustering <- function(data, K, preclustering) {
     ilp$rhs <- c(rep(1, choose(N, 3) * 3),
                  rep((N / K) - 1, N))
     ## Solve edited ILP
-    solution <- solve_ilp(ilp)
+    solution <- solve_ilp_diversity(ilp)
     assignment <- ilp_to_groups(solution, N)
     return(assignment)
   }
 
   ## Here the ILP is created without adjusting distances; i.e., true
   ## exact anticlustering
-  ilp <- anticlustering_ilp(distances, K)
-  solution <- solve_ilp(ilp)
+  ilp <- anticlustering_ilp(distances, K, solver = find_ilp_solver())
+  solution <- solve_ilp_diversity(ilp, solver = find_ilp_solver())
   ilp_to_groups(solution, N)
 }
 

@@ -2,7 +2,7 @@
 # Return a clustering vector based on ILP solution for cluster editing
 #
 # @param solution The solution of the instance returned by
-#     `solve_ilp`
+#     `solve_ilp_diversity`
 #
 # @return A clustering vector
 #

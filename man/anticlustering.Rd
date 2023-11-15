@@ -69,7 +69,7 @@ maximizing instead of minimizing a clustering objective function.
 Implements anticlustering methods as described in Papenberg and
 Klau (2021; <doi:10.1037/met0000301>), Brusco et al. 
 (2020; <doi:10.1111/bmsp.12186>), and Papenberg (2023; 
-<doi:10.31234/osf.io/7jw6v>).
+<doi:10.1111/bmsp.12315>).
 }
 \details{
 This function is used to solve anticlustering. That is, the data
@@ -81,7 +81,7 @@ four clustering objective functions is natively supported (other
 functions can also defined by the user as described below):
 
 \itemize{
-  \item{cluster editing `diversity` objective, setting 
+  \item{the `diversity`, setting 
         \code{objective = "diversity"} (this is the default objective)}
   \item{k-means `variance` objective, setting \code{objective = "variance"}}
   \item{`k-plus` objective, an extension of the k-means variance criterion,
@@ -95,28 +95,38 @@ The k-means objective is the within-group variance---that is, the
 sum of the squared distances between each element and its cluster
 center (see \code{\link{variance_objective}}). K-means
 anticlustering focuses on minimizing differences with regard to the
-means of the input variables \code{x}; k-plus \code{objective =
-"kplus"} anticlustering is an extension of this criterion that also
-tries to minimize differences with regard to the standard
-deviations between groups (see \code{\link{kplus_anticlustering}}).
+means of the input variables (that is, the columns in \code{x}), but it ignores any other distribution
+characterstics such as the variance / standard deviation. K-plus anticlustering
+(using \code{objective = "kplus"}) is an extension of the k-means criterion that also
+minimizes differences with regard to the standard
+deviations between groups (for details see \code{\link{kplus_anticlustering}}). K-plus
+anticlustering can also be extended towards higher order moments such as skew and kurtosis; 
+to consider these additional distribution characteristics, use the function
+\code{\link{kplus_anticlustering}}. Setting \code{objective = "kplus"} in 
+\code{anticlustering} function will only consider means 
+and standard deviations (in my experience, this is what users usually want). 
+It is strongly recommended to set the argument \code{standardize = TRUE} 
+when using the k-plus objective.
 
-The cluster editing "diversity" objective is the sum of pairwise
+The "diversity" objective is the sum of pairwise
 distances of elements within the same groups (see
-\code{\link{diversity_objective}}). Anticluster editing is also
-known as the »maximum diverse grouping problem« because it
-maximizes group diversity as measured by the sum of pairwise
-distances. Hence, anticlustering maximizes between-group similarity
-by maximizing within-group heterogeneity. Note that the equivalence
-of within-group heterogeneity and between-group similarity only
-holds for equal-sized groups in the case of anticluster editing. 
-If you request different-sized groups
-and wish the different groups to be similar to each other, use
-\code{objective = "kplus"} or \code{objective = "variance"}. In
-previous versions of this package, \code{method = "distance"} was
-used (and is still supported) to request anticluster editing, but
-now \code{method = "diversity"} is preferred because there are
-several clustering objectives based on pairwise distances (e.g.,
-see \code{\link{dispersion_objective}}).
+\code{\link{diversity_objective}}). Hence, anticlustering using the diversity 
+criterion maximizes between-group similarity
+by maximizing within-group heterogeneity (represented as the sum of all pairwise distances). 
+The diversity is an all rounder objective that tends to equalize all distribution 
+characteristics between groups (such as means, variances, ...). 
+Note that the equivalence of within-group heterogeneity and between-group similarity only
+holds for equal-sized groups. For unequal-sized groups, it is recommended to
+use a different objective when striving for overall between-group similarity
+(e.g., the k-plus objective). In previous versions of this
+package, \code{objective = "distance"} was used (and is still
+supported) to refer to the diversity objective, but now \code{objective =
+"diversity"} is preferred because there are several clustering
+objectives based on pairwise distances (e.g., see
+\code{\link{dispersion_objective}}). In the publication that introduces
+the \code{anticlust} package (Papenberg & Klau, 2021), we used the term "anticluster 
+editing" to refer to the maximization of the diversity, because the reversed 
+procedure - minimizing the diversity - is also known as "cluster editing". 
 
 The "dispersion" is the minimum distance between any two elements
 that are part of the same cluster; maximization of this objective
@@ -131,7 +141,7 @@ same time, see the function
 If the data input \code{x} is a feature matrix (that is: each row
 is a "case" and each column is a "variable") and the option
 \code{objective = "diversity"} is used, the Euclidean distance is
-computed as the basic unit of the anticluster editing objective. If
+computed as the basic unit of the diversity and dispersion objectives. If
 a different measure of dissimilarity is preferred, you may pass a
 self-generated dissimiliarity matrix via the argument \code{x}.
 
@@ -142,8 +152,8 @@ Examples).
 \strong{Algorithms for anticlustering}
 
 By default, a heuristic method is employed for anticlustering: the
-exchange method (\code{method = "exchange"}). First, elements
-are randomly assigned to anticlusters (It is also possible to
+exchange method (\code{method = "exchange"}). First, elements are
+randomly assigned to anticlusters (It is also possible to
 explicitly specify the initial assignment using the argument
 \code{K}; in this case, \code{K} has length \code{nrow(x)}.) Based
 on the initial assignment, elements are systematically swapped
@@ -162,43 +172,69 @@ exchanges until the objective cannot be improved.
 
 When setting \code{preclustering = TRUE}, only the \code{K - 1}
 most similar elements serve as exchange partners for each element,
-which can dramatically speed up the optimization (more information
-on the preclustering heuristic follows below). This option is
-recommended for larger N.
+which can speed up the optimization (more information
+on the preclustering heuristic follows below). If the \code{categories} argument
+is used, only elements having the same value in \code{categories} serve as exchange
+partners.
 
 Using \code{method = "brusco"} implements the local bicriterion
-iterated local search (BILS) heuristic by Brusco et al. (2020) and returns
-the partition that best optimized either the diversity or the dispersion
-during the optimization process. The function
-\code{\link{bicriterion_anticlustering}} can also be used to run the algorithm
-by Brusco et al., but it returns multiple partitions that approximate the 
-optimal pareto efficient set according to both objectives (diversity and 
-dispersion). Thus, to fully utilize the BILS algorithm, use the function 
+iterated local search (BILS) heuristic by Brusco et al. (2020) and
+returns the partition that best optimized either the diversity or
+the dispersion during the optimization process. The function
+\code{\link{bicriterion_anticlustering}} can also be used to run
+the algorithm by Brusco et al., but it returns multiple partitions
+that approximate the optimal pareto efficient set according to both
+objectives (diversity and dispersion). Thus, to fully utilize the
+BILS algorithm, use the function
 \code{\link{bicriterion_anticlustering}}.
 
 \strong{Optimal anticlustering}
 
-An optimal anticluster editing objective (i.e., a solution having
-the global maximum value in diversity) can be found via integer
-linear programming. The integer linear program implemented here can
-be found in Papenberg & Klau, (2021; (8) - (12)). To this end, set
-\code{method = "ilp"}. To obtain an optimal solution, the open
-source GNU linear programming kit (available from
-https://www.gnu.org/software/glpk/glpk.html) and the R package
-\code{Rglpk} must be installed. The optimal solution is retrieved
-by setting \code{objective = "diversity"}, \code{method = "ilp"}
-and \code{preclustering = FALSE}. Use this combination of arguments
-only for small problem sizes.
+Usually, heuristics are employed to tackle anticlustering problems,
+and their performance is generally very satisfying.  However,
+heuristics do not investigate all possible group assignments and
+therefore do not (necessarily) find the
+"globally optimal solution", i.e., a partitioning that has the best
+possible value with regard to the objective that is optimized.  Enumerating
+all possible partitions in order to find the best solution,
+however, quickly becomes impossible with increasing N, and
+therefore it is not possible to find a global optimum this
+way. Because all anticlustering problems considered here are also
+NP-hard, there is also no (known) clever algorithm that might
+identify the best solution without considering all possibilities -
+at least in the worst case. Integer linear programming (ILP) is an
+approach for tackling NP hard problems that nevertheless tries to
+be clever when finding optimal solutions: It does not necessarily
+enumerate all possibilities but is still guaranteed to return the
+optimal solution. Still, for NP hard problems such as
+anticlustering, ILP methods will also fail at some point (i.e.,
+when N increases).
 
-To relax the optimality requirement, it is possible to set the
-argument \code{preclustering = TRUE}. In this case, the anticluster
-editing objective is still optimized using integer linear
-programming, but a preprocessing forbids very similar elements to
-be assigned to the same anticluster. The preclustering reduces the
-size of the solution space, making the integer linear programming
-approach applicable for larger problem instances. With
-preclustering, optimality is no longer guaranteed, but the solution
-is usually optimal or very close to optimal.
+For the objectives \code{diversity} and \code{dispersion},
+\code{anticlust} implements optimal solution algorithms via integer
+linear programming. In order to use the ILP methods, set
+\code{method = "ilp"}. The integer linear program optimizing the
+diversity was described in Papenberg & Klau, (2021; (8) -
+(12)). The documentation of the function
+\code{\link{optimal_dispersion}} has more information on the
+optimal maximization of the dispersion (this is the function that is called internally by
+anticlustering() when using \code{objective = "dispersion"} and
+\code{method = "ilp"}). The ILP methods either require the R
+package \code{Rglpk} and the GNU linear programming kit
+(<http://www.gnu.org/software/glpk/>), or the R package
+\code{Rsymphony} and the COIN-OR SYMPHONY solver libraries
+(<https://github.com/coin-or/SYMPHONY>). The function will try to
+find the GLPK or SYMPHONY solver and throw an error if none is
+available (it prioritizes using SYMPHONY if both are available).
+
+Optimally maximizing the diversity only works for rather small N
+and K; N = 20 and K = 2 is usually solved within some seconds, but
+the run time quickly increases with increasing N (or K). The
+maximum dispersion problem can be solved for much larger instances,
+especially for K = 2 (which in theory is not even NP hard; note
+that for the diversity, K = 2 is already NP hard). For K = 3, and K
+= 4, several 100 elements can usually be processed, especially when
+installing the SYMPHONY solver.
 
 \strong{Preclustering}
 
@@ -215,6 +251,9 @@ is conducted using a call to \code{\link{matching}}. When using
 \code{method = "ilp"}, the preclustering optimally finds groups of
 minimum pairwise distance by solving the integer linear program
 described in Papenberg and Klau (2021; (8) - (10), (12) - (13)).
+Note that when combining preclustering restrictions with \code{method = "ilp"},
+the anticlustering result is no longer guaranteed to be globally optimal, but
+only optimal given the preclustering restrictions.
 
 \strong{Categorical variables}
 
@@ -224,7 +263,11 @@ between sets.  The grouping variables indicated by
 \code{categories} will be balanced out across anticlusters. This
 functionality is only available for the classical exchange
 procedures, that is, for \code{method = "exchange"} and
-\code{method = "local-maximum"}.
+\code{method = "local-maximum"}. When \code{categories} has multiple columns 
+(i.e., there are multiple categorical variables), each combination of categories is
+treated as a distinct category by the exchange method (i.e., the multiple columns
+are "merged" into a single column). This behaviour may lead
+to less than optimal results on the level of each single categorical variable.
 
 \strong{Optimize a custom objective function}
 
@@ -246,7 +289,7 @@ as well.
 }
 \examples{
 
-# Optimize the cluster editing (diversity) criterion
+# Optimize the default diversity criterion
 anticlusters <- anticlustering(
   schaper2019[, 3:6],
   K = 3,
@@ -291,26 +334,6 @@ by(schaper2019[, 3:6], anticlusters, function(x) round(colMeans(x), 2))
 by(schaper2019[, 3:6], anticlusters, function(x) round(apply(x, 2, sd), 2))
 
 
-## Use preclustering and variance (k-means) criterion on large data set
-N <- 1000
-K = 2
-lds <- data.frame(f1 = rnorm(N), f2 = rnorm(N))
-ac <- anticlustering(
-  lds, 
-  K = K,
-  objective = "variance",
-  preclustering = TRUE
-)
-
-# The following is equivalent to setting `preclustering = TRUE`:
-cl <- balanced_clustering(lds, K = N / K)
-ac <- anticlustering(
-  lds, 
-  K = K,
-  objective = "variance",
-  categories = cl
-)
-
 }
 \references{
 Brusco, M. J., Cradit, J. D., & Steinley, D. (2020). Combining
@@ -318,15 +341,14 @@ diversity and dispersion criteria for anticlustering: A bicriterion
 approach. British Journal of Mathematical and Statistical
 Psychology, 73, 275-396. https://doi.org/10.1111/bmsp.12186
 
-Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm
-for a clustering problem. Mathematical Programming, 45, 59-96.
-
 Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition 
 data sets into equivalent parts. Psychological Methods, 26(2), 
 161–174. https://doi.org/10.1037/met0000301.
 
-Papenberg, M. (2023). k-plus Anticlustering: An Improved k-means Criterion 
-for Maximizing Between-Group Similarity. Retrieved from psyarxiv.com/7jw6v 
+Papenberg, M. (2023). K-plus Anticlustering: An Improved k-means Criterion 
+for Maximizing Between-Group Similarity. British Journal of Mathematical 
+and Statistical Psychology. Advance online publication. 
+https://doi.org/10.1111/bmsp.12315
 
 Späth, H. (1986). Anticlustering: Maximizing the variance criterion.
 Control and Cybernetics, 15, 213-218.

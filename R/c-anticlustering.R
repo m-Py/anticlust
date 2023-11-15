@@ -9,7 +9,7 @@
 #' 
 #' @noRd
 #' 
-c_anticlustering <- function(data, K, categories = NULL, objective) {
+c_anticlustering <- function(data, K, categories = NULL, objective, exchange_partners = NULL) {
   
   clusters <- initialize_clusters(NROW(data), K, categories)
 
@@ -72,8 +72,7 @@ c_anticlustering <- function(data, K, categories = NULL, objective) {
       mem_error = as.integer(0),
       PACKAGE = "anticlust"
     )
-  }
-  else if (objective == "dispersion") {
+  } else if (objective == "dispersion") {
     results <- .C(
       "dispersion_anticlustering", 
       as.double(convert_to_distances(data)),
@@ -87,7 +86,22 @@ c_anticlustering <- function(data, K, categories = NULL, objective) {
       mem_error = as.integer(0),
       PACKAGE = "anticlust"
     )
+  } else if (objective == "fast-kmeans") {
+    results <- .C(
+      "fast_kmeans_anticlustering",
+      as.double(data),
+      as.integer(N),
+      as.integer(M),
+      as.integer(K),
+      as.integer(frequencies),
+      clusters = as.integer(clusters),
+      as.integer(exchange_partners),
+      as.integer(nrow(exchange_partners)),
+      PACKAGE = "anticlust"
+    )
+    results[["mem_error"]] <- 0
   }
+
   if (results[["mem_error"]] == 1) {
     stop("Could not allocate enough memory.")
   }

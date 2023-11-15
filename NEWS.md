@@ -1,14 +1,61 @@
-# 0.6.4
+# anticlust 0.8.2
+
+## Internal changes
+
+- (Regression) `anticlustering(..., objective = "variance")` temporarily uses pre 0.8.0 implementation to fix some CRAN issues
+
+# anticlust 0.8.0
+
+## New features
+
+- `fast_anticlustering()` now has an additional argument `exchange_partners`, which can be used to pass custom exchange partners instead of using the default nearest neighbour search.
+-  `generate_exchange_partners()` is a new exported function that can be used to address the new argument `exchange_partners` in `fast_anticlustering()`.
+
+## Internal changes 
+
+- `anticlustering()` received internal changes to ensure that it [no longer crashes the computer for about N > 250000 elements](https://github.com/m-Py/anticlust/issues/50).
+- `fast_anticlustering()` has been re-implemented in C, which is much faster than the previous R implementation.
+- `fast_anticlustering()` now uses an alternative computation of the k-means objective, which reduces run time by an order of magnitude as compared to before.
+
+## Documentation 
+
+- Expanded documentation of `fast_anticlustering()`.
+- The vignette "Speeding up anticlustering" has been rewritten to reflect that `fast_anticlustering()` is now again the best choice for processing (very) large data sets.
+
+# anticlust 0.7.0
+
+- An exact ILP method is now available for maximizing the dispersion, contributed by Max Diekhoff.
+  * `optimal_dispersion()` is a new exported function implementing the method
+  * `anticlustering()` makes it available when using `method = "ilp"` and `objective = "dispersion"`
+-  `kplus_moment_variables()` is a new exported function that generates k-plus variables from a data set
+  * Offers some additional flexibility as compared to calling `kplus_anticlustering()`, which generates these variables internally (e.g., use k-plus augmentation on some variables but not all -- such as binary variables)
+- `categories_to_binary()` is a new exported function that converts one or several categorical variables into a binary representation
+  * Can be used to include categorical variables as part of the optimization criterion in k-means / k-plus anticlustering, see new vignette "Using categorical variables with anticlustering"
+- 3 new vignettes have been added to the `anticlust` documentation
+- Fixed a bug in `kplus_anticlustering()` that did not correctly implement `preclustering = TRUE`
+- It is now possible to use the SYMPHONY solver as backend for the optimal ILP methods.
+
+# anticlust 0.6.4-1 / 0.6.4-2 / 0.6.4-3
+
+- [Implements](https://github.com/m-Py/anticlust/commit/435958a0577) 
+[some](https://github.com/m-Py/anticlust/commit/9bb8275cad) 
+[fixes](https://github.com/m-Py/anticlust/commit/33cee784cb392a) in the 
+internal function `gdc_set()` that finds the greatest common denominator in a 
+set of numbers. The fixes prevent `categorical_sampling()` (which is also called by `anticlustering()` when using the `categories` argument) from potentially running 
+into an infinite loop when combining uneven group sizes via `K` with a 
+`categories` argument.
+
+# anticlust 0.6.4
 
 - `kplus_anticlustering()` now has an argument `T` instead of `moments`, where `T` denotes the number of distribution moments considered during k-plus anticlustering (`moments` was an integer vector specifying each individual moment that should be considered)
   * Explanation: Lower order moments should be skipped in favour of higher order moments, so the new interface makes more sense.
 
-# 0.6.3
+# anticlust 0.6.3
 
 **Major changes**
 
 * This release adds a new exported function and removes two others (I very much doubt anyone used those, though -- see below -- if your code is affected, please email me).
-  - `kplus_anticlustering()` is a new exported function: A new interface function to k-plus anticlustering, implementing the k-plus method as described in "k-plus Anticlustering: An Improved k-means Criterion for Maximizing Between-Group Similarity" (Papenberg, 2023; https://doi.org/10.31234/osf.io/7jw6v). Using `anticlustering(x, K, objective = "kplus")` is still supported and remains unchanged. The new function `kplus_anticlustering()`, however, offers more functionality and nuance with regard to optimizing the k-plus objective family.
+  - `kplus_anticlustering()` is a new exported function: A new interface function to k-plus anticlustering, implementing the k-plus method as described in "K-plus Anticlustering: An Improved K-means Criterion for Maximizing Between-Group Similarity" (Papenberg, 2023; https://doi.org/10.1111/bmsp.12315). Using `anticlustering(x, K, objective = "kplus")` is still supported and remains unchanged. The new function `kplus_anticlustering()`, however, offers more functionality and nuance with regard to optimizing the k-plus objective family.
   - The function `kplus_objective()` was removed. 
   - The function `mean_sd_obj()` was removed. 
   
@@ -23,7 +70,7 @@ Explanations for the rather drastic changes, i.e., removing instead of deprecati
 - Finally added Marie Luisa Schaper as contributor for contributing her data set
 - Some work on documentation
 
-# 0.6.2
+# anticlust 0.6.2
 
 - Some work on docs and examples
 

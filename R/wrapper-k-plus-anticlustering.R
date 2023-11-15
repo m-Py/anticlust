@@ -2,7 +2,7 @@
 #' 
 #' Perform anticlustering using the k-plus objective to maximize between-group 
 #' similarity. This function implements the k-plus anticlustering method described 
-#' in Papenberg (2023; <doi:10.31234/osf.io/7jw6v>).
+#' in Papenberg (2023; <doi:10.1111/bmsp.12315>).
 #'
 #' @param x A feature matrix where rows correspond to elements and columns
 #'     correspond to variables (a single numeric variable can be
@@ -12,16 +12,16 @@
 #'     of length \code{nrow(x)} describing how elements are assigned
 #'     to anticlusters before the optimization starts.
 #' @param variance Boolean: Should the k-plus objective include a term to 
-#'   maximizie between-group similarity with regard to the variance? 
+#'   maximize between-group similarity with regard to the variance? 
 #'   (Default = TRUE)
 #' @param skew Boolean: Should the k-plus objective include a term to 
-#'   maximizie between-group similarity with regard to skewness? 
+#'   maximize between-group similarity with regard to skewness? 
 #'   (Default = FALSE)
 #' @param kurtosis Boolean: Should the k-plus objective include a term to 
-#'   maximizie between-group similarity with regard to kurtosis? 
+#'   maximize between-group similarity with regard to kurtosis? 
 #'   (Default = FALSE)
 #' @param covariances Boolean: Should the k-plus objective include a term to 
-#'   maximizie between-group similarity with regard to covariance structure? 
+#'   maximize between-group similarity with regard to covariance structure? 
 #'   (Default = FALSE)
 #' @param T Optional argument: An integer specifying how many
 #'   distribution moments should be equalized between groups. 
@@ -60,7 +60,7 @@
 #'     call \code{\link{anticlustering}} directly). Any arguments that are
 #'     not explicitly changed here (i.e., \code{standardize = TRUE}) receive the 
 #'     default given in \code{\link{anticlustering}} 
-#'     (e.g., `method = "exchange"`.)
+#'     (e.g., \code{method = "exchange"}.)
 #'     
 #' @examples 
 #' 
@@ -105,8 +105,10 @@
 #' 
 #' @references
 #' 
-#' Papenberg, M. (2023). k-plus Anticlustering: An Improved k-means Criterion 
-#' for Maximizing Between-Group Similarity. Retrieved from psyarxiv.com/7jw6v 
+#' Papenberg, M. (2023). K-plus Anticlustering: An Improved k-means Criterion 
+#' for Maximizing Between-Group Similarity. British Journal of Mathematical 
+#' and Statistical Psychology. Advance online publication. 
+#' https://doi.org/10.1111/bmsp.12315
 #' 
 
 
@@ -126,6 +128,16 @@ kplus_anticlustering <- function(
   M <- ncol(x) 
   feature_bools <- c(variance, skew, kurtosis)
   
+  # Unfortunately, I have to extract all ellipsis arguments by hand because
+  # preclustering / categories must be used here before calling anticlustering()...
+  # (I know this is really ugly...)
+  preclustering <- get_argument_from_ellipsis("preclustering", ...)
+  preclustering <- ifelse(is.null(preclustering), FALSE, preclustering) # default = FALSE
+  categories <- get_argument_from_ellipsis("categories", ...) # default = NULL
+  categories <- get_categorical_constraints(x, K, preclustering, categories)
+  method <- get_argument_from_ellipsis("method", ...) 
+  method <- ifelse(is.null(method), "exchange", method) # default = "exchange"
+  repetitions <- get_argument_from_ellipsis("repetitions", ...) # default = NULL
 
   if (is.null(T)) {
     moments <- (2:4)[feature_bools]
@@ -154,9 +166,11 @@ kplus_anticlustering <- function(
     augmented_data, 
     K = K, 
     standardize = standardize, 
-    objective = "variance", ...
+    objective = "variance", 
+    categories = categories,
+    method = method,
+    repetitions = repetitions
   )
-
 }
 
 # function to compute features for variance
@@ -182,6 +196,25 @@ covariance_features <- function(data) {
     cov_feature_matrix[, i] <- (data[, f1] - mean(data[, f1])) * (data[, f2] - mean(data[, f2]))
   }
   cov_feature_matrix
+}
+
+#' Get argument from ellipsis
+#' @param argument Name of the argument
+#' @param ... The list of additional arguments
+#' @examples
+#' 
+#' get_argument_from_ellipsis(argument = "moep", objective = 1:4)
+#' get_argument_from_ellipsis(argument = "objective", objective = 1:4)
+#' 
+#' @noRd
+#' 
+
+get_argument_from_ellipsis <- function(argument, ...) {
+  args <- as.list(substitute(list(...)))[-1L]
+  if (!argument %in% names(args)) {
+    return(NULL)
+  }
+  eval(args[[argument]])
 }
 
 

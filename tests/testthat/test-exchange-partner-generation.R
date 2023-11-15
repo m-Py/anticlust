@@ -73,79 +73,36 @@ test_that("Exchange partners are generatede correctly for fast k-means method", 
   ### Using categorical restrictions
   # Case 1: restricted number of exchange partners (i.e., nearest neighbour search)
   
-  partners <- all_exchange_partners(
+  partners <- nearest_neighbours(
     features = features,
     k_neighbours = k_neighbours,
     categories = categories
   )
   test_idx(partners, categories)
   ## ensure correct order of the output 
-  expect_true(all(sapply(partners, function(x) x[1]) == 1:N))
+  expect_true(all(lengths(partners) == k_neighbours))
   
   # Case 2: no restriction on number of exchange partners
-  partners <- all_exchange_partners(
-    features = features,
-    k_neighbours = Inf,
-    categories = categories
-  )
+  partners <- list_idx_by_category(categories)
   test_idx(partners, categories)
   
   ### Not using categorical restrictions
   # Case 1: restricted number of exchange partners (i.e., nearest neighbour search)
   categories <- to_numeric(schaper2019$room)
   k_neighbours <- k_neighbours
-  partners <- all_exchange_partners(
+  partners <- nearest_neighbours(
     features = features,
     k_neighbours = k_neighbours,
     categories = NULL
   )
-  expect_true(all(sapply(partners, length) == k_neighbours + 1))
-  ## ensure correct order of the output 
-  expect_true(all(sapply(partners, function(x) x[1]) == 1:N))
-  
-  # Case 2: no restriction on number of exchange partners
-  partners <- all_exchange_partners(
-    features = features,
-    k_neighbours = Inf,
-    categories = NULL
-  )
-  expect_true(all(sapply(partners, length) == N))
+  expect_true(all(lengths(partners) == k_neighbours))
 })
 
-
-# test for external data set. This test used to fail due to 
-# categories very very few members. useful test on actual data
-test_that("Exchange partners are generatede correctly for fast k-means method", {
-  skip_on_cran()
-  temp <- tempfile()
-  download.file("http://openpsychometrics.org/_rawdata/NPI.zip", temp)
-  npi <- read.csv(unz(temp, "NPI/data.csv")) # reads the data into R
-  unlink(temp)
-  rm(temp)
-  
-  temp <- npi[, paste0("Q", 1:40)]
-  temp[temp == 0] <- NA # 0 = missing value in this data set
-  npi <- npi[complete.cases(temp), ]
-  rm(temp)
-  
-  # The following vector encodes the key (i.e., narcissistic response)
-  # by item:
-  keys <- c(1, 1, 1, 2, 2, 1, 2, 1, 2, 2, 1, 1, 1, 1, 2, 1, 2, 2, 2, 2,
-            1, 2, 2, 1, 1, 2, 1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 2)
-  
-  # Use for-loop to score all 40 items using the key
-  for (i in 1:40) {
-    colname <- paste0("Q", i)
-    npi[[paste0("score_", colname)]] <- ifelse(npi[[colname]] == keys[i], 1, 0)
-  }
-  
-  item_responses <- subset(npi, select = score_Q1:score_Q40)
-  
-  partners <- all_exchange_partners(
-    features = item_responses,
-    k_neighbours = 5,
-    categories = to_numeric(npi$gender)
+test_that("remove_self() function works as intended in exchange partner generation", {
+ expect_true(
+   identical(
+     remove_self(list(c(2, 1), c(3, 2), c(4, 3))), list(2, 3, 4)
+    )
   )
-  
-  test_idx(partners, to_numeric(npi$gender))
 })
+

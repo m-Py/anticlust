@@ -13,7 +13,7 @@ balanced_cluster_editing <- function(data, K) {
   if (!is_distance_matrix(data)) {
     data <- as.matrix(dist(data))
   }
-  ilp <- anticlustering_ilp(data, K)
-  solution <- solve_ilp(ilp, "min")
+  ilp <- anticlustering_ilp(data, K, solver = find_ilp_solver())
+  solution <- solve_ilp_diversity(ilp, "min")
   ilp_to_groups(solution, nrow(data))
 }

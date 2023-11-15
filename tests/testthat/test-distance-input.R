@@ -47,6 +47,10 @@ test_that("distance input works for precluster ILP", {
                  diversity_objective(features, ac_dist))
     expect_equal(diversity_objective(distances, ac_feat),
                  diversity_objective(distances, ac_dist))
+    
+    # ensure that preclusters are balanced between anticlusters
+    preclusters <- balanced_clustering(features, K = n_elements / K, method = "ilp")
+    expect_true(all(table(ac_feat, preclusters) == 1))
   }
 })
 
