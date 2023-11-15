@@ -7,7 +7,7 @@
 #' @param x A N x N similarity matrix. Larger values indicate stronger
 #'     agreement / similarity between a pair of data points
 #' @param solver Optional argument; if passed, has to be either "glpk" or
-#'   "symphony". See details.
+#'   "symphony" or "gurobi". See details.
 #'   
 #' @return An integer vector representing the cluster affiliation of each data point
 #' 
@@ -36,16 +36,17 @@
 #' In the input some similarities should be negative (indicating dissimilarity) because 
 #' otherwise the maximum sum of similarities is obtained by simply joining all elements 
 #' within a single big cluster. If the argument \code{solver} is not specified, the function
-#' will try to find the GLPK or SYMPHONY solver by itself (it prioritizes using SYMPHONY if both are
-#' available).
+#' will try to find a solver by itself (it prioritizes gurobi > SYMPHONY > GLPK).
 #' 
 #' @note
 #' 
 #' This function either requires the R package \code{Rglpk} and the GNU linear 
 #' programming kit (<http://www.gnu.org/software/glpk/>) or the R package 
 #' \code{Rsymphony} and the COIN-OR SYMPHONY solver libraries 
-#' (<https://github.com/coin-or/SYMPHONY>).
-#' 
+#' (<https://github.com/coin-or/SYMPHONY>), or the commercial 
+#' gurobi solver (<https://www.gurobi.com/downloads/>), which distributes its own 
+#' interface R packaged called 'gurobi'.
+#'
 #' @references
 #'
 #' 

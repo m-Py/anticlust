@@ -10,7 +10,7 @@
 #'     where the entries of the upper and lower triangular matrix
 #'     represent pairwise dissimilarities.
 #' @param K The number of groups or a vector describing the size of each group.
-#' @param solver Optional argument; if passed, has to be either "glpk" or
+#' @param solver Optional argument; if passed, has to be either "gurobi", "glpk" or
 #'   "symphony". See details.
 #' @param max_dispersion_considered Optional argument used for early stopping. If the dispersion found
 #'   is equal to or exceeds this value, a solution having the previous best dispersion 
@@ -42,16 +42,14 @@
 #'   instances of a graph coloring problem, using an integer linear
 #'   programming (ILP) representation (also see Fernandez et al.,
 #'   2013).  It is possible to specify the ILP solver via the argument
-#'   \code{solver}. This function either requires the R package
-#'   \code{Rglpk} and the GNU linear programming kit
-#'   (<http://www.gnu.org/software/glpk/>) or the R package
-#'   \code{Rsymphony} and the COIN-OR SYMPHONY solver libraries
-#'   (<https://github.com/coin-or/SYMPHONY>). If the argument
-#'   \code{solver} is not specified, the function will try to find the
-#'   GLPK or SYMPHONY solver by itself (it prioritizes using SYMPHONY if
-#'   both are available). The GNU linear programming kit (\code{solver =
-#'   "glpk"}) seems to be considerably slower for K >= 3 than the
-#'   SYMPHPONY solver (\code{solver = "symphony"}).
+#'   \code{solver}. This function either requires the R package \code{Rglpk} and the GNU linear 
+#'   programming kit (<http://www.gnu.org/software/glpk/>) or the R package 
+#'   \code{Rsymphony} and the COIN-OR SYMPHONY solver libraries 
+#'   (<https://github.com/coin-or/SYMPHONY>), or the commercial 
+#'   gurobi solver (<https://www.gurobi.com/downloads/>), which distributes its own 
+#'   interface R packaged called 'gurobi'. If the argument \code{solver} is not 
+#'   specified, the function will try to find a solver by itself (it prioritizes
+#'   gurobi > SYMPHONY > GLPK).
 #' 
 #'   Optimally solving the maximum dispersion problem is NP-hard for K
 #'   > 2 and therefore computationally infeasible for larger data
