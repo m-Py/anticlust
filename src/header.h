@@ -3,6 +3,7 @@
 
 void bicriterion_iterated_local_search_call(
         double *distances, 
+        double *disp_distances,
         int *N, 
         int *R,
         int *upper_bound, 
@@ -16,6 +17,7 @@ void bicriterion_iterated_local_search_call(
 struct Pareto_element* multistart_bicriterion_pairwise_interchange(
         size_t N, 
         double matrix[N][N], 
+        double matrix2[N][N], 
         size_t R, 
         size_t WL, 
         double weights[WL], 
@@ -28,6 +30,7 @@ struct Pareto_element* bicriterion_iterated_local_search(
         struct Pareto_element* head, 
         size_t N, 
         double matrix[N][N], 
+        double matrix2[N][N], 
         size_t G, 
         size_t WL, 
         double weights[WL], 

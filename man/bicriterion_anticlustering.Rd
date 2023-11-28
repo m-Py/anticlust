@@ -9,7 +9,8 @@ bicriterion_anticlustering(
   K,
   R = NULL,
   W = c(1e-06, 1e-05, 1e-04, 0.001, 0.01, 0.1, 0.5, 0.99, 0.999, 0.999999),
-  Xi = c(0.05, 0.1)
+  Xi = c(0.05, 0.1),
+  dispersion_distances = NULL
 )
 }
 \arguments{
@@ -36,6 +37,9 @@ relative importance of dispersion and diversity (0 <= W <=
 
 \item{Xi}{Optional argument, specifies probability of swapping
 elements during the iterated local search. See examples.}
+
+\item{dispersion_distances}{A distance matrix used to compute the dispersion
+if the dispersion should not be computed on the basis of argument \code{x}.}
 }
 \value{
 A \code{matrix} of anticlustering partitions (i.e., the
@@ -91,6 +95,9 @@ is a "case" and each column is a "variable"), a matrix of the
 Euclidean distances is computed as input to the algorithm. If a
 different measure of dissimilarity is preferred, you may pass a
 self-generated dissimilarity matrix via the argument \code{x}.
+The argument \code{dispersion_distances} can additionally be used 
+if the dispersion should be computed on the basis of a different
+distance matrix.
 }
 \note{
 For technical reasons, the pareto set returned by this function has

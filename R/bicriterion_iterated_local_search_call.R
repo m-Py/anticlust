@@ -25,6 +25,8 @@
 #'     1). See details.
 #' @param Xi Optional argument, specifies probability of swapping
 #'     elements during the iterated local search. See examples.
+#' @param dispersion_distances A distance matrix used to compute the dispersion
+#'     if the dispersion should not be computed on the basis of argument \code{x}.
 #'
 #' @details
 #'
@@ -70,6 +72,9 @@
 #' Euclidean distances is computed as input to the algorithm. If a
 #' different measure of dissimilarity is preferred, you may pass a
 #' self-generated dissimilarity matrix via the argument \code{x}.
+#' The argument \code{dispersion_distances} can additionally be used 
+#' if the dispersion should be computed on the basis of a different
+#' distance matrix.
 #' 
 #' @return A \code{matrix} of anticlustering partitions (i.e., the
 #'     approximated pareto set). Each row corresponds to a partition,
@@ -154,7 +159,8 @@
 bicriterion_anticlustering <- function(
   x, K, R = NULL, 
   W = c(0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 0.5, 0.99, 0.999, 0.999999),
-  Xi = c(0.05, 0.1)) {
+  Xi = c(0.05, 0.1),
+  dispersion_distances = NULL) {
   
   input_validation_anticlustering(
     x, K, objective = "distance", method = "heuristic", 
@@ -170,6 +176,12 @@ bicriterion_anticlustering <- function(
   N <- NROW(distances)
   WL <- length(W)
   
+  if (is.null(dispersion_distances)) {
+    dispersion_distances <- distances
+  } else {
+    dispersion_distances <- convert_to_distances(dispersion_distances)
+  }
+  
   clusters <- initialize_clusters(N, K, NULL) - 1
   
   checkweights(W)
@@ -183,6 +195,7 @@ bicriterion_anticlustering <- function(
   results <- .C(
     "bicriterion_iterated_local_search_call",
     as.double(distances),
+    as.double(dispersion_distances),
     as.integer(N),
     as.integer(R),
     as.integer(upper_bound),

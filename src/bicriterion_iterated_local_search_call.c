@@ -15,7 +15,9 @@ struct Pareto_element {
 };
 
 //receive data from r, call bils algorithm, save results for r
-void bicriterion_iterated_local_search_call(double *distances, int *N, int *R, 
+void bicriterion_iterated_local_search_call(double *distances, 
+                                            double *disp_distances,
+                                            int *N, int *R, 
                                             int *upper_bound, int *WL, double *W, double *Xi, 
                                             int *partition,
                                             int *result,
@@ -42,6 +44,18 @@ void bicriterion_iterated_local_search_call(double *distances, int *N, int *R,
     }
   }
   
+  // Create another distance matrix if dispersion is based on other distance (I.E., use BILS-E)
+  // this *always* duplicates memory, but I guess this is not so bad because the algo is slow anyway for large N
+  for (size_t i = 0; i < n; i++) {
+    distance_ptr[i] = i * n; // not sure if this must be re-initialized
+  }
+  double disp_distance_pts[n][n];
+  for (size_t i = 0; i < n; i++) {
+    for (size_t j = 0; j < n; j++) {
+      disp_distance_pts[i][j] = disp_distances[distance_ptr[j]++];
+    }
+  }
+
   double weights[wl];
   for (size_t i = 0; i < wl; i++){
     weights[i] = W[i];
@@ -56,6 +70,7 @@ void bicriterion_iterated_local_search_call(double *distances, int *N, int *R,
   
   struct Pareto_element* head = multistart_bicriterion_pairwise_interchange(n, 
             distance_pts, 
+            disp_distance_pts,
             half_restarts, 
             wl, 
             weights, 
@@ -65,7 +80,13 @@ void bicriterion_iterated_local_search_call(double *distances, int *N, int *R,
     *mem_error = 1; // return after memory allocation error
     return;
   }
-  head = bicriterion_iterated_local_search(head, n, distance_pts, half_restarts, wl, weights, neighbor_percent);
+  head = bicriterion_iterated_local_search(
+    head, n, 
+    distance_pts, 
+    disp_distance_pts,
+    half_restarts, wl, 
+    weights, neighbor_percent
+  );
   if (head == NULL) {
     *mem_error = 1; // return after memory allocation error
     return;
@@ -105,6 +126,7 @@ void free_pareto_set(struct Pareto_element* head) {
 struct Pareto_element* multistart_bicriterion_pairwise_interchange(
     size_t N, 
     double matrix[N][N], 
+    double matrix2[N][N], 
     size_t R, 
     size_t WL, 
     double weights[WL], 
@@ -120,7 +142,7 @@ struct Pareto_element* multistart_bicriterion_pairwise_interchange(
     double dis_weight = 1 - div_weight;
     double diversity = get_diversity(N, partition, matrix);
     double save_diversity = diversity;
-    double dispersion = get_dispersion(N, partition, matrix);
+    double dispersion = get_dispersion(N, partition, matrix2);
     double save_dispersion = dispersion;
     double max_bicriterion = div_weight*diversity + dis_weight*dispersion;
     bool Flag = false;
@@ -133,7 +155,7 @@ struct Pareto_element* multistart_bicriterion_pairwise_interchange(
           if(g != h){
             cluster_swap(i, j, partition);
             double current_diversity = get_diversity_fast(save_diversity, i, j, N, partition, matrix);
-            double current_dispersion = get_dispersion_fast(save_dispersion , i, j, N, partition, matrix);
+            double current_dispersion = get_dispersion_fast(save_dispersion , i, j, N, partition, matrix2);
             if (update_pareto(&head, N, partition,current_diversity, current_dispersion) == 1) {
                 free_pareto_set(head); // free all memory
                 return NULL;
@@ -157,7 +179,8 @@ struct Pareto_element* multistart_bicriterion_pairwise_interchange(
 
 // returns the HEAD to a pareto set (linked list); if it returns NULL, a memory allocation error occurred
 struct Pareto_element* bicriterion_iterated_local_search(
-    struct Pareto_element* head, size_t N, double matrix[N][N], size_t R, 
+    struct Pareto_element* head, size_t N, double matrix[N][N], 
+    double matrix2[N][N], size_t R, 
     size_t WL, double weights[WL], double neighbor_percent[2]){
 
   for (size_t a = 0; a < R; a++){
@@ -180,7 +203,7 @@ struct Pareto_element* bicriterion_iterated_local_search(
     }
     double diversity = get_diversity(N, partition, matrix);
     double save_diversity = diversity;
-    double dispersion = get_dispersion(N, partition, matrix);
+    double dispersion = get_dispersion(N, partition, matrix2);
     double save_dispersion = dispersion;
     double max_bicriterion = div_weight*diversity + dis_weight*dispersion;
     bool Flag = false;
@@ -193,7 +216,7 @@ struct Pareto_element* bicriterion_iterated_local_search(
           if(g != h){
             cluster_swap(i, j, partition);
             double current_diversity = get_diversity_fast(save_diversity, i, j, N, partition, matrix);
-            double current_dispersion = get_dispersion_fast(save_dispersion , i, j, N, partition, matrix);
+            double current_dispersion = get_dispersion_fast(save_dispersion , i, j, N, partition, matrix2);
             if (update_pareto(&head, N, partition, current_diversity, current_dispersion) == 1) {
                 free_pareto_set(head); // free all memory
                 free(partition);
