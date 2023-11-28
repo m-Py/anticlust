@@ -27,6 +27,9 @@
 #'     elements during the iterated local search. See examples.
 #' @param dispersion_distances A distance matrix used to compute the dispersion
 #'     if the dispersion should not be computed on the basis of argument \code{x}.
+#' @param average_diversity Boolean. Compute the diversity not as a global sum across 
+#'     all pairwise within-group distances, but as the sum of the average of 
+#'     within-group distances. 
 #'
 #' @details
 #'
@@ -160,7 +163,7 @@ bicriterion_anticlustering <- function(
   x, K, R = NULL, 
   W = c(0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 0.5, 0.99, 0.999, 0.999999),
   Xi = c(0.05, 0.1),
-  dispersion_distances = NULL) {
+  dispersion_distances = NULL, average_diversity = FALSE) {
   
   input_validation_anticlustering(
     x, K, objective = "distance", method = "heuristic", 
@@ -186,7 +189,11 @@ bicriterion_anticlustering <- function(
   
   checkweights(W)
   checkneighborhood(Xi)
-
+  
+  frequencies <- rep(1, length(unique(clusters)))
+  if (average_diversity) {
+    frequencies <- table(clusters)
+  }
   upper_bound = 500 # limits number of resulting partitions 
   # create empty matrix for results to use in C
   result_matrix = matrix(data = -1, nrow = upper_bound , ncol = N) 
@@ -203,6 +210,7 @@ bicriterion_anticlustering <- function(
     as.double(W),
     as.double(Xi),
     as.integer(clusters),
+    as.integer(frequencies),
     result = integer(length(result_matrix)),
     mem_error = as.integer(0),
     PACKAGE = "anticlust" # important to call C
