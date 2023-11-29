@@ -4,7 +4,13 @@
 \alias{optimal_dispersion}
 \title{Maximize dispersion for K groups}
 \usage{
-optimal_dispersion(x, K, solver = NULL, max_dispersion_considered = NULL)
+optimal_dispersion(
+  x,
+  K,
+  solver = NULL,
+  max_dispersion_considered = NULL,
+  npartitions = 1
+)
 }
 \arguments{
 \item{x}{The data input. Can be one of two structures: (1) A
@@ -24,6 +30,9 @@ represent pairwise dissimilarities.}
 \item{max_dispersion_considered}{Optional argument used for early stopping. If the dispersion found
 is equal to or exceeds this value, a solution having the previous best dispersion 
 is returned.}
+
+\item{npartitions}{The number of groupings that are returned, each having an optimal
+dispersion value (defaults to 1).}
 }
 \value{
 A list with four elements:  

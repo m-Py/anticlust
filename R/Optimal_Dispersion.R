@@ -15,6 +15,8 @@
 #' @param max_dispersion_considered Optional argument used for early stopping. If the dispersion found
 #'   is equal to or exceeds this value, a solution having the previous best dispersion 
 #'   is returned.
+#' @param npartitions The number of groupings that are returned, each having an optimal
+#'   dispersion value (defaults to 1).
 #'
 #' @export
 #' 
@@ -147,7 +149,7 @@
 #' 
 #'
 
-optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = NULL) {
+optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = NULL, npartitions = 1) {
   
   if (argument_exists(solver)) {
     validate_input(solver, "solver", objmode = "character", len = 1,
@@ -157,6 +159,7 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
   }
   validate_data_matrix(x)
   validate_input(K, "K", objmode = "numeric", must_be_integer = TRUE, not_na = TRUE, not_function = TRUE)
+  validate_input(npartitions, "npartitions", objmode = "numeric", must_be_integer = TRUE, not_na = TRUE, not_function = TRUE, greater_than = 0)
   
   if (is.null(max_dispersion_considered)) {
     max_dispersion_considered <- Inf
@@ -220,7 +223,9 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
     )
   }
   # Calculate anticlusters from the last iteration with a K-coloring
-  groups <- groups_from_k_coloring_mapping(
+  groups <- t(sapply(
+    1:npartitions,
+    repeat_grouping,
     result_value = last_solution$obj,
     result_x = last_solution$x,
     all_nns = all_nns_last,
@@ -228,7 +233,16 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
     N = N,
     K = K, 
     target_groups = target_groups
-  )
+  ))
+  if (npartitions == 1) {
+    groups <- c(groups)
+  } else {
+    groups <- t(apply(groups, 1, order_cluster_vector))
+    if (any(duplicated(groups))) { # warn if there are duplicate partitions
+      warning("Some of the returned partitions are duplicates (i.e. argument 'npartitions' was > 1).")
+    }
+  }
+  
   return(
     list(
       dispersion = dispersion, 
@@ -374,6 +388,11 @@ solve_ilp_graph_colouring <- function(ilp, solver) {
   ret_list
 }
 
+
+# dummy function for calling groups_from_k_coloring_mapping() several times using sapply
+repeat_grouping <- function(X, result_value, result_x, all_nns, all_nns_reordered, N, K, target_groups) {
+  groups_from_k_coloring_mapping(result_value, result_x, all_nns, all_nns_reordered, N, K, target_groups)
+}
 
 # Restore a grouping from the solved ilp
 groups_from_k_coloring_mapping <- function(result_value, result_x, all_nns, all_nns_reordered, N, K, target_groups) {
