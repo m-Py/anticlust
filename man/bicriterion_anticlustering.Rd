@@ -30,7 +30,8 @@ of length \code{nrow(x)} describing how elements are assigned
 to anticlusters before the optimization starts.}
 
 \item{R}{The desired number of restarts for the algorithm. By
-default, both phases (MBPI + BILS) of the algorithm are performed once.}
+default, both phases (MBPI + BILS) of the algorithm are performed once.
+See details.}
 
 \item{W}{Optional argument, a vector of weights defining the
 relative importance of dispersion and diversity (0 <= W <=
@@ -77,15 +78,18 @@ al. used `G` to denote the number of groups. However, note that
 groups, but also to specify group sizes, as in
 \code{\link{anticlustering}}.
 
-This function implements the combined bicriterion algorithm MBPI + BILS.
-The argument \code{R} denotes the number of restarts of the search
-heuristic. Half of the repetitions perform MBPI and the other half perform 
-BILS, as suggested by Brusco et al. The argument \code{W} denotes the possible
-weights given
-to the diversity criterion in a given run of the search
+This function implements the combined bicriterion algorithm BILS.
+The argument \code{R} denotes the number of restarts of the two phases of the
+algorithm. If \code{R} has length 1, half of the repetitions perform the first 
+phase (multistart bicriterion pairwise interchange heuristic; MBPI), 
+the other half perform an iterated local search (ILS). 
+If \code{R} has length 2, the first entry indicates the number of restarts of
+MBPI the second entry indicates the number of restarts of ILS.
+The argument \code{W} denotes the relative weight given
+to the diversity and dispersion criterion in a given run of the search
 heuristic. In each run, the a weight is randomly selected from the
 vector \code{W}. As default values, we use the weights that Brusco
-et al. used in their analyses. All values in \code{w} have to be in
+et al. used in their analyses. All values in \code{W} have to be in
 [0, 1]; larger values indicate that diversity is more important,
 whereas smaller values indicate that dispersion is more important;
 \code{w = .5} implies the same weight for both criteria. The

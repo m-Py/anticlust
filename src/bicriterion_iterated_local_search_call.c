@@ -26,7 +26,6 @@ void bicriterion_iterated_local_search_call(double *distances,
                                            ) {
   
   const size_t n = *N; // number of elements
-  const size_t r = *R; // number of restarts
   const size_t u = *upper_bound; //max. length of result-list
   const size_t wl = *WL; // length of possible weights
   
@@ -66,13 +65,10 @@ void bicriterion_iterated_local_search_call(double *distances,
   neighbor_percent[0] = Xi[0];
   neighbor_percent[1] = Xi[1];
   
-  //divide restarts for both parts of the algorithm equally
-  size_t half_restarts = r/2 + (r%2);
-  
   struct Pareto_element* head = multistart_bicriterion_pairwise_interchange(n, 
             distance_pts, 
             disp_distance_pts,
-            half_restarts, 
+            R[0], 
             wl, 
             weights, 
             partition,
@@ -86,7 +82,7 @@ void bicriterion_iterated_local_search_call(double *distances,
     head, n, 
     distance_pts, 
     disp_distance_pts,
-    half_restarts, wl, 
+    R[1], wl, 
     weights, neighbor_percent,
     frequencies
   );
