@@ -31,7 +31,12 @@
 #' @param average_diversity Boolean. Compute the diversity not as a global sum across 
 #'     all pairwise within-group distances, but as the sum of the average of 
 #'     within-group distances. 
-#'
+#' @param init_partitions A matrix of initial partitions (rows = partitions; 
+#'     columns = elements) that serve as starting partitions during the 
+#'     iterations of the first phase of the BILS (i.e., the MBPI).
+#'     If not passed, a new random partition is generated at the start of each 
+#'     iteration (which is the default behaviour).
+#'     
 #' @details
 #'
 #' The bicriterion algorithm by Brusco, Cradit, and Steinley (2020)
@@ -167,7 +172,7 @@ bicriterion_anticlustering <- function(
   x, K, R = NULL, 
   W = c(0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 0.5, 0.99, 0.999, 0.999999),
   Xi = c(0.05, 0.1),
-  dispersion_distances = NULL, average_diversity = FALSE) {
+  dispersion_distances = NULL, average_diversity = FALSE, init_partitions = NULL) {
   
   input_validation_anticlustering(
     x, K, objective = "distance", method = "heuristic", 
@@ -191,11 +196,29 @@ bicriterion_anticlustering <- function(
   N <- NROW(distances)
   WL <- length(W)
   
+  if (argument_exists(init_partitions)) {
+    use_init_partitions <- 1
+    init_partitions <- t(apply(init_partitions, 1, to_numeric)) - 1 # ensure correct labeling of partitions
+    if (nrow(init_partitions) != R[1]) {
+      stop("The number of repetitions (argument 'R') and the number of partitions (argument 'init_partitions') do not match.")
+    } 
+    if (ncol(init_partitions) != N) {
+      stop("The number of columns in 'init_partitions' does not match the number of cases in 'x'.")
+    }
+  } else {
+    init_partitions <- 0
+    use_init_partitions <- 0
+  }
+  
   if (is.null(dispersion_distances)) {
     dispersion_distances <- distances
   } else {
     dispersion_distances <- convert_to_distances(dispersion_distances)
   }
+  
+  if (any(dim(dispersion_distances) != dim(distances))) {
+    stop("The dimensions of argument 'x' and 'dispersion_distances' do not match.")
+  } 
   
   clusters <- initialize_clusters(N, K, NULL) - 1
   
@@ -223,6 +246,8 @@ bicriterion_anticlustering <- function(
     as.double(Xi),
     as.integer(clusters),
     as.integer(frequencies),
+    as.integer(use_init_partitions),
+    as.integer(t(init_partitions)),
     result = integer(length(result_matrix)),
     mem_error = as.integer(0),
     PACKAGE = "anticlust" # important to call C

@@ -12,6 +12,8 @@ void bicriterion_iterated_local_search_call(
         double *Xi, 
         int *partition,
         int *frequencies, // frequency of each partition
+        int *use_init_partitions,
+        int *init_partitions,
         int *result,
         int *mem_error
 );
@@ -22,7 +24,8 @@ struct Pareto_element* multistart_bicriterion_pairwise_interchange(
         size_t R, 
         size_t WL, 
         double weights[WL], 
-        int *partition, int *frequencies
+        int *partition, int *frequencies, int *use_init_partitions,
+        int *init_partitions
 );
 
 void shuffle_permutation(int N, int *permutation);

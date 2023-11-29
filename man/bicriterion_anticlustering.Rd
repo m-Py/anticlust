@@ -11,7 +11,8 @@ bicriterion_anticlustering(
   W = c(1e-06, 1e-05, 1e-04, 0.001, 0.01, 0.1, 0.5, 0.99, 0.999, 0.999999),
   Xi = c(0.05, 0.1),
   dispersion_distances = NULL,
-  average_diversity = FALSE
+  average_diversity = FALSE,
+  init_partitions = NULL
 )
 }
 \arguments{
@@ -46,6 +47,12 @@ if the dispersion should not be computed on the basis of argument \code{x}.}
 \item{average_diversity}{Boolean. Compute the diversity not as a global sum across 
 all pairwise within-group distances, but as the sum of the average of 
 within-group distances.}
+
+\item{init_partitions}{A matrix of initial partitions (rows = partitions; 
+columns = elements) that serve as starting partitions during the 
+iterations of the first phase of the BILS (i.e., the MBPI).
+If not passed, a new random partition is generated at the start of each 
+iteration (which is the default behaviour).}
 }
 \value{
 A \code{matrix} of anticlustering partitions (i.e., the

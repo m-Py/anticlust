@@ -21,6 +21,8 @@ void bicriterion_iterated_local_search_call(double *distances,
                                             int *upper_bound, int *WL, double *W, double *Xi, 
                                             int *partition,
                                             int *frequencies, // frequency of each partition
+                                            int *use_init_partitions,
+                                            int *init_partitions,
                                             int *result,
                                             int *mem_error
                                            ) {
@@ -72,7 +74,9 @@ void bicriterion_iterated_local_search_call(double *distances,
             wl, 
             weights, 
             partition,
-            frequencies
+            frequencies,
+            use_init_partitions,
+            init_partitions
   );
   if (head == NULL) {
     *mem_error = 1; // return after memory allocation error
@@ -129,14 +133,26 @@ struct Pareto_element* multistart_bicriterion_pairwise_interchange(
     size_t R, 
     size_t WL, 
     double weights[WL], 
-    int *partition, int *frequencies) {
+    int *partition, int *frequencies, 
+    int *use_init_partitions, int *init_partitions) {
   
   struct Pareto_element* head = NULL; // head pointing on the later linked list(paretoset)
   
-  for (size_t a = 0; a < R; a++){
-    if (a > 0) {
+  size_t partition_counter = 0;
+  
+  for (size_t a = 0; a < R; a++) {
+    if (*use_init_partitions == 0) {
+      if (a > 0) {
         shuffle_permutation(N, partition);
+      }
+    } else {
+      for (size_t i = 0; i < N; i++) {
+        partition[i] = init_partitions[partition_counter];
+        partition_counter++;
+      }
     }
+
+
     double div_weight = sample(WL, weights); 
     double dis_weight = 1 - div_weight;
     double diversity = get_diversity(N, partition, matrix, frequencies);
