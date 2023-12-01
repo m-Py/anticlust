@@ -247,7 +247,7 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
     list(
       dispersion = dispersion, 
       groups = groups,
-      edges = unname(all_nns), # rownames can be quite ugly here
+      edges = unname(all_nns_last), # rownames can be quite ugly here
       dispersions_considered = c(dispersions_considered, dispersion)
     )
   )

@@ -1,3 +1,7 @@
+# anticlust 0.8.2.9999
+
+- Bug fix in `optimal_dispersion()`: Output element `$edges` no longer includes edges that were investigated in the last iteration of the algorithm (and which are not relevant for finding the optimal dispersion)
+
 # anticlust 0.8.2
 
 ## Internal changes
