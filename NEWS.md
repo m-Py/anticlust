@@ -1,6 +1,10 @@
 # anticlust 0.8.2.9999
 
 - Bug fix in `optimal_dispersion()`: Output element `$edges` no longer includes edges that were investigated in the last iteration of the algorithm (and which are not relevant for finding the optimal dispersion)
+- `bicriterion_anticlustering()` has new arguments: `dispersion_distances`, `average_diversity`, `init_partitions`
+- **TODO**
+  * objective = "Average diversity" for `anticlustering()` (still to be implemented) and `bicriterion_anticlustering()` (already implemented)
+  * add argument `cannot_link` to `anticlustering()` (for `method = "exchange", "local-maximum", "brusco"` and `objective = "diversity", "variance", "kplus"`)
 
 # anticlust 0.8.2
 
