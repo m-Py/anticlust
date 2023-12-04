@@ -37,7 +37,11 @@ cannot_link_anticlustering <- function(x, init_clusters, cannot_link, objective,
   
   for (i in 1:nrow(init_clusters)) {
     solutions[[i]] <- anticlustering(x, K = init_clusters[i, ], objective = objective, ...)
-    objectives[i] <- diversity_objective_(solutions[[i]], x)
+    if (objective == "diversity") {
+      objectives[i] <- diversity_objective_(solutions[[i]], x)
+    } else {
+      objectives[i] <- weighted_diversity_objective_(x, solutions[[i]], frequencies)
+    }
   }
   solutions[[which.max(objectives)]]
   
