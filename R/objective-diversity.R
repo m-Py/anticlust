@@ -68,6 +68,11 @@ diversity_objective_ <- function(clusters, x) {
   sum(diversity_objective_by_group(clusters, x))
 }
 
+# for local-maximum and multiple repetition method with "average diversity" objective:
+weighted_diversity_objective_ <- function(x, clusters, frequencies) {
+  sum(diversity_objective_by_group(clusters, x) / frequencies)
+}
+
 # Compute distance objective by cluster
 # param data: distance matrix or feature matrix
 # param cl: cluster assignment

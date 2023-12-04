@@ -33,6 +33,10 @@ repeat_anticlustering <- function(x, K, objective, categories, method, repetitio
     obj_function <- diversity_objective
   } else if (objective == "dispersion") {
     obj_function <- dispersion_objective
+  } else if (objective == "average-diversity") {
+    obj_function <- function(clusters, x) {
+      weighted_diversity_objective_(clusters, x, table(clusters))
+    }
   }
   
   if (method == "local-maximum") {

@@ -15,6 +15,11 @@ cannot_link_anticlustering <- function(x, init_clusters, cannot_link, objective,
     stop("Argument 'objective' must be 'diversity', 'variance' or 'kplus'")
   }
   frequencies <- table(init_clusters)
+  if (any(frequencies) != frequencies[1]) {
+    objective <- "average-diversity"
+  } else {
+    objective <- "diversity"
+  }
 
 
   # set cannot-link distances to large negative value so they cannot be linked
@@ -31,7 +36,7 @@ cannot_link_anticlustering <- function(x, init_clusters, cannot_link, objective,
   objectives <- rep(NA, nrow(init_clusters))
   
   for (i in 1:nrow(init_clusters)) {
-    solutions[[i]] <- anticlustering(x, K = init_clusters[i, ], objective = "average-diversity", ...)
+    solutions[[i]] <- anticlustering(x, K = init_clusters[i, ], objective = objective, ...)
     objectives[i] <- diversity_objective_(solutions[[i]], x)
   }
   solutions[[which.max(objectives)]]
