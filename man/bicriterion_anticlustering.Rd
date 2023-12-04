@@ -114,6 +114,9 @@ self-generated dissimilarity matrix via the argument \code{x}.
 The argument \code{dispersion_distances} can additionally be used 
 if the dispersion should be computed on the basis of a different
 distance matrix.
+
+If multiple \code{init_partitions} are given, ensure that each partition
+(i.e., each row of\code{init_partitions}) has the exact same output of \code{\link{table}}.
 }
 \note{
 For technical reasons, the pareto set returned by this function has

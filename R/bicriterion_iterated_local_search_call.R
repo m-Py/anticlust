@@ -88,6 +88,9 @@
 #' if the dispersion should be computed on the basis of a different
 #' distance matrix.
 #' 
+#' If multiple \code{init_partitions} are given, ensure that each partition
+#' (i.e., each row of\code{init_partitions}) has the exact same output of \code{\link{table}}.
+#' 
 #' @return A \code{matrix} of anticlustering partitions (i.e., the
 #'     approximated pareto set). Each row corresponds to a partition,
 #'     each column corresponds to an input element.
