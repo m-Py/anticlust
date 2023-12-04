@@ -196,20 +196,6 @@ bicriterion_anticlustering <- function(
   N <- NROW(distances)
   WL <- length(W)
   
-  if (argument_exists(init_partitions)) {
-    use_init_partitions <- 1
-    init_partitions <- t(apply(init_partitions, 1, to_numeric)) - 1 # ensure correct labeling of partitions
-    if (nrow(init_partitions) != R[1]) {
-      stop("The number of repetitions (argument 'R') and the number of partitions (argument 'init_partitions') do not match.")
-    } 
-    if (ncol(init_partitions) != N) {
-      stop("The number of columns in 'init_partitions' does not match the number of cases in 'x'.")
-    }
-  } else {
-    init_partitions <- 0
-    use_init_partitions <- 0
-  }
-  
   if (is.null(dispersion_distances)) {
     dispersion_distances <- distances
   } else {
@@ -224,6 +210,21 @@ bicriterion_anticlustering <- function(
   
   checkweights(W)
   checkneighborhood(Xi)
+  
+  if (argument_exists(init_partitions)) {
+    use_init_partitions <- 1
+    init_partitions <- t(apply(init_partitions, 1, to_numeric)) - 1 # ensure correct labeling of partitions
+    clusters <- init_partitions[1, ]
+    if (nrow(init_partitions) != R[1]) {
+      stop("The number of repetitions (argument 'R') and the number of partitions (argument 'init_partitions') do not match.")
+    } 
+    if (ncol(init_partitions) != N) {
+      stop("The number of columns in 'init_partitions' does not match the number of cases in 'x'.")
+    }
+  } else {
+    init_partitions <- 0
+    use_init_partitions <- 0
+  }
   
   frequencies <- rep(1, length(unique(clusters)))
   if (average_diversity) {

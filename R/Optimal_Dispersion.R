@@ -237,7 +237,6 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
   if (npartitions == 1) {
     groups <- c(groups)
   } else {
-    groups <- t(apply(groups, 1, order_cluster_vector))
     if (any(duplicated(groups))) { # warn if there are duplicate partitions
       warning("Some of the returned partitions are duplicates (i.e. argument 'npartitions' was > 1).")
     }
@@ -422,7 +421,9 @@ groups_from_k_coloring_mapping <- function(result_value, result_x, all_nns, all_
   if (sum(assigned) < N) {
     groups_new[is.na(groups_new)] <- sample_(rep(1:K, freq_not_assigned))
   }
-  groups_new
+  # now sort labels by group size (so that each time this function is called, we get the same output of table())
+  new_labels <- order(table(groups_new), decreasing = TRUE)
+  as.numeric(as.character(factor(groups_new, levels = 1:K, labels = new_labels)))
 }
 
 # Function that takes an edge list with any integer indices and remaps
