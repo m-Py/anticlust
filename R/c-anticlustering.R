@@ -58,12 +58,16 @@ c_anticlustering <- function(data, K, categories = NULL, objective, exchange_par
       mem_error = as.integer(0),
       PACKAGE = "anticlust"
     )
-  } else if (objective == "diversity" || objective == "distance") {
+  } else if (objective %in% c("diversity", "distance", "average-diversity")) {
+    if (objective != "average-diversity") {
+      frequencies <- rep_len(1, K)
+    }
     results <- .C(
       "distance_anticlustering", 
       as.double(convert_to_distances(data)),
       as.integer(N),
       as.integer(K),
+      as.integer(frequencies),
       clusters = as.integer(clusters),
       as.integer(USE_CATEGORIES),
       as.integer(N_CATS),

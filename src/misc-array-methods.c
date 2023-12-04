@@ -26,7 +26,7 @@ double array_sum(size_t k, double ARRAY[k]) {
         return sum;
 }
 
-/* Compute the weighted sum of an array */
+/* Compute the weighted sum of an array, by multiplication */
 double weighted_array_sum(size_t k, int* frequencies, double ARRAY[k]) {
         double sum = 0;
         for (size_t i = 0; i < k; i++) {
@@ -34,4 +34,12 @@ double weighted_array_sum(size_t k, int* frequencies, double ARRAY[k]) {
         }
         return sum;
 }
- 
+
+/* Compute the weighted sum of an array, by division */
+double weighted_array_sum2(size_t k, int* frequencies, double ARRAY[k]) {
+        double sum = 0;
+        for (size_t i = 0; i < k; i++) {
+                sum += ARRAY[i] / frequencies[i];
+        }
+        return sum;
+}

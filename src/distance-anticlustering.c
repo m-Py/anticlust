@@ -11,7 +11,10 @@
  * param *N: The number of elements (i.e., number of "rows" in *data)
  * param *K: The number of clusters
  * param *frequencies: The number of elements per cluster, i.e., an array
- *         of length *K.
+ *         of length *K. By default this is "1" replicated *K times, because
+ *         the diversity is defined as an overall sum without regard to cluster
+ *         sizes. If the cluster sizes are passed, an "average" diversity is computed.
+ *         (which makes more sense if the group sizes are unequal).
  * param *clusters: An initial assignment of elements to clusters,
  *         array of length *N (has to consists of integers between 0 and (K-1) 
  *         - this has to be guaranteed by the caller)
@@ -30,7 +33,7 @@
  * The return value is assigned to the argument `clusters`, via pointer
 */
 
-void distance_anticlustering(double *data, int *N, int *K, int *clusters, 
+void distance_anticlustering(double *data, int *N, int *K, int *frequencies, int *clusters, 
                              int *USE_CATS, int *C, int *CAT_frequencies,
                              int *categories, int *mem_error) {
         
@@ -127,11 +130,11 @@ void distance_anticlustering(double *data, int *N, int *K, int *clusters,
                         DISTANCES[i][j] = data[offsets[j]++];
                 }
         }
-        
+
         // Initialize objective
         double OBJ_BY_CLUSTER[k];
         distance_objective(n, k, DISTANCES, OBJ_BY_CLUSTER, CLUSTER_HEADS);
-        double SUM_OBJECTIVE = array_sum(k, OBJ_BY_CLUSTER);
+        double SUM_OBJECTIVE = weighted_array_sum2(k, frequencies, OBJ_BY_CLUSTER);
 
         /* Some variables for bookkeeping during the optimization */
         
@@ -198,7 +201,7 @@ void distance_anticlustering(double *data, int *N, int *K, int *clusters,
                                 i
                         );
 
-                        tmp_obj = array_sum(k, tmp_objs);
+                        tmp_obj = weighted_array_sum2(k, frequencies, tmp_objs);
                         
                         // Update `best` variables if objective was improved
                         if (tmp_obj > best_obj) {

@@ -238,3 +238,6 @@ void init_overall_centroid(size_t m, size_t n, double OVERALL_CENTROID[m], doubl
 void fast_swap(int *clusters, size_t i, size_t j);
 size_t one_dim_index(size_t i, size_t j, size_t n);
 double weighted_array_sum(size_t k, int* frequencies, double ARRAY[k]);
+
+// for average diversity implementation:
+double weighted_array_sum2(size_t k, int* frequencies, double ARRAY[k]);

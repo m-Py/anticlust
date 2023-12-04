@@ -99,6 +99,7 @@ input_validation_anticlustering <- function(x, K, objective, method,
     validate_input(objective, "objective", input_set = c(
       "distance", 
       "diversity", 
+      "average-diversity", 
       "dispersion",
       "variance", 
       "kplus"

@@ -15,10 +15,7 @@ cannot_link_anticlustering <- function(x, init_clusters, cannot_link, objective,
     stop("Argument 'objective' must be 'diversity', 'variance' or 'kplus'")
   }
   frequencies <- table(init_clusters)
-  if (!all(frequencies == frequencies[1])) {
-    stop("Currently, cannot-link anticlustering is only supported for equal-sized groups.")
-  }
-  
+
 
   # set cannot-link distances to large negative value so they cannot be linked
   x[rbind(cannot_link, t(apply(cannot_link, 1, rev)))] <- -(sum(x) + 1)
@@ -34,7 +31,7 @@ cannot_link_anticlustering <- function(x, init_clusters, cannot_link, objective,
   objectives <- rep(NA, nrow(init_clusters))
   
   for (i in 1:nrow(init_clusters)) {
-    solutions[[i]] <- anticlustering(x, K = init_clusters[i, ], objective = "diversity", ...)
+    solutions[[i]] <- anticlustering(x, K = init_clusters[i, ], objective = "average-diversity", ...)
     objectives[i] <- diversity_objective_(solutions[[i]], x)
   }
   solutions[[which.max(objectives)]]
