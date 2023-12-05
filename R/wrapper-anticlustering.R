@@ -400,19 +400,23 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
     return(partitions[best_obj, ])
   }
   
-  # Most generic exchange method, deals with any user defined objective function:
-  if (inherits(objective, "function")) { 
-    # In some cases, `anticlustering()` has to be called repeatedly - 
-    # redirect to `repeat_anticlustering()` in this case, which then
-    # again calls anticlustering with method "exchange" and 
-    # repetitions = NULL
-    if (method == "local-maximum" || 
-        (method == "exchange" && argument_exists(repetitions))) {
-      if (!argument_exists(repetitions)) {
-        repetitions <- 1
-      }
+  # Some special cases must be considered now:
+  # (a) Is a user defined objective function passed? 
+  # (b) Do we need "repeated" anticlustering (i.e., calling the standard exchange method multiple times via
+  #     local maximum search and/or multiple initializations)
+  # (c) Is the repeated optimization implemented in C, or do we just call the exchange method repeatedly from R?
+  
+  is_objective_user_defined <- inherits(objective, "function")
+  repeated_anticlustering_needed <- method == "local-maximum" || (method == "exchange" && argument_exists(repetitions))
+  repeated_anticlustering_has_c_implementation <- !inherits(objective, "function") && objective %in% c("diversity", "average-diversity")
+  
+  # Diversity anticlustering has C implementation for repeated anticlustering, consider this special case:
+  if (repeated_anticlustering_needed && !repeated_anticlustering_has_c_implementation) { 
+    repetitions <- ifelse(!argument_exists(repetitions), 1, repetitions)
       return(repeat_anticlustering(x, K, objective, categories, method, repetitions))
-    }
+  }
+  # Most generic exchange method for user defined objectives:
+  if (is_objective_user_defined) {
     return(exchange_method(x, K, objective, categories))
   }
 
