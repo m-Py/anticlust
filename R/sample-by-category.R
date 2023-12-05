@@ -42,6 +42,10 @@ categorical_sampling <- function(categories, K) {
   validate_input(K, "K", objmode = "numeric", 
                  must_be_integer = TRUE, not_na = TRUE)
 
+  if (length(K) == N) {
+    K <- table(K)
+  }
+  
   cats <- data.frame(
     categories = categories,
     order = 1:N

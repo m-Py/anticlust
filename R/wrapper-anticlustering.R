@@ -353,6 +353,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
                                   categories, repetitions, standardize)
 
   x <- to_matrix(x)
+  N <- nrow(x)
   # there is a reason why scaling happens here and below (because of ILP + kplus)
   if (!is_distance_matrix(x) && standardize == TRUE) {
     x <- scale(x)
@@ -417,7 +418,10 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
 
   # Redirect to specialized fast exchange methods for diversity, dispersion, kmeans/kplus objectives:
   local_maximum <- ifelse(method == "local-maximum", TRUE, FALSE)
-  c_anticlustering(x, K, categories, objective, local_maximum = local_maximum)
+  if (argument_exists(repetitions) && repetitions > 1) {
+    repetitions <- t(simplify2array(get_multiple_initial_clusters(N, K, categories, repetitions))) - 1
+  }
+  c_anticlustering(x, K, categories, objective, local_maximum = local_maximum, init_partitions = repetitions)
 }
 
 # Function that processes input and returns the data set that the

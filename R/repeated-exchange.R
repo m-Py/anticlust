@@ -63,9 +63,6 @@ get_multiple_initial_clusters <- function(N, K, categories, repetitions) {
   clusters <- list(initialize_clusters(N, K, categories))
   
   if (argument_exists(categories)) {
-    if (length(K) > 1 && sum(K) != N) {
-      stop("If `K` is of length `nrow(x)` and `repetitions` is given, you cannot use `preclustering = TRUE` or `categories`, sorry.")
-    }
     clusters_repetitions <- as.list(data.frame(as.matrix(
       replicate(repetitions - 1, categorical_sampling(categories, K))
     )))

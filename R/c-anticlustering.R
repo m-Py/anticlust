@@ -9,7 +9,7 @@
 #' 
 #' @noRd
 #' 
-c_anticlustering <- function(data, K, categories = NULL, objective, exchange_partners = NULL, local_maximum = FALSE) {
+c_anticlustering <- function(data, K, categories = NULL, objective, exchange_partners = NULL, local_maximum = FALSE, init_partitions = NULL) {
   
   clusters <- initialize_clusters(NROW(data), K, categories)
 
@@ -27,6 +27,16 @@ c_anticlustering <- function(data, K, categories = NULL, objective, exchange_par
   # Each cluster must occur more than once
   if (any(frequencies <= 1)) {
     stop("No clusters with only one member allowed.")
+  }
+  
+  # Case: initial partitions may be passed as a matrix (rows = partitions; cols = elements)
+  if (!argument_exists(init_partitions)) {
+    R <- 1
+    use_init_partitions <- 0
+    init_partitions <- 0
+  } else {
+    R <- nrow(init_partitions)
+    use_init_partitions <- 1
   }
   
   if (argument_exists(categories)) {
@@ -62,6 +72,7 @@ c_anticlustering <- function(data, K, categories = NULL, objective, exchange_par
     if (objective != "average-diversity") {
       frequencies <- rep_len(1, K)
     }
+
     results <- .C(
       "distance_anticlustering", 
       as.double(convert_to_distances(data)),
@@ -74,6 +85,9 @@ c_anticlustering <- function(data, K, categories = NULL, objective, exchange_par
       as.integer(CAT_frequencies),
       as.integer(categories),
       as.integer(local_maximum),
+      as.integer(R),
+      as.integer(use_init_partitions),
+      as.integer(t(init_partitions)),
       mem_error = as.integer(0),
       PACKAGE = "anticlust"
     )

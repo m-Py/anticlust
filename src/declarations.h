@@ -34,7 +34,7 @@ void kmeans_anticlustering(
 
 void distance_anticlustering_(int n, int k, double *DISTANCES[n], int *frequencies, int *clusters, 
                               int *USE_CATS, int *C, int *CAT_frequencies,
-                              int *categories, int *local_maximum, int *mem_error);
+                              int *categories, int *local_maximum, double *OBJ_RESULT, int *mem_error);
 
 size_t number_of_categories(int *USE_CATS, int *C);
 int get_cat_frequencies(int *USE_CATS, int *CAT_frequencies, size_t n);
