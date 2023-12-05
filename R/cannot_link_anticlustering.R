@@ -1,6 +1,6 @@
 
 #' @export
-cannot_link_anticlustering <- function(x, init_clusters, cannot_link, objective, ...) {
+cannot_link_anticlustering <- function(x, init_clusters, cannot_link, objective, method) {
 
   if (objective == "kplus") {
     x <- kplus_moment_variables(x, 2)
@@ -29,20 +29,21 @@ cannot_link_anticlustering <- function(x, init_clusters, cannot_link, objective,
   ## special case of only one init partition...
   init_clusters <- as.matrix(init_clusters)
   if (ncol(init_clusters) == 1) {
-    init_clusters <- t(init_clusters)
+    K <- c(init_clusters)
+    init_clusters <- NULL
+  } else {
+    K <- init_clusters[1, ]
+    init_clusters <- init_clusters - 1 # for C
   }
-  
-  solutions <- list()
-  objectives <- rep(NA, nrow(init_clusters))
-  
-  for (i in 1:nrow(init_clusters)) {
-    solutions[[i]] <- anticlustering(x, K = init_clusters[i, ], objective = objective, ...)
-    if (objective == "diversity") {
-      objectives[i] <- diversity_objective_(solutions[[i]], x)
-    } else {
-      objectives[i] <- weighted_diversity_objective_(x, solutions[[i]], frequencies)
-    }
-  }
-  solutions[[which.max(objectives)]]
+
+  c_anticlustering(
+    x, 
+    K = K, 
+    categories = NULL, 
+    objective = objective, 
+    local_maximum = ifelse(method == "local-maximum", TRUE, FALSE),
+    exchange_partners = NULL,
+    init_partitions = init_clusters
+  )
   
 }
