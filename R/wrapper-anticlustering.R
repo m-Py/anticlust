@@ -418,8 +418,10 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
 
   # Redirect to specialized fast exchange methods for diversity, dispersion, kmeans/kplus objectives:
   local_maximum <- ifelse(method == "local-maximum", TRUE, FALSE)
-  if (argument_exists(repetitions) && repetitions > 1) {
+  if (argument_exists(repetitions) && repetitions > 1) { # this can only be the case for diversity objective, based on the logic above
     repetitions <- t(simplify2array(get_multiple_initial_clusters(N, K, categories, repetitions))) - 1
+  } else if (argument_exists(repetitions) && repetitions == 1) {
+    repetitions <- NULL
   }
   c_anticlustering(x, K, categories, objective, local_maximum = local_maximum, init_partitions = repetitions)
 }
