@@ -416,8 +416,8 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   }
 
   # Redirect to specialized fast exchange methods for diversity, dispersion, kmeans/kplus objectives:
-  local_maximum <- ifelse(objective == "local-maximum", TRUE, FALSE)
-  c_anticlustering(x, K, categories, objective, local_maximum)
+  local_maximum <- ifelse(method == "local-maximum", TRUE, FALSE)
+  c_anticlustering(x, K, categories, objective, local_maximum = local_maximum)
 }
 
 # Function that processes input and returns the data set that the

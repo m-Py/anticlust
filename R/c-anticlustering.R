@@ -9,7 +9,7 @@
 #' 
 #' @noRd
 #' 
-c_anticlustering <- function(data, K, categories = NULL, objective, exchange_partners = NULL) {
+c_anticlustering <- function(data, K, categories = NULL, objective, exchange_partners = NULL, local_maximum = FALSE) {
   
   clusters <- initialize_clusters(NROW(data), K, categories)
 
@@ -73,6 +73,7 @@ c_anticlustering <- function(data, K, categories = NULL, objective, exchange_par
       as.integer(N_CATS),
       as.integer(CAT_frequencies),
       as.integer(categories),
+      as.integer(local_maximum),
       mem_error = as.integer(0),
       PACKAGE = "anticlust"
     )

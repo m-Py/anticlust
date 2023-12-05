@@ -26,6 +26,8 @@
  * param *categories: An assignment of elements to categories,
  *         array of length *N (has to consists of integers between 0 and (C-1) 
  *         - this has to be guaranteed by the caller)
+ * param *local_maximum: Use local maximum search instead of default exchange method
+ *       that terminates after one iteration through the data set
  * param *mem_error: This is passed with value 0 and only receives the value 1 
  *       if a memory error occurs when executing this function. The caller needs
  *       to test if this value is 1 after execution.
@@ -35,7 +37,7 @@
 
 void distance_anticlustering(double *data, int *N, int *K, int *frequencies, int *clusters, 
                              int *USE_CATS, int *C, int *CAT_frequencies,
-                             int *categories, int *mem_error) {
+                             int *categories, int *local_maximum, int *mem_error) {
         
         const size_t n = (size_t) *N; // number of data points
         const size_t k = (size_t) *K; // number of clusters
@@ -144,83 +146,91 @@ void distance_anticlustering(double *data, int *N, int *K, int *frequencies, int
         double tmp_obj;
         
         /* Start main iteration loop for exchange procedure */
+        /* 0. level: test if  local maximum was found */
+        int improvement_occured = 1;
+        while (improvement_occured) {
+                improvement_occured = 0;
+                /* 1. Level: Iterate through `n` data points */
+                for (size_t i = 0; i < n; i++) {
+                        size_t cl1 = PTR_NODES[i]->data->cluster;
+                        
+                        // Initialize `best` variable for the i'th item
+                        double best_obj = 0;
+                        copy_array(k, OBJ_BY_CLUSTER, best_objs);
+                        
+                        /* 2. Level: Iterate through the exchange partners */
+                        size_t category_i = PTR_NODES[i]->data->category;
+                        // `category_i = 0` if `USE_CATS == FALSE`.
+                        size_t n_partners = CAT_frequencies[category_i];
+                        // `CAT_frequencies[0] == n` if `USE_CATS == FALSE`
+                        for (size_t u = 0; u < n_partners; u++) {
+                                // recode exchange partner index
+                                size_t j = CATEGORY_HEADS[category_i][u];
+                                size_t cl2 = PTR_NODES[j]->data->cluster;
+                                // no swapping attempt if in the same cluster:
+                                if (cl1 == cl2) { 
+                                        continue;
+                                }
+                                
+                                // Initialize `tmp` variable for the exchange partner:
+                                copy_array(k, OBJ_BY_CLUSTER, tmp_objs);
+                                
+                                // Update objective
+                                // Cluster 1: Loses distances to element i
+                                tmp_objs[cl1] -= distances_one_element(
+                                        n, DISTANCES, 
+                                        CLUSTER_HEADS[cl1],
+                                        i
+                                );
+                                // Cluster 2: Loses distances to element j
+                                tmp_objs[cl2] -= distances_one_element(
+                                        n, DISTANCES, 
+                                        CLUSTER_HEADS[cl2],
+                                        j
+                                );
+                                // Now swap the elements in the cluster list
+                                swap(n, i, j, PTR_NODES);
+                                // Cluster 1: Gains distances to element j
+                                // (here, element i is no longer in cluster 1, so
+                                // we do not accidentally include d_ij, and the 
+                                // self distance d_jj is 0)
+                                tmp_objs[cl1] += distances_one_element(
+                                        n, DISTANCES, 
+                                        CLUSTER_HEADS[cl1],
+                                        j
+                                );
+                                // Cluster 2: Gains distances to element 1
+                                tmp_objs[cl2] += distances_one_element(
+                                        n, DISTANCES, 
+                                        CLUSTER_HEADS[cl2],
+                                        i
+                                );
         
-        /* 1. Level: Iterate through `n` data points */
-        for (size_t i = 0; i < n; i++) {
-                size_t cl1 = PTR_NODES[i]->data->cluster;
-                
-                // Initialize `best` variable for the i'th item
-                double best_obj = 0;
-                copy_array(k, OBJ_BY_CLUSTER, best_objs);
-                
-                /* 2. Level: Iterate through the exchange partners */
-                size_t category_i = PTR_NODES[i]->data->category;
-                // `category_i = 0` if `USE_CATS == FALSE`.
-                size_t n_partners = CAT_frequencies[category_i];
-                // `CAT_frequencies[0] == n` if `USE_CATS == FALSE`
-                for (size_t u = 0; u < n_partners; u++) {
-                        // recode exchange partner index
-                        size_t j = CATEGORY_HEADS[category_i][u];
-                        size_t cl2 = PTR_NODES[j]->data->cluster;
-                        // no swapping attempt if in the same cluster:
-                        if (cl1 == cl2) { 
-                                continue;
+                                tmp_obj = weighted_array_sum2(k, frequencies, tmp_objs);
+                                
+                                // Update `best` variables if objective was improved
+                                if (tmp_obj > best_obj) {
+                                        best_obj = tmp_obj;
+                                        copy_array(k, tmp_objs, best_objs);
+                                        best_partner = j;
+                                }
+                                // Swap back to test next exchange partner
+                                swap(n, i, j, PTR_NODES);
                         }
                         
-                        // Initialize `tmp` variable for the exchange partner:
-                        copy_array(k, OBJ_BY_CLUSTER, tmp_objs);
-                        
-                        // Update objective
-                        // Cluster 1: Loses distances to element i
-                        tmp_objs[cl1] -= distances_one_element(
-                                n, DISTANCES, 
-                                CLUSTER_HEADS[cl1],
-                                i
-                        );
-                        // Cluster 2: Loses distances to element j
-                        tmp_objs[cl2] -= distances_one_element(
-                                n, DISTANCES, 
-                                CLUSTER_HEADS[cl2],
-                                j
-                        );
-                        // Now swap the elements in the cluster list
-                        swap(n, i, j, PTR_NODES);
-                        // Cluster 1: Gains distances to element j
-                        // (here, element i is no longer in cluster 1, so
-                        // we do not accidentally include d_ij, and the 
-                        // self distance d_jj is 0)
-                        tmp_objs[cl1] += distances_one_element(
-                                n, DISTANCES, 
-                                CLUSTER_HEADS[cl1],
-                                j
-                        );
-                        // Cluster 2: Gains distances to element 1
-                        tmp_objs[cl2] += distances_one_element(
-                                n, DISTANCES, 
-                                CLUSTER_HEADS[cl2],
-                                i
-                        );
-
-                        tmp_obj = weighted_array_sum2(k, frequencies, tmp_objs);
-                        
-                        // Update `best` variables if objective was improved
-                        if (tmp_obj > best_obj) {
-                                best_obj = tmp_obj;
-                                copy_array(k, tmp_objs, best_objs);
-                                best_partner = j;
+                        // Only if objective is improved: Do the swap
+                        if (best_obj > SUM_OBJECTIVE) {
+                                if (*local_maximum) {
+                                        improvement_occured = 1;
+                                }
+                                swap(n, i, best_partner, PTR_NODES);
+                                // Update the "global" variables
+                                SUM_OBJECTIVE = best_obj;
+                                copy_array(k, best_objs, OBJ_BY_CLUSTER);
                         }
-                        // Swap back to test next exchange partner
-                        swap(n, i, j, PTR_NODES);
-                }
-                
-                // Only if objective is improved: Do the swap
-                if (best_obj > SUM_OBJECTIVE) {
-                        swap(n, i, best_partner, PTR_NODES);
-                        // Update the "global" variables
-                        SUM_OBJECTIVE = best_obj;
-                        copy_array(k, best_objs, OBJ_BY_CLUSTER);
                 }
         }
+
 
         // Write output
         for (size_t i = 0; i < n; i++) {
