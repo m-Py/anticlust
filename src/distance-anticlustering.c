@@ -36,12 +36,48 @@
 */
 
 void distance_anticlustering(double *data, int *N, int *K, int *frequencies, int *clusters, 
-                             int *USE_CATS, int *C, int *CAT_frequencies,
-                             int *categories, int *local_maximum, int *mem_error) {
-        
+                              int *USE_CATS, int *C, int *CAT_frequencies,
+                              int *categories, int *local_maximum, int *mem_error) {
         const size_t n = (size_t) *N; // number of data points
         const size_t k = (size_t) *K; // number of clusters
         
+                // Restore distance matrix
+        
+        int offsets[n]; // index variable for indexing correct cols in data matrix
+        // Allocate memory for distance matrix in C
+        double *DISTANCES[n];
+        for (size_t i = 0; i < n; i++) {
+                DISTANCES[i] = (double*) malloc(sizeof(double) * n);
+                if (DISTANCES[i] == NULL) {
+                        free_distances(n, DISTANCES, i);
+                        *mem_error = 1;
+                        return;
+                }
+        }
+        
+        // Column offsets (to convert one-dimensional array to Row/Col major)
+        for(size_t i = 0; i < n; i++) {
+                offsets[i] = i * n;
+        }
+        
+        // Reconstruct the data points as N x N distance matrix
+        for (size_t i = 0; i < n; i++) {
+                for (size_t j = 0; j < n; j++) {
+                        DISTANCES[i][j] = data[offsets[j]++];
+                }
+        }
+        distance_anticlustering_(
+          n, k, DISTANCES, frequencies, clusters, USE_CATS,
+          C, CAT_frequencies, categories, local_maximum, mem_error
+        );
+        free_distances(n, DISTANCES, n);
+}
+
+// This function actually implements the local maximum search:
+void distance_anticlustering_(int n, int k, double *DISTANCES[n], int *frequencies, int *clusters, 
+                             int *USE_CATS, int *C, int *CAT_frequencies,
+                             int *categories, int *local_maximum, int *mem_error) {
+
         // Per data point, store ID, cluster, and category
         struct element POINTS[n]; 
         
@@ -104,35 +140,6 @@ void distance_anticlustering(double *data, int *N, int *K, int *frequencies, int
                 return;
         }
         
-        // Restore distance matrix
-        
-        int offsets[n]; // index variable for indexing correct cols in data matrix
-        // Allocate memory for distance matrix in C
-        double *DISTANCES[n];
-        for (size_t i = 0; i < n; i++) {
-                DISTANCES[i] = (double*) malloc(sizeof(double) * n);
-                if (DISTANCES[i] == NULL) {
-                        free_distances(n, DISTANCES, i);
-                        free_points(n, POINTS, n);
-                        free_category_indices(c, CATEGORY_HEADS, c);
-                        free_cluster_list(k, CLUSTER_HEADS, k);
-                        *mem_error = 1;
-                        return;
-                }
-        }
-        
-        // Column offsets (to convert one-dimensional array to Row/Col major)
-        for(size_t i = 0; i < n; i++) {
-                offsets[i] = i * n;
-        }
-        
-        // Reconstruct the data points as N x N distance matrix
-        for (size_t i = 0; i < n; i++) {
-                for (size_t j = 0; j < n; j++) {
-                        DISTANCES[i][j] = data[offsets[j]++];
-                }
-        }
-
         // Initialize objective
         double OBJ_BY_CLUSTER[k];
         distance_objective(n, k, DISTANCES, OBJ_BY_CLUSTER, CLUSTER_HEADS);
@@ -241,7 +248,6 @@ void distance_anticlustering(double *data, int *N, int *K, int *frequencies, int
         free_points(n, POINTS, n);
         free_category_indices(c, CATEGORY_HEADS, c);
         free_cluster_list(k, CLUSTER_HEADS, k);
-        free_distances(n, DISTANCES, n);
 }
 
 // Compute sum of distances by cluster
