@@ -68,48 +68,7 @@ void distance_anticlustering(double *data, int *N, int *K, int *frequencies, int
                 }
         }
         
-        // outer optimization loop, across repetitions (where the initial partition varies)
-        double BEST_OBJ = 0;
-        int BEST_PARTITION[n];
-        size_t partition_counter = 0;
-        for (size_t a = 0; a < *R; a++) {
-                if (*use_init_partitions == 1) {
-                        for (size_t i = 0; i < n; i++) {
-                              clusters[i] = init_partitions[partition_counter];
-                              partition_counter++;
-                        }
-                }
-               
-                double *OBJ_RESULT;
-                OBJ_RESULT = malloc(sizeof(double));
-                
-                distance_anticlustering_(
-                        n, k, DISTANCES, frequencies, clusters, USE_CATS,
-                        C, CAT_frequencies, categories, local_maximum, OBJ_RESULT, mem_error
-                );
-
-                if (*OBJ_RESULT > BEST_OBJ) {
-                        for (size_t i = 0; i < n; i++) {
-                                BEST_PARTITION[i] = clusters[i];
-                        }
-                        BEST_OBJ = *OBJ_RESULT;
-                }
-        }
-        
-        // Write output
-        for (size_t i = 0; i < n; i++) {
-                clusters[i] = BEST_PARTITION[i];
-        }
-
-        free_distances(n, DISTANCES, n);
-}
-
-// This function actually implements the local maximum search:
-void distance_anticlustering_(int n, int k, double *DISTANCES[n], int *frequencies, int *clusters, 
-                             int *USE_CATS, int *C, int *CAT_frequencies,
-                             int *categories, int *local_maximum, double *OBJ_RESULT, int *mem_error) {
-
-        // Per data point, store ID, cluster, and category
+                // Per data point, store ID, cluster, and category
         struct element POINTS[n]; 
        
         for (size_t i = 0; i < n; i++) {
@@ -129,9 +88,7 @@ void distance_anticlustering_(int n, int k, double *DISTANCES[n], int *frequenci
 
         // Some book-keeping variables to track memory error
         int mem_error_categories = 0;
-        int mem_error_cluster_heads = 0;
-        int mem_error_cluster_lists = 0;
-        
+
         // Deal with categorical restrictions
         size_t c = number_of_categories(USE_CATS, C);
         *CAT_frequencies = get_cat_frequencies(USE_CATS, CAT_frequencies, n);
@@ -146,13 +103,64 @@ void distance_anticlustering_(int n, int k, double *DISTANCES[n], int *frequenci
                 return; 
         }
         
+        // outer optimization loop, across repetitions (where the initial partition varies)
+        double BEST_OBJ = 0;
+        int BEST_PARTITION[n];
+        size_t partition_counter = 0;
+        for (size_t a = 0; a < *R; a++) {
+                if (*use_init_partitions == 1) {
+                        for (size_t i = 0; i < n; i++) {
+                              clusters[i] = init_partitions[partition_counter];
+                              partition_counter++;
+                        }
+                }
+               
+                double *OBJ_RESULT;
+                OBJ_RESULT = malloc(sizeof(double));
+                
+                distance_anticlustering_(
+                        n, k, c, DISTANCES, POINTS, CATEGORY_HEADS, frequencies, clusters, USE_CATS,
+                        C, CAT_frequencies, categories, local_maximum, OBJ_RESULT, mem_error
+                );
+
+                if (*OBJ_RESULT > BEST_OBJ) {
+                        for (size_t i = 0; i < n; i++) {
+                                BEST_PARTITION[i] = clusters[i];
+                        }
+                        BEST_OBJ = *OBJ_RESULT;
+                }
+        }
+        
+        // Write output
+        for (size_t i = 0; i < n; i++) {
+                clusters[i] = BEST_PARTITION[i];
+        }
+        
+        free_points(n, POINTS, n);
+        free_category_indices(c, CATEGORY_HEADS, c);
+        free_distances(n, DISTANCES, n);
+}
+
+// This function actually implements the local maximum search:
+void distance_anticlustering_(int n, int k, int c, double *DISTANCES[n], struct element POINTS[n], 
+                              size_t *CATEGORY_HEADS[c],
+                              int *frequencies, int *clusters, 
+                              int *USE_CATS, int *C, int *CAT_frequencies,
+                              int *categories, int *local_maximum, double *OBJ_RESULT, int *mem_error) {
+        
+        for (size_t i = 0; i < n; i++) {
+                POINTS[i].cluster = clusters[i];
+        }
+        
+        int mem_error_cluster_heads = 0;
+        int mem_error_cluster_lists = 0;
+
         /* SET UP CLUSTER STRUCTURE */
         struct node *CLUSTER_HEADS[k];
         mem_error_cluster_heads = initialize_cluster_heads(k, CLUSTER_HEADS);
         
         if (mem_error_cluster_heads == 1) {
                 free_points(n, POINTS, n);
-                free_category_indices(c, CATEGORY_HEADS, c);
                 *mem_error = 1;
                 return; 
         }
@@ -165,7 +173,6 @@ void distance_anticlustering_(int n, int k, double *DISTANCES[n], int *frequenci
         );
         if (mem_error_cluster_lists == 1) {
                 free_points(n, POINTS, n);
-                free_category_indices(c, CATEGORY_HEADS, c);
                 free_cluster_list(k, CLUSTER_HEADS, k);
                 *mem_error = 1;
                 return;
@@ -278,8 +285,6 @@ void distance_anticlustering_(int n, int k, double *DISTANCES[n], int *frequenci
         *OBJ_RESULT = SUM_OBJECTIVE;
         
         // in the end, free allocated memory:
-        free_points(n, POINTS, n);
-        free_category_indices(c, CATEGORY_HEADS, c);
         free_cluster_list(k, CLUSTER_HEADS, k);
 }
 

@@ -32,7 +32,9 @@ void kmeans_anticlustering(
         int *mem_error
 );
 
-void distance_anticlustering_(int n, int k, double *DISTANCES[n], int *frequencies, int *clusters, 
+void distance_anticlustering_(int n, int k, int c, double *DISTANCES[n], struct element POINTS[n], 
+                              size_t *CATEGORY_HEADS[c],
+                              int *frequencies, int *clusters, 
                               int *USE_CATS, int *C, int *CAT_frequencies,
                               int *categories, int *local_maximum, double *OBJ_RESULT, int *mem_error);
 
