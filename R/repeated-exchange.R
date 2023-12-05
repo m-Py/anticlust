@@ -5,24 +5,10 @@ repeat_anticlustering <- function(x, K, objective, categories, method, repetitio
   N <- nrow(x)
   
   # Create initial cluster assignment for each `repetition`
-  clusters <- list(initialize_clusters(N, K, categories))
-  
   if (argument_exists(repetitions) && repetitions > 1) {
-    if (argument_exists(categories)) {
-      if (length(K) > 1 && sum(K) != N) {
-        stop("If `K` is of length `nrow(x)` and `repetitions` is given, you cannot use `preclustering = TRUE` or `categories`, sorry.")
-      }
-      clusters_repetitions <- as.list(data.frame(as.matrix(
-        replicate(repetitions - 1, categorical_sampling(categories, K))
-      )))
-    } else {
-      clusters_repetitions <- as.list(data.frame(as.matrix(
-        replicate(repetitions - 1, sample(clusters[[1]]))
-      )))
-    }
-    
-    clusters_repetitions <- unname(clusters_repetitions)
-    clusters <- merge_lists(list(clusters, clusters_repetitions))
+    clusters <- get_multiple_initial_clusters(N, K, categories, repetitions)
+  } else {
+    clusters <- list(initialize_clusters(N, K, categories))
   }
   
   if (inherits(objective, "function")) {
@@ -70,6 +56,27 @@ repeat_anticlustering <- function(x, K, objective, categories, method, repetitio
     x = x
   )
   candidate_solutions[[which.max(objs)]]
+}
+
+get_multiple_initial_clusters <- function(N, K, categories, repetitions) {
+  
+  clusters <- list(initialize_clusters(N, K, categories))
+  
+  if (argument_exists(categories)) {
+    if (length(K) > 1 && sum(K) != N) {
+      stop("If `K` is of length `nrow(x)` and `repetitions` is given, you cannot use `preclustering = TRUE` or `categories`, sorry.")
+    }
+    clusters_repetitions <- as.list(data.frame(as.matrix(
+      replicate(repetitions - 1, categorical_sampling(categories, K))
+    )))
+  } else {
+    clusters_repetitions <- as.list(data.frame(as.matrix(
+      replicate(repetitions - 1, sample(clusters[[1]]))
+    )))
+  }
+    
+  clusters_repetitions <- unname(clusters_repetitions)
+  merge_lists(list(clusters, clusters_repetitions))
 }
 
 
