@@ -384,19 +384,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
     x <- scale(x)
   }
   
-  # In some cases, `anticlustering()` has to be called repeatedly - 
-  # redirect to `repeat_anticlustering()` in this case, which then
-  # again calls anticlustering with method "exchange" and 
-  # repetitions = NULL
-  if (method == "local-maximum" || 
-      (method == "exchange" && argument_exists(repetitions))) {
-    if (!argument_exists(repetitions)) {
-      repetitions <- 1
-    }
-    return(repeat_anticlustering(x, K, objective, categories, method, repetitions))
-  }
-  
-
+  # BILS by Brusco et al.:
   if (method == "brusco") {
     if (objective == "diversity") {
       weights <- c(0.5, 0.99, 0.999, 0.999999)
@@ -410,15 +398,26 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
     best_obj <- which.max(apply(partitions, 1, obj_fun, convert_to_distances(x)))
     return(partitions[best_obj, ])
   }
-
-  if (inherits(objective, "function")) {
-    # most generic exchange method, deals with any objective function
+  
+  # Most generic exchange method, deals with any user defined objective function:
+  if (inherits(objective, "function")) { 
+    # In some cases, `anticlustering()` has to be called repeatedly - 
+    # redirect to `repeat_anticlustering()` in this case, which then
+    # again calls anticlustering with method "exchange" and 
+    # repetitions = NULL
+    if (method == "local-maximum" || 
+        (method == "exchange" && argument_exists(repetitions))) {
+      if (!argument_exists(repetitions)) {
+        repetitions <- 1
+      }
+      return(repeat_anticlustering(x, K, objective, categories, method, repetitions))
+    }
     return(exchange_method(x, K, objective, categories))
   }
 
-  # Redirect to specialized fast exchange methods for diversity and 
-  # variance objectives
-  c_anticlustering(x, K, categories, objective)
+  # Redirect to specialized fast exchange methods for diversity, dispersion, kmeans/kplus objectives:
+  local_maximum <- ifelse(objective == "local-maximum", TRUE, FALSE)
+  c_anticlustering(x, K, categories, objective, local_maximum)
 }
 
 # Function that processes input and returns the data set that the
