@@ -57,7 +57,7 @@ Description: The method of anticlustering partitions a pool of elements
     (weighted) cluster editing problem, also known as correlation
     clustering, clique partitioning problem or transitivity clustering.
 License: MIT + file LICENSE
-URL: https://github.com/m-Py/anticlust
+URL: https://github.com/m-Py/anticlust, https://m-py.github.io/anticlust/
 BugReports: https://github.com/m-Py/anticlust/issues
 Depends: 
     R (>= 3.6.0)
