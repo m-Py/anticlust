@@ -160,6 +160,10 @@ struct Pareto_element* multistart_bicriterion_pairwise_interchange(
     double dispersion = get_dispersion(N, partition, matrix2);
     double save_dispersion = dispersion;
     double max_bicriterion = div_weight*diversity + dis_weight*dispersion;
+    
+    //initialize Pareto set
+    update_pareto(&head, N, partition, diversity, dispersion);
+    
     bool Flag = false;
     while(!Flag){
       Flag = true;
