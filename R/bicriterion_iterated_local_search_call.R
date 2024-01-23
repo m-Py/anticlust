@@ -273,7 +273,7 @@ bicriterion_anticlustering <- function(
   results <- data.frame(t(apply(results, 1, order_cluster_vector)))
   # Remove duplicates
   results <- results[!duplicated(results), ]
-  as.matrix(results)
+  unname(as.matrix(results))
 }
 
 #verify input
