@@ -101,8 +101,7 @@ input_validation_anticlustering <- function(x, K, objective, method,
       "diversity", 
       "dispersion",
       "variance", 
-      "kplus",
-      "fast-kmeans2"
+      "kplus"
       ), 
       len = 1, not_na = TRUE)
     if (objective == "variance" && method == "ilp") {

@@ -9,7 +9,8 @@ fast_anticlustering(
   K,
   k_neighbours = Inf,
   categories = NULL,
-  exchange_partners = NULL
+  exchange_partners = NULL,
+  kmeans_computation = "centroid"
 )
 }
 \arguments{
@@ -33,6 +34,8 @@ or several categorical constraints.}
 elements that serve as exchange partners. If used, this
 argument overrides the \code{k_neighbours} argument. See
 examples.}
+
+\item{kmeans_computation}{Either "centroid" (default) or "pairwise". Docs to be written in details.}
 }
 \description{
 Increasing the speed of (k-means / k-plus) anticlustering by (1) 

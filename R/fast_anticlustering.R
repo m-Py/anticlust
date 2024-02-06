@@ -22,6 +22,7 @@
 #'     elements that serve as exchange partners. If used, this
 #'     argument overrides the \code{k_neighbours} argument. See
 #'     examples.
+#' @param kmeans_computation Either "centroid" (default) or "pairwise". Docs to be written in details.
 #'
 #' @importFrom RANN nn2
 #'
@@ -194,10 +195,13 @@
 #'
 
 fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL, 
-                                exchange_partners = NULL) {
+                                exchange_partners = NULL, kmeans_computation = "centroid") {
   input_validation_anticlustering(
     x, K, "variance", "exchange", FALSE, categories, NULL
   )
+  validate_input(kmeans_computation, "kmeans_computation", objmode = "character", len = 1,
+                 not_na = TRUE, input_set = c("centroid", "pairwise"))
+  
   categories <- merge_into_one_variable(categories)
   x <- as.matrix(x)
   N <- nrow(x)
@@ -212,7 +216,13 @@ fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL,
     exchange_partners <- all_exchange_partners(x, k_neighbours, categories)
   }
   exchange_partners <- cleanup_exchange_partners(exchange_partners, N)
-
+  if (kmeans_computation == "pairwise") {
+    return(c_anticlustering(
+      x, initialize_clusters(N, K, NULL), 
+      categories = NULL, objective = "fast-kmeans2", 
+      exchange_partners - 1
+    ))
+  }
   c_anticlustering(
     x, initialize_clusters(N, K, categories), 
     categories = NULL, objective = "fast-kmeans", 
