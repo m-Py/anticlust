@@ -107,6 +107,8 @@ c_anticlustering <- function(data, K, categories = NULL, objective, exchange_par
       as.integer(M),
       as.integer(K),
       clusters = as.integer(clusters),
+      as.integer(exchange_partners),
+      as.integer(nrow(exchange_partners)),
       mem_error = as.integer(0),
       PACKAGE = "anticlust"
     )

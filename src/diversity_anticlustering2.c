@@ -18,11 +18,13 @@
  * The return value is assigned to the argument `clusters`, via pointer
 */
 
-void diversity_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *clusters, int *mem_error) {
+void diversity_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *clusters, 
+                                     int *partners, int *k_neighbours, int *mem_error) {
         
         const size_t n = (size_t) *N; // number of data points
         const size_t m = (size_t) *M; // number of features
         const size_t k = (size_t) *K; // number of clusters
+        const size_t kn = (size_t) *k_neighbours; // number of neighbours
 
         // Per data point, store ID, cluster, and category
         struct element POINTS[n]; 
@@ -89,8 +91,9 @@ void diversity_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *
         double best_objs[k];
         double tmp_improvement; // encode if an exchange leads to improvement
         
-        // does any improvement occur during exchange method? is used for finding local maximum
+        // does any improvement occur during exchange method? is used for finding local maximum (not used here)
         int improvement = 1; 
+        size_t id_current_exch_partner = 0;
         
         /* Start main iteration loop for exchange procedure */
         while (improvement == 1) {
@@ -109,11 +112,15 @@ void diversity_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *
                         double best_improvement = 0;
                         copy_array(k, OBJ_BY_CLUSTER, best_objs);
                         int exchange_cluster_found = 0;
+                        size_t j;
                         
-                        for (size_t u = 0; u < n; u++) {
+                        for (size_t u = 0; u < kn; u++) {
+                          
+                                j = partners[id_current_exch_partner];
+                                id_current_exch_partner++; // this just counts upwards across all exchange partners, ignores matrix-like structure
 
-                                size_t cl2 = PTR_NODES[u]->data->cluster;
-                                double* features_j = PTR_NODES[u]->data->values;
+                                size_t cl2 = PTR_NODES[j]->data->cluster;
+                                double* features_j = PTR_NODES[j]->data->values;
                                 // is it necessary to test the other cluster?
                                 if (cl1 == cl2) {
                                         continue;
@@ -149,7 +156,7 @@ void diversity_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *
                                         best_objs[cl2] = tmp_obj_cl2;
                                         best_improvement = tmp_improvement;
                                         best_cluster = cl2;
-                                        best_partner = u;
+                                        best_partner = j;
                                         exchange_cluster_found = 1;
                                 }
                                 
