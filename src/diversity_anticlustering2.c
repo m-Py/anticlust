@@ -9,8 +9,15 @@
  * param *data: vector of data points (N * M features matrix)
  * param *N: The number of elements (i.e., number of "rows" in *data)
  * param *M: The number of features (i.e., number of "columns" in *data)
+ * param *K: The number of clusters 
  * param *clusters: An initial assignment of elements to clusters,
- *         array of length *N (MUST BE 1...N)
+ *         array of length *N
+ * param *partners: A pointer array of length N * k_neighbours, indicating for each 
+ *        element which other elements are exchange partners. The first `k_neighbours`
+ *        entries are the exchange partners of element 1, the next belong to element
+ *        2, and so forth. If an entry is N, the element is skipped (only indices up to N-1 work, 
+ *        so N is used to indicate that no exchange partners follow).
+ * param *k_neighbours: The number of exchange partners per element.
  * param *mem_error: This is passed with value 0 and only receives the value 1 
  *       if a memory error occurs when executing this function. The caller needs
  *       to test if this value is 1 after execution.
