@@ -1,6 +1,7 @@
 # anticlust devel
 
 - `wce()` now has a heuristic `"local-maximum"` method 
+- new argument "kmeans_computation" for fast_anticlustering(), may compute the k-means objective based on pairwise distances rather than (cluster) centroids
 
 # anticlust 0.8.0
 
