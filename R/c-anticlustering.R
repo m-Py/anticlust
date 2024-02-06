@@ -99,8 +99,20 @@ c_anticlustering <- function(data, K, categories = NULL, objective, exchange_par
       as.integer(nrow(exchange_partners)),
       PACKAGE = "anticlust"
     )
-    results[["mem_error"]] <- 0
+  } else if (objective == "fast-kmeans2") {
+    results <- .C(
+      "diversity_kmeans_anticlustering",
+      as.double(data),
+      as.integer(N),
+      as.integer(M),
+      as.integer(K),
+      clusters = as.integer(clusters),
+      mem_error = as.integer(0),
+      PACKAGE = "anticlust"
+    )
   }
+  
+  results[["mem_error"]] <- 0
 
   if (results[["mem_error"]] == 1) {
     stop("Could not allocate enough memory.")

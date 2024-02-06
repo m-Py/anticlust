@@ -242,3 +242,10 @@ void wce_heuristic(double *data, int *N, int *clusters, int *mem_error);
 void swap_wce(size_t n, size_t i, size_t cl1, size_t cl2, struct node *CLUSTER_HEADS[n]);
 
 void cpp_similarities_(int *data, int *N, int *M, int *output);
+
+
+// for new diversity implementation:
+
+double squared_distances_one_element(
+    size_t n, size_t m, double* features, struct node *start_node
+);
