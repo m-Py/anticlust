@@ -121,7 +121,8 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
               tmp_obj_cl2 = euclidean_squared(OVERALL_CENTROID, tmp_center2, m);
               
               // Update objective
-              tmp_reduction = tmp_obj_cl1 + tmp_obj_cl2 - OBJ_BY_CLUSTER[cl1] - OBJ_BY_CLUSTER[cl2];
+              tmp_reduction = tmp_obj_cl1 * frequencies[cl1] + tmp_obj_cl2 * frequencies[cl2] - 
+                OBJ_BY_CLUSTER[cl1] * frequencies[cl1] - OBJ_BY_CLUSTER[cl2] * frequencies[cl2];
 
               // Update `best` variables if objective was improved
               if (tmp_reduction < best_reduction) {
