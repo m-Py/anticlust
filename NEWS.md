@@ -1,3 +1,15 @@
+# anticlust 0.8.3
+
+## Documentation
+
+-  Updating all references to the k-plus anticlustering paper after its "actual" publication:
+
+Papenberg, M. (2024). K-plus Anticlustering: An Improved k-means Criterion for Maximizing Between-Group Similarity. *British Journal of Mathematical and Statistical Psychology, 77* (1), 80--102. https://doi.org/10.1111/bmsp.12315
+
+## Internal changes
+
+- `fast_anticlustering()` received another internal change to improve the speed of the re-computation of the objective during the optimization. In particular, the updating is restricted the two clusters between which the exchange actually takes place. 
+
 # anticlust 0.8.2
 
 ## Internal changes
