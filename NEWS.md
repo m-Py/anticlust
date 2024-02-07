@@ -8,7 +8,7 @@ Papenberg, M. (2024). K-plus Anticlustering: An Improved k-means Criterion for M
 
 ## Internal changes
 
-- `fast_anticlustering()` received another internal change to improve the speed of the re-computation of the objective during the optimization. In particular, updating is restricted to the two clusters between which an exchange actually takes place. 
+- `fast_anticlustering()` received another internal change to improve the speed of the re-computation of the objective during the optimization. In particular, updating the objective is now done by only inspecting the two clusters between which an exchange actually took place, instead of re-computing a sum across all clusters.
 
 # anticlust 0.8.2
 
