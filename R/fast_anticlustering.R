@@ -108,8 +108,9 @@
 #' between all data points and their cluster centers.  The function
 #' \code{fast_anticlustering} uses a different - but equivalent -
 #' formulation of the k-means objective, where the re-computation of
-#' the objective only depends on K and M, but no longer on N. In
-#' particular, it minimizes the weighted sum of squared distances between
+#' the objective only depends and M but no longer on N. In
+#' particular, this variant of k-means anticlustering minimizes 
+#' the weighted sum of squared distances between
 #' cluster centroids and the overall data centroid; the distances
 #' between all individual data points and their cluster center are not
 #' computed (Späth, 1986). Using the different objective formulation 
@@ -118,15 +119,14 @@
 #' very large data sets (even in the millions). For a fixed number of
 #' exchange partners (specified using the argument
 #' \code{k_neighbours}), the approximate run time of
-#' \code{fast_anticlustering} is in O(M N K). The algorithm
+#' \code{fast_anticlustering} is in O(M N). The algorithm
 #' \code{method = "exchange"} in \code{\link{anticlustering}} with
 #' \code{objective = "variance"} has a run time of O(M N^3). 
 #' Thus, \code{fast_anticlustering} can improve the run time
 #' by two orders of magnitude as compared to the standard exchange
 #' algorithm. The nearest neighbour search, which is done in the
-#' beginning, only has O(N log(N)) run time and does not strongly
-#' contribute to the overall run time (and it is extremely fast in
-#' practice). It is nevertheless possible to suppress the nearest
+#' beginning usually does not strongly contribute to the overall
+#' run time. It is nevertheless possible to suppress the nearest
 #' neighbour search by using the \code{exchange_partners} argument.
 #'
 #' When setting the \code{categories} argument, exchange partners
