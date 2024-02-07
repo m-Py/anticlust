@@ -229,9 +229,11 @@ void fast_kmeans_anticlustering(
         int *partners,
         int *k_neighbours
 );
-void fast_update_centers(size_t i, size_t j, size_t n, size_t m, size_t k, double *data, 
-                         int cl1, int cl2, double CENTERS[k][m], int *frequencies);
 
+void fast_update_one_center(size_t index_removed_from_cluster, 
+                            size_t index_added_to_cluster, 
+                            size_t n, size_t m, double *data, 
+                            double CENTER[m], int frequency);
 // for fast new k-means implementation
 void init_centers(size_t k, size_t m, size_t n, double CENTERS[k][m], int* clusters, int* frequencies, double* data);
 void init_overall_centroid(size_t m, size_t n, double OVERALL_CENTROID[m], double* data);
