@@ -15,13 +15,13 @@ If you use the bicriterion anticlustering heuristic by Brusco et al. (2020), you
 
 - Brusco, M. J., Cradit, J. D., & Steinley, D. (2020). Combining diversity and dispersion criteria for anticlustering: A bicriterion approach. *British Journal of Mathematical and Statistical Psychology, 73*(3), 375–396. https://doi.org/10.1111/bmsp.12186
 
-You are using the algorithm by Brusco et al. (2020) if you use the function `anticlustering()` with the argument `method = "brusco"` or if you are using the function `bicriterion_anticlustering()`. These functions implement the combined bicriterion algorithm MBPI + BILS. 
+You are using the algorithm by Brusco et al. (2020) if you use the function `anticlustering()` with the argument `method = "brusco"` or if you are using the function `bicriterion_anticlustering()`.
 
 If you use k-plus anticlustering, you should cite the following reference:
 
 - Papenberg, M. (2024). K-plus Anticlustering: An Improved k-means Criterion for Maximizing Between-Group Similarity. *British Journal of Mathematical and Statistical Psychology, 77* (1), 80--102. https://doi.org/10.1111/bmsp.12315
 
-You are using k-plus anticlustering if you use the function `anticlustering()` with the argument `objective = "kplus"` or if you are using the function `kplus_anticlustering()`.
+You are using k-plus anticlustering if you use the function `anticlustering()` with the argument `objective = "kplus"` or if you are using the function `kplus_anticlustering()` or `kplus_moment_variables()` (e.g. as input for `fast_anticlustering()`).
 
 ## References for anticlustering algorithms
 
