@@ -54,16 +54,14 @@ see Examples).
 
 The function \code{fast_anticlustering} employs a speed-optimized
 exchange method, which is basically equivalent to \code{method =
-"exchange"} in \code{\link{anticlustering}}, but reduces the number
-of exchanges that are investigated for each input element. For each
-element, the potential exchange partners are generated using a
-nearest neighbour search with the function \code{\link[RANN]{nn2}}
-from the \code{RANN} package. Only the nearest neighbours then
-serve as exchange partners. The number of exchange partners
-per element has to be set using the argument \code{k_neighbours}; by
+"exchange"} in \code{\link{anticlustering}}, but may reduce the number
+of exchanges that are investigated for each input element. The number of 
+exchange partners per element has to be set using the argument \code{k_neighbours}. By
 default, it is set to \code{Inf}, meaning that all possible swaps are
-tested. This default must be changed by the user for large data sets.
-More exchange partners can improve the quality of
+tested. If \code{k_neighbours} is set (which is usually recommended when running 
+this function), the default behaviour is to generate exchange partners using a
+nearest neighbour search (using the function \code{\link[RANN]{nn2}}
+from the \code{RANN} package). Using more exchange partners can improve the quality of
 the results, but also increase run time. Note that for very large
 data sets, anticlustering generally becomes "easier" (even a random
 split may yield satisfactory results), so using few exchange
