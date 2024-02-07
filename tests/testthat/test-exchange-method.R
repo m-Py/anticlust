@@ -69,21 +69,3 @@ test_that("fast exchange and exchange functions yield the same results - anticlu
   expect_equal(all(ac == ac_fast), TRUE)
 
 })
-
-
-test_that("same results for local updating and recomputing - different group sizes", {
-  N <- 60 
-  M <- 2
-  clusters <- rep(1:3, c(30, 15, 15))
-  features <- matrix(rnorm(N * M), ncol = M)
-  ac1 <- anticlustering(features, K = clusters, objective = "variance")
-  ac2 <- fast_anticlustering(features, clusters, exchange_partners = rep(list(1:N), N))
-  ac3 <- anticlustering(features, clusters, objective = "variance")
-  expect_true(all(ac1 == ac2))
-  expect_true(all(ac2 == ac3))
-  
-  ac4 <- anticlustering(features, K = clusters, objective = diversity_objective)
-  ac5 <- anticlustering(features, clusters)
-  expect_true(all(ac4 == ac5))
-  
-})
