@@ -36,7 +36,7 @@ Description: The method of anticlustering partitions a pool of elements
     anticlustering() gives access to exact and heuristic anticlustering
     methods described in Papenberg and Klau (2021;
     <doi:10.1037/met0000301>), Brusco et al. (2020;
-    <doi:10.1111/bmsp.12186>), and Papenberg (2023;
+    <doi:10.1111/bmsp.12186>), and Papenberg (2024;
     <doi:10.1111/bmsp.12315>). The exact algorithms require that an
     integer linear programming solver is installed, either the GNU linear
     programming kit (<https://www.gnu.org/software/glpk/glpk.html>)
@@ -48,7 +48,7 @@ Description: The method of anticlustering partitions a pool of elements
     bicriterion anticlustering method proposed by Brusco et al. (2020) is
     given via the function bicriterion_anticlustering(), while
     kplus_anticlustering() implements the full functionality of the k-plus
-    anticlustering approach proposed by Papenberg (2023). Some other
+    anticlustering approach proposed by Papenberg (2024). Some other
     functions are available to solve classical clustering problems. The
     function balanced_clustering() applies a cluster analysis under size
     constraints, i.e., creates equal-sized clusters. The function

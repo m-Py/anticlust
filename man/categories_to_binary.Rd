@@ -59,10 +59,9 @@ table(kplus_groups, schaper2019$room) # argument categories was not used!
  
 }
 \references{
-Papenberg, M. (2023). K-plus Anticlustering: An Improved k-means Criterion 
-for Maximizing Between-Group Similarity. British Journal of Mathematical 
-and Statistical Psychology. Advance online publication. 
-https://doi.org/10.1111/bmsp.12315
+Papenberg, M. (2024). K-plus Anticlustering: An Improved k-means Criterion for 
+Maximizing Between-Group Similarity. British Journal of Mathematical and 
+Statistical Psychology, 77(1), 80--102. https://doi.org/10.1111/bmsp.12315
 }
 \author{
 Martin Papenberg \email{martin.papenberg@hhu.de}

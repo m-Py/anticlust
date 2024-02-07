@@ -7,7 +7,7 @@
 #' maximizing instead of minimizing a clustering objective function.
 #' Implements anticlustering methods as described in Papenberg and
 #' Klau (2021; <doi:10.1037/met0000301>), Brusco et al. 
-#' (2020; <doi:10.1111/bmsp.12186>), and Papenberg (2023; 
+#' (2020; <doi:10.1111/bmsp.12186>), and Papenberg (2024; 
 #' <doi:10.1111/bmsp.12315>).
 #'
 #' @param x The data input. Can be one of two structures: (1) A
@@ -334,10 +334,9 @@
 #' data sets into equivalent parts. Psychological Methods, 26(2), 
 #' 161–174. https://doi.org/10.1037/met0000301.
 #' 
-#' Papenberg, M. (2023). K-plus Anticlustering: An Improved k-means Criterion 
-#' for Maximizing Between-Group Similarity. British Journal of Mathematical 
-#' and Statistical Psychology. Advance online publication. 
-#' https://doi.org/10.1111/bmsp.12315
+#' Papenberg, M. (2024). K-plus Anticlustering: An Improved k-means Criterion for 
+#' Maximizing Between-Group Similarity. British Journal of Mathematical and 
+#' Statistical Psychology, 77(1), 80--102. https://doi.org/10.1111/bmsp.12315
 #'
 #' Späth, H. (1986). Anticlustering: Maximizing the variance criterion.
 #' Control and Cybernetics, 15, 213-218.

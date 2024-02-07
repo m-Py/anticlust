@@ -2,9 +2,9 @@
 
 ## Documentation
 
--  Updating all references to the k-plus anticlustering paper after its "actual" publication:
+Updating all references to the k-plus anticlustering paper after its "actual" publication:
 
-Papenberg, M. (2024). K-plus Anticlustering: An Improved k-means Criterion for Maximizing Between-Group Similarity. *British Journal of Mathematical and Statistical Psychology, 77* (1), 80--102. https://doi.org/10.1111/bmsp.12315
+Papenberg, M. (2024). K-plus Anticlustering: An Improved k-means Criterion for Maximizing Between-Group Similarity. *British Journal of Mathematical and Statistical Psychology, 77*(1), 80--102. https://doi.org/10.1111/bmsp.12315
 
 ## Internal changes
 

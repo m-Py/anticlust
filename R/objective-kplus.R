@@ -25,7 +25,7 @@
 #' the mean of the respective column. All columns are then included---in
 #' addition to the original data---in standard k-means
 #' anticlustering. The logic is readily extended towards higher order moments,
-#' see Papenberg (2023). This function gives users the possibility to generate
+#' see Papenberg (2024). This function gives users the possibility to generate
 #' k-plus variables themselves, which offers some additional flexibility when
 #' conducting k-plus anticlustering.
 #'
@@ -35,10 +35,9 @@
 #'
 #' @references
 #' 
-#' Papenberg, M. (2023). K-plus Anticlustering: An Improved k-means Criterion 
-#' for Maximizing Between-Group Similarity. British Journal of Mathematical 
-#' and Statistical Psychology. Advance online publication. 
-#' https://doi.org/10.1111/bmsp.12315
+#' Papenberg, M. (2024). K-plus Anticlustering: An Improved k-means Criterion for 
+#' Maximizing Between-Group Similarity. British Journal of Mathematical and 
+#' Statistical Psychology, 77(1), 80--102. https://doi.org/10.1111/bmsp.12315
 #' 
 #' @export
 #'
