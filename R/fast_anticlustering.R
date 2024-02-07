@@ -77,7 +77,7 @@
 #' of exchanges that are investigated for each input element. The number of 
 #' exchange partners per element has to be set using the argument \code{k_neighbours}. By
 #' default, it is set to \code{Inf}, meaning that all possible swaps are
-#' tested. If \code{k_neighbours} is set (which is usually recommended when running 
+#' tested. If \code{k_neighbours} is set differently (which is usually recommended when running 
 #' this function), the default behaviour is to generate exchange partners using a
 #' nearest neighbour search (using the function \code{\link[RANN]{nn2}}
 #' from the \code{RANN} package). Using more exchange partners can improve the quality of
