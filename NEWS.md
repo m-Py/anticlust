@@ -14,7 +14,7 @@ Papenberg, M. (2024). K-plus Anticlustering: An Improved k-means Criterion for M
 
 ## Internal changes
 
-- (Regression) `anticlustering(..., objective = "variance")` temporarily uses pre 0.8.0 implementation to fix some CRAN issues
+- (Regression) `anticlustering(..., objective = "variance")` uses pre 0.8.0 implementation to fix some CRAN issues
 
 # anticlust 0.8.0
 
