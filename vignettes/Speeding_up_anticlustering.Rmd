@@ -25,7 +25,7 @@ This vignette documents various ways by which the speed of the anticlustering me
 
 ## The exchange algorithm
 
-The default anticlustering algorithm works by exchanging data points between clusters in such a way that exchanges improve the anticlustering objective as much as possible. Details on the exchange method may also be found in Papenberg and Klau (2021; https://doi.org/10.1037/met0000301), Papenberg (2023; https://doi.org/10.1111/bmsp.12315), or the `anticlust` documentation (`?anticlustering`). Basically, running more exchanges tends to improve the results, but the improvements are diminishing with many repetitions---especially for large data sets. So, to speed up anticlustering, we can reduce the number of exchanges. Here we will learn how to do that. However, first we learn how to slow down anticlustering. Slowing down can lead to better results and is recommended if you have the time.
+The default anticlustering algorithm works by exchanging data points between clusters in such a way that exchanges improve the anticlustering objective as much as possible. Details on the exchange method may also be found in Papenberg and Klau (2021; https://doi.org/10.1037/met0000301), Papenberg (2024; https://doi.org/10.1111/bmsp.12315), or the `anticlust` documentation (`?anticlustering`). Basically, running more exchanges tends to improve the results, but the improvements are diminishing with many repetitions---especially for large data sets. So, to speed up anticlustering, we can reduce the number of exchanges. Here we will learn how to do that. However, first we learn how to slow down anticlustering. Slowing down can lead to better results and is recommended if you have the time.
 
 ## Slowing down
 
@@ -218,7 +218,7 @@ Computing the standard k-means objective (which is done when using `anticlusteri
 
 [^minimization]: `fast_anticlustering()` minimizes the weighted sum of squared distances between cluster centroids and the overall data centroid; the distances between all individual data points and their cluster center are no longer computed. 
 
-Because the k-means objective has some disadvantages for anticlustering (see Papenberg, 2023),[^kmeansbad] you may consider using the k-plus objective, which extends---and effectively re-uses---the k-means criterion. It can also be applied to very large data sets using `fast_anticlustering()`. For example, the following code---using $N = 100000$, $K = 5$, 3 features and 10 exchange partners per element---runs quite quickly:
+Because the k-means objective has some disadvantages for anticlustering (see Papenberg, 2024),[^kmeansbad] you may consider using the k-plus objective, which extends---and effectively re-uses---the k-means criterion. It can also be applied to very large data sets using `fast_anticlustering()`. For example, the following code---using $N = 100000$, $K = 5$, 3 features and 10 exchange partners per element---runs quite quickly:
 
 [^kmeansbad]: The primary disadvantage is that k-means anticlustering only leads to similarity in means, but not in standard deviations or any other distribution aspects; the k-plus criterion can be used to equalize any distribution moments between groups.
 
