@@ -109,6 +109,8 @@ system.time(anticlustering(data, K = K))
 system.time(anticlustering(data, K = K, preclustering = TRUE))
 ```
 
+Still, the preclustering approach is probably not necessarily recommended to speed up anticlustering for very large data sets; it is useful if you are interested in enforcing the preclustering restrictions in the groupings.
+
 ### Secret hack
 
 There is also an additional "hidden" method to make the `anticlustering()` function run faster. This method also relies on using fewer exchange partners during the exchange process, but does not use preclustering or the approach used in `fast_anticlustering()`. This approach is documented here and mostly relies on a dirty "hack" involving the `anticlustering()` argument `categories`. Since it works with `anticlustering()`, it can be used for all anticlustering objectives (unlike `fast_anticlustering()`). Let's see how it works:
