@@ -144,8 +144,9 @@
 #' unsolvable <- as.dist(unsolvable)
 #' unsolvable
 #' optimal_dispersion(unsolvable, K = 2)
+#' # But:
+#' optimal_dispersion(unsolvable, K = c(2, 4)) # group sizes, not number of groups
 #' 
-#'
 
 optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = NULL) {
   

@@ -137,7 +137,8 @@ unsolvable[5, 1] <- -1
 unsolvable <- as.dist(unsolvable)
 unsolvable
 optimal_dispersion(unsolvable, K = 2)
-
+# But:
+optimal_dispersion(unsolvable, K = c(2, 4)) # group sizes, not number of groups
 
 }
 \references{
