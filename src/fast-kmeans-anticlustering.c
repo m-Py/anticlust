@@ -82,8 +82,6 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
           
           // Initialize `best` variable for the i'th item
           double best_reduction = 0;
-          best_obj_cl1 = OBJ_BY_CLUSTER[cl1];
-          copy_array(m, CENTERS[cl1], best_centers_cl1);
           int exchange_cluster_found = 0;
           
           size_t j;
@@ -103,11 +101,9 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
               // Initialize `tmp` variables for the exchange partner:
               copy_array(m, CENTERS[cl1], tmp_center1);
               copy_array(m, CENTERS[cl2], tmp_center2);
-              copy_array(m, CENTERS[cl2], best_centers_cl2);
               tmp_obj_cl1 = OBJ_BY_CLUSTER[cl1];
               tmp_obj_cl2 = OBJ_BY_CLUSTER[cl2];
-              best_obj_cl2 = OBJ_BY_CLUSTER[cl2];
-              
+
               fast_update_one_center(
                 i, j, n, m,
                 data, tmp_center1, 
