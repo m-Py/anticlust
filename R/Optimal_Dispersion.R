@@ -17,6 +17,8 @@
 #'   is returned.
 #' @param npartitions The number of groupings that are returned, each having an optimal
 #'   dispersion value (defaults to 1).
+#' @param presolve Logical (default = FALSE): Use a heuristic to initialize the 
+#'   first distance instead of using the minimum distance at the beginning of the algorithm?
 #'
 #' @export
 #' 
