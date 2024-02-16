@@ -155,7 +155,7 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
   
   if (argument_exists(solver)) {
     validate_input(solver, "solver", objmode = "character", len = 1,
-                   input_set = c("glpk", "symphony"), not_na = TRUE, not_function = TRUE)
+                   input_set = c("glpk", "symphony", "Gecode"), not_na = TRUE, not_function = TRUE)
   } else {
     solver <- find_ilp_solver()
   }
@@ -183,6 +183,7 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
   dispersion_found <- FALSE
   # Data frame to keep track of previous nearest neighbours (init as NULL)
   all_nns <- NULL
+
   # Placeholders to store data needed for retrieving the anticlusters
   last_solution <- NULL
   all_nns_last <- NULL
@@ -209,9 +210,13 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
     # Reorder edge labels so that they start from 1 to C, where C is the number
     # of relevant edges (Better for creating K-coloring ILP).
     all_nns_reordered <- reorder_edges(all_nns)
-    # Construct graph from all previous edges (that had low distances)
-    ilp <- k_coloring_ilp(all_nns_reordered, N, K, target_groups)
-    solution <- solve_ilp_graph_colouring(ilp, solver)
+    if (solver == "Gecode") {
+      solution <- constraintV9(K, all_nns_reordered, target_groups, solver)
+    } else {
+      # Construct graph from all previous edges (that had low distances)
+      ilp <- k_coloring_ilp(all_nns_reordered, N, K, target_groups)
+      solution <- solve_ilp_graph_colouring(ilp, solver)
+    }
     dispersion_found <- solution$status != 0 
     if (!dispersion_found){
       last_solution <- solution
@@ -450,4 +455,39 @@ reorder_edges <- function(edgelist) {
 remove_redundant_edges <- function(df) {
   df <- t(apply(df, 1, sort))
   df[!duplicated(df), ]
+}
+
+# Written by Lars Torben Schwabe: 
+constraintV9 <- function(number_clusters, edges, target_groups, solver_name){
+  number_edges <- nrow(edges)
+  number_nodes <- max(edges)
+  data <- paste("number_nodes = ",as.character(number_nodes),"; number_clusters = ",
+                as.character(number_clusters),"; number_edges = ",as.character(number_edges),
+                "; edges1 = [",paste(edges[,1], collapse = ", "),"]; edges2 = [",paste(edges[,2], collapse = ", "),"]; target_groups = [",
+                paste(target_groups, collapse = ", "),"];")
+  dzn_file <- file.path(tempdir(), "minizinc_input.dzn")
+  writeLines(data, con = dzn_file)
+  modelfile <- system.file("MinizincModel20.mzn", package="anticlust")
+  out <- system(paste("minizinc --solver ", solver_name,"--disable-all-satisfaction --time-limit 60000", modelfile, dzn_file), intern = TRUE, ignore.stderr = TRUE)
+  if(out[1] != "=====UNSATISFIABLE====="){
+    num <- as.numeric(unlist(stringr::str_extract_all(out, "\\d+")))
+    color_of_nodes <- num
+    dispersion_found <- 0;
+    colors_matrix <- matrix(0,number_nodes,number_clusters)
+    for(i in 1:number_nodes){
+      colors_matrix[i,color_of_nodes[i]]=1
+    }
+    colors_vector <- unlist(t(colors_matrix))
+    names(colors_vector) <- paste("x" ,rep(1:number_nodes, each = number_clusters),
+                                  rep(1:number_clusters, times = number_nodes), sep = "_")
+    w_vector <- rep(1,number_clusters)  
+    names(w_vector) <- paste("w" ,1:number_clusters, sep = "_")
+    x_vector <- c(w_vector, colors_vector)
+    solution <- list(x = x_vector, obj = number_clusters, status = dispersion_found)
+    return(solution)
+  }else{
+    dispersion_found <- 1;
+    solution <- list(obj = 0, status = dispersion_found)
+    return(solution)
+  }
 }
