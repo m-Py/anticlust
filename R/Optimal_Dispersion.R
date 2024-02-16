@@ -253,10 +253,19 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
     }
   }
   
+  group_fixated <- graph_coloring_to_group_vector(
+    all_nns_reordered = all_nns_reordered_last, 
+    result_x = last_solution$x, 
+    K = K, 
+    all_nns = all_nns_last, 
+    N = N
+  )
+  
   return(
     list(
       dispersion = dispersion, 
       groups = groups,
+      groups_fixated = group_fixated,
       edges = unname(all_nns_last), # rownames can be quite ugly here
       dispersions_considered = c(dispersions_considered, dispersion)
     )
@@ -406,7 +415,25 @@ repeat_grouping <- function(X, result_value, result_x, all_nns, all_nns_reordere
 
 # Restore a grouping from the solved ilp
 groups_from_k_coloring_mapping <- function(result_value, result_x, all_nns, all_nns_reordered, N, K, target_groups) {
-  
+  groups_new <- graph_coloring_to_group_vector(all_nns_reordered, result_x, K, all_nns, N)
+  # now we have the original indices, assign remaining elements randomly to groups
+  # how many are not yet assigned
+  add_unassigned_elements(target_groups, groups_new, N, K)
+}
+
+add_unassigned_elements <- function(target_groups, groups_new, N, K) {
+  freq_not_assigned <- target_groups - table(groups_new)
+  assigned <- table(groups_new)
+  # Randomly fill other groups that are not yet full
+  if (sum(assigned) < N) {
+    groups_new[is.na(groups_new)] <- sample_(rep(1:K, freq_not_assigned))
+  }
+  # now sort labels by group size (so that each time this function is called, we get the same output of table())
+  new_labels <- order(table(groups_new), decreasing = TRUE)
+  as.numeric(as.character(factor(groups_new, levels = 1:K, labels = new_labels)))
+}
+
+graph_coloring_to_group_vector <- function(all_nns_reordered, result_x, K, all_nns, N) {
   # Retrieve assigned colors from the x_v,i ILP variables
   mapping <- rep(NA, max(all_nns_reordered))
   matrix <- matrix(result_x[-(1:K)], nrow=K)
@@ -424,17 +451,7 @@ groups_from_k_coloring_mapping <- function(result_value, result_x, all_nns, all_
   # create vector with groupings
   groups_new <- rep(NA, N)
   groups_new[df$id] <- df$mapping
-  # now we have the original indices, assign remaining elements randomly to groups
-  # how many are not yet assigned
-  freq_not_assigned <- target_groups - table(groups_new)
-  assigned <- table(groups_new)
-  # Randomly fill other groups that are not yet full
-  if (sum(assigned) < N) {
-    groups_new[is.na(groups_new)] <- sample_(rep(1:K, freq_not_assigned))
-  }
-  # now sort labels by group size (so that each time this function is called, we get the same output of table())
-  new_labels <- order(table(groups_new), decreasing = TRUE)
-  as.numeric(as.character(factor(groups_new, levels = 1:K, labels = new_labels)))
+  groups_new
 }
 
 # Function that takes an edge list with any integer indices and remaps
