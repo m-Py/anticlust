@@ -149,7 +149,7 @@
 #' 
 #'
 
-optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = NULL, npartitions = 1) {
+optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = NULL, npartitions = 1, presolve = FALSE) {
   
   if (argument_exists(solver)) {
     validate_input(solver, "solver", objmode = "character", len = 1,
@@ -190,10 +190,19 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
   MINIMUM_DISTANCE <- min(distances)
   while (!dispersion_found) {
     dispersion <- min(distances)
+    # presolve: get higher initial dispersion estimate using heuristic
+    if (presolve && counter == 1) {
+      estimate_opt_dispersion <- dispersion_objective(
+        as.dist(distances),
+        anticlustering(as.dist(distances), K = target_groups, method = "brusco", objective = "dispersion")
+      )
+      sorted_unique_distances <- sort(unique(distances))
+      dispersion <- sorted_unique_distances[which(sorted_unique_distances == estimate_opt_dispersion)[1] - 1] #init usage
+    }
     if (dispersion >= max_dispersion_considered) {
       break
     }
-    ids_of_nearest_neighbours <- which(dispersion == distances, arr.ind = TRUE)
+    ids_of_nearest_neighbours <- which(distances <= dispersion, arr.ind = TRUE)
     all_nns <- rbind(all_nns, remove_redundant_edges(ids_of_nearest_neighbours))
     # Reorder edge labels so that they start from 1 to C, where C is the number
     # of relevant edges (Better for creating K-coloring ILP).
