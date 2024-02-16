@@ -9,7 +9,8 @@ optimal_dispersion(
   K,
   solver = NULL,
   max_dispersion_considered = NULL,
-  npartitions = 1
+  npartitions = 1,
+  presolve = FALSE
 )
 }
 \arguments{
@@ -33,6 +34,9 @@ is returned.}
 
 \item{npartitions}{The number of groupings that are returned, each having an optimal
 dispersion value (defaults to 1).}
+
+\item{presolve}{Logical (default = FALSE): Use a heuristic to initialize the 
+first distance instead of using the minimum distance at the beginning of the algorithm?}
 }
 \value{
 A list with four elements:  
