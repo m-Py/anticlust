@@ -10,7 +10,9 @@ optimal_dispersion(
   solver = NULL,
   max_dispersion_considered = NULL,
   npartitions = 1,
-  presolve = FALSE
+  presolve = FALSE,
+  first_feasible = FALSE,
+  init_dispersion = NULL
 )
 }
 \arguments{

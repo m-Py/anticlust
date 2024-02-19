@@ -151,7 +151,7 @@
 #' 
 #'
 
-optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = NULL, npartitions = 1, presolve = FALSE) {
+optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = NULL, npartitions = 1, presolve = FALSE, first_feasible = FALSE, init_dispersion = NULL) {
   
   if (argument_exists(solver)) {
     validate_input(solver, "solver", objmode = "character", len = 1,
@@ -189,6 +189,7 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
   all_nns_last <- NULL
   all_nns_reordered_last <- NULL
   dispersions_considered <- NULL
+  times <- NULL
   counter <- 1
   MINIMUM_DISTANCE <- min(distances)
   while (!dispersion_found) {
@@ -201,6 +202,8 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
       )
       sorted_unique_distances <- sort(unique(distances))
       dispersion <- sorted_unique_distances[which(sorted_unique_distances == estimate_opt_dispersion)[1] - 1] #init usage
+    } else if (argument_exists(init_dispersion) && counter == 1) {
+      dispersion <- init_dispersion
     }
     if (dispersion >= max_dispersion_considered) {
       break
@@ -210,20 +213,28 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
     # Reorder edge labels so that they start from 1 to C, where C is the number
     # of relevant edges (Better for creating K-coloring ILP).
     all_nns_reordered <- reorder_edges(all_nns)
+    start <- Sys.time()
     if (solver == "Gecode") {
       solution <- constraintV9(K, all_nns_reordered, target_groups, solver)
     } else {
       # Construct graph from all previous edges (that had low distances)
       ilp <- k_coloring_ilp(all_nns_reordered, N, K, target_groups)
-      solution <- solve_ilp_graph_colouring(ilp, solver)
+      solution <- solve_ilp_graph_colouring(ilp, solver, first_feasible)
     }
-    dispersion_found <- solution$status != 0 
+    end <- Sys.time()
+    dispersion_found <- ifelse(
+      solver == "symphony" && first_feasible,
+      names(solution$status) != "TM_FOUND_FIRST_FEASIBLE",
+      solution$status != 0
+    )
     if (!dispersion_found){
       last_solution <- solution
       all_nns_last <- all_nns
       all_nns_reordered_last <- all_nns_reordered
       dispersions_considered <- c(dispersions_considered, dispersion)
+      
     }
+    times <- c(times, as.numeric(difftime(end, start, units = "s")))
     counter <- counter + 1
     # Take out distances that have been investigated to proceed
     distances[ids_of_nearest_neighbours] <- Inf 
@@ -263,7 +274,8 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
       dispersion = dispersion, 
       groups = groups,
       edges = unname(all_nns_last), # rownames can be quite ugly here
-      dispersions_considered = c(dispersions_considered, dispersion)
+      dispersions_considered = c(dispersions_considered, dispersion),
+      times = times
     )
   )
 }
@@ -376,7 +388,7 @@ constraint_names <- function(nr_of_nodes, K) {
 
 # allow for different solvers (Symphony, GLPK)
 
-solve_ilp_graph_colouring <- function(ilp, solver) {
+solve_ilp_graph_colouring <- function(ilp, solver, first_feasible) {
   
   # solver_function = Rglpk::Rglpk_solve_LP OR Rsymphony::Rsymphony_solve_LP
   # name_opt (refers to the output of the function) = "objval" (GLPK) OR "optimum" (Symphony)
@@ -390,7 +402,8 @@ solve_ilp_graph_colouring <- function(ilp, solver) {
     dir = ilp$equalities,
     rhs = ilp$rhs,
     types = "B",
-    max = FALSE
+    max = FALSE,
+    first_feasible = first_feasible
   )
 
   # return the optimal value and the variable assignment
