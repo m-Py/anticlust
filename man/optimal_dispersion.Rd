@@ -9,10 +9,8 @@ optimal_dispersion(
   K,
   solver = NULL,
   max_dispersion_considered = NULL,
-  npartitions = 1,
-  presolve = FALSE,
-  first_feasible = FALSE,
-  init_dispersion = NULL
+  min_dispersion_considered = NULL,
+  npartitions = 1
 )
 }
 \arguments{
@@ -34,11 +32,11 @@ represent pairwise dissimilarities.}
 is equal to or exceeds this value, a solution having the previous best dispersion 
 is returned.}
 
+\item{min_dispersion_considered}{Optional argument used for speeding up the algorithm computation. 
+If passed, the dispersion is optimized starting from this value instead the global minimum distance.}
+
 \item{npartitions}{The number of groupings that are returned, each having an optimal
 dispersion value (defaults to 1).}
-
-\item{presolve}{Logical (default = FALSE): Use a heuristic to initialize the 
-first distance instead of using the minimum distance at the beginning of the algorithm?}
 }
 \value{
 A list with four elements:  

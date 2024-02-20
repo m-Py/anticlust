@@ -15,10 +15,10 @@
 #' @param max_dispersion_considered Optional argument used for early stopping. If the dispersion found
 #'   is equal to or exceeds this value, a solution having the previous best dispersion 
 #'   is returned.
+#' @param min_dispersion_considered Optional argument used for speeding up the algorithm computation. 
+#'   If passed, the dispersion is optimized starting from this value instead the global minimum distance.
 #' @param npartitions The number of groupings that are returned, each having an optimal
 #'   dispersion value (defaults to 1).
-#' @param presolve Logical (default = FALSE): Use a heuristic to initialize the 
-#'   first distance instead of using the minimum distance at the beginning of the algorithm?
 #'
 #' @export
 #' 
@@ -151,8 +151,14 @@
 #' 
 #'
 
-optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = NULL, npartitions = 1, presolve = FALSE, first_feasible = FALSE, init_dispersion = NULL) {
-  
+
+optimal_dispersion <- function(
+    x, K, 
+    solver = NULL, 
+    max_dispersion_considered = NULL, 
+    min_dispersion_considered = NULL,
+    npartitions = 1) {
+
   if (argument_exists(solver)) {
     validate_input(solver, "solver", objmode = "character", len = 1,
                    input_set = c("glpk", "symphony", "Gecode"), not_na = TRUE, not_function = TRUE)
@@ -169,12 +175,19 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
     validate_input(max_dispersion_considered, "max_dispersion_considered", 
                    objmode = "numeric", len = 1, not_na = TRUE, not_function = TRUE)
   }
-
+  
   distances <- convert_to_distances(x)
   diag(distances) <- Inf
   N <- nrow(distances)
   if (!(length(K) == 1 || sum(K) == N)) {
     stop("Argument `K` is misspecified.")
+  }
+  
+  if (argument_exists(min_dispersion_considered)) {
+    validate_input(min_dispersion_considered, "min_dispersion_considered", 
+                   objmode = "numeric", len = 1, not_na = TRUE, not_function = TRUE)
+    sorted_unique_distances <- sort(unique(distances))
+    dispersion <- sorted_unique_distances[which(sorted_unique_distances == min_dispersion_considered)[1] - 1]
   }
   
   # `target_groups` is primarily needed for unequal sized groups
@@ -193,17 +206,8 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
   counter <- 1
   MINIMUM_DISTANCE <- min(distances)
   while (!dispersion_found) {
-    dispersion <- min(distances)
-    # presolve: get higher initial dispersion estimate using heuristic
-    if (presolve && counter == 1) {
-      estimate_opt_dispersion <- dispersion_objective(
-        as.dist(distances),
-        anticlustering(as.dist(distances), K = target_groups, method = "brusco", objective = "dispersion")
-      )
-      sorted_unique_distances <- sort(unique(distances))
-      dispersion <- sorted_unique_distances[which(sorted_unique_distances == estimate_opt_dispersion)[1] - 1] #init usage
-    } else if (argument_exists(init_dispersion) && counter == 1) {
-      dispersion <- init_dispersion
+    if (is.null(min_dispersion_considered) || counter > 1) {
+      dispersion <- min(distances)
     }
     if (dispersion >= max_dispersion_considered) {
       break
@@ -219,14 +223,10 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
     } else {
       # Construct graph from all previous edges (that had low distances)
       ilp <- k_coloring_ilp(all_nns_reordered, N, K, target_groups)
-      solution <- solve_ilp_graph_colouring(ilp, solver, first_feasible)
+      solution <- solve_ilp_graph_colouring(ilp, solver)
     }
     end <- Sys.time()
-    dispersion_found <- ifelse(
-      solver == "symphony" && first_feasible,
-      names(solution$status) != "TM_FOUND_FIRST_FEASIBLE",
-      solution$status != 0
-    )
+    dispersion_found <- solution$status != 0
     if (!dispersion_found){
       last_solution <- solution
       all_nns_last <- all_nns
@@ -397,7 +397,7 @@ constraint_names <- function(nr_of_nodes, K) {
 
 # allow for different solvers (Symphony, GLPK)
 
-solve_ilp_graph_colouring <- function(ilp, solver, first_feasible) {
+solve_ilp_graph_colouring <- function(ilp, solver) {
   
   # solver_function = Rglpk::Rglpk_solve_LP OR Rsymphony::Rsymphony_solve_LP
   # name_opt (refers to the output of the function) = "objval" (GLPK) OR "optimum" (Symphony)
@@ -411,8 +411,7 @@ solve_ilp_graph_colouring <- function(ilp, solver, first_feasible) {
     dir = ilp$equalities,
     rhs = ilp$rhs,
     types = "B",
-    max = FALSE,
-    first_feasible = first_feasible
+    max = FALSE
   )
 
   # return the optimal value and the variable assignment
