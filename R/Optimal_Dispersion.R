@@ -422,6 +422,9 @@ groups_from_k_coloring_mapping <- function(result_value, result_x, all_nns, all_
 }
 
 add_unassigned_elements <- function(target_groups, groups_new, N, K) {
+  if (sum(!is.na(groups_new)) == N) {
+    return(groups_new)  # groups are already full, no unassigned elements!
+  }
   freq_not_assigned <- target_groups - table(groups_new)
   assigned <- table(groups_new)
   # Randomly fill other groups that are not yet full
