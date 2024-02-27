@@ -12,7 +12,8 @@ anticlustering(
   preclustering = FALSE,
   categories = NULL,
   repetitions = NULL,
-  standardize = FALSE
+  standardize = FALSE,
+  cannot_link = NULL
 )
 }
 \arguments{
@@ -56,6 +57,9 @@ best objective found across the repetitions is returned.}
 feature matrix, the data is standardized through a call to
 \code{\link{scale}} before the optimization starts. This
 argument is silently ignored if \code{x} is a distance matrix.}
+
+\item{cannot_link}{A 2 column matrix containing the indices of elements
+that must not be assigned to the same anticluster.}
 }
 \value{
 A vector of length N that assigns a group (i.e, a number

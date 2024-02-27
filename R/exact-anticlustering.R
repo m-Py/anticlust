@@ -15,7 +15,7 @@
 #'
 #' @noRd
 
-exact_anticlustering <- function(data, K, preclustering) {
+exact_anticlustering <- function(data, K, preclustering, cannot_link) {
   
   distances <- convert_to_distances(data)
   N <- nrow(distances)
@@ -35,6 +35,10 @@ exact_anticlustering <- function(data, K, preclustering) {
     solution <- solve_ilp_diversity(ilp)
     assignment <- ilp_to_groups(solution, N)
     return(assignment)
+  }
+  
+  if (argument_exists(cannot_link)) {
+    distances[rbind(cannot_link, t(apply(cannot_link, 1, rev)))] <- -(sum(distances) + 1)
   }
 
   ## Here the ILP is created without adjusting distances; i.e., true

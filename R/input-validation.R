@@ -7,7 +7,22 @@
 #' @noRd
 input_validation_anticlustering <- function(x, K, objective, method,
                                           preclustering, categories,
-                                          repetitions, standardize = FALSE) {
+                                          repetitions, standardize = FALSE, cannot_link = NULL) {
+  
+  if (argument_exists(cannot_link)) {
+    validate_input(cannot_link, "cannot_link", objmode = "numeric", not_na = TRUE, not_function = TRUE)
+    if (method == "brusco") {
+      stop("BILS method still to be implemented with cannot-link constraints in anticlustering().")
+    }
+    if (objective == "dispersion") {
+      stop("objective = dispersion does not work with cannot_link constraints.")
+    }
+    if (argument_exists(categories)) {
+      stop("\nCombining the `categories` argument together with cannot-link constraints \n",
+           "is currently not supported; use the categorical variables as part of the first argument\n",
+           "`x` instead (see the vignette on categorical variables).")
+    }
+  }
   
   validate_input(standardize, "standardize", objmode = "logical", len = 1,
                  input_set = c(TRUE, FALSE), not_na = TRUE, not_function = TRUE)
