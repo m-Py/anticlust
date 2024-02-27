@@ -22,6 +22,9 @@ input_validation_anticlustering <- function(x, K, objective, method,
            "is currently not supported; use the categorical variables as part of the first argument\n",
            "`x` instead (see the vignette on categorical variables).")
     }
+    if (isTRUE(preclustering)) {
+      stop("It is not possible to combine preclustering with cannot-link constraints.")
+    }
   }
   
   validate_input(standardize, "standardize", objmode = "logical", len = 1,
