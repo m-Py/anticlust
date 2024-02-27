@@ -381,7 +381,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
       init <- initialize_clusters(N, K, NULL)
     }
     return(cannot_link_anticlustering(
-      x = distances, 
+      x = convert_to_distances(x), 
       init_clusters = init,
       cannot_link = cannot_link,
       objective = objective,
