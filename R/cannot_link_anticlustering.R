@@ -1,5 +1,5 @@
 
-#' @export
+
 cannot_link_anticlustering <- function(x, init_clusters, cannot_link, objective, method) {
 
   if (objective == "kplus") {

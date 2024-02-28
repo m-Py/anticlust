@@ -3,7 +3,6 @@
 export(anticlustering)
 export(balanced_clustering)
 export(bicriterion_anticlustering)
-export(cannot_link_anticlustering)
 export(categorical_sampling)
 export(categories_to_binary)
 export(dispersion_objective)
