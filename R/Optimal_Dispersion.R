@@ -481,7 +481,7 @@ remove_redundant_edges <- function(df) {
 optimal_cannot_link <- function(N, K, target_groups, cannot_link, repetitions) {
   all_nns_reordered <- reorder_edges(cannot_link)
   ilp <- k_coloring_ilp(all_nns_reordered, N, K, target_groups)
-  solution <- solve_ilp_graph_colouring(ilp, solver)
+  solution <- solve_ilp_graph_colouring(ilp, find_ilp_solver())
   if (solution$status != 0) {
     stop("The cannot-link constraints cannot be fulfilled.")
   } else {
