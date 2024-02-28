@@ -11,15 +11,12 @@ input_validation_anticlustering <- function(x, K, objective, method,
   
   if (argument_exists(cannot_link)) {
     cannot_link <- as.matrix(cannot_link)
-    validate_input(cannot_link, "cannot_link", objmode = "numeric", must_be_integer = TRUE, not_na = TRUE, not_function = TRUE)
+    validate_input(cannot_link, "cannot_link", 
+                   objmode = "numeric", must_be_integer = TRUE, 
+                   greater_than = 0, smaller_than = NROW(x), 
+                   not_na = TRUE, not_function = TRUE)
     if (ncol(cannot_link) != 2) {
       stop("Argument cannot_link must have 2 columns.")
-    }
-    if (max(cannot_link) > NROW(x)) {
-      stop("Argument cannot_link contains indices that are too large (i.e., > N.")
-    }
-    if (min(cannot_link) < 1) {
-      stop("Argument cannot_link contains zero or negative indices.")
     }
     if (objective == "dispersion") {
       stop("objective = dispersion does not work with cannot_link constraints.")
