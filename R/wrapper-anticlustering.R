@@ -369,7 +369,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   }
   
   if (argument_exists(cannot_link)) {
-    if (length(K) != N) {
+    if (length(K) != N) { # no initial clustering was passed! Solve cannot-link constraints via optimal dispersion here
       cannot_link_matrix <- matrix(1, ncol = N, nrow = N)
       cannot_link_matrix[rbind(cannot_link, t(apply(cannot_link, 1, rev)))] <- -1
       init <- optimal_dispersion(
@@ -377,7 +377,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
         K = K, 
         npartitions = ifelse(argument_exists(repetitions), repetitions, 1)
       )$groups
-    } else {
+    } else { # initial clustering was passed
       init <- initialize_clusters(N, K, NULL)
     }
     return(cannot_link_anticlustering(

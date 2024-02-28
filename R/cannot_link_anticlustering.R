@@ -1,5 +1,20 @@
 
 
+#' Use cannot-link constraints with anticlustering
+#' 
+#' @param x An N x M feature matrix or N x N distance matrix
+#' @param init_clusters vector of initial clusters or matrix with N columns where each row is an initial partition
+#'   (usually a structure returned by optimal_dispersion() in the slot $groups)
+#' @param cannot_link A 2 column matrix containing the indices of elements
+#'     that must not be assigned to the same anticluster. (e.g., a matrix returned by
+#'     optimal_dispersion() in the slot $edges)
+#' @param objective "diversity", "average-diversity", "variance" or "kplus" (not dispersion!)
+#' @param method "local-maximum" or "exchange" (TODO: "brusco"!)
+#' 
+#' @note
+#' This function uses the average diversity objective if some groups are unequaled-sized
+#' 
+#' @noRd
 cannot_link_anticlustering <- function(x, init_clusters, cannot_link, objective, method) {
 
   if (objective == "kplus") {
@@ -31,7 +46,7 @@ cannot_link_anticlustering <- function(x, init_clusters, cannot_link, objective,
     init_clusters <- NULL
   } else {
     K <- init_clusters[1, ]
-    init_clusters <- init_clusters - 1 # for C
+    init_clusters <- init_clusters - 1 # -1 for C
   }
 
   c_anticlustering(
