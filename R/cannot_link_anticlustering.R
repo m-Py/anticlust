@@ -16,7 +16,9 @@
 #' 
 #' @noRd
 cannot_link_anticlustering <- function(x, init_clusters, cannot_link, objective, method) {
-
+  
+  cannot_link <- as.matrix(cannot_link)
+  
   if (objective == "kplus") {
     x <- kplus_moment_variables(x, 2)
     objective <- "variance"

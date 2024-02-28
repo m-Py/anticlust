@@ -10,9 +10,16 @@ input_validation_anticlustering <- function(x, K, objective, method,
                                           repetitions, standardize = FALSE, cannot_link = NULL) {
   
   if (argument_exists(cannot_link)) {
+    cannot_link <- as.matrix(cannot_link)
     validate_input(cannot_link, "cannot_link", objmode = "numeric", not_na = TRUE, not_function = TRUE)
-    if (method == "brusco") {
-      stop("BILS method still to be implemented with cannot-link constraints in anticlustering().")
+    if (nrow(cannot_link) != 2) {
+      stop("Argument cannot_link must have 2 rows.")
+    }
+    if (max(cannot_link) > NROW(X)) {
+      stop("Argument cannot_link contains indices that are too large (i.e., > N.")
+    }
+    if (min(cannot_link) < 1) {
+      stop("Argument cannot_link contains zero or negative indices.")
     }
     if (objective == "dispersion") {
       stop("objective = dispersion does not work with cannot_link constraints.")
