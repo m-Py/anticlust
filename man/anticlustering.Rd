@@ -293,17 +293,16 @@ as well.
 }
 \examples{
 
-# Optimize the default diversity criterion
+# Use default method ("exchange") and the default diversity criterion, also include
+# a categorical variable via argument `categories`:
 anticlusters <- anticlustering(
   schaper2019[, 3:6],
   K = 3,
   categories = schaper2019$room
 )
-# Compare feature means by anticluster
-by(schaper2019[, 3:6], anticlusters, function(x) round(colMeans(x), 2))
-# Compare standard deviations by anticluster
-by(schaper2019[, 3:6], anticlusters, function(x) round(apply(x, 2, sd), 2))
-# check that the "room" is balanced across anticlusters:
+# Compare feature means and standard deviations by anticluster
+mean_sd_tab(schaper2019[, 3:6], anticlusters)
+# Verify that the "room" is balanced across anticlusters:
 table(anticlusters, schaper2019$room)
 
 # Use multiple starts of the algorithm to improve the objective and
@@ -313,12 +312,11 @@ anticlusters <- anticlustering(
   objective = "variance",
   K = 3,
   categories = schaper2019$room,
-  method = "local-maximum",
-  repetitions = 2
+  method = "local-maximum", # better search algorithm
+  repetitions = 20 # multiple restarts of the algorithm 
 )
 # Compare means and standard deviations by anticluster
-by(schaper2019[, 3:6], anticlusters, function(x) round(colMeans(x), 2))
-by(schaper2019[, 3:6], anticlusters, function(x) round(apply(x, 2, sd), 2))
+mean_sd_tab(schaper2019[, 3:6], anticlusters)
 
 # Use different group sizes and optimize the extended k-means
 # criterion ("kplus")
@@ -327,16 +325,30 @@ anticlusters <- anticlustering(
   objective = "kplus",
   K = c(24, 24, 48),
   categories = schaper2019$room,
-  repetitions = 10,
+  repetitions = 20,
   method = "local-maximum",
-  standardize = TRUE
+  standardize = TRUE # ususally recommended
 )
 
+mean_sd_tab(schaper2019[, 3:6], anticlusters)
 table(anticlusters, schaper2019$room)
-# Compare means and standard deviations by anticluster
-by(schaper2019[, 3:6], anticlusters, function(x) round(colMeans(x), 2))
-by(schaper2019[, 3:6], anticlusters, function(x) round(apply(x, 2, sd), 2))
 
+# Use the heuristic by Brusco et al. (2020) for k-plus anticlustering
+# Include categorical variable as part of the optimization criterion rather 
+# than the argument categories! 
+anticlusters <- anticlustering(
+  cbind(
+    kplus_moment_variables(schaper2019[, 3:6], 2), 
+    categories_to_binary(schaper2019$room)
+  ),
+  objective = "variance", # k-plus anticlustering because of the input above!
+  K = 3,
+  repetitions = 20,
+  method = "brusco"
+)
+
+mean_sd_tab(schaper2019[, 3:6], anticlusters)
+table(anticlusters, schaper2019$room)
 
 }
 \references{
