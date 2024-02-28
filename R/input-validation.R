@@ -64,9 +64,6 @@ input_validation_anticlustering <- function(x, K, objective, method,
     if (preclustering == TRUE) {
       stop("It is not possible to use the algorithm by Brusco et al. with preclustering restrictions.")
     }
-    if (!objective %in% c("dispersion", "diversity")) {
-      stop("The algorithm by Brusco et al. can only be used to optimize diversity or dispersion.")
-    }
   }
   
                  
