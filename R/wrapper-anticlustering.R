@@ -43,8 +43,8 @@
 #'     feature matrix, the data is standardized through a call to
 #'     \code{\link{scale}} before the optimization starts. This
 #'     argument is silently ignored if \code{x} is a distance matrix.
-#' @param cannot_link A 2 column matrix containing the indices of elements
-#'     that must not be assigned to the same anticluster.
+#' @param cannot_link A 2 column matrix where each row has the indices 
+#'     of two elements that must not be assigned to the same anticluster.
 #'
 #' @return A vector of length N that assigns a group (i.e, a number
 #'     between 1 and \code{K}) to each input element.
