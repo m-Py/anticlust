@@ -7,7 +7,29 @@
 #' @noRd
 input_validation_anticlustering <- function(x, K, objective, method,
                                           preclustering, categories,
-                                          repetitions, standardize = FALSE) {
+                                          repetitions, standardize = FALSE, cannot_link = NULL) {
+  
+  if (argument_exists(cannot_link)) {
+    cannot_link <- as.matrix(cannot_link)
+    validate_input(cannot_link, "cannot_link", 
+                   objmode = "numeric", must_be_integer = TRUE, 
+                   greater_than = 0, smaller_than = NROW(x)+1, 
+                   not_na = TRUE, not_function = TRUE)
+    if (ncol(cannot_link) != 2) {
+      stop("Argument cannot_link must have 2 columns.")
+    }
+    if (objective == "dispersion") {
+      stop("objective = dispersion does not work with cannot_link constraints.")
+    }
+    if (argument_exists(categories)) {
+      stop("\nCombining the `categories` argument together with cannot-link constraints \n",
+           "is currently not supported; use the categorical variables as part of the first argument\n",
+           "`x` instead (see the vignette on categorical variables).")
+    }
+    if (isTRUE(preclustering)) {
+      stop("It is not possible to combine preclustering with cannot-link constraints.")
+    }
+  }
   
   validate_input(standardize, "standardize", objmode = "logical", len = 1,
                  input_set = c(TRUE, FALSE), not_na = TRUE, not_function = TRUE)
@@ -41,9 +63,6 @@ input_validation_anticlustering <- function(x, K, objective, method,
     }
     if (preclustering == TRUE) {
       stop("It is not possible to use the algorithm by Brusco et al. with preclustering restrictions.")
-    }
-    if (!objective %in% c("dispersion", "diversity")) {
-      stop("The algorithm by Brusco et al. can only be used to optimize diversity or dispersion.")
     }
   }
   

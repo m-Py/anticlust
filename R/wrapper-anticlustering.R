@@ -43,7 +43,8 @@
 #'     feature matrix, the data is standardized through a call to
 #'     \code{\link{scale}} before the optimization starts. This
 #'     argument is silently ignored if \code{x} is a distance matrix.
-#'     
+#' @param cannot_link A 2 column matrix where each row has the indices 
+#'     of two elements that must not be assigned to the same anticluster.
 #'
 #' @return A vector of length N that assigns a group (i.e, a number
 #'     between 1 and \code{K}) to each input element.
@@ -345,12 +346,12 @@
 
 anticlustering <- function(x, K, objective = "diversity", method = "exchange",
                            preclustering = FALSE, categories = NULL, 
-                           repetitions = NULL, standardize = FALSE) {
+                           repetitions = NULL, standardize = FALSE, cannot_link = NULL) {
 
 
   ## Get data into required format
   input_validation_anticlustering(x, K, objective, method, preclustering, 
-                                  categories, repetitions, standardize)
+                                  categories, repetitions, standardize, cannot_link)
 
   x <- to_matrix(x)
   N <- nrow(x)
@@ -358,13 +359,31 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   if (!is_distance_matrix(x) && standardize == TRUE) {
     x <- scale(x)
   }
+  
+  NUMBER_OF_ANTICLUSTERS <- length(table(initialize_clusters(N, K, NULL)))
+  TARGET_GROUPS <- table(initialize_clusters(N, K, NULL))
 
   ## Exact method using ILP
   if (method == "ilp") {
     if (objective == "dispersion") {
       return(optimal_dispersion(x, K)$groups)
     }
-    return(exact_anticlustering(x, K, preclustering))
+    return(exact_anticlustering(x, K, preclustering, cannot_link))
+  }
+  
+  if (argument_exists(cannot_link)) {
+    init <- initialize_clusters(N, K, NULL)
+    cannot_link <- as.matrix(cannot_link)
+    if (length(K) != N) { # no initial clustering was passed! Solve cannot-link constraints here
+      init <- optimal_cannot_link(N, NUMBER_OF_ANTICLUSTERS, table(init), cannot_link, repetitions)
+    }
+    return(cannot_link_anticlustering(
+      x = x, 
+      init_clusters = init,
+      cannot_link = cannot_link,
+      objective = objective,
+      method = method
+    ))
   }
 
   # Preclustering and categorical constraints are both processed in the
@@ -387,14 +406,25 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   
   # BILS by Brusco et al.:
   if (method == "brusco") {
-    if (objective == "diversity") {
-      weights <- c(0.5, 0.99, 0.999, 0.999999)
-      obj_fun <- diversity_objective_
-    } else if (objective == "dispersion") {
+    weights <- c(0.5, 0.99, 0.999, 0.999999)
+    obj_fun <- diversity_objective_
+    average_diversity <- FALSE
+    if (objective == "dispersion") {
       weights <- c(0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1)
       obj_fun <- dispersion_objective_
+    } else if (objective == "kplus") {
+      x <- kplus_moment_variables(x, 2)
+      objective <- "variance"
+    } 
+    if (objective == "variance") {
+      x <- convert_to_distances(x)^2
+      if (any(TARGET_GROUPS != TARGET_GROUPS[1])) {
+        average_diversity <- TRUE
+      }
     }
-    partitions <- as.matrix(bicriterion_anticlustering(x, K, repetitions, weights))
+    partitions <- as.matrix(
+      bicriterion_anticlustering(x, K, repetitions, weights, average_diversity = average_diversity)
+    )
     # get best partition wrt dispersion / diversity
     best_obj <- which.max(apply(partitions, 1, obj_fun, convert_to_distances(x)))
     return(partitions[best_obj, ])
