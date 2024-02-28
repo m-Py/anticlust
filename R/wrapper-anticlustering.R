@@ -353,6 +353,8 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   input_validation_anticlustering(x, K, objective, method, preclustering, 
                                   categories, repetitions, standardize, cannot_link)
 
+  NUMBER_OF_ANTICLUSTERS <- length(table(initialize_clusters(N, K, NULL)))
+  
   x <- to_matrix(x)
   N <- nrow(x)
   # there is a reason why scaling happens here and below (because of ILP + kplus)
@@ -369,16 +371,10 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   }
   
   if (argument_exists(cannot_link)) {
-    if (length(K) != N) { # no initial clustering was passed! Solve cannot-link constraints via optimal dispersion here
-      cannot_link_matrix <- matrix(1, ncol = N, nrow = N)
-      cannot_link_matrix[rbind(cannot_link, t(apply(cannot_link, 1, rev)))] <- -1
-      init <- optimal_dispersion(
-        as.dist(cannot_link_matrix), 
-        K = K, 
-        npartitions = ifelse(argument_exists(repetitions), repetitions, 1)
-      )$groups
-    } else { # initial clustering was passed
-      init <- initialize_clusters(N, K, NULL)
+    init <- initialize_clusters(N, K, NULL)
+    cannot_link <- as.matrix(cannot_link)
+    if (length(K) != N) { # no initial clustering was passed! Solve cannot-link constraints here
+      init <- optimal_cannot_link(N, NUMBER_OF_ANTICLUSTERS, table(init), cannot_link, repetitions)
     }
     return(cannot_link_anticlustering(
       x = x, 
