@@ -464,7 +464,7 @@ graph_coloring_to_group_vector <- function(all_nns_reordered, result_x, K, all_n
 
 # Function that takes an edge list with any integer indices and remaps
 # these indices to 1, ..., C (where C is the number of nodes) while 
-# preserving the original order of indices. This is important for igraph
+# preserving the original order of indices.
 reorder_edges <- function(edgelist) {
   dims <- dim(edgelist)
   edgelist <- as.numeric(as.factor(edgelist))
