@@ -36,10 +36,8 @@ cannot_link_anticlustering <- function(x, init_clusters, cannot_link, objective,
     objective <- "diversity"
   }
 
-
   # set cannot-link distances to large negative value so they cannot be linked
   x[rbind(cannot_link, t(apply(cannot_link, 1, rev)))] <- -(sum(x) + 1)
-  
   
   ## special case of only one init partition...
   init_clusters <- as.matrix(init_clusters)
@@ -51,6 +49,10 @@ cannot_link_anticlustering <- function(x, init_clusters, cannot_link, objective,
     init_clusters <- init_clusters - 1 # -1 for C
   }
 
+  if (method == "brusco") {
+    return(BILS_E_ALL_RESTRICTED(x, init_clusters, cannot_link))
+  }
+  
   c_anticlustering(
     x, 
     K = K, 
@@ -60,5 +62,18 @@ cannot_link_anticlustering <- function(x, init_clusters, cannot_link, objective,
     exchange_partners = NULL,
     init_partitions = init_clusters
   )
-  
 }
+
+
+# Wrapper for BILS method that preserves optimal dispersion and potentially uses multiple initial partitions
+BILS_E_ALL_RESTRICTED <- function(distances, init_clusters, cannot_link) {
+  multiple_partitions_as_input <- is.matrix(init_partitions)
+  PARTITIONS <- bicriterion_anticlustering(
+    distances, 
+    K = if (multiple_partitions_as_input) init_clusters[1, ] else length(unique(init_clusters)),
+    R = if (multiple_partitions_as_input) c(nrow(init_clusters), nrow(init_clusters)) else c(1, 10),
+    init_partitions = if (multiple_partitions_as_input) init_clusters else NULL
+  )
+  PARTITIONS[which.max(apply(PARTITIONS, 1, dispersion_objective, x = distances)), ]
+}
+
