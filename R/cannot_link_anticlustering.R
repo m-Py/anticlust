@@ -72,7 +72,7 @@ BILS_E_ALL_RESTRICTED <- function(distances, init_clusters, cannot_link) {
   multiple_partitions_as_input <- is.matrix(init_clusters)
   PARTITIONS <- bicriterion_anticlustering(
     distances, 
-    K = if (multiple_partitions_as_input) init_clusters[1, ] else length(unique(init_clusters)),
+    K = if (multiple_partitions_as_input) init_clusters[1, ] else init_clusters,
     R = if (multiple_partitions_as_input) c(nrow(init_clusters), 1) else c(1, 1),
     init_partitions = if (multiple_partitions_as_input) init_clusters else NULL
   )
