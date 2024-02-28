@@ -13,7 +13,7 @@ input_validation_anticlustering <- function(x, K, objective, method,
     cannot_link <- as.matrix(cannot_link)
     validate_input(cannot_link, "cannot_link", 
                    objmode = "numeric", must_be_integer = TRUE, 
-                   greater_than = 0, smaller_than = NROW(x), 
+                   greater_than = 0, smaller_than = NROW(x)+1, 
                    not_na = TRUE, not_function = TRUE)
     if (ncol(cannot_link) != 2) {
       stop("Argument cannot_link must have 2 columns.")
