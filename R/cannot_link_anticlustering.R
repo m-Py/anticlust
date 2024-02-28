@@ -11,9 +11,7 @@ cannot_link_anticlustering <- function(x, init_clusters, cannot_link, objective,
     x <- convert_to_distances(x)^2
   } else if (objective == "diversity") {
     x <- convert_to_distances(x)
-  } else {
-    stop("Argument 'objective' must be 'diversity', 'variance' or 'kplus'")
-  }
+  } 
   frequencies <- table(init_clusters)
   if (any(frequencies) != frequencies[1]) {
     objective <- "average-diversity"
