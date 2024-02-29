@@ -500,7 +500,7 @@ constraintV9 <- function(number_clusters, edges, target_groups, solver_name) {
   dzn_file <- file.path(tempdir(), "minizinc_input.dzn")
   writeLines(data, con = dzn_file)
   modelfile <- system.file("MinizincModel20.mzn", package="anticlust")
-  out <- system(paste("minizinc --solver ", solver_name,"--disable-all-satisfaction --time-limit 60000", modelfile, dzn_file), intern = TRUE, ignore.stderr = TRUE)
+  out <- system(paste("minizinc --solver ", solver_name,"--disable-all-satisfaction", modelfile, dzn_file), intern = TRUE, ignore.stderr = TRUE)
   if(out[1] != "=====UNSATISFIABLE====="){
     num <- as.numeric(unlist(stringr::str_extract_all(out, "\\d+")))
     color_of_nodes <- num
