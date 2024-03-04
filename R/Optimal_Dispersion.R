@@ -526,11 +526,16 @@ constraintV9 <- function(number_clusters, edges, target_groups, solver_name) {
 
 
 # Function to solve optimal cannot_link constraints, used for the argument 
-# cannot_link in anticlustering()
+# cannot_link in anticlustering().
+# In constraint-programming branch I use Gecode solver for K > 4
 optimal_cannot_link <- function(N, K, target_groups, cannot_link, repetitions) {
   all_nns_reordered <- reorder_edges(cannot_link)
-  ilp <- k_coloring_ilp(all_nns_reordered, N, K, target_groups)
-  solution <- solve_ilp_graph_colouring(ilp, find_ilp_solver())
+  if (K > 5) {
+    solution <- constraintV9(K, all_nns_reordered, target_groups, "Gecode")
+  } else {
+    ilp <- k_coloring_ilp(all_nns_reordered, N, K, target_groups)
+    solution <- solve_ilp_graph_colouring(ilp, find_ilp_solver())
+  }
   if (solution$status != 0) {
     stop("The cannot-link constraints cannot be fulfilled.")
   } 
