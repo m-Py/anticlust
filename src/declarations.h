@@ -238,7 +238,9 @@ void print_matrix(size_t N, size_t M, double matrix[N][M]);
 size_t one_dim_index(size_t i, size_t j, size_t n);
 double weighted_array_sum(size_t k, int* frequencies, double ARRAY[k]);
 
+// For WCE heuristic
 void wce_heuristic(double *data, int *N, int *clusters, int *mem_error);
+void wce_heuristic_average(double *data, int *N, int *clusters, int *mem_error);
 void swap_wce(size_t n, size_t i, size_t cl1, size_t cl2, struct node *CLUSTER_HEADS[n]);
-
 void cpp_similarities_(int *data, int *N, int *M, int *output);
+int number_elements_in_cluster(struct node *CLUSTER_HEAD);

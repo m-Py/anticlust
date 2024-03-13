@@ -63,6 +63,10 @@ diversity_objective <- function(x, clusters) {
   diversity_objective_(clusters, x)
 }
 
+average_diversity_objective <- function(x, clusters) {
+  sum(diversity_objective_by_group(clusters, x)  / table(clusters))
+}
+
 # other order of the arguments, needed for some internal handling
 diversity_objective_ <- function(clusters, x) {
   sum(diversity_objective_by_group(clusters, x))

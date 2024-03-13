@@ -11,6 +11,8 @@
 #' @param method Either "ilp" (default) or "local-maximum".
 #' @param repetitions Number of repetitions when using \code{method =
 #'     "local-maximum"}.
+#' @param average_diversity TRUE/FALSE (default FALSE) Optimize the average diversity. 
+#'     Only works for method = "local-maximum".
 #'
 #' @return An integer vector representing the cluster affiliation of
 #'     each data point
@@ -103,7 +105,7 @@
 #' data with transitivity clustering. Nature Methods, 7, 419–420.
 #'
 
-wce <- function(x, solver = NULL, method = "ilp", repetitions = NULL) {
+wce <- function(x, solver = NULL, method = "ilp", repetitions = NULL, average_diversity = FALSE) {
 
   validate_data_matrix(x)
   if (!is_distance_matrix(x)) {
@@ -122,20 +124,30 @@ wce <- function(x, solver = NULL, method = "ilp", repetitions = NULL) {
                      greater_than = 0, must_be_integer = TRUE, not_na = TRUE,
                      not_function = TRUE)
     }
+    validate_input(average_diversity, "average_diversity", objmode = "logical", len = 1, 
+                   not_na = TRUE, not_function = TRUE)
     repetitions <- ifelse(is.null(repetitions), 1, repetitions)
     if (repetitions > 1) {
-      solutions <- lapply(1:repetitions, heuristic_wce, x = x)
+      solutions <- lapply(1:repetitions, heuristic_wce, x = x, average_diversity = average_diversity)
       # Get best of all solutions
-      objs <- lapply(
-        solutions,
-        diversity_objective_,
-        x = x
-      )
+      if (!average_diversity) {
+        objs <- lapply(
+          solutions,
+          diversity_objective_,
+          x = x
+        )
+      } else {
+        objs <- lapply(
+          solutions,
+          average_diversity_objective,
+          x = x
+        )
+      }
       return(solutions[[which.max(objs)]])
     } else {
-      return(heuristic_wce(NULL, x))
+      return(heuristic_wce(NULL, x, average_diversity))
     }
-  } 
+  }
   # exact cluster editing:
   if (argument_exists(solver)) {
     validate_input(solver, "solver", objmode = "character", len = 1,
@@ -149,17 +161,28 @@ wce <- function(x, solver = NULL, method = "ilp", repetitions = NULL) {
 }
 
 # param X is for repetitions
-heuristic_wce <- function(X, x) {
+heuristic_wce <- function(X, x, average_diversity) {
   N <- nrow(x)
   rnd_order <- sample(N)
-  results <- .C(
-    "wce_heuristic", 
-    as.double(x[rnd_order, rnd_order]),
-    as.integer(N),
-    clusters = as.integer(0:(N-1)),
-    mem_error = as.integer(0),
-    PACKAGE = "anticlust"
-  )
+  if (average_diversity) {
+    results <- .C(
+      "wce_heuristic_average", 
+      as.double(x[rnd_order, rnd_order]),
+      as.integer(N),
+      clusters = as.integer(0:(N-1)),
+      mem_error = as.integer(0),
+      PACKAGE = "anticlust"
+    )
+  } else {
+    results <- .C(
+      "wce_heuristic", 
+      as.double(x[rnd_order, rnd_order]),
+      as.integer(N),
+      clusters = as.integer(0:(N-1)),
+      mem_error = as.integer(0),
+      PACKAGE = "anticlust"
+    )
+  }
   if (results[["mem_error"]] == 1) {
     stop("Could not allocate enough memory.")
   }

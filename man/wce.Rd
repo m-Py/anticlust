@@ -4,7 +4,13 @@
 \alias{wce}
 \title{Weighted cluster editing / Clique partitioning}
 \usage{
-wce(x, solver = NULL, method = "ilp", repetitions = NULL)
+wce(
+  x,
+  solver = NULL,
+  method = "ilp",
+  repetitions = NULL,
+  average_diversity = FALSE
+)
 }
 \arguments{
 \item{x}{A N x N similarity matrix. Larger values indicate stronger
@@ -17,6 +23,9 @@ or "symphony". See details.}
 
 \item{repetitions}{Number of repetitions when using \code{method =
 "local-maximum"}.}
+
+\item{average_diversity}{TRUE/FALSE (default FALSE) Optimize the average diversity. 
+Only works for method = "local-maximum".}
 }
 \value{
 An integer vector representing the cluster affiliation of
