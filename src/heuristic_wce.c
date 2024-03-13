@@ -93,20 +93,10 @@ void wce_heuristic(double *data, int *N, int *clusters, int *mem_error) {
                         DISTANCES[i][j] = data[offsets[j]++];
                 }
         }
-        
-        
-        // Initialize objective
-        double OBJ_BY_CLUSTER[n];
-        for (size_t i = 0; i < n; i++) {
-          OBJ_BY_CLUSTER[i] = 0;
-        }
 
         /* Some variables for bookkeeping during the optimization */
         
         size_t best_cluster;
-        double tmp_obj_cl1;
-        double tmp_obj_cl2;
-        double best_objs[n];
         double tmp_improvement; // encode if an exchange leads to improvement
 
         // does any improvement occur during exchange method? is used for finding local maximum
@@ -127,7 +117,6 @@ void wce_heuristic(double *data, int *N, int *clusters, int *mem_error) {
 
                         // Initialize `best` variable for the i'th item
                         double best_improvement = 0;
-                        copy_array(n, OBJ_BY_CLUSTER, best_objs);
                         
                         // encode if for element i, it was tested if it should be a singleton cluster
                         int singleton_tried = 0;
@@ -149,11 +138,8 @@ void wce_heuristic(double *data, int *N, int *clusters, int *mem_error) {
                                 }
                           
                                 // Initialize `tmp` variables for the exchange partner:
-                                tmp_obj_cl1 = OBJ_BY_CLUSTER[cl1];
-                                tmp_obj_cl2 = OBJ_BY_CLUSTER[cl2];
                                 // Update objective
                                 tmp_improvement = -sum_dists_i_cl1;
-                                tmp_obj_cl1 -= sum_dists_i_cl1;
                                 // Other cluster: Gains distances to element i --
                                 // compute distances between item i and all items in cluster `cl2`
                                 double sum_dists_i_cl2 = distances_one_element(
@@ -161,12 +147,9 @@ void wce_heuristic(double *data, int *N, int *clusters, int *mem_error) {
                                         CLUSTER_HEADS[cl2], i
                                 );
                                 tmp_improvement += sum_dists_i_cl2;
-                                tmp_obj_cl2 += sum_dists_i_cl2;
 
                                 // Update `best` variables if objective was improved
                                 if (tmp_improvement > best_improvement) {
-                                        best_objs[cl1] = tmp_obj_cl1;
-                                        best_objs[cl2] = tmp_obj_cl2;
                                         best_improvement = tmp_improvement;
                                         best_cluster = cl2;
                                         exchange_cluster_found = 1;
@@ -182,9 +165,6 @@ void wce_heuristic(double *data, int *N, int *clusters, int *mem_error) {
                                         n, i, cl1, best_cluster,
                                         CLUSTER_HEADS
                                 );
-                                // Update the "global" variables
-                                OBJ_BY_CLUSTER[cl1] = best_objs[cl1];
-                                OBJ_BY_CLUSTER[best_cluster] = best_objs[best_cluster];
                                 improvement = 1;
                         }
                 }
