@@ -244,3 +244,4 @@ void wce_heuristic_average(double *data, int *N, int *clusters, int *mem_error);
 void swap_wce(size_t n, size_t i, size_t cl1, size_t cl2, struct node *CLUSTER_HEADS[n]);
 void cpp_similarities_(int *data, int *N, int *M, int *output);
 int number_elements_in_cluster(struct node *CLUSTER_HEAD);
+int correction_factor(int N);

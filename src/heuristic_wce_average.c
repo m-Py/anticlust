@@ -158,10 +158,7 @@ void wce_heuristic_average(double *data, int *N, int *clusters, int *mem_error) 
                                 tmp_obj_cl2 = OBJ_BY_CLUSTER[cl2];
                                 // Update objective
                                 tmp_obj_cl1 -= sum_dists_i_cl1;
-                                if (N_CL1 > 1) {
-                                  tmp_obj_cl1 = tmp_obj_cl1 / (N_CL1 - 1); // average diversity! scale by N
-                                }
-                                
+
                                 // Other cluster: Gains distances to element i --
                                 // compute distances between item i and all items in cluster `cl2`
                                 double sum_dists_i_cl2 = distances_one_element(
@@ -170,17 +167,9 @@ void wce_heuristic_average(double *data, int *N, int *clusters, int *mem_error) 
                                 );
                                 
                                 tmp_obj_cl2 += sum_dists_i_cl2;
-                                tmp_obj_cl2 = tmp_obj_cl2 / (N_CL2 + 1); // average diversity! scale by N
-                                
-                                int scale_CL2_before; // prevent division by 0 when averaging diversity
-                                if (N_CL2 == 0) {
-                                  scale_CL2_before = 1;
-                                } else {
-                                  scale_CL2_before = N_CL2;
-                                }
-                                
-                                tmp_improvement = (tmp_obj_cl1 + tmp_obj_cl2) -
-                                  (OBJ_BY_CLUSTER[cl1] / N_CL1 + OBJ_BY_CLUSTER[cl2] / scale_CL2_before);
+
+                                tmp_improvement = (tmp_obj_cl1 / correction_factor(N_CL1 - 1) + tmp_obj_cl2 / correction_factor(N_CL2 + 1)) -
+                                  (OBJ_BY_CLUSTER[cl1] / correction_factor(N_CL1) + OBJ_BY_CLUSTER[cl2] / correction_factor(N_CL2));
 
                                 // Update `best` variables if objective was improved
                                 if (tmp_improvement > best_improvement) {
@@ -219,6 +208,14 @@ void wce_heuristic_average(double *data, int *N, int *clusters, int *mem_error) 
         free_points(POINTS, n);
         free_cluster_list(CLUSTER_HEADS, n);
         free_distances(n, DISTANCES, n);
+}
+
+int correction_factor(int N) {
+  if (N > 1) {
+    return N; // number of pairs
+  } else {
+    return 1;
+  }
 }
 
 int number_elements_in_cluster(struct node *CLUSTER_HEAD) {
