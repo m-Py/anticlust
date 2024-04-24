@@ -9,7 +9,8 @@ Papenberg, M. (2024). K-plus Anticlustering: An Improved k-means Criterion for M
 
 ## Internal changes
 
-- `fast_anticlustering()` received another internal change to improve the speed of the re-computation of the objective during the optimization. In particular, updating the objective is now done by only inspecting the two clusters between which an exchange actually took place, instead of re-computing a sum across all clusters.
+- `fast_anticlustering()` received [another internal change](https://github.com/m-Py/anticlust/commit/8d3c85dc0076) to improve the speed of the re-computation of the objective during the optimization. In particular, updating the objective is now done by only inspecting the two clusters between which an exchange actually took place, instead of re-computing a sum across all clusters.
+- A bug in `fast_anticlustering()` [was fixed](https://github.com/m-Py/anticlust/commit/957490ac2fe04); the computation of the objective did not incoorporate the cluster sizes
 
 # anticlust 0.8.2
 
