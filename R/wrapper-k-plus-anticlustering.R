@@ -2,7 +2,7 @@
 #' 
 #' Perform anticlustering using the k-plus objective to maximize between-group 
 #' similarity. This function implements the k-plus anticlustering method described 
-#' in Papenberg (2023; <doi:10.1111/bmsp.12315>).
+#' in Papenberg (2024; <doi:10.1111/bmsp.12315>).
 #'
 #' @param x A feature matrix where rows correspond to elements and columns
 #'     correspond to variables (a single numeric variable can be
@@ -34,7 +34,7 @@
 #' @details 
 #'     
 #'     This function implements the unweighted sum approach for k-plus 
-#'     anticlustering. Details are given in Papenberg (2023). 
+#'     anticlustering. Details are given in Papenberg (2024). 
 #'     
 #'     The optional argument \code{T} denotes the number of distribution 
 #'     moments that are considered in the anticlustering process. For example,
@@ -105,10 +105,9 @@
 #' 
 #' @references
 #' 
-#' Papenberg, M. (2023). K-plus Anticlustering: An Improved k-means Criterion 
-#' for Maximizing Between-Group Similarity. British Journal of Mathematical 
-#' and Statistical Psychology. Advance online publication. 
-#' https://doi.org/10.1111/bmsp.12315
+#' Papenberg, M. (2024). K-plus Anticlustering: An Improved k-means Criterion for 
+#' Maximizing Between-Group Similarity. British Journal of Mathematical and 
+#' Statistical Psychology, 77(1), 80--102. https://doi.org/10.1111/bmsp.12315
 #' 
 
 

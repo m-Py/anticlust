@@ -8,7 +8,7 @@ such as the intra-cluster variance (used in k-means clustering) or the
 sum of pairwise distances within clusters. The package `anticlust`
 implements anticlustering methods as described in Papenberg and Klau
 (2021; <https://doi.org/10.1037/met0000301>), Brusco et al. (2020;
-<https://doi.org/10.1111/bmsp.12186>), and Papenberg (2023;
+<https://doi.org/10.1111/bmsp.12186>), and Papenberg (2024;
 <https://doi.org/10.1111/bmsp.12315>).
 
 ## Installation
@@ -62,7 +62,7 @@ This README contains some basic information on the `R` package
     English in the future.
 -   The [package website](https://m-py.github.io/anticlust/) contains
     all documentation as a convenient website. At the current time, the
-    website also lists three package vignettes, while additional
+    website also lists four package vignettes, while additional
     vignettes are planned.
 
 ## A quick start

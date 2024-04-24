@@ -59,30 +59,30 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
         for (size_t i = 0; i < k; i++) {
           OBJ_BY_CLUSTER[i] = euclidean_squared(OVERALL_CENTROID, CENTERS[i], m);
         }
-        /* K-means objective in this setting: Sum of squared Euclidean 
-         * distances between cluster centers and overall centroid */
-        double SUM_OBJECTIVE = weighted_array_sum(k, frequencies, OBJ_BY_CLUSTER); 
 
         /* Some variables for bookkeeping during the optimization */
         size_t best_partner;
-        double tmp_centers[k][m];
-        double best_centers[k][m];
-        double tmp_objs[k];
-        double best_objs[k];
-        double tmp_obj;
+        size_t best_cluster;
+        double tmp_center1[m];
+        double tmp_center2[m];
+        double tmp_obj_cl1;
+        double tmp_obj_cl2;
+        double best_obj_cl1;
+        double best_obj_cl2;
+        double best_centers_cl1[m];
+        double best_centers_cl2[m];
+        double tmp_reduction; // encode if the exchange led to reduction in objective (this is a minimization problem)
         
         /* Start main iteration loop for exchange procedure */
         size_t id_current_exch_partner = 0;
-        
         
         /* 1. Level: Iterate through `n` data points */
         for (size_t i = 0; i < n; i++) {
           int cl1 = clusters[i];
           
           // Initialize `best` variable for the i'th item
-          double best_obj = SUM_OBJECTIVE + 1; // we have a minimization problem; init as large value
-          copy_matrix(k, m, CENTERS, best_centers);
-          copy_array(k, OBJ_BY_CLUSTER, best_objs);
+          double best_reduction = 0;
+          int exchange_cluster_found = 0;
           
           size_t j;
           /* 2. Level: Iterate through the exchange partners */
@@ -99,40 +99,53 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
               }
               
               // Initialize `tmp` variables for the exchange partner:
-              // Center matrix, is updated after swap
-              // Initialize `tmp` variables for the exchange partner:
-              copy_matrix(k, m, CENTERS, tmp_centers);
-              copy_array(k, OBJ_BY_CLUSTER, tmp_objs);
+              copy_array(m, CENTERS[cl1], tmp_center1);
+              copy_array(m, CENTERS[cl2], tmp_center2);
+              tmp_obj_cl1 = OBJ_BY_CLUSTER[cl1];
+              tmp_obj_cl2 = OBJ_BY_CLUSTER[cl2];
+
+              fast_update_one_center(
+                i, j, n, m,
+                data, tmp_center1, 
+                frequencies[cl1]
+              );
               
-              fast_update_centers(
-                i, j, n, m, k,
-                data, cl1, cl2,
-                tmp_centers, 
-                frequencies
+              fast_update_one_center(
+                j, i, n, m,
+                data, tmp_center2, 
+                frequencies[cl2]
               );
               
               // Update objective
-              tmp_objs[cl1] = euclidean_squared(OVERALL_CENTROID, tmp_centers[cl1], m);
-              tmp_objs[cl2] = euclidean_squared(OVERALL_CENTROID, tmp_centers[cl2], m);
-              tmp_obj = weighted_array_sum(k, frequencies, tmp_objs);
+              tmp_obj_cl1 = euclidean_squared(OVERALL_CENTROID, tmp_center1, m); // should be smaller than before
+              tmp_obj_cl2 = euclidean_squared(OVERALL_CENTROID, tmp_center2, m);
               
+              // Update objective
+              tmp_reduction = tmp_obj_cl1 * frequencies[cl1] + tmp_obj_cl2 * frequencies[cl2] - 
+                OBJ_BY_CLUSTER[cl1] * frequencies[cl1] - OBJ_BY_CLUSTER[cl2] * frequencies[cl2];
+
               // Update `best` variables if objective was improved
-              if (tmp_obj < best_obj) {
-                best_obj = tmp_obj;
-                copy_matrix(k, m, tmp_centers, best_centers);
-                copy_array(k, tmp_objs, best_objs);
+              if (tmp_reduction < best_reduction) {
+                best_obj_cl1 = tmp_obj_cl1;
+                best_obj_cl2 = tmp_obj_cl2;
+                copy_array(m, tmp_center1, best_centers_cl1);
+                copy_array(m, tmp_center2, best_centers_cl2);
                 best_partner = j;
+                best_cluster = cl2;
+                exchange_cluster_found = 1;
+                best_reduction = tmp_reduction;
               }
             }
           }
           
           // Only if objective is improved: Do the swap
-          if (best_obj < SUM_OBJECTIVE) {
+          if (exchange_cluster_found) {
             fast_swap(clusters, i, best_partner);
             // Update the "global" variables
-            SUM_OBJECTIVE = best_obj;
-            copy_matrix(k, m, best_centers, CENTERS);
-            copy_array(k, best_objs, OBJ_BY_CLUSTER);
+            OBJ_BY_CLUSTER[cl1] = best_obj_cl1;
+            OBJ_BY_CLUSTER[best_cluster] = best_obj_cl2;
+            copy_array(m, best_centers_cl1, CENTERS[cl1]);
+            copy_array(m, best_centers_cl2, CENTERS[best_cluster]);
             // here for local-maximum method: set flag that an improvement occurred!
           }
           
@@ -142,22 +155,16 @@ void fast_kmeans_anticlustering(double *data, int *N, int *M, int *K, int *frequ
 
 
 /* Update cluster centers for simpler implementation not using cluster lists */
-void fast_update_centers(size_t i, size_t j, size_t n, size_t m, size_t k, double *data, 
-                         int cl1, int cl2, double CENTERS[k][m], int *frequencies) {
+void fast_update_one_center(size_t index_removed_from_cluster, 
+                            size_t index_added_to_cluster, 
+                            size_t n, size_t m, double *data, 
+                            double CENTER[m], int frequency) {
   
   for (int u = 0; u < m; u++) {
-    double added_to_cl1 = data[one_dim_index(j, u, n)] / frequencies[cl1];
-    double removed_from_cl1 = data[one_dim_index(i, u, n)] / frequencies[cl1];
-    
-    double added_to_cl2 = data[one_dim_index(i, u, n)] / frequencies[cl2];
-    double removed_from_cl2 = data[one_dim_index(j, u, n)] / frequencies[cl2];
-    
+    double added = data[one_dim_index(index_added_to_cluster, u, n)] / frequency;
+    double removed = data[one_dim_index(index_removed_from_cluster, u, n)] / frequency;
     // Update first cluster center
-    CENTERS[cl1][u] = CENTERS[cl1][u] + added_to_cl1;
-    CENTERS[cl1][u] = CENTERS[cl1][u] - removed_from_cl1;
-    // Update second cluster center
-    CENTERS[cl2][u] = CENTERS[cl2][u] - removed_from_cl2;
-    CENTERS[cl2][u] = CENTERS[cl2][u] + added_to_cl2;
+    CENTER[u] = CENTER[u] + added - removed;
   }
 }
 
