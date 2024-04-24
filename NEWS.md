@@ -1,8 +1,21 @@
+# anticlust 0.8.3
+
+## Documentation
+
+- Some minor updates to documentation and vignettes
+- Updating all references to the k-plus anticlustering paper after its "actual" publication:
+
+Papenberg, M. (2024). K-plus Anticlustering: An Improved k-means Criterion for Maximizing Between-Group Similarity. *British Journal of Mathematical and Statistical Psychology, 77*(1), 80--102. https://doi.org/10.1111/bmsp.12315
+
+## Internal changes
+
+- `fast_anticlustering()` received another internal change to improve the speed of the re-computation of the objective during the optimization. In particular, updating the objective is now done by only inspecting the two clusters between which an exchange actually took place, instead of re-computing a sum across all clusters.
+
 # anticlust 0.8.2
 
 ## Internal changes
 
-- (Regression) `anticlustering(..., objective = "variance")` temporarily uses pre 0.8.0 implementation to fix some CRAN issues
+- (Regression) `anticlustering(..., objective = "variance")` uses pre 0.8.0 implementation to fix some CRAN issues
 
 # anticlust 0.8.0
 

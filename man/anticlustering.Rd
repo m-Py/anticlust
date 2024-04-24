@@ -68,7 +68,7 @@ between-group similarity.  Anticlustering is accomplished by
 maximizing instead of minimizing a clustering objective function.
 Implements anticlustering methods as described in Papenberg and
 Klau (2021; <doi:10.1037/met0000301>), Brusco et al. 
-(2020; <doi:10.1111/bmsp.12186>), and Papenberg (2023; 
+(2020; <doi:10.1111/bmsp.12186>), and Papenberg (2024; 
 <doi:10.1111/bmsp.12315>).
 }
 \details{
@@ -113,17 +113,13 @@ distances of elements within the same groups (see
 \code{\link{diversity_objective}}). Hence, anticlustering using the diversity 
 criterion maximizes between-group similarity
 by maximizing within-group heterogeneity (represented as the sum of all pairwise distances). 
-The diversity is an all rounder objective that tends to equalize all distribution 
+If it is computed on the basis of the Euclidean distance (which is the default
+behaviour if \code{x} is a feature matrix), the diversity is an all rounder objective that tends to equalize all distribution 
 characteristics between groups (such as means, variances, ...). 
 Note that the equivalence of within-group heterogeneity and between-group similarity only
 holds for equal-sized groups. For unequal-sized groups, it is recommended to
 use a different objective when striving for overall between-group similarity
-(e.g., the k-plus objective). In previous versions of this
-package, \code{objective = "distance"} was used (and is still
-supported) to refer to the diversity objective, but now \code{objective =
-"diversity"} is preferred because there are several clustering
-objectives based on pairwise distances (e.g., see
-\code{\link{dispersion_objective}}). In the publication that introduces
+(e.g., the k-plus objective). In the publication that introduces
 the \code{anticlust} package (Papenberg & Klau, 2021), we used the term "anticluster 
 editing" to refer to the maximization of the diversity, because the reversed 
 procedure - minimizing the diversity - is also known as "cluster editing". 
@@ -140,10 +136,10 @@ same time, see the function
 
 If the data input \code{x} is a feature matrix (that is: each row
 is a "case" and each column is a "variable") and the option
-\code{objective = "diversity"} is used, the Euclidean distance is
-computed as the basic unit of the diversity and dispersion objectives. If
+\code{objective = "diversity"} or \code{objective = "dispersion"} is used, 
+the Euclidean distance is computed as the basic unit of the objectives. If
 a different measure of dissimilarity is preferred, you may pass a
-self-generated dissimiliarity matrix via the argument \code{x}.
+self-generated dissimilarity matrix via the argument \code{x}.
 
 In the standard case, groups of equal size are generated. Adjust
 the argument \code{K} to create groups of different size (see
@@ -165,7 +161,8 @@ if there is an improvement at all. This swapping procedure is
 repeated for each element. When using \code{method =
 "local-maximum"}, the exchange method does not terminate after the
 first iteration over all elements; instead, the swapping continues
-until a local maximum is reached. This means that after the
+until a local maximum is reached. This method corresponds to the algorithm 
+"LCW" by Weitz and Lakshminarayanan (1998). This means that after the
 exchange process has been conducted once for each data point, the
 algorithm restarts with the first element and proceeds to conduct
 exchanges until the objective cannot be improved.
@@ -345,13 +342,16 @@ Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition
 data sets into equivalent parts. Psychological Methods, 26(2), 
 161–174. https://doi.org/10.1037/met0000301.
 
-Papenberg, M. (2023). K-plus Anticlustering: An Improved k-means Criterion 
-for Maximizing Between-Group Similarity. British Journal of Mathematical 
-and Statistical Psychology. Advance online publication. 
-https://doi.org/10.1111/bmsp.12315
+Papenberg, M. (2024). K-plus Anticlustering: An Improved k-means Criterion for 
+Maximizing Between-Group Similarity. British Journal of Mathematical and 
+Statistical Psychology, 77(1), 80-102. https://doi.org/10.1111/bmsp.12315
 
 Späth, H. (1986). Anticlustering: Maximizing the variance criterion.
 Control and Cybernetics, 15, 213-218.
+
+Weitz, R. R., & Lakshminarayanan, S. (1998). An empirical comparison of 
+heuristic methods for creating maximally diverse groups. Journal of the 
+Operational Research Society, 49(6), 635-646. https://doi.org/10.1057/palgrave.jors.2600510
 }
 \author{
 Martin Papenberg \email{martin.papenberg@hhu.de}

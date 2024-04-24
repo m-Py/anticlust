@@ -25,7 +25,7 @@ This vignette documents various ways by which the speed of the anticlustering me
 
 ## The exchange algorithm
 
-The default anticlustering algorithm works by exchanging data points between clusters in such a way that exchanges improve the anticlustering objective as much as possible. Details on the exchange method may also be found in Papenberg and Klau (2021; https://doi.org/10.1037/met0000301), Papenberg (2023; https://doi.org/10.1111/bmsp.12315), or the `anticlust` documentation (`?anticlustering`). Basically, running more exchanges tends to improve the results, but the improvements are diminishing with many repetitions---especially for large data sets. So, to speed up anticlustering, we can reduce the number of exchanges. Here we will learn how to do that. However, first we learn how to slow down anticlustering. Slowing down can lead to better results and is recommended if you have the time.
+The default anticlustering algorithm works by exchanging data points between clusters in such a way that exchanges improve the anticlustering objective as much as possible. Details on the exchange method may also be found in Papenberg and Klau (2021; https://doi.org/10.1037/met0000301), Papenberg (2024; https://doi.org/10.1111/bmsp.12315), or the `anticlust` documentation (`?anticlustering`). Basically, running more exchanges tends to improve the results, but the improvements are diminishing with many repetitions---especially for large data sets. So, to speed up anticlustering, we can reduce the number of exchanges. Here we will learn how to do that. However, first we learn how to slow down anticlustering. Slowing down can lead to better results and is recommended if you have the time.
 
 ## Slowing down
 
@@ -108,6 +108,8 @@ data <- matrix(rnorm(N*M), ncol = M)
 system.time(anticlustering(data, K = K))
 system.time(anticlustering(data, K = K, preclustering = TRUE))
 ```
+
+Still, the preclustering approach is probably not necessarily recommended to speed up anticlustering for very large data sets; it is useful if you are interested in enforcing the preclustering restrictions in the groupings.
 
 ### Secret hack
 
@@ -214,11 +216,11 @@ The package `anticlust` primarily implements two objective functions for anticlu
 
 As explained in the previous section, the anticlustering algorithms recompute the objective function for each attempted exchange. Computing the objective is therefore the major contributor to overall run time. In `anticlust`, I exploit the fact that anticlustering objectives can be recomputed faster when only two items have swapped between clusters and the objective value prior to the exchange is known. For example, computing the diversity objective "from scratch" is in $O(N^2)$. When the cluster affiliation of only two items differs between swaps, it is however not necessary to spend the entire $O(N^2)$ time during each exchange. Instead, by "cleverly" updating the objective before and after the swap, the computation reduces to $O(N)$, leading to about $O(N^3)$ for the entire exchange method (instead of $O(N^4)$---this is a huge difference). When using a fixed number of exchange partners as described in the previous section, we are left with a run time of $O(N^2)$ *in total*. However, note that for very large data sets, using the diversity objective may not be feasible at all. The reason for this is that a quadratic matrix of between-item distances has to be computed and stored in memory. It is my experience that on a personal computer this becomes difficult for about > 20000 elements (where the distance matrix has 20000^2 = `r format(20000^2, scientific = FALSE)` elements).
 
-Computing the standard k-means objective (which is done when using `anticlustering(..., objective = "variance"`) is in $O(M \cdot N)$, where $M$ is the number of variables. The function `anticlustering()` uses some optimizations during the exchange process to prevent the entire re-computation of the cluster centroids for each exchange, which otherwise consumes most of the run time. However, this does not change the theoretical $O(M \cdot N)$ run time of the computation. The function `fast_anticlustering()` uses a different -- but equivalent -- formulation of the k-means objective where the re-computation of the objective only depends on $K$ and $M$, but no longer on $N$;[^minimization] this reduces the run time by an additional order of magnitude and makes k-means anticlustering applicable to very large data sets (even in the millions). 
+Computing the standard k-means objective (which is done when using `anticlustering(..., objective = "variance"`) is in $O(M \cdot N)$, where $M$ is the number of variables. The function `anticlustering()` uses some optimizations during the exchange process to prevent the entire re-computation of the cluster centroids for each exchange, which otherwise consumes most of the run time. However, this does not change the theoretical $O(M \cdot N)$ run time of the computation. The function `fast_anticlustering()` uses a different -- but equivalent -- formulation of the k-means objective where the re-computation of the objective only depends on $M$, but no longer on $N$.[^minimization] This reduces the run time by an additional order of magnitude and makes k-means anticlustering applicable to very large data sets (even in the millions). 
 
 [^minimization]: `fast_anticlustering()` minimizes the weighted sum of squared distances between cluster centroids and the overall data centroid; the distances between all individual data points and their cluster center are no longer computed. 
 
-Because the k-means objective has some disadvantages for anticlustering (see Papenberg, 2023),[^kmeansbad] you may consider using the k-plus objective, which extends---and effectively re-uses---the k-means criterion. It can also be applied to very large data sets using `fast_anticlustering()`. For example, the following code---using $N = 100000$, $K = 5$, 3 features and 10 exchange partners per element---runs quite quickly:
+Because the k-means objective has some disadvantages for anticlustering (see Papenberg, 2024),[^kmeansbad] you may consider using the k-plus objective, which extends---and effectively re-uses---the k-means criterion. It can also be applied to very large data sets using `fast_anticlustering()`. For example, the following code---using $N = 100000$, $K = 5$, 3 features and 10 exchange partners per element---runs quite quickly:
 
 [^kmeansbad]: The primary disadvantage is that k-means anticlustering only leads to similarity in means, but not in standard deviations or any other distribution aspects; the k-plus criterion can be used to equalize any distribution moments between groups.
 
@@ -244,7 +246,7 @@ When k-plus anticlustering is conducted with `fast_anticlustering()`, we have to
 
 Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition data sets into equivalent parts. *Psychological Methods, 26*(2), 161--174. https://doi.org/10.1037/met0000301.
 
-Papenberg, M. (2023). K-plus Anticlustering: An Improved k-means Criterion for Maximizing Between-Group Similarity. *British Journal of Mathematical and Statistical Psychology*. Advance online publication. https://doi.org/10.1111/bmsp.12315
+Papenberg, M. (2024). K-plus Anticlustering: An Improved k-means Criterion for Maximizing Between-Group Similarity. *British Journal of Mathematical and Statistical Psychology, 77* (1), 80--102. https://doi.org/10.1111/bmsp.12315
 
 Weitz, R., & Lakshminarayanan, S. (1998). An empirical comparison of heuristic methods
 for creating maximally diverse groups. *Journal of the Operational Research Society, 49*(6), 635--646. https://doi.org/10.1057/palgrave.jors.2600510

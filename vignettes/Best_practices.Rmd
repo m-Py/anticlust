@@ -19,7 +19,7 @@ This vignette documents some "best practices" for anticlustering using the R pac
 
 [^wellactually]: Well, actually your R session can break if you use an optimal method (`method = "ilp"`) with a data set that is too large.
 
-This document uses somewhat imperative language; nuance and explanations are given in the package documentation, the other vignettes, and the papers by Papenberg and Klau (2021; https://doi.org/10.1037/met0000301) and Papenberg (2023; https://doi.org/10.1111/bmsp.12315). Note that deciding which anticlustering objective to use usually requires substantial content considerations and cannot be reduced to "which one is better". However, some hints are given below. 
+This document uses somewhat imperative language; nuance and explanations are given in the package documentation, the other vignettes, and the papers by Papenberg and Klau (2021; https://doi.org/10.1037/met0000301) and Papenberg (2024; https://doi.org/10.1111/bmsp.12315). Note that deciding which anticlustering objective to use usually requires substantial content considerations and cannot be reduced to "which one is better". However, some hints are given below. 
 
 - If speed is not an issue (it usually is not), use `method = "local-maximum"` instead of the default  `method = "exchange"`. **It is unambiguously better.**
 - If speed is not an issue (it usually is not), use several `repetitions`.
@@ -44,4 +44,4 @@ This document uses somewhat imperative language; nuance and explanations are giv
 
 Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition data sets into equivalent parts. *Psychological Methods, 26*(2), 161--174. https://doi.org/10.1037/met0000301.
 
-Papenberg, M. (2023). K-plus Anticlustering: An Improved k-means Criterion for Maximizing Between-Group Similarity. *British Journal of Mathematical and Statistical Psychology*. Advance online publication. https://doi.org/10.1111/bmsp.12315
+Papenberg, M. (2024). K-plus Anticlustering: An Improved k-means Criterion for Maximizing Between-Group Similarity. *British Journal of Mathematical and Statistical Psychology, 77* (1), 80--102. https://doi.org/10.1111/bmsp.12315
