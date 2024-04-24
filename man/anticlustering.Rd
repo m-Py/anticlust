@@ -332,7 +332,7 @@ table(anticlusters, schaper2019$room)
 
 # Use the heuristic by Brusco et al. (2020) for k-plus anticlustering
 # Include categorical variable as part of the optimization criterion rather 
-# than the argument categories! 
+# than the argument categories!
 anticlusters <- anticlustering(
   cbind(
     kplus_moment_variables(schaper2019[, 3:6], 2), 

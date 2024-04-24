@@ -9,7 +9,7 @@
 #'     that must not be assigned to the same anticluster. (e.g., a matrix returned by
 #'     optimal_dispersion() in the slot $edges)
 #' @param objective "diversity", "average-diversity", "variance" or "kplus" (not dispersion!)
-#' @param method "local-maximum" or "exchange" (TODO: "brusco"!)
+#' @param method "local-maximum" or "exchange", "brusco"
 #' 
 #' @note
 #' This function uses the average diversity objective if some groups are unequaled-sized
@@ -76,6 +76,8 @@ BILS_E_ALL_RESTRICTED <- function(distances, init_clusters, cannot_link) {
     R = if (multiple_partitions_as_input) c(nrow(init_clusters), 1) else c(1, 1),
     init_partitions = if (multiple_partitions_as_input) init_clusters else NULL
   )
+  ## TODO: THE RETURNED PARTITION MUST BE DECIDED ON THE BASIS OF A CANNOT-LINK MATRIX,
+  ## NOT THE DISPERSION OF THE ORIGINAL DISTANCES!!!!
   PARTITIONS[which.max(apply(PARTITIONS, 1, dispersion_objective, x = distances)), ]
 }
 

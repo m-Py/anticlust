@@ -6,6 +6,7 @@
 - `anticlustering()` now has new `objective = "average-diversity"`
 - added argument `cannot_link` to `anticlustering()` (for `method = "exchange", "local-maximum", "brusco" "ilp"`, and `objective = "diversity", "variance", "kplus"`)
 - `method = "brusco"` now works for `objective = "variance"` and `"kplus"`
+- `anticlustering()` now has an argument `cannot_link`, which works with options for `method`
 
 # anticlust 0.8.3
 
