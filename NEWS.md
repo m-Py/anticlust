@@ -1,4 +1,5 @@
-# anticlust 0.8.2.9999
+
+# anticlust 0.8.3.9999
 
 - Bug fix in `optimal_dispersion()`: Output element `$edges` no longer includes edges that were investigated in the last iteration of the algorithm (and which are not relevant for finding the optimal dispersion)
 - `bicriterion_anticlustering()` has new arguments: `dispersion_distances`, `average_diversity`, `init_partitions`
@@ -6,11 +7,25 @@
 - added argument `cannot_link` to `anticlustering()` (for `method = "exchange", "local-maximum", "brusco" "ilp"`, and `objective = "diversity", "variance", "kplus"`)
 - `method = "brusco"` now works for `objective = "variance"` and `"kplus"`
 
+# anticlust 0.8.3
+
+## Documentation
+
+- Some minor updates to documentation and vignettes
+- Updating all references to the k-plus anticlustering paper after its "actual" publication:
+
+Papenberg, M. (2024). K-plus Anticlustering: An Improved k-means Criterion for Maximizing Between-Group Similarity. *British Journal of Mathematical and Statistical Psychology, 77*(1), 80--102. https://doi.org/10.1111/bmsp.12315
+
+## Internal changes
+
+- `fast_anticlustering()` received [another internal change](https://github.com/m-Py/anticlust/commit/8d3c85dc0076) to improve the speed of the re-computation of the objective during the optimization. In particular, updating the objective is now done by only inspecting the two clusters between which an exchange actually took place, instead of re-computing a sum across all clusters.
+- A bug in `fast_anticlustering()` [was fixed](https://github.com/m-Py/anticlust/commit/957490ac2fe04); the computation of the objective did not incoorporate the cluster sizes
+
 # anticlust 0.8.2
 
 ## Internal changes
 
-- (Regression) `anticlustering(..., objective = "variance")` temporarily uses pre 0.8.0 implementation to fix some CRAN issues
+- (Regression) `anticlustering(..., objective = "variance")` uses pre 0.8.0 implementation to fix some CRAN issues
 
 # anticlust 0.8.0
 
