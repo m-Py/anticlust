@@ -4,4 +4,3 @@ if ( requireNamespace("tinytest", quietly=TRUE) ){
   library(anticlust)
   tinytest::test_package("anticlust")
 }
-

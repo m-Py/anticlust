@@ -1,8 +1,7 @@
 
-context("Optimal dispersion")
 library("anticlust")
 
-test_that("Output format is as expected for optimal_dispersion()", {
+# Output format is as expected for optimal_dispersion()
   N <- 30
   M <- 5
   K <- 3
@@ -20,7 +19,7 @@ test_that("Output format is as expected for optimal_dispersion()", {
   )
   expect_true(dispersion_objective(distances, opt$groups) >= dispersion_objective(distances, groups_heuristic))
   
-  expect_true(all(sort(table(opt$groups)) == sort(table(initialize_clusters(N, K, NULL)))))
+  expect_true(all(sort(table(opt$groups)) == sort(table(anticlust:::initialize_clusters(N, K, NULL)))))
   
   
   # test for unequal group sizes (groups differ by 1 at most)
@@ -40,7 +39,7 @@ test_that("Output format is as expected for optimal_dispersion()", {
     repetitions = 10
   )
   expect_true(dispersion_objective(distances, opt$groups) >= dispersion_objective(distances, groups_heuristic))
-  expect_true(all(sort(table(opt$groups)) == sort(table(initialize_clusters(N, K, NULL)))))
+  expect_true(all(sort(table(opt$groups)) == sort(table(anticlust:::initialize_clusters(N, K, NULL)))))
 
 
   # now "truly" unequal group sizes 
@@ -72,6 +71,5 @@ test_that("Output format is as expected for optimal_dispersion()", {
   
   expect_true(dispersion_objective(distances, opt$groups) >= dispersion_objective(distances, groups_heuristic))
   expect_true(all(sort(table(opt$groups)) == sort(K)))
-  
-})
+
   

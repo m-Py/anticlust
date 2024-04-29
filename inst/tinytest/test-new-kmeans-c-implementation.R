@@ -1,9 +1,7 @@
 library("anticlust")
 library("RANN")
 
-context("New C implementation")
-
-test_that("New k-means C implementation yields same results as other implementations", {
+# New k-means C implementation yields same results as other implementations
   
   set.seed(123)
   M <- 5
@@ -23,7 +21,7 @@ test_that("New k-means C implementation yields same results as other implementat
   
   # new C fast_anticlustering() implementation does the same as old R implementation?
   ac_exchangeC <- fast_anticlustering(features, K = init, k_neighbours = 20)
-  ac_exchangeR <- fast_exchange_(features, init, nearest_neighbours(features, 20, NULL))
+  ac_exchangeR <- anticlust:::fast_exchange_(features, init, anticlust:::nearest_neighbours(features, 20, NULL))
   expect_true(all(ac_exchangeC == ac_exchangeR))
   
   # Also test with categorical restrictions
@@ -35,16 +33,16 @@ test_that("New k-means C implementation yields same results as other implementat
   expect_true(all(table(ac_exchangeC, categories)  == table(ac_exchangeC2, categories)))
   
   # Use reduced exchange partners
-  init <- initialize_clusters(N, 3, categories)
+  init <- anticlust:::initialize_clusters(N, 3, categories)
   ac_exchangeC <- fast_anticlustering(features, K = init, k_neighbours = 20, categories = categories)
-  ac_exchangeR <- fast_exchange_(features, init, nearest_neighbours(features, 20, to_numeric(categories)))
+  ac_exchangeR <- anticlust:::fast_exchange_(features, init, anticlust:::nearest_neighbours(features, 20, anticlust:::to_numeric(categories)))
   expect_true(all(ac_exchangeC == ac_exchangeR))
   
   # What if `k_neighbours` is greater than the number of elements in the group with fewest members?
-  categories <- merge_into_one_variable(cbind(schaper2019$syllables, schaper2019$room))
+  categories <- anticlust:::merge_into_one_variable(cbind(schaper2019$syllables, schaper2019$room))
   init <- categorical_sampling(categories, K = 3)
   ac_exchangeC <- fast_anticlustering(features, K = init, k_neighbours = 10, categories = categories)
-  ac_exchangeR <- fast_exchange_(features, init, nearest_neighbours(features, 10, categories))
+  ac_exchangeR <- anticlust:::fast_exchange_(features, init, anticlust:::nearest_neighbours(features, 10, categories))
   expect_true(all(table(ac_exchangeC, categories) == table(ac_exchangeR, categories)))
   
   # test custom exchange partners
@@ -54,7 +52,7 @@ test_that("New k-means C implementation yields same results as other implementat
   exchange_partners <- lapply(rep(N, N), function(x) sample(1:x)[1:k_neighbours])
   # R and C implementation the same?
   ac_exchangeC <- fast_anticlustering(features, K = init, exchange_partners = exchange_partners)
-  ac_exchangeR <- fast_exchange_(features, init, exchange_partners)
+  ac_exchangeR <- anticlust:::fast_exchange_(features, init, exchange_partners)
   expect_true(all(ac_exchangeC == ac_exchangeR))
   
   # Remove some exchange partners to test if an unequal number of exchange partners works
@@ -62,12 +60,12 @@ test_that("New k-means C implementation yields same results as other implementat
   exchange_partners[[10]] <- exchange_partners[[10]][-2]
   exchange_partners[[23]] <- exchange_partners[[23]][-(10:7)]
   ac_exchangeC <- fast_anticlustering(features, K = init, exchange_partners = exchange_partners)
-  ac_exchangeR <- fast_exchange_(features, init, exchange_partners)
+  ac_exchangeR <- anticlust:::fast_exchange_(features, init, exchange_partners)
   expect_true(all(ac_exchangeC == ac_exchangeR))
   
   # Does the argument `exchange_partners` really do the same as `k_neighbours`?
   nn_exchange_partners <- RANN::nn2(features, k = k_neighbours + 1)$nn.idx #+1 because the element itself is also returned by nn2
-  ac1 <- fast_anticlustering(features, K = init, exchange_partners = matrix_to_list(nn_exchange_partners))
+  ac1 <- fast_anticlustering(features, K = init, exchange_partners = anticlust:::matrix_to_list(nn_exchange_partners))
   ac2 <- fast_anticlustering(features, K = init, k_neighbours = k_neighbours)
   expect_true(all(ac1 == ac2))
   
@@ -78,7 +76,7 @@ test_that("New k-means C implementation yields same results as other implementat
   
   # again, using a different data set
   features <- iris[,-5]
-  init <- initialize_clusters(K = 75, N = nrow(features), NULL)
+  init <- anticlust:::initialize_clusters(K = 75, N = nrow(features), NULL)
   n_exchange_partners <- 10
   groups1 <- fast_anticlustering(
     features,
@@ -93,4 +91,3 @@ test_that("New k-means C implementation yields same results as other implementat
   expect_length(fast_anticlustering(1:6, K = 2), 6)
   expect_length(fast_anticlustering(1:20, K = 2), 20)
   expect_length(fast_anticlustering(1:21, K = 2), 21)
-})
