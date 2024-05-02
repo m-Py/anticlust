@@ -6,7 +6,8 @@
 
 ## Internal changes
 
-- On Mac computers, the default selection of ILP solvers was changed due to a reoccurring CRAN issue: Mac computers will prioritize the the GLPK solver over the SYMPHONY solver. The `optimal_anticlustering()` has an argument `solver` that can be used to circumvent this default behaviour.
+- The default selection of ILP solvers in `anticlustering()`, `balanced_clustering()` and `optimal_dispersion()` was changed due to a reoccurring CRAN issue: If both the Rglpk and the Rsymphony packages are available, the GLPK will now be prioritized. This is because the SYMPHONY solver sometimes crashes on Macs (or at least on one CRAN test station). The `optimal_anticlustering()` and `optimal_dispersion()` functions have an argument `solver` that can be used to circumvent this default behaviour.
+- `anticlust` now uses [`tinytest`](https://cran.r-project.org/package=tinytest) instead of [`testthat`](https://cran.r-project.org/package=testthat) for unit tests.
 
 # anticlust 0.8.3
 

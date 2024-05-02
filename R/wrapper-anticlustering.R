@@ -210,7 +210,9 @@
 #' \code{Rsymphony} and the COIN-OR SYMPHONY solver libraries
 #' (<https://github.com/coin-or/SYMPHONY>). The function will try to
 #' find the GLPK or SYMPHONY solver and throw an error if none is
-#' available.
+#' available. If both are found, the GLPK solver is used. Use the functions
+#' \code{\link{optimal_anticlustering}} or \code{\link{optimal_dispersion}}
+#' to manually select a solver.
 #'
 #' Optimally maximizing the diversity only works for rather small N
 #' and K; N = 20 and K = 2 is usually solved within some seconds, but

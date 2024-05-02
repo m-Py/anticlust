@@ -58,10 +58,11 @@ The dispersion is the minimum distance between two elements
   \code{Rsymphony} and the COIN-OR SYMPHONY solver libraries
   (<https://github.com/coin-or/SYMPHONY>). If the argument
   \code{solver} is not specified, the function will try to find the
-  GLPK or SYMPHONY solver by itself (it prioritizes using SYMPHONY if
-  both are available). The GNU linear programming kit (\code{solver =
+  GLPK or SYMPHONY solver by itself. It prioritizes using GLPK if
+  both are available. However, the GNU linear programming kit (\code{solver =
   "glpk"}) seems to be considerably slower for K >= 3 than the
-  SYMPHPONY solver (\code{solver = "symphony"}).
+  SYMPHPONY solver (\code{solver = "symphony"}). So, it is recommended to manually
+  change the default behaviour.
 
   Optimally solving the maximum dispersion problem is NP-hard for K
   > 2 and therefore computationally infeasible for larger data
