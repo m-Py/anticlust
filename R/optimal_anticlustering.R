@@ -32,13 +32,13 @@
 #' solution and it can be used to obtain optimal solutions for all supported
 #' anticlustering objectives (variance, diversity, k-plus, dispersion). For 
 #' the objectives variance, diversity and k-plus, the optimal ILP method 
-#' in Papenberg and Klau (2021) is used. for variance (i.e., k-means), the squared
-#' Euclidean distance is used, and for k-plus the squared Euclidean distance
+#' in Papenberg and Klau (2021) is used. For the variance (i.e., k-means anticlustering), 
+#' the squared Euclidean distance is used, and for k-plus the squared Euclidean distance
 #' based on the extended k-plus data matrix is used (see \code{\link{kplus_moment_variables}}).
 #' For the diversity (and the dispersion), the Euclidean distance is used by default, 
 #' but any user-defined dissimilarity matrix is possible.
 #' 
-#' The dispersion is solved optimal using the approach described in \code{link{optimal_dispersion}}.
+#' The dispersion is solved optimal using the approach described in \code{\link{optimal_dispersion}}.
 #' 
 #' The optimal methods either require the R package \code{Rglpk} and the GNU linear programming kit
 #' (<http://www.gnu.org/software/glpk/>), or the R package
