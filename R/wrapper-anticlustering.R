@@ -210,7 +210,7 @@
 #' \code{Rsymphony} and the COIN-OR SYMPHONY solver libraries
 #' (<https://github.com/coin-or/SYMPHONY>). The function will try to
 #' find the GLPK or SYMPHONY solver and throw an error if none is
-#' available (it prioritizes using SYMPHONY if both are available).
+#' available.
 #'
 #' Optimally maximizing the diversity only works for rather small N
 #' and K; N = 20 and K = 2 is usually solved within some seconds, but

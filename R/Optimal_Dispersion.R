@@ -150,15 +150,12 @@
 
 optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = NULL) {
   
-  if (argument_exists(solver)) {
-    validate_input(solver, "solver", objmode = "character", len = 1,
-                   input_set = c("glpk", "symphony"), not_na = TRUE, not_function = TRUE)
-  } else {
+  validate_input_optimal_anticlustering(x, K, "dispersion", solver)
+  
+  if (!argument_exists(solver)) {
     solver <- find_ilp_solver()
   }
-  validate_data_matrix(x)
-  validate_input(K, "K", objmode = "numeric", must_be_integer = TRUE, not_na = TRUE, not_function = TRUE)
-  
+
   if (is.null(max_dispersion_considered)) {
     max_dispersion_considered <- Inf
   } else {
@@ -169,9 +166,6 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
   distances <- convert_to_distances(x)
   diag(distances) <- Inf
   N <- nrow(distances)
-  if (!(length(K) == 1 || sum(K) == N)) {
-    stop("Argument `K` is misspecified.")
-  }
   
   # `target_groups` is primarily needed for unequal sized groups
   target_groups <- sort(table(initialize_clusters(N, K, NULL)), decreasing = TRUE)

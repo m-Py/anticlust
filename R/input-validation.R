@@ -104,11 +104,11 @@ input_validation_anticlustering <- function(x, K, objective, method,
       "kplus"
       ), 
       len = 1, not_na = TRUE)
-    if (objective == "variance" && method == "ilp") {
-      stop("You cannot use integer linear programming method to maximize the variance criterion.")
+    if (objective %in% c("variance", "kplus") && method == "ilp") {
+      stop("You cannot use this function to optimally maximize the kmeans or kplus criterion. Use optimal_anticlustering().")
     }
-    if (objective == "variance" && is_distance_matrix(x)) {
-        stop("You cannot use a distance matrix with the objective 'variance'.")
+    if (objective %in% c("variance", "kplus") && is_distance_matrix(x)) {
+        stop("You cannot use a distance matrix with the objective 'variance' or 'kplus'.")
     }
   }
 
