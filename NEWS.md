@@ -1,3 +1,13 @@
+# anticlust 0.8.4
+
+## New features
+
+- `optimal_anticlustering()` is a new exported function that gathers all currently (and in the future) implemented optimal algorithms for anticlustering
+
+## Internal changes
+
+- On Mac computers, the default selection of ILP solvers was changed due to a reoccurring CRAN issue: Mac computers will prioritize the the GLPK solver over the SYMPHONY solver. The `optimal_anticlustering()` has an argument `solver` that can be used to circumvent this default behaviour.
+
 # anticlust 0.8.3
 
 ## Documentation
