@@ -82,7 +82,7 @@ optimal_anticlustering <- function(x, K, objective, solver = NULL) {
   if (objective == "diversity") {
     ilp <- anticlustering_ilp(x, K)
     solution <- solve_ilp_diversity(ilp, solver = solver)
-    return(ilp_to_groups(solution, N))
+    return(ilp_to_groups(solution, nrow(x)))
   } else {
     return(optimal_dispersion(x, K, solver)$groups)
   }
