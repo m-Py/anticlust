@@ -36,4 +36,9 @@ expect_error(
   pattern = "objective 'variance'"
 )
 
+expect_error(
+  optimal_anticlustering(dist(dat), K = K, "kplus", solver = "glpk"),
+  pattern = "objective 'variance'"
+)
+
 
