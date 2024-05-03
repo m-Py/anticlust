@@ -1,12 +1,13 @@
-# anticlust 0.8.4
+# anticlust 0.8.5
 
 ## New features
 
 - `optimal_anticlustering()` is a new exported function that gathers all currently (and in the future) implemented optimal algorithms for anticlustering
+- `balanced_clustering()` now has an argument `solver`, which can be used to specify the ILP solver when using `method = "ilp"`
 
 ## Internal changes
 
-- The default selection of ILP solvers in `anticlustering()`, `balanced_clustering()` and `optimal_dispersion()` was changed due to a reoccurring CRAN issue: If both the Rglpk and the Rsymphony packages are available, the GLPK will now be prioritized. This is because the SYMPHONY solver sometimes crashes on Macs (or at least on one CRAN test station). The `optimal_anticlustering()` and `optimal_dispersion()` functions have an argument `solver` that can be used to circumvent this default behaviour.
+- The default selection of ILP solvers in `anticlustering()`, `balanced_clustering()` and `optimal_dispersion()` was changed due to a reoccurring CRAN issue: If both the Rglpk and the Rsymphony packages are available, the GLPK will now be prioritized. This is because the SYMPHONY solver sometimes crashes on Macs (or at least on one CRAN test station). The `optimal_anticlustering()`, `optimal_dispersion()`, and `balanced_clustering()` functions have an argument `solver` that can be used to circumvent this default behaviour.
 - `anticlust` now uses [`tinytest`](https://cran.r-project.org/package=tinytest) instead of [`testthat`](https://cran.r-project.org/package=testthat) for unit tests.
 
 # anticlust 0.8.3
