@@ -57,15 +57,15 @@
 #' 
 #' @examples 
 #' 
-#' data <- matrix(rnorm(24), ncol = 2)
+#' # data <- matrix(rnorm(24), ncol = 2)
 #' 
 #' # These calls are equivalent for k-means anticlustering:
-#' optimal_anticlustering(data, K = 2, objective = "variance")
-#' optimal_anticlustering(dist(data)^2, K = 2, objective = "diversity")
+#' # optimal_anticlustering(data, K = 2, objective = "variance")
+#' # optimal_anticlustering(dist(data)^2, K = 2, objective = "diversity")
 #' 
 #' # These calls are equivalent for k-plus anticlustering:
-#' optimal_anticlustering(data, K = 2, objective = "kplus")
-#' optimal_anticlustering(dist(kplus_moment_variables(data, 2))^2, K = 2, objective = "diversity")
+#' # optimal_anticlustering(data, K = 2, objective = "kplus")
+#' # optimal_anticlustering(dist(kplus_moment_variables(data, 2))^2, K = 2, objective = "diversity")
 #' 
 optimal_anticlustering <- function(x, K, objective, solver = NULL) {
   
