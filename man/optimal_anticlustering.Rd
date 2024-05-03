@@ -35,13 +35,15 @@ Wrapper function that gives access to all optimal algorithms for anticlustering
 that are available in anticlust.
 }
 \details{
-This is a wrapper for all optimal methods supported in anticlust. As compared to 
-\code{\link{anticlust}}, it allows to specify the solver to obtain an optimal
+This is a wrapper for all optimal methods supported in anticlust (currently and in the future). 
+As compared to \code{\link{anticlustering}}, it allows to specify the solver to obtain an optimal
 solution and it can be used to obtain optimal solutions for all supported
 anticlustering objectives (variance, diversity, k-plus, dispersion). For 
-the objectives variance, diversity and k-plus, the optimal ILP method 
-in Papenberg and Klau (2021) is used. For the variance (i.e., k-means anticlustering), 
-the squared Euclidean distance is used, and for k-plus the squared Euclidean distance
+the objectives "variance", "diversity" and "kplus", the optimal ILP method 
+in Papenberg and Klau (2021) is used, which maximizes the sum of all pairwise 
+intra-cluster distances (given user specified number of clusters, for equal-sized clusters).
+To employ k-means anticlustering (i.e. set \code{objective = "variance"}), the
+squared Euclidean distance is used. For k-plus anticlustering, the squared Euclidean distance
 based on the extended k-plus data matrix is used (see \code{\link{kplus_moment_variables}}).
 For the diversity (and the dispersion), the Euclidean distance is used by default, 
 but any user-defined dissimilarity matrix is possible.
@@ -53,13 +55,24 @@ The optimal methods either require the R package \code{Rglpk} and the GNU linear
 \code{Rsymphony} and the COIN-OR SYMPHONY solver libraries
 (<https://github.com/coin-or/SYMPHONY>). If the argument \code{solver} is not 
 specified by the user, the function will try to find the GLPK or SYMPHONY 
-solver and throw an error if none is available. It will usually select the 
-SYMPHONY solver if both are available because it usually performs better than 
-the GLPK solver. For Mac computers, however, the GLPK is selected by default if both solvers 
-are available. This is because some rare instances have been observed where
+solver and throw an error if none is available. It will select the 
+GLPK solver if both are available because some rare instances have been observed where
 the SYMPHONY solver crashes on Mac computers. I would still try out the 
 SYMPHONY solver to see if the unlikely crash occurs. However, this has to be 
-set by the user.
+set by the user (at least if both solver packages Rsymphony and Rglpk are available on the system).
+}
+\examples{
+
+data <- matrix(rnorm(24), ncol = 2)
+
+# These calls are equivalent for k-means anticlustering:
+optimal_anticlustering(data, K = 2, objective = "variance")
+optimal_anticlustering(dist(data)^2, K = 2, objective = "diversity")
+
+# These calls are equivalent for k-plus anticlustering:
+optimal_anticlustering(data, K = 2, objective = "kplus")
+optimal_anticlustering(dist(kplus_moment_variables(data, 2))^2, K = 2, objective = "diversity")
+
 }
 \author{
 Martin Papenberg \email{martin.papenberg@hhu.de}
