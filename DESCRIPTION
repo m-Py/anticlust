@@ -67,7 +67,8 @@ Suggests:
     palmerpenguins,
     Rglpk,
     rmarkdown,
-    Rsymphony
+    Rsymphony,
+    tinytest
 VignetteBuilder: 
     knitr,
     rmarkdown
