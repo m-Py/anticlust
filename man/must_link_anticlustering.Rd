@@ -4,7 +4,7 @@
 \alias{must_link_anticlustering}
 \title{Must-link anticlustering}
 \usage{
-must_link_anticlustering(x, K, must_link, infeasible_prob = 0)
+must_link_anticlustering(x, K, must_link, method = "exchange")
 }
 \arguments{
 \item{x}{A distance matrix (Only maximum diversity is implemented)}
@@ -13,11 +13,11 @@ must_link_anticlustering(x, K, must_link, infeasible_prob = 0)
 
 \item{must_link}{Vector of IDs; elements having the same value are linked in the same anticluster.}
 
-\item{infeasible_prob}{Probability that a swap is accepted that does not maintain the required balance in group sizes. Defaults to 0.}
+\item{method}{"exchange" (default) or "local-maximum"}
 }
 \description{
 Must-link anticlustering
 }
 \details{
-Conducts an exchange method (method = "local-maximum") on "merged" elements.
+Conducts an exchange method on "merged" elements.
 }
