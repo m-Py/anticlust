@@ -72,8 +72,17 @@ merged_cluster_to_original_cluster <- function(merged_clusters, must_link) {
   df[order(df$order), "clusters"]
 }
 
+#' Must-link anticlustering
+#' 
+#' @param x A distance matrix (Only maximum diversity is implemented)
+#' @param K What do the required groups look like (as in \code{\link{anticlustering}})
+#' @param must_link Vector of IDs; elements having the same value are linked in the same anticluster.
+#' @param infeasible_prob Probability that a swap is accepted that does not maintain the required balance in group sizes. Defaults to 0.
 #' @export
-anticlustering_must_link <- function(x, K, must_link) {
+#' 
+#' @details Conducts an exchange method (method = "local-maximum") on "merged" elements.
+#' 
+must_link_anticlustering <- function(x, K, must_link, infeasible_prob = 0) {
   stopifnot(is_distance_matrix(x))
   x <- to_matrix(x)
   N <- nrow(x)
@@ -84,18 +93,20 @@ anticlustering_must_link <- function(x, K, must_link) {
   
   obj_for_merged_clusters <- function(x, clusters) {
     clusters_real <- merged_cluster_to_original_cluster(clusters, DF_[, 1])
-    # Punish clusterings that do not adhere to group size constraints
-    if (!same_cluster_sizes(clusters_real, clusters_init)) {
+    if (runif(1) < infeasible_prob || same_cluster_sizes(clusters_real, clusters_init)) {
+      diversity_objective(DF_[, -1], clusters_real)
+    } else {
+      # Punish clusterings that do not adhere to group size constraints
       return(-Inf)
     }
-    diversity_objective(DF_[, -1], clusters_real)
   }
   
   dummy_data <- 1:length(unique(must_link))
   dummy_groups <- anticlustering(
     dummy_data,
     K = original_cluster_to_merged_cluster(clusters_init, must_link),
-    objective = obj_for_merged_clusters
+    objective = obj_for_merged_clusters, 
+    method = "local-maximum"
   )
   solution <- merged_cluster_to_original_cluster(dummy_groups, must_link)
   if (!is.infinite(obj_fun_must_link(must_link, solution))) {
