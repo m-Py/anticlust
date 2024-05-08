@@ -2,6 +2,7 @@
 % Please edit documentation in R/anticlust.R
 \docType{package}
 \name{anticlust}
+\alias{anticlust-package}
 \alias{anticlust}
 \title{anticlust: Subset Partitioning via Anticlustering}
 \description{
@@ -38,3 +39,22 @@ transitivity clustering.
 \code{\link{wce}}
 }
 
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/m-Py/anticlust}
+  \item Report bugs at \url{https://github.com/m-Py/anticlust/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: Martin Papenberg \email{martin.papenberg@hhu.de} (\href{https://orcid.org/0000-0002-9900-4268}{ORCID})
+
+Other contributors:
+\itemize{
+  \item Meik Michalke (centroid based clustering algorithm) [contributor]
+  \item Gunnar W. Klau [thesis advisor]
+  \item Juliane V. Tkotz (package logo) [contributor]
+}
+
+}
