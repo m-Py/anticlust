@@ -106,7 +106,7 @@ must_link_anticlustering <- function(x, K, must_link, method = "exchange") {
     dummy_data,
     K = original_cluster_to_merged_cluster(clusters_init, must_link),
     objective = obj_for_merged_clusters, 
-    method = "local-maximum"
+    method = method
   )
   solution <- merged_cluster_to_original_cluster(dummy_groups, must_link)
   if (!is.infinite(obj_fun_must_link(must_link, solution))) {
