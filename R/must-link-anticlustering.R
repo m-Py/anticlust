@@ -1,4 +1,122 @@
 
+# Initialize must-link constraints by assigning all persons having the same ID to the same set
+# all others remain free (i.e., as NA)
+get_init_assignments <- function(N, ID, target_groups) {
+  # Initialize all as NA
+  init <- rep(NA, N)
+  ID <- tt$patientID
+  # for loop to satisfy must-link constraints, will not work in all cases (this can
+  # be solved optimally in polynomial time but I do not have this algorithm right now):
+  K <- length(target_groups)
+  cluster_sizes_real <- rep(0, K)
+  multiple_IDs <- as.numeric(names(table(ID)[table(ID) > 1]))
+  
+  for (current_id in multiple_IDs) {
+    random_order_clusters <- sample(K)
+    for (k in random_order_clusters) {
+      # only fill into cluster if it fits
+      if ((cluster_sizes_real[k] + sum(ID == current_id)) > target_groups[k]) {
+        if (k == random_order_clusters[K]) {
+          stop("Sorry, this failed")
+        }
+        next
+      }
+      init[ID == current_id] <- k
+      cluster_sizes_real[k] <- cluster_sizes_real[k] + sum(ID == current_id)
+      break
+    }
+  }
+  stopifnot(sum(!is.na(init))  == sum(ID %in% multiple_IDs))
+  init
+}
+
+# After initial assignment, fill the rest randomly
+fill_groups <- function(init, target_groups) {
+  K <- length(target_groups)
+  table_assigned <- table(init)
+  # assign elements that have no group (unfortunately, this "simple" task is quite difficult in general)
+  if (length(table_assigned) != length(target_groups)) {
+    table_assigned <- data.frame(K = 1:K, size = 0)
+    df <- as.data.frame(table(init))
+    together <- merge(table_assigned, df, by.x = "K", by.y = "init", all = TRUE)
+    table_assigned <- ifelse(is.na(together$Freq), 0, together$Freq)
+  }
+  freq_not_assigned <- target_groups - table_assigned
+  init[is.na(init)] <- anticlust:::sample_(rep(1:K, freq_not_assigned))
+  stopifnot(all(table(init) == target_groups))
+  init
+}
+
+# wrapper for the two above
+init_must_link_groups <- function(N, ID, target_groups) {
+  init <- get_init_assignments(N, ID, target_groups)
+  fill_groups(init, target_groups)
+}
+
+# Given an assignment of original elements to clusters, generate the
+# corresponding clusters for the merged elements. 
+original_cluster_to_merged_cluster <- function(clusters, must_link) {
+  df <- data.frame(clusters, must_link)
+  new_df <- df[!duplicated(df$must_link), ]
+  # order by must_link grouping
+  new_df[order(new_df$must_link), ]$clusters
+}
+
+# Given an assignment of "merged" elements to clusters, re-establish the
+# corresponding clusters for the original elements. 
+merged_cluster_to_original_cluster <- function(merged_clusters, must_link) {
+  df <- data.frame(must_link, order = 1:length(must_link))
+  new_order <- order(must_link)
+  df <- df[new_order, ]
+  df$clusters <- rep(merged_clusters, table(must_link))
+  df[order(df$order), "clusters"]
+}
+
+#' @export
+anticlustering_must_link <- function(x, K, must_link) {
+  stopifnot(is_distance_matrix(x))
+  x <- to_matrix(x)
+  N <- nrow(x)
+  
+  clusters_init <- init_must_link_groups(N, must_link, table(initialize_clusters(N, K, NULL)))
+
+  DF_ <- data.frame(must_link, x)
+  
+  obj_for_merged_clusters <- function(x, clusters) {
+    clusters_real <- merged_cluster_to_original_cluster(clusters, DF_[, 1])
+    # Punish clusterings that do not adhere to group size constraints
+    if (!same_cluster_sizes(clusters_real, clusters_init)) {
+      return(-Inf)
+    }
+    diversity_objective(DF_[, -1], clusters_real)
+  }
+  
+  dummy_data <- 1:length(unique(must_link))
+  dummy_groups <- anticlustering(
+    dummy_data,
+    K = original_cluster_to_merged_cluster(clusters_init, must_link),
+    objective = obj_for_merged_clusters
+  )
+  solution <- merged_cluster_to_original_cluster(dummy_groups, must_link)
+  if (!is.infinite(obj_fun_must_link(must_link, solution))) {
+    stop("I could not fulfil the `must_link` restrictions, sorry!")
+  }
+  # Group sizes may be unequal if restrictions were not fulfilled
+  if (!same_cluster_sizes(solution, clusters_init)) {
+    stop("I could not fulfil the `must_link` restrictions, sorry!")
+  }
+  solution
+}
+
+same_cluster_sizes <- function(clusters1, clusters2) {
+  all(sort(table(clusters1)) == sort(table(clusters2)))
+}
+
+
+
+
+############################# DEAD CODE:
+
 # Quantify how well a clustering satisfies must-link constraints
 clustering_fit_must_link <- function(must_link, cl) {
   must_link <- c(must_link)
@@ -54,71 +172,5 @@ initialize_must_link_clustering <- function(must_link, N, K, categories) {
   df[order(df$order), ]$cl
 }
 
-# Given an assignment of original elements to clusters, generate the
-# corresponding clusters for the merged elements. 
-original_cluster_to_merged_cluster <- function(clusters, must_link) {
-  df <- data.frame(clusters, must_link)
-  new_df <- df[!duplicated(df$must_link), ]
-  # order by must_link grouping
-  new_df[order(new_df$must_link), ]$clusters
-}
 
-# Given an assignment of "merged" elements to clusters, re-establish the
-# corresponding clusters for the original elements. 
-merged_cluster_to_original_cluster <- function(merged_clusters, must_link) {
-  df <- data.frame(must_link, order = 1:length(must_link))
-  new_order <- order(must_link)
-  df <- df[new_order, ]
-  df$clusters <- rep(merged_clusters, table(must_link))
-  df[order(df$order), "clusters"]
-}
-
-#' @export
-anticlustering_must_link <- function(x, K, must_link, categories = NULL) {
-  
-  categories <- merge_into_one_variable(categories)
-  
-  clusters_init <- initialize_must_link_clustering(
-    must_link, 
-    N = NROW(x), 
-    K = K, 
-    categories = categories
-  )
-
-  DF_ <- data.frame(must_link, x)
-  
-  obj_for_merged_clusters <- function(x, clusters) {
-    clusters_real <- merged_cluster_to_original_cluster(clusters, DF_[, 1])
-    # Punish clusterings that do not adhere to categorical restrictions
-    if (argument_exists(categories)) {
-      if (any(sort(table(clusters_init, categories)) != sort(table(clusters_real, categories)))) {
-        return(-Inf)
-      }
-    }
-    # Punish clusterings that do not adhere to group size constraints
-    if (!same_cluster_sizes(clusters_real, clusters_init)) {
-      return(-Inf)
-    }
-    kplus_objective(DF_[, -1], clusters_real)
-  }
-  
-  dummy_data <- 1:length(unique(must_link))
-  dummy_groups <- anticlustering(
-    dummy_data,
-    K = original_cluster_to_merged_cluster(clusters_init, must_link),
-    objective = obj_for_merged_clusters
-  )
-  solution <- merged_cluster_to_original_cluster(dummy_groups, must_link)
-  if (!is.infinite(obj_fun_must_link(must_link, solution))) {
-    stop("I could not fulfil the `must_link` restrictions, sorry!")
-  }
-  # Group sizes may be unequal if restrictions were not fulfilled
-  if (!same_cluster_sizes(solution, clusters_init)) {
-    stop("I could not fulfil the `must_link` restrictions, sorry!")
-  }
-  solution
-}
-
-same_cluster_sizes <- function(clusters1, clusters2) {
-  all(sort(table(clusters1)) == sort(table(clusters2)))
-}
+########################## END DEAD
