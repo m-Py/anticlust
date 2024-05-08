@@ -4,7 +4,6 @@
 get_init_assignments <- function(N, ID, target_groups) {
   # Initialize all as NA
   init <- rep(NA, N)
-  ID <- tt$patientID
   # for loop to satisfy must-link constraints, will not work in all cases (this can
   # be solved optimally in polynomial time but I do not have this algorithm right now):
   K <- length(target_groups)
