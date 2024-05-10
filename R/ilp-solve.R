@@ -48,10 +48,11 @@ solve_ilp_diversity <- function(ilp, objective = "max", solver = NULL) {
 
 # Function to find a solver package
 find_ilp_solver <- function() {
-  if (requireNamespace("Rsymphony", quietly = TRUE)) {
-    return("symphony")
-  } else if (requireNamespace("Rglpk", quietly = TRUE)) {
+  if (requireNamespace("Rglpk", quietly = TRUE)) {
     return("glpk")
+  }
+  else if (requireNamespace("Rsymphony", quietly = TRUE)) {
+    return("symphony")
   }
   check_if_solver_is_available() # throws an error here!
 }

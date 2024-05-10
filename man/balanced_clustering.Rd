@@ -9,7 +9,7 @@ Meik Michalke. It was later rewritten by Martin Papenberg, who
 also implemented the integer linear programming method.
 }
 \usage{
-balanced_clustering(x, K, method = "centroid")
+balanced_clustering(x, K, method = "centroid", solver = NULL)
 }
 \arguments{
 \item{x}{The data input. Can be one of two structures: (1) A feature
@@ -24,6 +24,10 @@ represent pairwise dissimilarities.}
 \item{K}{How many clusters should be created.}
 
 \item{method}{One of "centroid" or "ilp". See Details.}
+
+\item{solver}{Optional. The solver used to obtain the optimal method 
+if \code{method  = "ilp"}. Currently supports "glpk" and "symphony". 
+Is ignored for \code{method = "centroid"}.}
 }
 \value{
 An integer vector representing the cluster affiliation of 
@@ -60,11 +64,17 @@ objective. If the argument \code{x} is a features matrix, the
 Euclidean distance is computed as the basic unit of the cluster
 editing objective. If another distance measure is preferred, users
 may pass a self-computed dissimiliarity matrix via the argument
-\code{x}. The optimal cluster editing objective can be found via
-integer linear programming. To obtain an optimal solution, the open
-source GNU linear programming kit (available from
-https://www.gnu.org/software/glpk/glpk.html) and the R package
-\code{Rglpk} must be installed.
+\code{x}. 
+
+The optimal \code{method = "ilp"} either require the R 
+package \code{Rglpk} and the GNU linear programming kit
+(<http://www.gnu.org/software/glpk/>), or the R package
+\code{Rsymphony} and the COIN-OR SYMPHONY solver libraries
+(<https://github.com/coin-or/SYMPHONY>). If the argument \code{solver} is not 
+specified by the user, the function will try to find the GLPK or SYMPHONY 
+solver and throw an error if none is available. It will select the 
+GLPK solver if both are available and if the argument \code{solver} is not set
+by the user.
 }
 \examples{
 

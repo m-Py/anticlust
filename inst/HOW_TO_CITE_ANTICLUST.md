@@ -79,6 +79,8 @@ Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition data sets
 
 Papenberg, M. (2024). K-plus Anticlustering: An Improved k-means Criterion for Maximizing Between-Group Similarity. *British Journal of Mathematical and Statistical Psychology, 77* (1), 80--102. https://doi.org/10.1111/bmsp.12315
 
+Späth, H. (1986). Anticlustering: Maximizing the variance criterion. *Control and Cybernetics*, 15, 213--218.
+
 Steinley, D. (2006). K-means clustering: A half-century synthesis. *British Journal of Mathematical and Statistical Psychology, 59*, 1--34.
 
 Valev, V. (1983). Set partition principles. In J. Kozesnik (Ed.), *Transactions of the ninth Prague conference on information theory, statistical decision functions, and random processes* (Prague, 1982) (pp. 251--256). Prague, Czech Republic: Springer Netherlands.

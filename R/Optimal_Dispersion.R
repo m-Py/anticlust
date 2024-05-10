@@ -52,10 +52,11 @@
 #'   \code{Rsymphony} and the COIN-OR SYMPHONY solver libraries
 #'   (<https://github.com/coin-or/SYMPHONY>). If the argument
 #'   \code{solver} is not specified, the function will try to find the
-#'   GLPK or SYMPHONY solver by itself (it prioritizes using SYMPHONY if
-#'   both are available). The GNU linear programming kit (\code{solver =
+#'   GLPK or SYMPHONY solver by itself. It prioritizes using GLPK if
+#'   both are available. However, the GNU linear programming kit (\code{solver =
 #'   "glpk"}) seems to be considerably slower for K >= 3 than the
-#'   SYMPHPONY solver (\code{solver = "symphony"}).
+#'   SYMPHPONY solver (\code{solver = "symphony"}). So, it is recommended to manually
+#'   change the default behaviour.
 #' 
 #'   Optimally solving the maximum dispersion problem is NP-hard for K
 #'   > 2 and therefore computationally infeasible for larger data
@@ -160,16 +161,15 @@ optimal_dispersion <- function(
     min_dispersion_considered = NULL,
     npartitions = 1) {
 
-  if (argument_exists(solver)) {
-    validate_input(solver, "solver", objmode = "character", len = 1,
-                   input_set = c("glpk", "symphony", "Gecode"), not_na = TRUE, not_function = TRUE)
-  } else {
+  
+  validate_input_optimal_anticlustering(x, K, "dispersion", solver)
+  
+  if (!argument_exists(solver)) {
     solver <- find_ilp_solver()
   }
-  validate_data_matrix(x)
-  validate_input(K, "K", objmode = "numeric", must_be_integer = TRUE, not_na = TRUE, not_function = TRUE)
+
   validate_input(npartitions, "npartitions", objmode = "numeric", must_be_integer = TRUE, not_na = TRUE, not_function = TRUE, greater_than = 0)
-  
+
   if (is.null(max_dispersion_considered)) {
     max_dispersion_considered <- Inf
   } else {
@@ -180,9 +180,6 @@ optimal_dispersion <- function(
   distances <- convert_to_distances(x)
   diag(distances) <- Inf
   N <- nrow(distances)
-  if (!(length(K) == 1 || sum(K) == N)) {
-    stop("Argument `K` is misspecified.")
-  }
   
   if (argument_exists(min_dispersion_considered)) {
     validate_input(min_dispersion_considered, "min_dispersion_considered", 
