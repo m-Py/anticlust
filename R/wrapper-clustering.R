@@ -11,6 +11,9 @@
 #'     represent pairwise dissimilarities.
 #' @param K How many clusters should be created.
 #' @param method One of "centroid" or "ilp". See Details.
+#' @param solver Optional. The solver used to obtain the optimal method 
+#'     if \code{method  = "ilp"}. Currently supports "glpk" and "symphony". 
+#'     Is ignored for \code{method = "centroid"}.
 #'
 #' @return An integer vector representing the cluster affiliation of 
 #'     each data point
@@ -44,11 +47,17 @@
 #' Euclidean distance is computed as the basic unit of the cluster
 #' editing objective. If another distance measure is preferred, users
 #' may pass a self-computed dissimiliarity matrix via the argument
-#' \code{x}. The optimal cluster editing objective can be found via
-#' integer linear programming. To obtain an optimal solution, the open
-#' source GNU linear programming kit (available from
-#' https://www.gnu.org/software/glpk/glpk.html) and the R package
-#' \code{Rglpk} must be installed.
+#' \code{x}. 
+#' 
+#' The optimal \code{method = "ilp"} either require the R 
+#' package \code{Rglpk} and the GNU linear programming kit
+#' (<http://www.gnu.org/software/glpk/>), or the R package
+#' \code{Rsymphony} and the COIN-OR SYMPHONY solver libraries
+#' (<https://github.com/coin-or/SYMPHONY>). If the argument \code{solver} is not 
+#' specified by the user, the function will try to find the GLPK or SYMPHONY 
+#' solver and throw an error if none is available. It will select the 
+#' GLPK solver if both are available and if the argument \code{solver} is not set
+#' by the user.
 #'
 #'
 #' @source
@@ -86,13 +95,15 @@
 #' 161–174. https://doi.org/10.1037/met0000301.
 #'
 
-balanced_clustering <- function(x, K, method = "centroid") {
+balanced_clustering <- function(x, K, method = "centroid", solver = NULL) {
 
   input_validation_anticlustering(x, K, "distance", method, TRUE, NULL, NULL)
+  validate_input_optimal_anticlustering(x, K, "diversity", solver)
   data <- to_matrix(x)
   
   if (method == "ilp") {
-    return(balanced_cluster_editing(data, K))
+    solver <- ifelse(argument_exists(solver), solver, find_ilp_solver())
+    return(balanced_cluster_editing(data, K, solver))
   }
   nn_centroid_clustering(data, NROW(data) / K)
 }
