@@ -13,7 +13,7 @@ for (k in 1:nrow(conditions)) {
   anti_list <- list()
   for (i in c(TRUE, FALSE)) {
     anticlusters <- anticlust:::exact_anticlustering(as.matrix(dist(features)),
-                                         p_anticlusters, preclustering = i)
+                                         p_anticlusters, preclustering = i, NULL)
     anti_list[[i + 1]] <- anticlusters
     # Allow for some numeric imprecision of ILP solver:
     obj_values[i + 1]  <- round(anticlust:::diversity_objective_(anticlusters, features), 10)
