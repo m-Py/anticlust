@@ -355,7 +355,8 @@ input_validation_matching <- function(
 check_if_solver_is_available <- function() {
   glpk_available <- requireNamespace("Rglpk", quietly = TRUE)
   symphony_available <- requireNamespace("Rsymphony", quietly = TRUE)
-  no_solver_available <- !glpk_available && !symphony_available
+  lpSolve_available <- requireNamespace("lpSolve", quietly = TRUE)
+  no_solver_available <- !glpk_available && !symphony_available && !lpSolve_available
   
   if (no_solver_available) {
     stop("\n\nAn exact method was requested, but no ILP solver is ",
@@ -366,7 +367,7 @@ check_if_solver_is_available <- function() {
          "- 'sudo apt install libglpk-dev' on Ubuntu ",
          "\n\nThen, install the Rglpk package via ",
          "`install.packages('Rglpk')`.\n \n Another possibilty is to install the R package 'Rsymphony' ",
-         "and the SYMPHONY ILP solver (https://github.com/coin-or/SYMPHONY).")
+         "and the SYMPHONY ILP solver (https://github.com/coin-or/SYMPHONY), or the R package `lpSolve`.")
   }
   return(invisible(NULL))
 }

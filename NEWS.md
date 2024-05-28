@@ -1,3 +1,8 @@
+# anticlust 0.8.6.99999
+
+- Add lpSolve solver, and import it when installing (so an ILP solver is always available, and lpSolve has no system dependencies)
+- Is now default
+
 # anticlust 0.8.5
 
 ## New features

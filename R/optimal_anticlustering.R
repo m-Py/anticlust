@@ -17,7 +17,7 @@
 #' @param objective The anticlustering objective, can be "diversity", "variance", 
 #'     "kplus" or "dispersion".
 #' @param solver Optional. The solver used to obtain the optimal method. 
-#'     Currently supports "glpk" and "symphony". See details.
+#'     Currently supports "glpk", "symphony", and "lpSolve". See details.
 #'     
 #' @return A vector of length N that assigns a group (i.e, a number
 #'     between 1 and \code{K}) to each input element.
@@ -127,7 +127,7 @@ validate_input_optimal_anticlustering <- function(x, K, objective, solver) {
   # Solver
   if (argument_exists(solver)) {
     validate_input(solver, "solver", objmode = "character", len = 1,
-                   input_set = c("glpk", "symphony"), not_na = TRUE, not_function = TRUE)
+                   input_set = c("glpk", "symphony", "lpSolve"), not_na = TRUE, not_function = TRUE)
   }
   
 }

@@ -24,7 +24,7 @@ only works for \code{objective = "dispersion")}.}
 "kplus" or "dispersion".}
 
 \item{solver}{Optional. The solver used to obtain the optimal method. 
-Currently supports "glpk" and "symphony". See details.}
+Currently supports "glpk", "symphony", and "lpSolve". See details.}
 }
 \value{
 A vector of length N that assigns a group (i.e, a number
