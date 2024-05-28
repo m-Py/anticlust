@@ -64,7 +64,41 @@ data <- matrix(rnorm(N*M), ncol = M)
 b <- anticlustering(data, K = 2, cannot_link = cbind(1:2, 2:3), repetitions = 10, method = "local-maximum")
 expect_true(b[1] != b[2])
 expect_true(b[2] != b[3])
-b <- anticlustering(data, K = 2, cannot_link = cbind(1:2, 2:3), method = "brusco", repetitions = 10)
+b <- anticlustering(data, K = 2, cannot_link = rbind(1:2, 2:3), method = "brusco", repetitions = 10)
 expect_true(b[1] != b[2])
 expect_true(b[2] != b[3])
 
+expect_true(table(b)[1] == table(b)[2])
+
+# different sized groups:
+b <- anticlustering(data, K = c(100, 40), cannot_link = rbind(1:2, 2:3), method = "brusco", repetitions = 10)
+expect_true(b[1] != b[2])
+expect_true(b[2] != b[3])
+
+expect_true(sort(table(b))[1] == 40)
+expect_true(sort(table(b))[2] == 100)
+
+# more constraints, different sized groups
+b <- anticlustering(data, K = c(100, 40), cannot_link = rbind(1:2, 2:3, 4:5, 6:7), method = "brusco", repetitions = 10)
+expect_true(b[1] != b[2])
+expect_true(b[2] != b[3])
+expect_true(b[4] != b[5])
+expect_true(b[6] != b[7])
+
+expect_true(sort(table(b))[1] == 40)
+expect_true(sort(table(b))[2] == 100)
+
+# more groups, different sized groups
+b <- anticlustering(data, K = c(20, 20, 40, 30, 10, 10, 10), cannot_link = rbind(1:2, 2:3, 4:5, 6:7), method = "brusco", repetitions = 10)
+expect_true(b[1] != b[2])
+expect_true(b[2] != b[3])
+expect_true(b[4] != b[5])
+expect_true(b[6] != b[7])
+
+expect_true(sort(table(b))[1] == 10)
+expect_true(sort(table(b))[2] == 10)
+expect_true(sort(table(b))[3] == 10)
+expect_true(sort(table(b))[4] == 20)
+expect_true(sort(table(b))[5] == 20)
+expect_true(sort(table(b))[6] == 30)
+expect_true(sort(table(b))[7] == 40)
