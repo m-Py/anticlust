@@ -412,28 +412,19 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   
   # BILS by Brusco et al.:
   if (method == "brusco") {
-    weights <- c(0.5, 0.99, 0.999, 0.999999)
-    obj_fun <- diversity_objective_
     average_diversity <- FALSE
-    if (objective == "dispersion") {
-      weights <- c(0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1)
-      obj_fun <- dispersion_objective_
-    } else if (objective == "kplus") {
+    if (objective == "kplus") {
       x <- kplus_moment_variables(x, 2)
       objective <- "variance"
     } 
     if (objective == "variance") {
       x <- convert_to_distances(x)^2
-      if (any(TARGET_GROUPS != TARGET_GROUPS[1])) {
-        average_diversity <- TRUE
-      }
+      average_diversity <- TRUE
+      objective <- "diversity"
     }
-    partitions <- as.matrix(
-      bicriterion_anticlustering(x, K, repetitions, weights, average_diversity = average_diversity)
-    )
-    # get best partition wrt dispersion / diversity
-    best_obj <- which.max(apply(partitions, 1, obj_fun, convert_to_distances(x)))
-    return(partitions[best_obj, ])
+    return(as.matrix(
+      bicriterion_anticlustering(x, K, repetitions, average_diversity = average_diversity, return = paste0("best-", objective))
+    ))
   }
   
   # Some special cases must be considered now:

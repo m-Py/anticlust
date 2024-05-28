@@ -12,7 +12,8 @@ bicriterion_anticlustering(
   Xi = c(0.05, 0.1),
   dispersion_distances = NULL,
   average_diversity = FALSE,
-  init_partitions = NULL
+  init_partitions = NULL,
+  return = "paretoset"
 )
 }
 \arguments{
@@ -53,11 +54,15 @@ columns = elements) that serve as starting partitions during the
 iterations of the first phase of the BILS (i.e., the MBPI).
 If not passed, a new random partition is generated at the start of each 
 iteration (which is the default behaviour).}
+
+\item{return}{Either "paretoset" (default), "best-diversity", or "best-dispersion". See below.}
 }
 \value{
-A \code{matrix} of anticlustering partitions (i.e., the
+By default, a \code{matrix} of anticlustering partitions (i.e., the
     approximated pareto set). Each row corresponds to a partition,
-    each column corresponds to an input element.
+    each column corresponds to an input element. If the argument is set to 
+    either "best-diversity" or "best-dispersion", it only returns one partition
+    (as a vector), that maximizes the respective objective.
 }
 \description{
 This function implements the bicriterion for anticlustering by Brusco, 

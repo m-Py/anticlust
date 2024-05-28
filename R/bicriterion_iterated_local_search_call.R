@@ -36,6 +36,7 @@
 #'     iterations of the first phase of the BILS (i.e., the MBPI).
 #'     If not passed, a new random partition is generated at the start of each 
 #'     iteration (which is the default behaviour).
+#' @param return Either "paretoset" (default), "best-diversity", or "best-dispersion". See below.
 #'     
 #' @details
 #'
@@ -91,9 +92,11 @@
 #' If multiple \code{init_partitions} are given, ensure that each partition
 #' (i.e., each row of\code{init_partitions}) has the exact same output of \code{\link{table}}.
 #' 
-#' @return A \code{matrix} of anticlustering partitions (i.e., the
+#' @return By default, a \code{matrix} of anticlustering partitions (i.e., the
 #'     approximated pareto set). Each row corresponds to a partition,
-#'     each column corresponds to an input element.
+#'     each column corresponds to an input element. If the argument is set to 
+#'     either "best-diversity" or "best-dispersion", it only returns one partition
+#'     (as a vector), that maximizes the respective objective.
 #' 
 #' @author Martin Breuer \email{M.Breuer@@hhu.de}, Martin Papenberg
 #'     \email{martin.papenberg@@hhu.de}
@@ -175,12 +178,19 @@ bicriterion_anticlustering <- function(
   x, K, R = NULL, 
   W = c(0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 0.5, 0.99, 0.999, 0.999999),
   Xi = c(0.05, 0.1),
-  dispersion_distances = NULL, average_diversity = FALSE, init_partitions = NULL) {
+  dispersion_distances = NULL, average_diversity = FALSE, init_partitions = NULL, return = "paretoset") {
   
   input_validation_anticlustering(
     x, K, objective = "distance", method = "heuristic", 
     preclustering = FALSE, categories = NULL,
     repetitions = 1, standardize = FALSE
+  )
+  
+  validate_input(
+    return, "return", objmode = "character", len = 1,
+    input_set = c("paretoset", "best-diversity", "best-dispersion"), 
+    not_na = TRUE, 
+    not_function = TRUE
   )
   
   
@@ -273,7 +283,15 @@ bicriterion_anticlustering <- function(
   results <- data.frame(t(apply(results, 1, order_cluster_vector)))
   # Remove duplicates
   results <- results[!duplicated(results), ]
-  unname(as.matrix(results))
+  results <- unname(as.matrix(results))
+  if (return == "best-diversity") {
+    best_obj <- which.max(apply(results, 1, diversity_objective_, convert_to_distances(x)))
+    return(results[best_obj, ])
+  } else if (return == "best-dispersion") {
+    best_obj <- which.max(apply(results, 1, dispersion_objective_, convert_to_distances(x)))
+    return(results[best_obj, ])
+  }
+  results
 }
 
 #verify input
