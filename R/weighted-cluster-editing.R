@@ -35,16 +35,10 @@
 #' Finds the clustering that maximizes the sum of pairwise similarities within clusters. 
 #' In the input some similarities should be negative (indicating dissimilarity) because 
 #' otherwise the maximum sum of similarities is obtained by simply joining all elements 
-#' within a single big cluster. If the argument \code{solver} is not specified, the function
-#' will try to find the GLPK or SYMPHONY solver by itself (it prioritizes using SYMPHONY if both are
-#' available).
+#' within a single big cluster. The function uses a "solver" to optimize
+#' the clustering objective. See \code{\link{optimal_anticlustering}}
+#' for an overview of the solvers that are available.
 #' 
-#' @note
-#' 
-#' This function either requires the R package \code{Rglpk} and the GNU linear 
-#' programming kit (<http://www.gnu.org/software/glpk/>) or the R package 
-#' \code{Rsymphony} and the COIN-OR SYMPHONY solver libraries 
-#' (<https://github.com/coin-or/SYMPHONY>).
 #' 
 #' @references
 #'
@@ -67,7 +61,7 @@ wce <- function(x, solver = NULL) {
 
   if (argument_exists(solver)) {
     validate_input(solver, "solver", objmode = "character", len = 1,
-                   input_set = c("glpk", "symphony"), not_na = TRUE, not_function = TRUE)
+                   input_set = c("glpk", "symphony", "lpSolve"), not_na = TRUE, not_function = TRUE)
   } else {
     solver <- find_ilp_solver()
   }
@@ -80,6 +74,6 @@ wce <- function(x, solver = NULL) {
   
   x <- as.matrix(x)
   ilp <- anticlustering_ilp(x, K = 0, FALSE) # k is irrelevant
-  solution <- solve_ilp_diversity(ilp, "max", solver)
+  solution <- solve_ilp(ilp, "max", solver)
   ilp_to_groups(solution, nrow(x))
 }

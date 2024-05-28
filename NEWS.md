@@ -6,6 +6,7 @@
 - added argument `cannot_link` to `anticlustering()` (for `method = "exchange", "local-maximum", "brusco" "ilp"`, and `objective = "diversity", "variance", "kplus"`)
 - `method = "brusco"` now works for `objective = "variance"` and `"kplus"`
 - `anticlustering()` now has an argument `cannot_link`, which works with options for `method`
+- Add lpSolve solver, and import it when installing (so an ILP solver is always available, and lpSolve has no system dependencies); it is now also the default solver
 
 # anticlust 0.8.5
 

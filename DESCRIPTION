@@ -61,7 +61,8 @@ Depends:
     R (>= 3.6.0)
 Imports: 
     Matrix,
-    RANN (>= 2.6.0)
+    RANN (>= 2.6.0),
+    lpSolve
 Suggests: 
     knitr,
     palmerpenguins,

@@ -46,19 +46,8 @@
 #'   instances of a graph coloring problem, using an integer linear
 #'   programming (ILP) representation (also see Fernandez et al.,
 #'   2013).  It is possible to specify the ILP solver via the argument
-#'   \code{solver}. This function either requires the R package
-#'   \code{Rglpk} and the GNU linear programming kit
-#'   (<http://www.gnu.org/software/glpk/>) or the R package
-#'   \code{Rsymphony} and the COIN-OR SYMPHONY solver libraries
-#'   (<https://github.com/coin-or/SYMPHONY>). If the argument
-#'   \code{solver} is not specified, the function will try to find the
-#'   GLPK or SYMPHONY solver by itself. It prioritizes using GLPK if
-#'   both are available. However, the GNU linear programming kit (\code{solver =
-#'   "glpk"}) seems to be considerably slower for K >= 3 than the
-#'   SYMPHPONY solver (\code{solver = "symphony"}). So, it is recommended to manually
-#'   change the default behaviour.
-#' 
-#'   Optimally solving the maximum dispersion problem is NP-hard for K
+#'   \code{solver} (See \code{\link{optimal_anticlustering}} for more information on 
+#'   this argument). Optimally solving the maximum dispersion problem is NP-hard for K
 #'   > 2 and therefore computationally infeasible for larger data
 #'   sets. For K = 3 and K = 4, it seems that this approach scales up to several 100 elements, 
 #'   or even > 1000 for K = 3 (at least when using the Symphony solver). 
@@ -213,7 +202,7 @@ optimal_dispersion <- function(
     all_nns_reordered <- reorder_edges(all_nns)
     # Construct graph from all previous edges (that had low distances)
     ilp <- k_coloring_ilp(all_nns_reordered, N, K, target_groups)
-    solution <- solve_ilp_graph_colouring(ilp, solver)
+    solution <- solve_ilp(ilp, objective = "min", solver = solver)
     dispersion_found <- solution$status != 0 
     if (!dispersion_found){
       last_solution <- solution
@@ -379,36 +368,6 @@ constraint_names <- function(nr_of_nodes, K) {
   
   return(c(w_l, x_j_i$variables))
 }
-
-# allow for different solvers (Symphony, GLPK)
-
-solve_ilp_graph_colouring <- function(ilp, solver) {
-  
-  # solver_function = Rglpk::Rglpk_solve_LP OR Rsymphony::Rsymphony_solve_LP
-  # name_opt (refers to the output of the function) = "objval" (GLPK) OR "optimum" (Symphony)
-  # rest of the input is the same between the solver functions, which is nice
-  solver_function <- ifelse(solver == "symphony", Rsymphony::Rsymphony_solve_LP, Rglpk::Rglpk_solve_LP)
-  name_opt <- ifelse(solver == "symphony", "objval", "optimum")
-  
-  ilp_solution <- solver_function(
-    obj = ilp$obj_function,
-    mat = ilp$constraints,
-    dir = ilp$equalities,
-    rhs = ilp$rhs,
-    types = "B",
-    max = FALSE
-  )
-
-  # return the optimal value and the variable assignment
-  ret_list <- list() 
-  ret_list$x <- ilp_solution$solution
-  ret_list$obj <- ilp_solution[[name_opt]]
-  ret_list$status <- ilp_solution$status
-  ## name the decision variables
-  names(ret_list$x) <- colnames(ilp$constraints)
-  ret_list
-}
-
 
 # dummy function for calling groups_from_k_coloring_mapping() several times using sapply
 repeat_grouping <- function(X, result_value, result_x, all_nns, all_nns_reordered, N, K, target_groups) {

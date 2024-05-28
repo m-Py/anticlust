@@ -26,7 +26,7 @@ for (k in 1:nrow(conditions)) {
   features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
   distances <- as.matrix(dist(features))
   ilp <- anticlust:::anticlustering_ilp(distances, p_anticlusters)
-  solution <- anticlust:::solve_ilp_diversity(ilp, "min")
+  solution <- anticlust:::solve_ilp(ilp, "min")
   anticlusters <- anticlust:::ilp_to_groups(solution, n_elements)
   expect_equal(solution$obj, anticlust:::diversity_objective_(anticlusters, features))
 }

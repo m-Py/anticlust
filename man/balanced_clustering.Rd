@@ -66,15 +66,9 @@ editing objective. If another distance measure is preferred, users
 may pass a self-computed dissimiliarity matrix via the argument
 \code{x}. 
 
-The optimal \code{method = "ilp"} either require the R 
-package \code{Rglpk} and the GNU linear programming kit
-(<http://www.gnu.org/software/glpk/>), or the R package
-\code{Rsymphony} and the COIN-OR SYMPHONY solver libraries
-(<https://github.com/coin-or/SYMPHONY>). If the argument \code{solver} is not 
-specified by the user, the function will try to find the GLPK or SYMPHONY 
-solver and throw an error if none is available. It will select the 
-GLPK solver if both are available and if the argument \code{solver} is not set
-by the user.
+The optimal \code{method = "ilp"} uses a "solver" to optimize
+the clustering objective. See \code{\link{optimal_anticlustering}}
+for an overview of the solvers that are available.
 }
 \examples{
 

@@ -205,15 +205,7 @@
 #' \code{\link{optimal_dispersion}} has more information on the
 #' optimal maximization of the dispersion (this is the function that is called internally by
 #' anticlustering() when using \code{objective = "dispersion"} and
-#' \code{method = "ilp"}). The ILP methods either require the R
-#' package \code{Rglpk} and the GNU linear programming kit
-#' (<http://www.gnu.org/software/glpk/>), or the R package
-#' \code{Rsymphony} and the COIN-OR SYMPHONY solver libraries
-#' (<https://github.com/coin-or/SYMPHONY>). The function will try to
-#' find the GLPK or SYMPHONY solver and throw an error if none is
-#' available. If both are found, the GLPK solver is used. Use the functions
-#' \code{\link{optimal_anticlustering}} or \code{\link{optimal_dispersion}}
-#' to manually select a solver.
+#' \code{method = "ilp"}). 
 #'
 #' Optimally maximizing the diversity only works for rather small N
 #' and K; N = 20 and K = 2 is usually solved within some seconds, but

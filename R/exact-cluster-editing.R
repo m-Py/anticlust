@@ -15,6 +15,6 @@ balanced_cluster_editing <- function(data, K, solver) {
     data <- as.matrix(dist(data))
   }
   ilp <- anticlustering_ilp(data, K)
-  solution <- solve_ilp_diversity(ilp, "min", solver)
+  solution <- solve_ilp(ilp, "min", solver)
   ilp_to_groups(solution, nrow(data))
 }
