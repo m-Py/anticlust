@@ -59,6 +59,11 @@ expect_true(is.vector(
   anticlustering(schaper2019[, 3:6], K = 2, method = "brusco")
 ))
 
+# For dispersion objective
+expect_true(is.vector(
+  anticlustering(schaper2019[, 3:6], K = 2, method = "brusco", objective = "dispersion")
+))
+
 # Ensure that random seeds work with bicriterion algorithm (this is important
 # because the algorithm uses random number generation in C, should be 
 # reproducible from R!)
