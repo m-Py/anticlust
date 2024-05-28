@@ -43,7 +43,7 @@ expect_error(
 bc <- bicriterion_anticlustering(schaper2019[, 3:6], K = 3, R = 20)
 tab <- apply(bc, 1, table)
 tab <- data.frame(tab)
-tab <- tab[order(tab$X1, decreasing = TRUE), ]
+tab <- tab[order(tab[, 1], decreasing = TRUE), ]
 expect_true(all(tab == c(32, 32, 32)))
 
 # Ensure that random seeds work with bicriterion algorithm (this is important
