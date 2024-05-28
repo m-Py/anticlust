@@ -128,6 +128,17 @@ validate_input_optimal_anticlustering <- function(x, K, objective, solver) {
   if (argument_exists(solver)) {
     validate_input(solver, "solver", objmode = "character", len = 1,
                    input_set = c("glpk", "symphony", "lpSolve"), not_na = TRUE, not_function = TRUE)
+    if (solver == "glpk") {
+      if (!requireNamespace("Rglpk", quietly = TRUE)) {
+        stop("The package Rglpk must be installed to use `solver = glpk`.\n", 
+             "Type install.packages('Rglpk') in the R console to install it.")
+      }
+    } else if (solver == "symphony") {
+      if (!requireNamespace("Rsymphony", quietly = TRUE)) {
+        stop("The package Rsymphony must be installed to use `solver = Rsymphony`.\n", 
+             "Type install.packages('Rsymphony') in the R console to install it.")
+      }
+    }
   }
   
 }
