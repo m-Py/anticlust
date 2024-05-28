@@ -382,20 +382,28 @@ groups_from_k_coloring_mapping <- function(result_value, result_x, all_nns, all_
   add_unassigned_elements(target_groups, groups_new, N, K)
 }
 
-add_unassigned_elements <- function(target_groups, groups_new, N, K) {
-  if (sum(!is.na(groups_new)) == N) {
-    return(groups_new)  # groups are already full, no unassigned elements!
+# After initial assignment, fill the rest randomly
+add_unassigned_elements <- function(target_groups, init, N, K) {
+  if (sum(!is.na(init)) == N) {
+    return(init)  # groups are already full, no unassigned elements!
   }
-  freq_not_assigned <- target_groups - table(groups_new)
-  assigned <- table(groups_new)
-  # Randomly fill other groups that are not yet full
-  if (sum(assigned) < N) {
-    groups_new[is.na(groups_new)] <- sample_(rep(1:K, freq_not_assigned))
+  K <- length(target_groups)
+  table_assigned <- table(init)
+  # assign elements that have no group (unfortunately, this "simple" task is quite difficult in general)
+  if (length(table_assigned) != length(target_groups)) {
+    table_assigned <- data.frame(K = 1:K, size = 0)
+    df <- as.data.frame(table(init))
+    together <- merge(table_assigned, df, by.x = "K", by.y = "init", all = TRUE)
+    table_assigned <- ifelse(is.na(together$Freq), 0, together$Freq)
   }
+  freq_not_assigned <- target_groups - table_assigned
+  init[is.na(init)] <- sample_(rep(1:K, freq_not_assigned))
+  stopifnot(all(table(init) == target_groups))
   # now sort labels by group size (so that each time this function is called, we get the same output of table())
-  new_labels <- order(table(groups_new), decreasing = TRUE)
-  as.numeric(as.character(factor(groups_new, levels = 1:K, labels = new_labels)))
+  new_labels <- order(table(init), decreasing = TRUE)
+  as.numeric(as.character(factor(init, levels = 1:K, labels = new_labels)))
 }
+
 
 graph_coloring_to_group_vector <- function(all_nns_reordered, result_x, K, all_nns, N) {
   # Retrieve assigned colors from the x_v,i ILP variables
