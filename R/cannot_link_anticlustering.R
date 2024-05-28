@@ -73,7 +73,7 @@ BILS_CANNOT_LINK <- function(distances, init_clusters, cannot_link) {
   N <- nrow(distances)
   multiple_partitions_as_input <- is.matrix(init_clusters)
   selection_matrix <- matrix(1, ncol = N, nrow = N)
-  selection_matrix[rbind(cannot_link, rev(cannot_link))] <- -1
+  selection_matrix[rbind(cannot_link, t(apply(cannot_link, 1, rev)))] <- -1
   PARTITIONS <- bicriterion_anticlustering(
     distances, 
     K = if (multiple_partitions_as_input) init_clusters[1, ] else init_clusters,
