@@ -56,3 +56,13 @@ expect_true(a[one] == a[other]) # this is necessary, but maybe we appreciate the
 expect_true(diversity_objective(data, a) >= diversity_objective(data, b))
 
 
+
+## TEST FAILS: Use method to fill elements from must-link branch!
+N <- 140
+M <- 5
+data <- matrix(rnorm(N*M), ncol = M)
+b <- anticlustering(data, K = 5, cannot_link = cbind(1:2, 2:3), repetitions = 10)
+diversity_objective(data, b)
+b <- anticlustering(data, K = 5, cannot_link = cbind(1:2, 2:3), method = "brusco", repetitions = 10)
+diversity_objective(data, b)
+
