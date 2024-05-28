@@ -193,7 +193,7 @@ optimal_dispersion <- function(x, K, solver = NULL, max_dispersion_considered = 
     all_nns_reordered <- reorder_edges(all_nns)
     # Construct graph from all previous edges (that had low distances)
     ilp <- k_coloring_ilp(all_nns_reordered, N, K, target_groups)
-    solution <- solve_ilp_graph_colouring(ilp, solver)
+    solution <- solve_ilp(ilp, objective = "min", solver = solver)
     dispersion_found <- solution$status != 0 
     if (!dispersion_found){
       last_solution <- solution
@@ -342,34 +342,6 @@ constraint_names <- function(nr_of_nodes, K) {
 }
 
 # allow for different solvers (Symphony, GLPK)
-
-solve_ilp_graph_colouring <- function(ilp, solver) {
-  
-  # solver_function = Rglpk::Rglpk_solve_LP OR Rsymphony::Rsymphony_solve_LP
-  # name_opt (refers to the output of the function) = "objval" (GLPK) OR "optimum" (Symphony)
-  # rest of the input is the same between the solver functions, which is nice
-  solver_function <- ifelse(solver == "symphony", Rsymphony::Rsymphony_solve_LP, Rglpk::Rglpk_solve_LP)
-  name_opt <- ifelse(solver == "symphony", "objval", "optimum")
-  
-  ilp_solution <- solver_function(
-    obj = ilp$obj_function,
-    mat = ilp$constraints,
-    dir = ilp$equalities,
-    rhs = ilp$rhs,
-    types = "B",
-    max = FALSE
-  )
-
-  # return the optimal value and the variable assignment
-  ret_list <- list() 
-  ret_list$x <- ilp_solution$solution
-  ret_list$obj <- ilp_solution[[name_opt]]
-  ret_list$status <- ilp_solution$status
-  ## name the decision variables
-  names(ret_list$x) <- colnames(ilp$constraints)
-  ret_list
-}
-
 
 # Restore a grouping from the solved ilp
 groups_from_k_coloring_mapping <- function(result_value, result_x, all_nns, all_nns_reordered, N, K, target_groups) {

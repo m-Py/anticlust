@@ -15,22 +15,22 @@
 #'
 #' @noRd
 
-solve_ilp_diversity <- function(ilp, objective = "max", solver = NULL) {
+solve_ilp <- function(ilp, objective = "max", solver = NULL) {
 
   if (is.null(solver)) {
     solver <- find_ilp_solver()
   }
   
   if (solver == "glpk") {
-    return(solve_ilp_diversity_glpk(ilp, objective))
+    return(solve_ilp_glpk(ilp, objective))
   } else if (solver == "symphony") {
-    return(solve_ilp_diversity_symphony(ilp, objective))
+    return(solve_ilp_symphony(ilp, objective))
   } else if (solver == "lpSolve") {
-    return(solve_ilp_diversity_lpSolve(ilp, objective))
+    return(solve_ilp_lpSolve(ilp, objective))
   }
 }
 
-solve_ilp_diversity_glpk <- function(ilp, objective) {
+solve_ilp_glpk <- function(ilp, objective) {
 
   ilp_solution <- Rglpk::Rglpk_solve_LP(
     obj = ilp$obj_function,
@@ -45,12 +45,13 @@ solve_ilp_diversity_glpk <- function(ilp, objective) {
   ret_list <- list() 
   ret_list$x <- ilp_solution$solution
   ret_list$obj <- ilp_solution$optimum
+  ret_list$status <- ilp_solution$status
   ## name the decision variables
   names(ret_list$x) <- colnames(ilp$constraints)
   ret_list
 }
 
-solve_ilp_diversity_symphony <- function(ilp, objective) {
+solve_ilp_symphony <- function(ilp, objective) {
   
   ilp_solution <- Rsymphony::Rsymphony_solve_LP(
     obj = ilp$obj_function,
@@ -65,12 +66,13 @@ solve_ilp_diversity_symphony <- function(ilp, objective) {
   ret_list <- list() 
   ret_list$x <- ilp_solution$solution
   ret_list$obj <- ilp_solution$objval
+  ret_list$status <- ilp_solution$status
   ## name the decision variables
   names(ret_list$x) <- colnames(ilp$constraints)
   ret_list
 }
 
-solve_ilp_diversity_lpSolve <- function(ilp, objective) {
+solve_ilp_lpSolve <- function(ilp, objective) {
   ilp_solution <- lpSolve::lp(
     objective,
     ilp$obj_function,
@@ -83,6 +85,7 @@ solve_ilp_diversity_lpSolve <- function(ilp, objective) {
   ret_list <- list() 
   ret_list$x <- ilp_solution$solution
   ret_list$obj <- ilp_solution$objval
+  ret_list$status <- ilp_solution$status
   ## name the decision variables
   names(ret_list$x) <- colnames(ilp$constraints)
   ret_list

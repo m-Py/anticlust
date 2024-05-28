@@ -80,6 +80,6 @@ wce <- function(x, solver = NULL) {
   
   x <- as.matrix(x)
   ilp <- anticlustering_ilp(x, K = 0, FALSE) # k is irrelevant
-  solution <- solve_ilp_diversity(ilp, "max", solver)
+  solution <- solve_ilp(ilp, "max", solver)
   ilp_to_groups(solution, nrow(x))
 }
