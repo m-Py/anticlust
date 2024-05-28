@@ -42,30 +42,37 @@
 #' 
 #' The dispersion is solved optimal using the approach described in \code{\link{optimal_dispersion}}.
 #' 
-#' The optimal methods either require the R package \code{Rglpk} and the GNU linear programming kit
-#' (<http://www.gnu.org/software/glpk/>), or the R package
-#' \code{Rsymphony} and the COIN-OR SYMPHONY solver libraries
-#' (<https://github.com/coin-or/SYMPHONY>). If the argument \code{solver} is not 
-#' specified by the user, the function will try to find the GLPK or SYMPHONY 
-#' solver and throw an error if none is available. It will select the 
-#' GLPK solver if both are available because some rare instances have been observed where
-#' the SYMPHONY solver crashes on Mac computers. I would still try out the 
-#' SYMPHONY solver to see if the unlikely crash occurs. However, this has to be 
-#' set by the user (at least if both solver packages Rsymphony and Rglpk are available on the system).
+#' The optimal methods make use of "solvers" that actually implement the algorithm 
+#' for finding optimal solutions. The package anticlust supports three solvers:
+#' 
+#' \itemize{
+#'   \item{The default solver lpSolve (<https://sourceforge.net/projects/lpsolve/>).}
+#'   \item{GNU linear programming kit (<http://www.gnu.org/software/glpk/>), 
+#'   available from the package Rglpk and requested using \code{solver = "glpk"}.
+#'   The R package Rglpk has to be installed manually if this solver should be used.}
+#'   \item{The Symphony solver (<https://github.com/coin-or/SYMPHONY>),
+#'   available from the package Rsymphony and requested using \code{solver = "symphony"}.
+#'   (The package Rsymphony has to be installed manually if this solver should be used).}
+#' }
+#' 
+#' For the maximum dispersion problem, it seems that the Symphony solver is fastest,
+#' while the lpSolve solver seems to be good for maximum diversity. However, note 
+#' that in general the dispersion can be solved optimally for much larger data sets
+#' than the diversity.
 #' 
 #' @export
 #' 
 #' @examples 
 #' 
-#' # data <- matrix(rnorm(24), ncol = 2)
+#' data <- matrix(rnorm(24), ncol = 2)
 #' 
 #' # These calls are equivalent for k-means anticlustering:
-#' # optimal_anticlustering(data, K = 2, objective = "variance")
-#' # optimal_anticlustering(dist(data)^2, K = 2, objective = "diversity")
+#' optimal_anticlustering(data, K = 2, objective = "variance")
+#' optimal_anticlustering(dist(data)^2, K = 2, objective = "diversity")
 #' 
 #' # These calls are equivalent for k-plus anticlustering:
-#' # optimal_anticlustering(data, K = 2, objective = "kplus")
-#' # optimal_anticlustering(dist(kplus_moment_variables(data, 2))^2, K = 2, objective = "diversity")
+#' optimal_anticlustering(data, K = 2, objective = "kplus")
+#' optimal_anticlustering(dist(kplus_moment_variables(data, 2))^2, K = 2, objective = "diversity")
 #' 
 optimal_anticlustering <- function(x, K, objective, solver = NULL) {
   
