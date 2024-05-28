@@ -26,3 +26,24 @@ expect_equal(val1, val3)
 expect_equal(val1, val4)
 expect_true(val1 >= val5)
 
+
+### Test solvers for maximum dispersion
+
+x <- schaper2019[, 3:6]
+start <- Sys.time()
+val1 <- optimal_dispersion(x, K = 3, solver = "lpSolve")$dispersion # here lpSolve is slower
+Sys.time() - start
+
+x <- schaper2019[, 3:6]
+start <- Sys.time()
+val2 <- optimal_dispersion(x, K = 3, solver = "glpk")$dispersion
+Sys.time() - start
+
+x <- schaper2019[, 3:6]
+start <- Sys.time()
+val3 <- optimal_dispersion(x, K = 3, solver = "symphony")$dispersion # here symphony is fastest
+Sys.time() - start
+
+expect_equal(val1, val2)
+expect_equal(val1, val3)
+
