@@ -1,4 +1,6 @@
 
+### Test solvers for maximum diversity
+
 N <- 14
 M <- 5
 K <- 2
@@ -17,6 +19,10 @@ val3 <- diversity_objective(data, symphony)
 default <- optimal_anticlustering(data, K, objective = "diversity") # Test default
 val4 <- diversity_objective(data, default)
 
+val5 <- diversity_objective(data, anticlustering(data, K = K))
+
 expect_equal(val1, val2)
 expect_equal(val1, val3)
 expect_equal(val1, val4)
+expect_true(val1 >= val5)
+
