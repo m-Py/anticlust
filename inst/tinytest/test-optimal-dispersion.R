@@ -1,6 +1,12 @@
 
 library("anticlust")
 
+x <- schaper2019[, 3:6]
+val1 <- optimal_dispersion(x, K = 3)$dispersion
+val2 <- dispersion_objective(x, anticlustering(x, K = 3, method = "brusco", objective = "dispersion"))
+expect_true(val1 >= val2) 
+
+
 # Output format is as expected for optimal_dispersion()
   N <- 30
   M <- 5
