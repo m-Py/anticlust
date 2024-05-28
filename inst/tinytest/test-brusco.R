@@ -46,6 +46,19 @@ tab <- data.frame(tab)
 tab <- tab[order(tab[, 1], decreasing = TRUE), ]
 expect_true(all(tab == c(32, 32, 32)))
 
+# Ensure that vector is returned when using "return" argument
+expect_true(
+  is.vector(bicriterion_anticlustering(schaper2019[, 3:6], K = 3, return = "best-diversity"))
+)
+
+expect_true(
+  is.vector(bicriterion_anticlustering(schaper2019[, 3:6], K = 3, return = "best-dispersion"))
+)
+
+expect_true(is.vector(
+  anticlustering(schaper2019[, 3:6], K = 2, method = "brusco")
+))
+
 # Ensure that random seeds work with bicriterion algorithm (this is important
 # because the algorithm uses random number generation in C, should be 
 # reproducible from R!)

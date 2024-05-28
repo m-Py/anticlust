@@ -422,9 +422,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
       average_diversity <- TRUE
       objective <- "diversity"
     }
-    return(as.matrix(
-      bicriterion_anticlustering(x, K, repetitions, average_diversity = average_diversity, return = paste0("best-", objective))
-    ))
+    return(bicriterion_anticlustering(x, K, repetitions, average_diversity = average_diversity, return = paste0("best-", objective)))
   }
   
   # Some special cases must be considered now:
