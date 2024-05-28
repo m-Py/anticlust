@@ -61,8 +61,10 @@ expect_true(diversity_objective(data, a) >= diversity_objective(data, b))
 N <- 140
 M <- 5
 data <- matrix(rnorm(N*M), ncol = M)
-b <- anticlustering(data, K = 5, cannot_link = cbind(1:2, 2:3), repetitions = 10)
-diversity_objective(data, b)
-b <- anticlustering(data, K = 5, cannot_link = cbind(1:2, 2:3), method = "brusco", repetitions = 10)
-diversity_objective(data, b)
+b <- anticlustering(data, K = 2, cannot_link = cbind(1:2, 2:3), repetitions = 10, method = "local-maximum")
+expect_true(b[1] != b[2])
+expect_true(b[2] != b[3])
+b <- anticlustering(data, K = 2, cannot_link = cbind(1:2, 2:3), method = "brusco", repetitions = 10)
+expect_true(b[1] != b[2])
+expect_true(b[2] != b[3])
 
