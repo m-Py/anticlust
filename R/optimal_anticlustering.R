@@ -142,7 +142,7 @@ validate_input_optimal_anticlustering <- function(x, K, objective, solver) {
       }
     } else if (solver == "symphony") {
       if (!requireNamespace("Rsymphony", quietly = TRUE)) {
-        stop("The package Rsymphony must be installed to use `solver = Rsymphony`.\n", 
+        stop("The package Rsymphony must be installed to use `solver = symphony`.\n", 
              "Type install.packages('Rsymphony') in the R console to install it.")
       }
     }
