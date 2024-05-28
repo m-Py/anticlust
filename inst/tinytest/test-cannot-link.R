@@ -34,3 +34,25 @@ expect_true(b[one] != b[other])
 expect_true(a[one] == a[other]) # this is necessary, but maybe we appreciate the reminder.
 expect_true(diversity_objective(data, a) >= diversity_objective(data, b))
 
+
+
+# Now: use multiple repetitions!
+
+N <- 14
+M <- 3
+data <- matrix(rnorm(N*M), ncol = M)
+a <- anticlustering(data, K = 2, method = "ilp")
+one <- which(a == 1)[1]
+other <- which(a == 1)[2]
+diversity_objective(data, a)
+
+b <- anticlustering(data, K = 2, cannot_link = cbind(one, other), repetitions = 10)
+expect_true(b[one] != b[other])
+expect_true(diversity_objective(data, a) >= diversity_objective(data, b))
+
+b <- anticlustering(data, K = 2, cannot_link = cbind(one, other), method = "brusco", repetitions = 10)
+expect_true(b[one] != b[other])
+expect_true(a[one] == a[other]) # this is necessary, but maybe we appreciate the reminder.
+expect_true(diversity_objective(data, a) >= diversity_objective(data, b))
+
+
