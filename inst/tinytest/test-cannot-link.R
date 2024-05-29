@@ -56,8 +56,7 @@ expect_true(a[one] == a[other]) # this is necessary, but maybe we appreciate the
 expect_true(diversity_objective(data, a) >= diversity_objective(data, b))
 
 
-
-## TEST FAILS: Use method to fill elements from must-link branch!
+## Test for larger data sets:
 N <- 140
 M <- 5
 data <- matrix(rnorm(N*M), ncol = M)
