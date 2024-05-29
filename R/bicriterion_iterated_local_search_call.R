@@ -278,10 +278,13 @@ bicriterion_anticlustering <- function(
     best_obj <- which.max(apply(results, 1, dispersion_objective_, dispersion_distances))
     return(results[best_obj, ])
   } else if (return == "best-average-diversity" || average_diversity) {
-    best_obj <- which.max(apply(results, 1, weighted_diversity_objective_, x = distances, frequencies = frequencies))
-    return(results[best_obj, ])
-  }
-  else if (return == "best-diversity") {
+    # manually compute objectives, apply() does not work here because table() has different results for the different clusterings
+    average_diversities <- c()
+    for (i in 1:nrow(results)) {
+      average_diversities[i] <- weighted_diversity_objective_(distances, results[i, ], table(results[i, ]))
+    }
+    return(results[which.max(average_diversities), ])
+  } else if (return == "best-diversity") {
     best_obj <- which.max(apply(results, 1, diversity_objective_, distances))
     return(results[best_obj, ])
   } 
