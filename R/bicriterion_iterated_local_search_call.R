@@ -303,10 +303,10 @@ bicriterion_anticlustering <- function(
   results <- results[!duplicated(results), ]
   results <- unname(as.matrix(results))
   if (return == "best-diversity") {
-    best_obj <- which.max(apply(results, 1, diversity_objective_, convert_to_distances(x)))
+    best_obj <- which.max(apply(results, 1, diversity_objective_, distances))
     return(results[best_obj, ])
   } else if (return == "best-dispersion") {
-    best_obj <- which.max(apply(results, 1, dispersion_objective_, convert_to_distances(x)))
+    best_obj <- which.max(apply(results, 1, dispersion_objective_, dispersion_distances))
     return(results[best_obj, ])
   }
   results
