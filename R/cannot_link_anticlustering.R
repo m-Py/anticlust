@@ -11,9 +11,6 @@
 #' @param objective "diversity", "average-diversity", "variance" or "kplus" (not dispersion!)
 #' @param method "local-maximum" or "exchange", "brusco"
 #' 
-#' @note
-#' This function uses the average diversity objective if some groups are unequaled-sized. 
-#' This is not documented (for the diversity objective in anticlustering() at least.)
 #' 
 #' @noRd
 cannot_link_anticlustering <- function(x, init_clusters, cannot_link, objective, method) {
@@ -27,15 +24,14 @@ cannot_link_anticlustering <- function(x, init_clusters, cannot_link, objective,
   
   if (objective == "variance") {
     x <- convert_to_distances(x)^2
-  } else if (objective == "diversity") {
+  } else if (grepl("diversity", objective)) {
     x <- convert_to_distances(x)
   } 
   frequencies <- table(init_clusters)
-  if (any(frequencies) != frequencies[1]) {
+  if (objective == "variance") {
     objective <- "average-diversity"
-  } else {
-    objective <- "diversity"
   }
+  stopifnot(grepl("diversity", objective)) # must be diversity or average-diversity here
 
   ## special case of only one init partition...
   init_clusters <- as.matrix(init_clusters)
@@ -50,7 +46,7 @@ cannot_link_anticlustering <- function(x, init_clusters, cannot_link, objective,
   }
   
   if (method == "brusco") {
-    return(BILS_CANNOT_LINK(x, init_clusters_bils, cannot_link))
+    return(BILS_CANNOT_LINK(x, init_clusters_bils, cannot_link, objective))
   }
   
   # For LCW: Set cannot-link distances to large negative value so they cannot be linked
@@ -70,18 +66,19 @@ cannot_link_anticlustering <- function(x, init_clusters, cannot_link, objective,
 
 # Wrapper for BILS method that preserves optimal dispersion and potentially uses multiple initial partitions
 # TODO check out this function, it should be able to use more ILS repetitions...
-BILS_CANNOT_LINK <- function(distances, init_clusters, cannot_link) {
+BILS_CANNOT_LINK <- function(distances, init_clusters, cannot_link, objective) {
   N <- nrow(distances)
   multiple_partitions_as_input <- is.matrix(init_clusters)
   selection_matrix <- matrix(1, ncol = N, nrow = N)
   selection_matrix[rbind(cannot_link, t(apply(cannot_link, 1, rev)))] <- -1
-  PARTITIONS <- bicriterion_anticlustering(
+  bicriterion_anticlustering(
     distances, 
     K = if (multiple_partitions_as_input) init_clusters[1, ] else init_clusters,
     R = if (multiple_partitions_as_input) rep(ceiling(nrow(init_clusters)/2), 2) else c(1, 1),
     init_partitions = if (multiple_partitions_as_input) init_clusters[1:ceiling(nrow(init_clusters)/2),] else NULL,
-    dispersion_distances = selection_matrix
+    dispersion_distances = selection_matrix,
+    average_diversity = objective == "average-diversity",
+    return = "best-dispersion"
   )
-  PARTITIONS[which.max(apply(PARTITIONS, 1, dispersion_objective, x = selection_matrix)), ]
 }
 
