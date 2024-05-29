@@ -3,21 +3,22 @@
 #' Wrapper function that gives access to all optimal algorithms for anticlustering 
 #' that are available in anticlust.
 #' 
-#'@param x The data input. Can be one of two structures: (1) A
-#'     feature matrix where rows correspond to elements and columns
-#'     correspond to variables (a single numeric variable can be
-#'     passed as a vector). (2) An N x N matrix dissimilarity matrix;
-#'     can be an object of class \code{dist} (e.g., returned by
+#'@param x The data input. Can be one of two structures: (1) A feature
+#'     matrix where rows correspond to elements and columns correspond
+#'     to variables (a single numeric variable can be passed as a
+#'     vector). (2) An N x N matrix dissimilarity matrix; can be an
+#'     object of class \code{dist} (e.g., returned by
 #'     \code{\link{dist}} or \code{\link{as.dist}}) or a \code{matrix}
 #'     where the entries of the upper and lower triangular matrix
-#'     represent pairwise dissimilarities. 
+#'     represent pairwise dissimilarities.
 #' @param K How many anticlusters should be created or alternatively:
-#'     (a) A vector describing the size of each group (the latter currently 
-#'     only works for \code{objective = "dispersion")}.
-#' @param objective The anticlustering objective, can be "diversity", "variance", 
-#'     "kplus" or "dispersion".
-#' @param solver Optional. The solver used to obtain the optimal method. 
-#'     Currently supports "glpk", "symphony", and "lpSolve". See details.
+#'     (a) A vector describing the size of each group (the latter
+#'     currently only works for \code{objective = "dispersion")}.
+#' @param objective The anticlustering objective, can be "diversity",
+#'     "variance", "kplus" or "dispersion".
+#' @param solver Optional. The solver used to obtain the optimal
+#'     method.  Currently supports "glpk", "symphony", and
+#'     "lpSolve". See details.
 #'     
 #' @return A vector of length N that assigns a group (i.e, a number
 #'     between 1 and \code{K}) to each input element.
@@ -27,23 +28,29 @@
 #' 
 #' @details 
 #' 
-#' This is a wrapper for all optimal methods supported in anticlust (currently and in the future). 
-#' As compared to \code{\link{anticlustering}}, it allows to specify the solver to obtain an optimal
-#' solution and it can be used to obtain optimal solutions for all supported
-#' anticlustering objectives (variance, diversity, k-plus, dispersion). For 
-#' the objectives "variance", "diversity" and "kplus", the optimal ILP method 
-#' in Papenberg and Klau (2021) is used, which maximizes the sum of all pairwise 
-#' intra-cluster distances (given user specified number of clusters, for equal-sized clusters).
-#' To employ k-means anticlustering (i.e. set \code{objective = "variance"}), the
-#' squared Euclidean distance is used. For k-plus anticlustering, the squared Euclidean distance
-#' based on the extended k-plus data matrix is used (see \code{\link{kplus_moment_variables}}).
-#' For the diversity (and the dispersion), the Euclidean distance is used by default, 
-#' but any user-defined dissimilarity matrix is possible.
+#' This is a wrapper for all optimal methods supported in anticlust
+#' (currently and in the future).  As compared to
+#' \code{\link{anticlustering}}, it allows to specify the solver to
+#' obtain an optimal solution and it can be used to obtain optimal
+#' solutions for all supported anticlustering objectives (variance,
+#' diversity, k-plus, dispersion). For the objectives "variance",
+#' "diversity" and "kplus", the optimal ILP method in Papenberg and
+#' Klau (2021) is used, which maximizes the sum of all pairwise
+#' intra-cluster distances (given user specified number of clusters,
+#' for equal-sized clusters).  To employ k-means anticlustering
+#' (i.e. set \code{objective = "variance"}), the squared Euclidean
+#' distance is used. For k-plus anticlustering, the squared Euclidean
+#' distance based on the extended k-plus data matrix is used (see
+#' \code{\link{kplus_moment_variables}}).  For the diversity (and the
+#' dispersion), the Euclidean distance is used by default, but any
+#' user-defined dissimilarity matrix is possible.
 #' 
-#' The dispersion is solved optimal using the approach described in \code{\link{optimal_dispersion}}.
+#' The dispersion is solved optimal using the approach described in
+#' \code{\link{optimal_dispersion}}.
 #' 
-#' The optimal methods make use of "solvers" that actually implement the algorithm 
-#' for finding optimal solutions. The package anticlust supports three solvers:
+#' The optimal methods make use of "solvers" that actually implement
+#' the algorithm for finding optimal solutions. The package anticlust
+#' supports three solvers:
 #' 
 #' \itemize{
 #'   \item{The default solver lpSolve (<https://sourceforge.net/projects/lpsolve/>).}
@@ -55,10 +62,10 @@
 #'   (The package Rsymphony has to be installed manually if this solver should be used).}
 #' }
 #' 
-#' For the maximum dispersion problem, it seems that the Symphony solver is fastest,
-#' while the lpSolve solver seems to be good for maximum diversity. However, note 
-#' that in general the dispersion can be solved optimally for much larger data sets
-#' than the diversity.
+#' For the maximum dispersion problem, it seems that the Symphony
+#' solver is fastest, while the lpSolve solver seems to be good for
+#' maximum diversity. However, note that in general the dispersion can
+#' be solved optimally for much larger data sets than the diversity.
 #' 
 #' @export
 #' 

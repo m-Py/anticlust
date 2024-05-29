@@ -1,10 +1,18 @@
 
 #' Bicriterion iterated local search heuristic
 #'
-#' This function implements the bicriterion for anticlustering by Brusco, 
-#' Cradit, and Steinley (2020; <doi:10.1111/bmsp.12186>). The description of 
-#' the algorithm is given in Section 3 of their paper (in particular, see the 
-#' pseudocode in their Figure 2).
+#' This function implements the bicriterion algorithm BILS for
+#' anticlustering by Brusco et al. (2020;
+#' <doi:10.1111/bmsp.12186>). The description of their algorithm is
+#' given in Section 3 of their paper (in particular, see the
+#' Pseudocode in their Figure 2). As of anticlust version 0.8.6, this
+#' function also includes some extensions to the BILS algorithm that
+#' are implemented through the optional arguments
+#' \code{dispersion_distances}, \code{average_diversity},
+#' \code{init_partitions}, and \code{return}. If these arguments are
+#' not changed, the function performs the "vanilla" BILS as described
+#' in Brusco et al.
+#' 
 #' 
 #' @param x The data input. Can be one of two structures: (1) A
 #'     feature matrix where rows correspond to elements and columns
@@ -19,30 +27,33 @@
 #'     of length \code{nrow(x)} describing how elements are assigned
 #'     to anticlusters before the optimization starts.
 #' @param R The desired number of restarts for the algorithm. By
-#'     default, both phases (MBPI + BILS) of the algorithm are performed once.
-#'     See details.
+#'     default, both phases (MBPI + BILS) of the algorithm are
+#'     performed once.  See details.
 #' @param W Optional argument, a vector of weights defining the
 #'     relative importance of dispersion and diversity (0 <= W <=
 #'     1). See details.
 #' @param Xi Optional argument, specifies probability of swapping
 #'     elements during the iterated local search. See examples.
-#' @param dispersion_distances A distance matrix used to compute the dispersion
-#'     if the dispersion should not be computed on the basis of argument \code{x}.
-#' @param average_diversity Boolean. Compute the diversity not as a global sum across 
-#'     all pairwise within-group distances, but as the sum of the average of 
-#'     within-group distances. 
-#' @param init_partitions A matrix of initial partitions (rows = partitions; 
-#'     columns = elements) that serve as starting partitions during the 
-#'     iterations of the first phase of the BILS (i.e., the MBPI).
-#'     If not passed, a new random partition is generated at the start of each 
-#'     iteration (which is the default behaviour).
-#' @param return Either "paretoset" (default), "best-diversity", or "best-dispersion". See below.
+#' @param dispersion_distances A distance matrix used to compute the
+#'     dispersion if the dispersion should not be computed on the
+#'     basis of argument \code{x}.
+#' @param average_diversity Boolean. Compute the diversity not as a
+#'     global sum across all pairwise within-group distances, but as
+#'     the sum of the average of within-group distances.
+#' @param init_partitions A matrix of initial partitions (rows =
+#'     partitions; columns = elements) that serve as starting
+#'     partitions during the iterations of the first phase of the BILS
+#'     (i.e., the MBPI).  If not passed, a new random partition is
+#'     generated at the start of each iteration (which is the default
+#'     behaviour).
+#' @param return Either "paretoset" (default), "best-diversity", or
+#'     "best-dispersion". See below.
 #'     
 #' @details
 #'
-#' The bicriterion algorithm by Brusco, Cradit, and Steinley (2020)
-#' aims to simultaneously optimize two anticlustering criteria:
-#' the \code{\link{diversity_objective}} and the
+#' The bicriterion algorithm by Brusco et al. (2020) aims to
+#' simultaneously optimize two anticlustering criteria: the
+#' \code{\link{diversity_objective}} and the
 #' \code{\link{dispersion_objective}}. It returns a list of partitions
 #' that approximate the pareto set of efficient solutions across both
 #' criteria. By considering both the diversity and dispersion, this
@@ -59,44 +70,51 @@
 #' groups, but also to specify group sizes, as in
 #' \code{\link{anticlustering}}.
 #' 
-#' This function implements the combined bicriterion algorithm BILS.
-#' The argument \code{R} denotes the number of restarts of the two phases of the
-#' algorithm. If \code{R} has length 1, half of the repetitions perform the first 
-#' phase (multistart bicriterion pairwise interchange heuristic; MBPI), 
-#' the other half perform an iterated local search (ILS). 
-#' If \code{R} has length 2, the first entry indicates the number of restarts of
-#' MBPI the second entry indicates the number of restarts of ILS.
-#' The argument \code{W} denotes the relative weight given
-#' to the diversity and dispersion criterion in a given run of the search
-#' heuristic. In each run, the a weight is randomly selected from the
-#' vector \code{W}. As default values, we use the weights that Brusco
-#' et al. used in their analyses. All values in \code{W} have to be in
-#' [0, 1]; larger values indicate that diversity is more important,
-#' whereas smaller values indicate that dispersion is more important;
-#' \code{w = .5} implies the same weight for both criteria. The
-#' argument \code{Xi} is the probability that an element is swapped
-#' during the iterated local search (specifically, Xi has to be a
-#' vector of length 2, denoting the range of a uniform distribution
-#' from which the probability of swapping is selected). For \code{Xi}, the default
-#' is selected consistent with the analyses by Brusco et al. 
+#' This function implements the combined bicriterion algorithm BILS,
+#' which consists of two phases: The multistart bicriterion pairwise
+#' interchange heuristic (MBPI, which is a local maximum search
+#' heuristic similar to \code{method = "local-maximum"} in
+#' \code{\link{anticlustering}}), and the iterated local search (ILS),
+#' which is an improvement procedure that tries to overcome local
+#' optima.  The argument \code{R} denotes the number of restarts of
+#' the two phases of the algorithm. If \code{R} has length 1, half of
+#' the repetitions perform the first phase MBPI), the other half
+#' perform the ILS.  If \code{R} has length 2, the first entry
+#' indicates the number of restarts of MBPI the second entry indicates
+#' the number of restarts of ILS.  The argument \code{W} denotes the
+#' relative weight given to the diversity and dispersion criterion in
+#' a given run of the search heuristic. In each run, the a weight is
+#' randomly selected from the vector \code{W}. As default values, we
+#' use the weights that Brusco et al. used in their analyses. All
+#' values in \code{W} have to be in [0, 1]; larger values indicate
+#' that diversity is more important, whereas smaller values indicate
+#' that dispersion is more important; \code{w = .5} implies the same
+#' weight for both criteria. The argument \code{Xi} is the probability
+#' that an element is swapped during the iterated local search
+#' (specifically, Xi has to be a vector of length 2, denoting the
+#' range of a uniform distribution from which the probability of
+#' swapping is selected). For \code{Xi}, the default is selected
+#' consistent with the analyses by Brusco et al.
 #'
 #' If the data input \code{x} is a feature matrix (that is: each row
 #' is a "case" and each column is a "variable"), a matrix of the
 #' Euclidean distances is computed as input to the algorithm. If a
 #' different measure of dissimilarity is preferred, you may pass a
-#' self-generated dissimilarity matrix via the argument \code{x}.
-#' The argument \code{dispersion_distances} can additionally be used 
-#' if the dispersion should be computed on the basis of a different
+#' self-generated dissimilarity matrix via the argument \code{x}.  The
+#' argument \code{dispersion_distances} can additionally be used if
+#' the dispersion should be computed on the basis of a different
 #' distance matrix.
 #' 
-#' If multiple \code{init_partitions} are given, ensure that each partition
-#' (i.e., each row of\code{init_partitions}) has the exact same output of \code{\link{table}}.
+#' If multiple \code{init_partitions} are given, ensure that each
+#' partition (i.e., each row of\code{init_partitions}) has the exact
+#' same output of \code{\link{table}}.
 #' 
-#' @return By default, a \code{matrix} of anticlustering partitions (i.e., the
-#'     approximated pareto set). Each row corresponds to a partition,
-#'     each column corresponds to an input element. If the argument is set to 
-#'     either "best-diversity" or "best-dispersion", it only returns one partition
-#'     (as a vector), that maximizes the respective objective.
+#' @return By default, a \code{matrix} of anticlustering partitions
+#'     (i.e., the approximated pareto set). Each row corresponds to a
+#'     partition, each column corresponds to an input element. If the
+#'     argument is set to either "best-diversity" or
+#'     "best-dispersion", it only returns one partition (as a vector),
+#'     that maximizes the respective objective.
 #' 
 #' @author Martin Breuer \email{M.Breuer@@hhu.de}, Martin Papenberg
 #'     \email{martin.papenberg@@hhu.de}
