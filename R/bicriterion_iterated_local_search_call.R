@@ -198,60 +198,29 @@ bicriterion_anticlustering <- function(
   Xi = c(0.05, 0.1),
   dispersion_distances = NULL, average_diversity = FALSE, init_partitions = NULL, return = "paretoset") {
   
-  input_validation_anticlustering(
-    x, K, objective = "distance", method = "heuristic", 
-    preclustering = FALSE, categories = NULL,
-    repetitions = 1, standardize = FALSE
-  )
-  
-  validate_input(
-    return, "return", objmode = "character", len = 1,
-    input_set = c("paretoset", "best-diversity", "best-average-diversity", "best-dispersion"), 
-    not_na = TRUE, 
-    not_function = TRUE
-  )
-  
-  
-  if (is.null(R)) {
-    R <- c(1, 1)
-  } else {
-    validate_input(R, "R", must_be_integer = TRUE, not_na = TRUE, not_function = TRUE, greater_than = -1)
-    if (length(R) == 1) {
-      R <- rep(ceiling(R / 2), 2)
-    } else if (length(R) != 2) {
-      stop("Argument 'R' must have length 1 or 2.")
-    }
-  }
-  
+  input_validation_bicriterion_anticlustering(x, K, R, W, Xi, dispersion_distances, average_diversity, init_partitions, return)
+
   distances <- convert_to_distances(x) 
   N <- NROW(distances)
   WL <- length(W)
+  if (is.null(R)) {
+    R <- c(1, 1)
+  } else if (length(R) == 1) {
+    R <- rep(ceiling(R / 2), 2)
+  }
   
   if (is.null(dispersion_distances)) {
     dispersion_distances <- distances
   } else {
     dispersion_distances <- convert_to_distances(dispersion_distances)
   }
-  
-  if (any(dim(dispersion_distances) != dim(distances))) {
-    stop("The dimensions of argument 'x' and 'dispersion_distances' do not match.")
-  } 
-  
+
   clusters <- initialize_clusters(N, K, NULL) - 1
-  
-  checkweights(W)
-  checkneighborhood(Xi)
   
   if (argument_exists(init_partitions)) {
     use_init_partitions <- 1
     init_partitions <- t(apply(init_partitions, 1, to_numeric)) - 1 # ensure correct labeling of partitions
     clusters <- init_partitions[1, ]
-    if (nrow(init_partitions) != R[1]) {
-      stop("The number of repetitions (argument 'R') and the number of partitions (argument 'init_partitions') do not match.")
-    } 
-    if (ncol(init_partitions) != N) {
-      stop("The number of columns in 'init_partitions' does not match the number of cases in 'x'.")
-    }
   } else {
     init_partitions <- 0
     use_init_partitions <- 0
@@ -284,7 +253,7 @@ bicriterion_anticlustering <- function(
     mem_error = as.integer(0),
     PACKAGE = "anticlust" # important to call C
   )
-  
+
   if (results[["mem_error"]] == 1) {
     stop("Could not allocate enough memory.")
   }
@@ -318,17 +287,83 @@ bicriterion_anticlustering <- function(
   } 
 }
 
+input_validation_bicriterion_anticlustering <- function(
+    x, K, R, W, Xi, dispersion_distances, 
+    average_diversity, init_partitions, return) {
+
+  input_validation_anticlustering(
+    x, K, objective = "diversity", method = "brusco", 
+    preclustering = FALSE, categories = NULL,
+    repetitions = 1, standardize = FALSE
+  )
+  
+  x <- convert_to_distances(x)
+  N <- nrow(x)
+  
+  validate_input(
+    return, "return", objmode = "character", len = 1,
+    input_set = c("paretoset", "best-diversity", "best-average-diversity", "best-dispersion"), 
+    not_na = TRUE, 
+    not_function = TRUE
+  )
+  
+  validate_input(
+    average_diversity, "average_diversity", objmode = "logical", len = 1,
+    input_set = c(TRUE, FALSE), 
+    not_na = TRUE, 
+    not_function = TRUE
+  )
+  
+  if (average_diversity && return == "best-diversity") {
+    stop("Cannot use 'return = best-diversity' with 'average_diversity = TRUE' (probably you want to use 'return = best-average-diversity'.")
+  }
+  if (!average_diversity && return == "best-average-diversity") {
+    stop("Cannot use 'return = best-average-diversity' with 'average_diversity = TRUE' (probably you want to use 'return = best-diversity'.")
+  }
+
+  if (argument_exists(dispersion_distances)) {
+    if (any(dim(dispersion_distances) != dim(x))) {
+      stop("The dimensions of argument 'x' and 'dispersion_distances' do not match.")
+    } 
+  }
+
+  checkweights(W)
+  checkneighborhood(Xi)
+  
+  if (argument_exists(R)) {
+    validate_input(R, "R", must_be_integer = TRUE, not_na = TRUE, not_function = TRUE, greater_than = -1)
+    if (!length(R) %in% 1:2) {
+      stop("Argument 'R' must have length 1 or 2.")
+    }
+  }
+  
+  if (argument_exists(init_partitions)) {
+    if (length(R) != 2) {
+      stop("If 'init_partitions' is used, specify argument R as vector of length 2.")
+    }
+    if (nrow(init_partitions) != R[1]) {
+      stop("The number of repetitions (argument 'R') and the number of partitions (argument 'init_partitions') do not match.")
+    } 
+    if (ncol(init_partitions) != N) {
+      stop("The number of columns in 'init_partitions' does not match the number of cases in 'x'.")
+    }
+  }
+}
+
+
 #verify input
 #############
-checkweights <- function(weights){
-  for(i in weights){
+checkweights <- function(W){
+  validate_input(W, "W", not_na = TRUE, not_function = TRUE, objmode = "numeric")
+  for(i in W){
     if(i < 0 | i > 1){
-      stop("All weights must be a percentage. Only values between 0 and 1 are allowed.")
+      stop("All weights (argument 'W') must be percentages. Only values between 0 and 1 are allowed.")
     }
   }  
 }
 
 checkneighborhood <- function(Xi) {
+  validate_input(Xi, "Xi", not_na = TRUE, not_function = TRUE, len = 2, objmode = "numeric")
   for (i in Xi) {
     if (i < 0 | i > 1) {
       stop("Both neighorhood indexes must be a percentage. Only values between 0 and 1 are allowed.")
@@ -338,3 +373,5 @@ checkneighborhood <- function(Xi) {
     stop("First neighborhood percentage needs to be smaller than the second.")
   }
 }
+
+
