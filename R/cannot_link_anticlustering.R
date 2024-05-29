@@ -50,7 +50,7 @@ cannot_link_anticlustering <- function(x, init_clusters, cannot_link, objective,
   }
   
   # For LCW: Set cannot-link distances to large negative value so they cannot be linked
-  x[rbind(cannot_link, t(apply(cannot_link, 1, rev)))] <- -(sum(x) + 1)
+  x[cleanup_cannot_link_indices(cannot_link)] <- -(sum(x) + 1)
 
   c_anticlustering(
     x, 
@@ -69,16 +69,20 @@ cannot_link_anticlustering <- function(x, init_clusters, cannot_link, objective,
 BILS_CANNOT_LINK <- function(distances, init_clusters, cannot_link, objective) {
   N <- nrow(distances)
   multiple_partitions_as_input <- is.matrix(init_clusters)
-  selection_matrix <- matrix(1, ncol = N, nrow = N)
-  selection_matrix[rbind(cannot_link, t(apply(cannot_link, 1, rev)))] <- -1
+  cl_matrix <- matrix(1, ncol = N, nrow = N)
+  cl_matrix[cleanup_cannot_link_indices(cannot_link)] <- -1
   bicriterion_anticlustering(
     distances, 
     K = if (multiple_partitions_as_input) init_clusters[1, ] else init_clusters,
     R = if (multiple_partitions_as_input) rep(ceiling(nrow(init_clusters)/2), 2) else c(1, 1),
     init_partitions = if (multiple_partitions_as_input) init_clusters[1:ceiling(nrow(init_clusters)/2),] else NULL,
-    dispersion_distances = selection_matrix,
+    dispersion_distances = cl_matrix,
     average_diversity = objective == "average-diversity",
     return = "best-dispersion"
   )
 }
 
+cleanup_cannot_link_indices <- function(cannot_link) {
+  cannot_link <- rbind(cannot_link, t(apply(cannot_link, 1, rev))) # use (1, 2) and (2, 1)
+  cannot_link[!duplicated(cannot_link), ] # but do not use (1, 2), (2, 1), (1, 2) and (2, 1)
+} 

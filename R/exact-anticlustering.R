@@ -38,7 +38,7 @@ exact_anticlustering <- function(data, K, preclustering, cannot_link) {
   }
   
   if (argument_exists(cannot_link)) {
-    distances[rbind(cannot_link, t(apply(cannot_link, 1, rev)))] <- -(sum(distances) + 1)
+    distances[cleanup_cannot_link_indices(cannot_link)] <- -(sum(distances) + 1)
   }
 
   ## Here the ILP is created without adjusting distances; i.e., true
