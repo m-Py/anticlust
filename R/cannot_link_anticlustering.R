@@ -12,7 +12,8 @@
 #' @param method "local-maximum" or "exchange", "brusco"
 #' 
 #' @note
-#' This function uses the average diversity objective if some groups are unequaled-sized
+#' This function uses the average diversity objective if some groups are unequaled-sized. 
+#' This is not documented (for the diversity objective in anticlustering() at least.)
 #' 
 #' @noRd
 cannot_link_anticlustering <- function(x, init_clusters, cannot_link, objective, method) {
