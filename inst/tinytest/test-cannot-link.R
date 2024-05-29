@@ -63,7 +63,7 @@ data <- matrix(rnorm(N*M), ncol = M)
 b <- anticlustering(data, K = 2, cannot_link = cbind(1:2, 2:3), repetitions = 10, method = "local-maximum")
 expect_true(b[1] != b[2])
 expect_true(b[2] != b[3])
-b <- anticlustering(data, K = 2, cannot_link = rbind(1:2, 2:3), method = "brusco", repetitions = 10)
+b <- anticlustering(data, K = 2, cannot_link = rbind(1:2, 2:3), method = "brusco", repetitions = 10, objective = "variance")
 expect_true(b[1] != b[2])
 expect_true(b[2] != b[3])
 
@@ -97,3 +97,39 @@ expect_true(b[6] != b[7])
 
 expect_true(all(sort(groups) == sort(table(b))))
 
+# Test that all argument combinations go through without error
+
+N <- 30
+M <- 5
+K <- 5
+data <- matrix(rnorm(N*M), ncol = M)
+
+combinations <- expand.grid(
+  objective = c("kplus", "variance", "diversity", "average-diversity"),
+  repetitions = c(1, 10),
+  method = c("brusco", "local-maximum", "exchange"),
+  standardize = c(TRUE, FALSE)
+)
+
+
+for (i in 1:nrow(combinations)) {
+  objective <- combinations[i, "objective"]
+  method <- combinations[i, "method"]
+  repetitions <- combinations[i, "repetitions"]
+  standardize <- combinations[i, "standardize"]
+  a <- anticlustering(data, K = K, objective = objective, method = method, repetitions = repetitions, standardize = standardize) # Once without cannot-link constraints
+  b <- anticlustering(data, K = K, objective = objective, method = method, repetitions = repetitions, standardize = standardize, cannot_link = rbind(1:2, 2:3))
+  expect_true(b[1] != b[2])
+  expect_true(b[2] != b[3])
+}
+
+## Expect errors
+
+expect_error(
+  anticlustering(data, K = K, cannot_link = rbind(1:2, 2:3), categories = sample(LETTERS, size = N, replace = TRUE)),
+  pattern = "categories"
+)
+expect_error(
+  anticlustering(data, K = K, cannot_link = rbind(1:2, 2:3),preclustering = TRUE),
+  pattern = "preclustering"
+)
