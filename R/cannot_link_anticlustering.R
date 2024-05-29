@@ -65,7 +65,6 @@ cannot_link_anticlustering <- function(x, init_clusters, cannot_link, objective,
 
 
 # Wrapper for BILS method that preserves optimal dispersion and potentially uses multiple initial partitions
-# TODO check out this function, it should be able to use more ILS repetitions...
 BILS_CANNOT_LINK <- function(distances, init_clusters, cannot_link, objective) {
   N <- nrow(distances)
   multiple_partitions_as_input <- is.matrix(init_clusters)
