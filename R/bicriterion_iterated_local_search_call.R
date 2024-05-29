@@ -27,7 +27,7 @@
 #'     of length \code{nrow(x)} describing how elements are assigned
 #'     to anticlusters before the optimization starts.
 #' @param R The desired number of restarts for the algorithm. By
-#'     default, both phases (MBPI + BILS) of the algorithm are
+#'     default, both phases (MBPI + ILS) of the algorithm are
 #'     performed once.  See details.
 #' @param W Optional argument, a vector of weights defining the
 #'     relative importance of dispersion and diversity (0 <= W <=
