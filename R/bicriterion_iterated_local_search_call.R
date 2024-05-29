@@ -206,7 +206,7 @@ bicriterion_anticlustering <- function(
   
   validate_input(
     return, "return", objmode = "character", len = 1,
-    input_set = c("paretoset", "best-diversity", "best-dispersion"), 
+    input_set = c("paretoset", "best-diversity", "best-average-diversity", "best-dispersion"), 
     not_na = TRUE, 
     not_function = TRUE
   )
@@ -302,14 +302,16 @@ bicriterion_anticlustering <- function(
   # Remove duplicates
   results <- results[!duplicated(results), ]
   results <- unname(as.matrix(results))
-  if (return == "best-diversity") {
-    best_obj <- which.max(apply(results, 1, diversity_objective_, distances))
-    return(results[best_obj, ])
-  } else if (return == "best-dispersion") {
+  if (return == "paretoset") {
+    return(results)
+  }
+  if (return == "best-dispersion") {
     best_obj <- which.max(apply(results, 1, dispersion_objective_, dispersion_distances))
     return(results[best_obj, ])
+  } else { # diversity / average-diversity
+    best_obj <- which.max(apply(results, 1, diversity_objective_, distances))
+    return(results[best_obj, ])
   }
-  results
 }
 
 #verify input
