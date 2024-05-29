@@ -122,8 +122,6 @@ expect_true(!all(anticlusters == anticlusters3))
 
 ## Test return argument
 
-set.seed(123)
-
 N <- 100
 M <- 5
 K <- 10
@@ -184,12 +182,41 @@ b <- bicriterion_anticlustering(
   kmeans_distances,
   K = c(10, 10, 20, 20, 40),
   R = c(10, 10),
+  average_diversity = TRUE
+)
+
+expect_identical(a, b)
+
+set.seed(123)
+c <- bicriterion_anticlustering(
+  kmeans_distances,
+  K = c(10, 10, 20, 20, 40),
+  R = c(10, 10),
   average_diversity = TRUE,
   return = "best-average-diversity"
 )
 
 n <- nrow(a)
 expect_true(duplicated(rbind(a, b))[n+1])
+
+# manually compute objectives:
+average_diversities <- c()
+diversities <- c()
+dispersions <- c()
+for (i in 1:nrow(a)) {
+  average_diversities[i] <- anticlust:::weighted_diversity_objective_(kmeans_distances, a[i, ], table(a[i, ]))
+  diversities[i] <- diversity_objective(kmeans_distances, a[i, ])
+}
+
+# Compare with "actual" k-means objective computations
+expect_equal(average_diversities, apply(a, 1, variance_objective, x = data)) # numeric imprecision is okay here!
+
+# -> weighted_diversity computation is correct!
+
+# Does BILS function return the partition that maximizes the average diversity?
+expect_true(all(a[which.max(average_diversities), ] == c))
+
+
 
 # prevent inconsistent calls (average_diversity + return)
 expect_error(bicriterion_anticlustering(
