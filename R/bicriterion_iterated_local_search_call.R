@@ -308,10 +308,14 @@ bicriterion_anticlustering <- function(
   if (return == "best-dispersion") {
     best_obj <- which.max(apply(results, 1, dispersion_objective_, dispersion_distances))
     return(results[best_obj, ])
-  } else { # diversity / average-diversity
-    best_obj <- which.max(apply(results, 1, diversity_objective_, distances))
+  } else if (return == "best-average-diversity" || average_diversity) {
+    best_obj <- which.max(apply(results, 1, weighted_diversity_objective_, x = distances, frequencies = frequencies))
     return(results[best_obj, ])
   }
+  else if (return == "best-diversity") {
+    best_obj <- which.max(apply(results, 1, diversity_objective_, distances))
+    return(results[best_obj, ])
+  } 
 }
 
 #verify input
