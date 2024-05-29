@@ -118,3 +118,92 @@ anticlusters3 <- anticlustering(
 )
 expect_true(!all(anticlusters == anticlusters3))
 
+
+
+## Test return argument
+
+set.seed(123)
+
+N <- 100
+M <- 5
+K <- 10
+data <- matrix(rnorm(N*M), ncol = M)
+
+set.seed(123)
+a <- bicriterion_anticlustering(
+  data,
+  K = K,
+  R = c(10, 10)
+)
+
+set.seed(123)
+b <- bicriterion_anticlustering(
+  data,
+  K = K,
+  R = c(10, 10)
+)
+
+expect_true(identical(a, b))
+
+set.seed(123)
+c <- bicriterion_anticlustering(
+  data,
+  K = K,
+  R = c(10, 10),
+  return = "best-diversity"
+)
+
+set.seed(123)
+e <- bicriterion_anticlustering(
+  data,
+  K = K,
+  R = c(10, 10),
+  return = "best-dispersion"
+)
+
+# Is the 1 solution from the pareto set?
+n <- nrow(a)
+expect_true(duplicated(rbind(a, c))[n+1])
+expect_true(duplicated(rbind(a, e))[n+1])
+
+
+## Test that computation of the return arguments is correct! 
+# Use k-means anticlustering + different sized groups
+
+kmeans_distances <- as.matrix(dist(data)^2)
+set.seed(123)
+a <- bicriterion_anticlustering(
+  kmeans_distances,
+  K = c(10, 10, 20, 20, 40),
+  R = c(10, 10),
+  average_diversity = TRUE
+)
+
+set.seed(123)
+b <- bicriterion_anticlustering(
+  kmeans_distances,
+  K = c(10, 10, 20, 20, 40),
+  R = c(10, 10),
+  average_diversity = TRUE,
+  return = "best-average-diversity"
+)
+
+n <- nrow(a)
+expect_true(duplicated(rbind(a, b))[n+1])
+
+# prevent inconsistent calls (average_diversity + return)
+expect_error(bicriterion_anticlustering(
+  dist(data)^2,
+  K = c(10, 10, 20, 20, 40),
+  R = c(10, 10),
+  average_diversity = FALSE,
+  return = "best-average-diversity"
+))
+
+expect_error(bicriterion_anticlustering(
+  dist(data)^2,
+  K = c(10, 10, 20, 20, 40),
+  R = c(10, 10),
+  average_diversity = TRUE,
+  return = "best-diversity"
+))
