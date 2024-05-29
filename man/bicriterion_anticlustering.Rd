@@ -57,16 +57,16 @@ partitions during the iterations of the first phase of the BILS
 generated at the start of each iteration (which is the default
 behaviour).}
 
-\item{return}{Either "paretoset" (default), "best-diversity", or
-"best-dispersion". See below.}
+\item{return}{Either "paretoset" (default), "best-diversity", 
+"best-average-diversity", "best-dispersion". See below.}
 }
 \value{
 By default, a \code{matrix} of anticlustering partitions
     (i.e., the approximated pareto set). Each row corresponds to a
     partition, each column corresponds to an input element. If the
-    argument is set to either "best-diversity" or
-    "best-dispersion", it only returns one partition (as a vector),
-    that maximizes the respective objective.
+    argument \code{return} is set to either "best-diversity", 
+    "best-average-diversity", or "best-dispersion", it only returns one 
+    partition (as a vector), that maximizes the respective objective.
 }
 \description{
 This function implements the bicriterion algorithm BILS for

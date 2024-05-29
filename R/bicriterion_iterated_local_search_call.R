@@ -46,8 +46,8 @@
 #'     (i.e., the MBPI).  If not passed, a new random partition is
 #'     generated at the start of each iteration (which is the default
 #'     behaviour).
-#' @param return Either "paretoset" (default), "best-diversity", or
-#'     "best-dispersion". See below.
+#' @param return Either "paretoset" (default), "best-diversity", 
+#'     "best-average-diversity", "best-dispersion". See below.
 #'     
 #' @details
 #'
@@ -112,9 +112,9 @@
 #' @return By default, a \code{matrix} of anticlustering partitions
 #'     (i.e., the approximated pareto set). Each row corresponds to a
 #'     partition, each column corresponds to an input element. If the
-#'     argument is set to either "best-diversity" or
-#'     "best-dispersion", it only returns one partition (as a vector),
-#'     that maximizes the respective objective.
+#'     argument \code{return} is set to either "best-diversity", 
+#'     "best-average-diversity", or "best-dispersion", it only returns one 
+#'     partition (as a vector), that maximizes the respective objective.
 #' 
 #' @author Martin Breuer \email{M.Breuer@@hhu.de}, Martin Papenberg
 #'     \email{martin.papenberg@@hhu.de}
