@@ -87,6 +87,8 @@ must_link_anticlustering <- function(x, K, must_link, method = "exchange") {
   x <- to_matrix(x)
   N <- nrow(x)
   
+  must_link <- replace_na_by_index(must_link)
+  
   clusters_init <- init_must_link_groups(N, must_link, table(initialize_clusters(N, K, NULL)))
 
   DF_ <- data.frame(must_link, x)
