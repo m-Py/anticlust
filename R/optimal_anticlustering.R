@@ -19,7 +19,9 @@
 #' @param solver Optional. The solver used to obtain the optimal
 #'     method.  Currently supports "glpk", "symphony", and
 #'     "lpSolve". See details.
-#'     
+#' @param time_limit Time limit in seconds, given to the solver.
+#'    Default is there is no time limit.
+#'
 #' @return A vector of length N that assigns a group (i.e, a number
 #'     between 1 and \code{K}) to each input element.
 #' 
@@ -81,9 +83,9 @@
 #' optimal_anticlustering(data, K = 2, objective = "kplus")
 #' optimal_anticlustering(dist(kplus_moment_variables(data, 2))^2, K = 2, objective = "diversity")
 #' 
-optimal_anticlustering <- function(x, K, objective, solver = NULL) {
+optimal_anticlustering <- function(x, K, objective, solver = NULL, time_limit = NULL) {
   
-  validate_input_optimal_anticlustering(x, K, objective, solver)
+  validate_input_optimal_anticlustering(x, K, objective, solver, time_limit)
   input_validation_anticlustering(
     x, K, objective = objective, method = "exchange", # 'method' is actually a lie to make it work
     preclustering = FALSE, categories = NULL, 
@@ -104,18 +106,21 @@ optimal_anticlustering <- function(x, K, objective, solver = NULL) {
     x <- x^2
     objective <- "diversity"
   }
-  
+
   if (objective == "diversity") {
     ilp <- anticlustering_ilp(x, K)
-    solution <- solve_ilp(ilp, solver = solver)
+    solution <- solve_ilp(ilp, solver = solver, time_limit = time_limit)
+    if (solution$status != 0) {
+      stop("Could not find the optimal diversity in the given time limit.")
+    }
     return(ilp_to_groups(solution, nrow(x)))
   } else {
-    return(optimal_dispersion(x, K, solver)$groups)
+    return(optimal_dispersion(x, K, solver, time_limit = time_limit)$groups)
   }
   
 }
   
-validate_input_optimal_anticlustering <- function(x, K, objective, solver) {
+validate_input_optimal_anticlustering <- function(x, K, objective, solver, time_limit) {
   # x
   validate_data_matrix(x)
   # K
@@ -154,5 +159,16 @@ validate_input_optimal_anticlustering <- function(x, K, objective, solver) {
       }
     }
   }
-  
+  # time_limit 
+  if (argument_exists(time_limit)) {
+    validate_input(
+      time_limit, 
+      "time_limit",
+      objmode = "numeric",
+      len = 1, not_na = TRUE, 
+      not_function = TRUE, 
+      greater_than = 0
+    )
+  }
+    
 }

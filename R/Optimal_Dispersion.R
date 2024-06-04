@@ -23,6 +23,8 @@
 #'     global minimum distance.
 #' @param npartitions The number of groupings that are returned, each
 #'     having an optimal dispersion value (defaults to 1).
+#' @param time_limit Time limit in seconds, given to the solver.
+#'    Default is there is no time limit.
 #'
 #' @export
 #' 
@@ -34,6 +36,7 @@
 #'    of elements cannot be part of the same group in order to achieve maximum 
 #'    dispersion).}
 #'    \item{dispersions_considered}{All distances that were tested until the dispersion was found.}
+#'    \item{dispersion_optimal}{TRUE or FALSE, depending on whether the dispersion is verified optimal (can only be FALSE if a time limit is set.)}
 #' 
 #' @details
 #'
@@ -156,9 +159,10 @@ optimal_dispersion <- function(
     solver = NULL, 
     max_dispersion_considered = NULL, 
     min_dispersion_considered = NULL,
-    npartitions = 1) {
+    npartitions = 1,
+    time_limit = NULL) {
   
-  validate_input_optimal_anticlustering(x, K, "dispersion", solver)
+  validate_input_optimal_anticlustering(x, K, "dispersion", solver, time_limit)
   
   if (!argument_exists(solver)) {
     solver <- find_ilp_solver()
@@ -195,8 +199,11 @@ optimal_dispersion <- function(
   all_nns_last <- NULL
   all_nns_reordered_last <- NULL
   dispersions_considered <- NULL
+  time_limit_exceeded <- FALSE
   counter <- 1
   MINIMUM_DISTANCE <- min(distances)
+  dispersion_optimal <- TRUE
+  start <- Sys.time()
   while (!dispersion_found) {
     if (is.null(min_dispersion_considered) || counter > 1) {
       dispersion <- min(distances)
@@ -211,8 +218,13 @@ optimal_dispersion <- function(
     all_nns_reordered <- reorder_edges(all_nns)
     # Construct graph from all previous edges (that had low distances)
     ilp <- k_coloring_ilp(all_nns_reordered, N, K, target_groups)
-    solution <- solve_ilp(ilp, objective = "min", solver = solver)
-    dispersion_found <- solution$status != 0 
+    solution <- solve_ilp(ilp, objective = "min", solver = solver, time_limit = time_limit)
+    dispersion_found <- solution$status != 0
+    if (argument_exists(time_limit) && (as.numeric(difftime(Sys.time(), start, units = "s")) > time_limit)) {
+      warning("Time limit was exceeded, results are likely not optimal.")
+      dispersion_optimal <- FALSE
+      dispersion_found <- TRUE
+    }
     if (!dispersion_found){
       last_solution <- solution
       all_nns_last <- all_nns
@@ -229,7 +241,8 @@ optimal_dispersion <- function(
         dispersion = MINIMUM_DISTANCE, 
         groups = NULL,
         edges = NULL, 
-        dispersions_considered = MINIMUM_DISTANCE
+        dispersions_considered = MINIMUM_DISTANCE,
+        dispersion_optimal = TRUE
       )
     )
   }
@@ -267,7 +280,8 @@ optimal_dispersion <- function(
       groups = groups,
       groups_fixated = group_fixated,
       edges = unname(all_nns_last), # rownames can be quite ugly here
-      dispersions_considered = c(dispersions_considered, dispersion)
+      dispersions_considered = c(dispersions_considered, dispersion),
+      dispersion_optimal = dispersion_optimal
     )
   )
 }

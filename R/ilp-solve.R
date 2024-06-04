@@ -8,6 +8,7 @@
 #'     ("min"). Maximizing creates similar groups (i.e., solves
 #'     anticlustering), minimizing creates distinct clusters (i.e.,
 #'     solves weighted cluster editing).
+#' @param 
 #'
 #' @return A `list` with two entries: `x` is the vector of optimal
 #'     coefficients for all decision variables. `obj` is the optimal
@@ -15,30 +16,30 @@
 #'
 #' @noRd
 
-solve_ilp <- function(ilp, objective = "max", solver = NULL) {
+solve_ilp <- function(ilp, objective = "max", solver = NULL, time_limit = NULL) {
 
   if (is.null(solver)) {
     solver <- find_ilp_solver()
   }
-  
+
   if (solver == "glpk") {
-    return(solve_ilp_glpk(ilp, objective))
+    return(solve_ilp_glpk(ilp, objective, time_limit))
   } else if (solver == "symphony") {
-    return(solve_ilp_symphony(ilp, objective))
+    return(solve_ilp_symphony(ilp, objective, time_limit))
   } else if (solver == "lpSolve") {
-    return(solve_ilp_lpSolve(ilp, objective))
+    return(solve_ilp_lpSolve(ilp, objective, time_limit))
   }
 }
 
-solve_ilp_glpk <- function(ilp, objective) {
-
+solve_ilp_glpk <- function(ilp, objective, time_limit) {
   ilp_solution <- Rglpk::Rglpk_solve_LP(
     obj = ilp$obj_function,
     mat = ilp$constraints,
     dir = ilp$equalities,
     rhs = ilp$rhs,
     types = "B",
-    max = objective == "max"
+    max = objective == "max",
+    control = list(tm_limit = ifelse(is.null(time_limit), 0, time_limit * 1000))
   )
   
   # return the optimal value and the variable assignment
@@ -51,7 +52,7 @@ solve_ilp_glpk <- function(ilp, objective) {
   ret_list
 }
 
-solve_ilp_symphony <- function(ilp, objective) {
+solve_ilp_symphony <- function(ilp, objective, time_limit) {
   
   ilp_solution <- Rsymphony::Rsymphony_solve_LP(
     obj = ilp$obj_function,
@@ -59,7 +60,8 @@ solve_ilp_symphony <- function(ilp, objective) {
     dir = ilp$equalities,
     rhs = ilp$rhs,
     types = "B",
-    max = objective == "max"
+    max = objective == "max",
+    time_limit = ifelse(is.null(time_limit), -1, time_limit)
   )
   
   # return the optimal value and the variable assignment
@@ -72,14 +74,15 @@ solve_ilp_symphony <- function(ilp, objective) {
   ret_list
 }
 
-solve_ilp_lpSolve <- function(ilp, objective) {
+solve_ilp_lpSolve <- function(ilp, objective, time_limit) {
   ilp_solution <- lpSolve::lp(
     objective,
     ilp$obj_function,
     as.matrix(ilp$constraints),
     ilp$equalities,
     ilp$rhs,
-    all.bin = TRUE
+    all.bin = TRUE,
+    timeout = ifelse(is.null(time_limit), 0, time_limit)
   )
   # return the optimal value and the variable assignment
   ret_list <- list() 
