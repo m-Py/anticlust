@@ -296,7 +296,7 @@ optimal_dispersion <- function(
       groups_fixated = group_fixated,
       edges = unname(all_nns_last), # rownames can be quite ugly here
       dispersions_considered = c(dispersions_considered, dispersion),
-      times = times
+      times = times,
       dispersion_optimal = dispersion_optimal
     )
   )
