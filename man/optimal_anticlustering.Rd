@@ -24,8 +24,8 @@ currently only works for \code{objective = "dispersion")}.}
 "variance", "kplus" or "dispersion".}
 
 \item{solver}{Optional. The solver used to obtain the optimal
-method.  Currently supports "glpk", "symphony", and
-"lpSolve". See details.}
+method.  Currently supports "glpk", "symphony", "lpSolve" and "gurobi". 
+See details.}
 
 \item{time_limit}{Time limit in seconds, given to the solver.
 Default is there is no time limit.}
@@ -71,6 +71,7 @@ supports three solvers:
   \item{The Symphony solver (<https://github.com/coin-or/SYMPHONY>),
   available from the package Rsymphony and requested using \code{solver = "symphony"}.
   (The package Rsymphony has to be installed manually if this solver should be used).}
+  \item{The commercial gurobi solver, see https://www.gurobi.com/downloads/.}
 }
 
 For the maximum dispersion problem, it seems that the Symphony

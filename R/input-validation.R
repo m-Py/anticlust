@@ -376,7 +376,8 @@ check_if_solver_is_available <- function() {
   glpk_available <- requireNamespace("Rglpk", quietly = TRUE)
   symphony_available <- requireNamespace("Rsymphony", quietly = TRUE)
   lpSolve_available <- requireNamespace("lpSolve", quietly = TRUE)
-  no_solver_available <- !glpk_available && !symphony_available && !lpSolve_available
+  gurobi_available <- requireNamespace("gurobi", quietly = TRUE)
+  no_solver_available <- !glpk_available && !symphony_available && !lpSolve_available && !gurobi_available
   
   if (no_solver_available) {
     stop("\n\nAn exact method was requested, but no ILP solver is ",

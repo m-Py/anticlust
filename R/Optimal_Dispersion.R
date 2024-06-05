@@ -12,7 +12,7 @@
 #' @param K The number of groups or a vector describing the size of
 #'     each group.
 #' @param solver Optional argument; currently supports "lpSolve", 
-#'     "glpk", and "symphony". See \code{\link{optimal_anticlustering}}.
+#'     "glpk", "symphony", and "gurobi". See \code{\link{optimal_anticlustering}}.
 #' @param max_dispersion_considered Optional argument used for early
 #'     stopping. If the dispersion found is equal to or exceeds this
 #'     value, a solution having the previous best dispersion is

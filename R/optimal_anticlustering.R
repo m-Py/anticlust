@@ -17,8 +17,8 @@
 #' @param objective The anticlustering objective, can be "diversity",
 #'     "variance", "kplus" or "dispersion".
 #' @param solver Optional. The solver used to obtain the optimal
-#'     method.  Currently supports "glpk", "symphony", and
-#'     "lpSolve". See details.
+#'     method.  Currently supports "glpk", "symphony", "lpSolve" and "gurobi". 
+#'     See details.
 #' @param time_limit Time limit in seconds, given to the solver.
 #'    Default is there is no time limit.
 #'
@@ -62,6 +62,7 @@
 #'   \item{The Symphony solver (<https://github.com/coin-or/SYMPHONY>),
 #'   available from the package Rsymphony and requested using \code{solver = "symphony"}.
 #'   (The package Rsymphony has to be installed manually if this solver should be used).}
+#'   \item{The commercial gurobi solver, see https://www.gurobi.com/downloads/.}
 #' }
 #' 
 #' For the maximum dispersion problem, it seems that the Symphony
@@ -149,7 +150,7 @@ validate_input_optimal_anticlustering <- function(x, K, objective, solver, time_
   # Solver
   if (argument_exists(solver)) {
     validate_input(solver, "solver", objmode = "character", len = 1,
-                  input_set = c("glpk", "symphony", "lpSolve", "Gecode"), not_na = TRUE, not_function = TRUE)
+                  input_set = c("glpk", "symphony", "lpSolve", "Gecode", "gurobi"), not_na = TRUE, not_function = TRUE)
     if (solver == "Gecode" && objective != "dispersion") {
       stop("The Gecode solver is only available for the dispersion objective.")
     }
@@ -162,6 +163,10 @@ validate_input_optimal_anticlustering <- function(x, K, objective, solver, time_
       if (!requireNamespace("Rsymphony", quietly = TRUE)) {
         stop("The package Rsymphony must be installed to use `solver = symphony`.\n", 
              "Type install.packages('Rsymphony') in the R console to install it.")
+      }
+    } else if (solver == "gurobi") {
+      if (!requireNamespace("gurobi", quietly = TRUE)) {
+        stop("The package gurobi must be installed to use `solver = gurobi`.")
       }
     }
   }

@@ -28,7 +28,7 @@ represent pairwise dissimilarities.}
 each group.}
 
 \item{solver}{Optional argument; currently supports "lpSolve", 
-"glpk", and "symphony". See \code{\link{optimal_anticlustering}}.}
+"glpk", "symphony", and "gurobi". See \code{\link{optimal_anticlustering}}.}
 
 \item{max_dispersion_considered}{Optional argument used for early
 stopping. If the dispersion found is equal to or exceeds this

@@ -1,31 +1,36 @@
 
 ### Test solvers for maximum diversity
-
+library(anticlust)
+library(tinytest)
 N <- 14
 M <- 5
 K <- 2
 
 data <- matrix(rnorm(N*M), ncol = M)
-
+start <- Sys.time()
 lpsolve <- optimal_anticlustering(data, K, objective = "diversity", solver = "lpSolve")
+Sys.time() - start
 val1 <- diversity_objective(data, lpsolve)
 
+start <- Sys.time()
 glpk <- optimal_anticlustering(data, K, objective = "diversity", solver = "glpk")
+Sys.time() - start
 val2 <- diversity_objective(data, glpk)
 
+start <- Sys.time()
 symphony <- optimal_anticlustering(data, K, objective = "diversity", solver = "symphony") # symphony is slowest for max diversity!
+Sys.time() - start
 val3 <- diversity_objective(data, symphony)
 
-default <- optimal_anticlustering(data, K, objective = "diversity") # Test default
-val4 <- diversity_objective(data, default)
-
-val5 <- diversity_objective(data, anticlustering(data, K = K))
+start <- Sys.time()
+gurobi <- optimal_anticlustering(data, K, objective = "diversity", solver = "gurobi") 
+Sys.time() - start
+val5 <- diversity_objective(data, gurobi)
 
 expect_equal(val1, val2)
 expect_equal(val1, val3)
 expect_equal(val1, val4)
-expect_true(val1 >= val5)
-
+expect_equal(val1, val5)
 
 ### Test solvers for maximum dispersion
 
