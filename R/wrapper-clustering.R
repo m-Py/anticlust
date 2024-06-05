@@ -91,7 +91,7 @@
 balanced_clustering <- function(x, K, method = "centroid", solver = NULL) {
 
   input_validation_anticlustering(x, K, "distance", method, TRUE, NULL, NULL)
-  validate_input_optimal_anticlustering(x, K, "diversity", solver)
+  validate_input_optimal_anticlustering(x, K, "diversity", solver, NULL)
   data <- to_matrix(x)
   
   if (method == "ilp") {
