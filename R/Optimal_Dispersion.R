@@ -36,7 +36,6 @@
 #'    of elements cannot be part of the same group in order to achieve maximum 
 #'    dispersion).}
 #'    \item{dispersions_considered}{All distances that were tested until the dispersion was found.}
-#'    \item{dispersion_optimal}{TRUE or FALSE, depending on whether the dispersion is verified optimal (can only be FALSE if a time limit is set.)}
 #' 
 #' @details
 #'
@@ -46,7 +45,7 @@
 #'   feature matrix and not a dissimilarity matrix, the pairwise
 #'   Euclidean distance is used. It uses the algorithm presented in
 #'   Max Diekhoff's Bachelor thesis at the Computer Science Department
-#'   at the Heinrich Heine University Düsseldorf.
+#'   at Heinrich Heine University Düsseldorf.
 #'
 #'   To find out which items are not allowed to be grouped in the same
 #'   cluster for maximum dispersion, the algorithm sequentially builds
@@ -74,6 +73,9 @@
 #'   \code{groups} are set to \code{NULL} because all possible
 #'   groupings have the same value of dispersion.  In this case the
 #'   output element \code{dispersions_considered} has length 1.
+#'   
+#'   If a \code{time_limit} is set and the function cannot find in the optimal
+#'   dispersion in the given time, it will throw an error.
 #'   
 #'
 #' @note If the SYMPHONY solver is used, an unfortunate "message" is
@@ -205,7 +207,6 @@ optimal_dispersion <- function(
   time_limit_exceeded <- FALSE
   counter <- 1
   MINIMUM_DISTANCE <- min(distances)
-  dispersion_optimal <- TRUE
   start <- Sys.time()
   while (!dispersion_found) {
     if (is.null(min_dispersion_considered) || counter > 1) {
@@ -233,10 +234,8 @@ optimal_dispersion <- function(
     ilp <- k_coloring_ilp(all_nns_reordered, N, K, target_groups)
     solution <- solve_ilp(ilp, objective = "min", solver = solver, time_limit = time_limit)
     dispersion_found <- solution$status != 0
-    if (argument_exists(time_limit) && (as.numeric(difftime(Sys.time(), start, units = "s")) > time_limit)) {
-      warning("Time limit was exceeded, results are likely not optimal.")
-      dispersion_optimal <- FALSE
-      dispersion_found <- TRUE
+    if (!dispersion_found && argument_exists(time_limit) && (as.numeric(difftime(Sys.time(), start, units = "s")) > time_limit)) {
+      stop("Could not find the optimal dispersion in the given time limit.")
     }
     if (!dispersion_found){
       last_solution <- solution
@@ -256,8 +255,7 @@ optimal_dispersion <- function(
         dispersion = MINIMUM_DISTANCE, 
         groups = NULL,
         edges = NULL, 
-        dispersions_considered = MINIMUM_DISTANCE,
-        dispersion_optimal = TRUE
+        dispersions_considered = MINIMUM_DISTANCE
       )
     )
   }
@@ -295,9 +293,7 @@ optimal_dispersion <- function(
       groups = groups,
       groups_fixated = group_fixated,
       edges = unname(all_nns_last), # rownames can be quite ugly here
-      dispersions_considered = c(dispersions_considered, dispersion),
-      times = times,
-      dispersion_optimal = dispersion_optimal
+      dispersions_considered = c(dispersions_considered, dispersion)
     )
   )
 }

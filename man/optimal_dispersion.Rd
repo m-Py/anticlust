@@ -55,7 +55,6 @@ A list with four elements:
    of elements cannot be part of the same group in order to achieve maximum 
    dispersion).}
    \item{dispersions_considered}{All distances that were tested until the dispersion was found.}
-   \item{dispersion_optimal}{TRUE or FALSE, depending on whether the dispersion is verified optimal (can only be FALSE if a time limit is set.)}
 }
 \description{
 Maximize dispersion for K groups
@@ -67,7 +66,7 @@ The dispersion is the minimum distance between two elements
   feature matrix and not a dissimilarity matrix, the pairwise
   Euclidean distance is used. It uses the algorithm presented in
   Max Diekhoff's Bachelor thesis at the Computer Science Department
-  at the Heinrich Heine University Düsseldorf.
+  at Heinrich Heine University Düsseldorf.
 
   To find out which items are not allowed to be grouped in the same
   cluster for maximum dispersion, the algorithm sequentially builds
@@ -95,6 +94,9 @@ The dispersion is the minimum distance between two elements
   \code{groups} are set to \code{NULL} because all possible
   groupings have the same value of dispersion.  In this case the
   output element \code{dispersions_considered} has length 1.
+  
+  If a \code{time_limit} is set and the function cannot find in the optimal
+  dispersion in the given time, it will throw an error.
 }
 \note{
 If the SYMPHONY solver is used, an unfortunate "message" is

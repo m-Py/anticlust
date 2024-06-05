@@ -77,6 +77,9 @@ For the maximum dispersion problem, it seems that the Symphony
 solver is fastest, while the lpSolve solver seems to be good for
 maximum diversity. However, note that in general the dispersion can
 be solved optimally for much larger data sets than the diversity.
+
+If a \code{time_limit} is set and the function cannot find in the optimal
+objective in the given time, it will throw an error.
 }
 \examples{
 
