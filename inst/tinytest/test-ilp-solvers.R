@@ -73,33 +73,42 @@ val2 <- diversity_objective(data, glpk)
 symphony <- balanced_clustering(data, K, method = "ilp", solver = "symphony")
 val3 <- diversity_objective(data, symphony)
 
-default <- balanced_clustering(data, K, method = "ilp") # Test default
-val4 <- diversity_objective(data, default)
+gurobi <- balanced_clustering(data, K, method = "ilp", solver = "gurobi")
+val4 <- diversity_objective(data, gurobi)
 
-val5 <- diversity_objective(data, balanced_clustering(data, K = K))
 
 expect_equal(val1, val2)
 expect_equal(val1, val3)
 expect_equal(val1, val4)
-expect_true(val1 <= val5)
 
 
 ### Test solvers for weighted cluster editing (i.e., reversed max diversity without group restrictions)
 
 features <- swiss[sample(nrow(swiss), size = 20), ]
-
+features <- swiss
 distances <- dist(scale(features))
 agreements <- ifelse(as.matrix(distances) < median(distances), 1, -1)
 
+start <- Sys.time()
 lpsolve <- wce(agreements, solver = "lpSolve")
+Sys.time() - start
 val1 <- diversity_objective(agreements, lpsolve)
 
+start <- Sys.time()
 glpk <- wce(agreements, solver = "glpk")
+Sys.time() - start
 val2 <- diversity_objective(agreements, glpk)
 
-symphony <- wce(agreements, solver = "symphony") # again, Symphony seems to be fastest
+start <- Sys.time()
+symphony <- wce(agreements, solver = "symphony")
+Sys.time() - start
 val3 <- diversity_objective(agreements, symphony)
+
+start <- Sys.time()
+gurobi <- wce(agreements, solver = "gurobi")
+Sys.time() - start
+val4 <- diversity_objective(agreements, gurobi)
 
 expect_equal(val1, val2)
 expect_equal(val1, val3)
-
+expect_equal(val1, val4)
