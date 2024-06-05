@@ -25,22 +25,36 @@ val3 <- diversity_objective(data, symphony)
 start <- Sys.time()
 gurobi <- optimal_anticlustering(data, K, objective = "diversity", solver = "gurobi") 
 Sys.time() - start
-val5 <- diversity_objective(data, gurobi)
+val4 <- diversity_objective(data, gurobi)
+
+expect_equal(val1, val2)
+expect_equal(val1, val3)
+expect_equal(val1, val4)
+
+
+### Test solvers for maximum dispersion
+
+x <- schaper2019[, 3:6]
+start <- Sys.time()
+val1 <- optimal_dispersion(x, K = 3, solver = "lpSolve")$dispersion # here lpSolve is slower
+Sys.time() - start
+start <- Sys.time()
+val2 <- optimal_dispersion(x, K = 3, solver = "glpk")$dispersion
+Sys.time() - start
+start <- Sys.time()
+val3 <- optimal_dispersion(x, K = 3, solver = "symphony")$dispersion
+Sys.time() - start
+start <- Sys.time()
+val4 <- optimal_dispersion(x, K = 3, solver = "gurobi")$dispersion
+Sys.time() - start
+start <- Sys.time()
+val5 <- optimal_dispersion(x, K = 3, solver = "Gecode")$dispersion
+Sys.time() - start
 
 expect_equal(val1, val2)
 expect_equal(val1, val3)
 expect_equal(val1, val4)
 expect_equal(val1, val5)
-
-### Test solvers for maximum dispersion
-
-x <- schaper2019[, 3:6]
-val1 <- optimal_dispersion(x, K = 3, solver = "lpSolve")$dispersion # here lpSolve is slower
-val2 <- optimal_dispersion(x, K = 3, solver = "glpk")$dispersion
-val3 <- optimal_dispersion(x, K = 3, solver = "symphony")$dispersion
-
-expect_equal(val1, val2)
-expect_equal(val1, val3)
 
 ### Test solvers for balanced clustering (i.e., reversed maximum - minimum - diversity)
 
