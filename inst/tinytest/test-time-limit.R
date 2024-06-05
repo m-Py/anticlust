@@ -1,6 +1,9 @@
 
 ### Test that time limit argument works for all solvers
 
+library(anticlust)
+library(tinytest)
+
 ## Diversity
 
 N <- 40
@@ -23,6 +26,12 @@ expect_error(
   optimal_anticlustering(data, K, objective = "diversity", solver = "symphony", time_limit = 1),
   pattern = "time limit"
 )
+
+expect_error(
+  optimal_anticlustering(data, K, objective = "diversity", solver = "gurobi", time_limit = 1),
+  pattern = "time limit"
+)
+
 
 ## Dispersion
 
@@ -47,3 +56,7 @@ expect_error(
   pattern = "time limit"
 )
 
+expect_error(
+  optimal_anticlustering(data, K, objective = "dispersion", solver = "gurobi", time_limit = 1),
+  pattern = "time limit"
+)
