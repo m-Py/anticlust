@@ -219,19 +219,12 @@ optimal_dispersion <- function(
     # Reorder edge labels so that they start from 1 to C, where C is the number
     # of relevant edges (Better for creating K-coloring ILP).
     all_nns_reordered <- reorder_edges(all_nns)
-    start <- Sys.time()
     if (solver == "Gecode") {
       solution <- constraintV9(K, all_nns_reordered, target_groups, solver)
     } else {
-      # Construct graph from all previous edges (that had low distances)
       ilp <- k_coloring_ilp(all_nns_reordered, N, K, target_groups)
-      solution <- solve_ilp_graph_colouring(ilp, solver)
+      solution <- solve_ilp(ilp, objective = "min", solver = solver, time_limit = time_limit)
     }
-    end <- Sys.time()
-    dispersion_found <- solution$status != 0
-    # Construct graph from all previous edges (that had low distances)
-    ilp <- k_coloring_ilp(all_nns_reordered, N, K, target_groups)
-    solution <- solve_ilp(ilp, objective = "min", solver = solver, time_limit = time_limit)
     dispersion_found <- solution$status != 0
     if (!dispersion_found && argument_exists(time_limit) && (as.numeric(difftime(Sys.time(), start, units = "s")) > time_limit)) {
       stop("Could not find the optimal dispersion in the given time limit.")
