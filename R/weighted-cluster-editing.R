@@ -61,7 +61,7 @@ wce <- function(x, solver = NULL) {
 
   if (argument_exists(solver)) {
     validate_input(solver, "solver", objmode = "character", len = 1,
-                   input_set = c("glpk", "symphony", "lpSolve"), not_na = TRUE, not_function = TRUE)
+                   input_set = c("glpk", "symphony", "lpSolve", "gurobi"), not_na = TRUE, not_function = TRUE)
   } else {
     solver <- find_ilp_solver()
   }
