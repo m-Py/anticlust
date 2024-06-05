@@ -167,7 +167,8 @@ validate_input_optimal_anticlustering <- function(x, K, objective, solver, time_
       objmode = "numeric",
       len = 1, not_na = TRUE, 
       not_function = TRUE, 
-      greater_than = 0
+      greater_than = 0,
+      must_be_integer = TRUE
     )
   }
     
