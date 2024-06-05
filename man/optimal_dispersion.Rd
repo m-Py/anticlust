@@ -10,7 +10,8 @@ optimal_dispersion(
   solver = NULL,
   max_dispersion_considered = NULL,
   min_dispersion_considered = NULL,
-  npartitions = 1
+  npartitions = 1,
+  time_limit = NULL
 )
 }
 \arguments{
@@ -23,20 +24,27 @@ can be an object of class \code{dist} (e.g., returned by
 where the entries of the upper and lower triangular matrix
 represent pairwise dissimilarities.}
 
-\item{K}{The number of groups or a vector describing the size of each group.}
+\item{K}{The number of groups or a vector describing the size of
+each group.}
 
-\item{solver}{Optional argument; if passed, has to be either "glpk" or
-"symphony". See details.}
+\item{solver}{Optional argument; currently supports "lpSolve", 
+"glpk", and "symphony". See \code{\link{optimal_anticlustering}}.}
 
-\item{max_dispersion_considered}{Optional argument used for early stopping. If the dispersion found
-is equal to or exceeds this value, a solution having the previous best dispersion 
-is returned.}
+\item{max_dispersion_considered}{Optional argument used for early
+stopping. If the dispersion found is equal to or exceeds this
+value, a solution having the previous best dispersion is
+returned.}
 
-\item{min_dispersion_considered}{Optional argument used for speeding up the algorithm computation. 
-If passed, the dispersion is optimized starting from this value instead the global minimum distance.}
+\item{min_dispersion_considered}{Optional argument used for
+speeding up the algorithm computation.  If passed, the
+dispersion is optimized starting from this value instead the
+global minimum distance.}
 
-\item{npartitions}{The number of groupings that are returned, each having an optimal
-dispersion value (defaults to 1).}
+\item{npartitions}{The number of groupings that are returned, each
+having an optimal dispersion value (defaults to 1).}
+
+\item{time_limit}{Time limit in seconds, given to the solver.
+Default is there is no time limit.}
 }
 \value{
 A list with four elements:  
@@ -47,6 +55,7 @@ A list with four elements:
    of elements cannot be part of the same group in order to achieve maximum 
    dispersion).}
    \item{dispersions_considered}{All distances that were tested until the dispersion was found.}
+   \item{dispersion_optimal}{TRUE or FALSE, depending on whether the dispersion is verified optimal (can only be FALSE if a time limit is set.)}
 }
 \description{
 Maximize dispersion for K groups
@@ -54,56 +63,50 @@ Maximize dispersion for K groups
 \details{
 The dispersion is the minimum distance between two elements
   within the same group. This function implements an optimal method
-  to maximize the dispersion. If the data input \code{x} is a feature
-  matrix and not a dissimilarity matrix, the pairwise Euclidean
-  distance is used. It uses the algorithm presented in Max
-  Diekhoff's Bachelor thesis at the Computer Science Department at
-  the Heinrich Heine University Düsseldorf.
+  to maximize the dispersion. If the data input \code{x} is a
+  feature matrix and not a dissimilarity matrix, the pairwise
+  Euclidean distance is used. It uses the algorithm presented in
+  Max Diekhoff's Bachelor thesis at the Computer Science Department
+  at the Heinrich Heine University Düsseldorf.
 
   To find out which items are not allowed to be grouped in the same
   cluster for maximum dispersion, the algorithm sequentially builds
   instances of a graph coloring problem, using an integer linear
   programming (ILP) representation (also see Fernandez et al.,
   2013).  It is possible to specify the ILP solver via the argument
-  \code{solver}. This function either requires the R package
-  \code{Rglpk} and the GNU linear programming kit
-  (<http://www.gnu.org/software/glpk/>) or the R package
-  \code{Rsymphony} and the COIN-OR SYMPHONY solver libraries
-  (<https://github.com/coin-or/SYMPHONY>). If the argument
-  \code{solver} is not specified, the function will try to find the
-  GLPK or SYMPHONY solver by itself. It prioritizes using GLPK if
-  both are available. However, the GNU linear programming kit (\code{solver =
-  "glpk"}) seems to be considerably slower for K >= 3 than the
-  SYMPHPONY solver (\code{solver = "symphony"}). So, it is recommended to manually
-  change the default behaviour.
-
-  Optimally solving the maximum dispersion problem is NP-hard for K
-  > 2 and therefore computationally infeasible for larger data
-  sets. For K = 3 and K = 4, it seems that this approach scales up to several 100 elements, 
-  or even > 1000 for K = 3 (at least when using the Symphony solver). 
-  For larger data sets, use the heuristic approaches in \code{\link{anticlustering}} or
-  \code{\link{bicriterion_anticlustering}}. However, note that for K = 2, 
-  the optimal approach is usually much faster than the heuristics.
+  \code{solver} (See \code{\link{optimal_anticlustering}} for more
+  information on this argument). Optimally solving the maximum
+  dispersion problem is NP-hard for K > 2 and therefore
+  computationally infeasible for larger data sets. For K = 3 and K
+  = 4, it seems that this approach scales up to several 100
+  elements, or even > 1000 for K = 3 (at least when using the
+  Symphony solver).  For larger data sets, use the heuristic
+  approaches in \code{\link{anticlustering}} or
+  \code{\link{bicriterion_anticlustering}}. However, note that for
+  K = 2, the optimal approach is usually much faster than the
+  heuristics.
   
-  In the output, the element \code{edges} defines which elements must be in separate 
-  clusters in order to achieve maximum dispersion. All elements not listed here
-  can be changed arbitrarily between clusters without reducing the dispersion.
-  If the maximum possible dispersion corresponds to the minimum dispersion
-  in the data set, the output elements \code{edges} and \code{groups} are set to
-  \code{NULL} because all possible groupings have the same value of dispersion.
-  In this case the output element \code{dispersions_considered} has length 1.
+  In the output, the element \code{edges} defines which elements
+  must be in separate clusters in order to achieve maximum
+  dispersion. All elements not listed here can be changed
+  arbitrarily between clusters without reducing the dispersion.  If
+  the maximum possible dispersion corresponds to the minimum
+  dispersion in the data set, the output elements \code{edges} and
+  \code{groups} are set to \code{NULL} because all possible
+  groupings have the same value of dispersion.  In this case the
+  output element \code{dispersions_considered} has length 1.
 }
 \note{
-If the SYMPHONY solver is used, an unfortunate
-"message" is printed to the console when this function terminates: 
+If the SYMPHONY solver is used, an unfortunate "message" is
+    printed to the console when this function terminates:
 
 sym_get_col_solution(): No solution has been stored!
 
 This message is no reason to worry and instead is a direct result
 of the algorithm finding the optimal value for the dispersion.
-Unfortunately, this message is generated in the C code underlying the 
-SYMPHONY library (via the printing function \code{printf}), which cannot be
-prevented in R.
+Unfortunately, this message is generated in the C code underlying
+the SYMPHONY library (via the printing function \code{printf}),
+which cannot be prevented in R.
 }
 \examples{
 
