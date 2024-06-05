@@ -69,6 +69,9 @@
 #' maximum diversity. However, note that in general the dispersion can
 #' be solved optimally for much larger data sets than the diversity.
 #' 
+#' If a \code{time_limit} is set and the function cannot find in the optimal
+#' objective in the given time, it will throw an error.
+#' 
 #' @export
 #' 
 #' @examples 
@@ -111,7 +114,7 @@ optimal_anticlustering <- function(x, K, objective, solver = NULL, time_limit = 
     ilp <- anticlustering_ilp(x, K)
     solution <- solve_ilp(ilp, solver = solver, time_limit = time_limit)
     if (solution$status != 0) {
-      stop("Could not find the optimal diversity in the given time limit.")
+      stop("Could not find the optimal objective in the given time limit.")
     }
     return(ilp_to_groups(solution, nrow(x)))
   } else {
