@@ -8,7 +8,7 @@
 #'     ("min"). Maximizing creates similar groups (i.e., solves
 #'     anticlustering), minimizing creates distinct clusters (i.e.,
 #'     solves weighted cluster editing).
-#' @param 
+#' @param time_limit time limit given to solver, in seconds
 #'
 #' @return A `list` with two entries: `x` is the vector of optimal
 #'     coefficients for all decision variables. `obj` is the optimal

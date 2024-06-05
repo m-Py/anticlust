@@ -4,7 +4,7 @@
 \alias{optimal_anticlustering}
 \title{Optimal ("exact") algorithms for anticlustering}
 \usage{
-optimal_anticlustering(x, K, objective, solver = NULL)
+optimal_anticlustering(x, K, objective, solver = NULL, time_limit = NULL)
 }
 \arguments{
 \item{x}{The data input. Can be one of two structures: (1) A feature
@@ -26,6 +26,9 @@ currently only works for \code{objective = "dispersion")}.}
 \item{solver}{Optional. The solver used to obtain the optimal
 method.  Currently supports "glpk", "symphony", and
 "lpSolve". See details.}
+
+\item{time_limit}{Time limit in seconds, given to the solver.
+Default is there is no time limit.}
 }
 \value{
 A vector of length N that assigns a group (i.e, a number

@@ -10,7 +10,8 @@ optimal_dispersion(
   solver = NULL,
   max_dispersion_considered = NULL,
   min_dispersion_considered = NULL,
-  npartitions = 1
+  npartitions = 1,
+  time_limit = NULL
 )
 }
 \arguments{
@@ -41,6 +42,9 @@ global minimum distance.}
 
 \item{npartitions}{The number of groupings that are returned, each
 having an optimal dispersion value (defaults to 1).}
+
+\item{time_limit}{Time limit in seconds, given to the solver.
+Default is there is no time limit.}
 }
 \value{
 A list with four elements:  
@@ -51,6 +55,7 @@ A list with four elements:
    of elements cannot be part of the same group in order to achieve maximum 
    dispersion).}
    \item{dispersions_considered}{All distances that were tested until the dispersion was found.}
+   \item{dispersion_optimal}{TRUE or FALSE, depending on whether the dispersion is verified optimal (can only be FALSE if a time limit is set.)}
 }
 \description{
 Maximize dispersion for K groups
