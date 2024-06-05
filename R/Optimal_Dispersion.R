@@ -203,7 +203,6 @@ optimal_dispersion <- function(
   all_nns_last <- NULL
   all_nns_reordered_last <- NULL
   dispersions_considered <- NULL
-  times <- NULL
   time_limit_exceeded <- FALSE
   counter <- 1
   MINIMUM_DISTANCE <- min(distances)
@@ -244,7 +243,6 @@ optimal_dispersion <- function(
       dispersions_considered <- c(dispersions_considered, dispersion)
       
     }
-    times <- c(times, as.numeric(difftime(end, start, units = "s")))
     counter <- counter + 1
     # Take out distances that have been investigated to proceed
     distances[ids_of_nearest_neighbours] <- Inf 
