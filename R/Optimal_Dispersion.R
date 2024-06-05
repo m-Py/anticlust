@@ -226,7 +226,7 @@ optimal_dispersion <- function(
       solution <- solve_ilp(ilp, objective = "min", solver = solver, time_limit = time_limit)
     }
     dispersion_found <- solution$status != 0
-    if (!dispersion_found && argument_exists(time_limit) && (as.numeric(difftime(Sys.time(), start, units = "s")) > time_limit)) {
+    if (argument_exists(time_limit) && (as.numeric(difftime(Sys.time(), start, units = "s")) > time_limit)) {
       stop("Could not find the optimal dispersion in the given time limit.")
     }
     if (!dispersion_found){
