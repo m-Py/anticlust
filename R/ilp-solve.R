@@ -119,7 +119,9 @@ solve_ilp_gurobi <- function(ilp, objective, time_limit) {
   ret_list$obj <- ilp_solution$objval
   ret_list$status <- ifelse(ilp_solution$status == "OPTIMAL", 0, 1)
   ## name the decision variables
-  names(ret_list$x) <- colnames(ilp$constraints)
+  if (!is.null(ilp_solution$x)) { # gurobi does not return solution if not optimal
+    names(ret_list$x) <- colnames(ilp$constraints)
+  }
   ret_list
 }
 
