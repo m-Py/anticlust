@@ -1,12 +1,13 @@
 # anticlust 0.8.5.9999
 
-- Bug fix in `optimal_dispersion()`: Output element `$edges` no longer includes edges that were investigated in the last iteration of the algorithm (and which are not relevant for finding the optimal dispersion)
-- `bicriterion_anticlustering()` has new arguments: `dispersion_distances`, `average_diversity`, `init_partitions`
+- `bicriterion_anticlustering()` has new arguments: `dispersion_distances`, `average_diversity`, `init_partitions`, `return`
 - `anticlustering()` now has new `objective = "average-diversity"`
-- added argument `cannot_link` to `anticlustering()` (for `method = "exchange", "local-maximum", "brusco" "ilp"`, and `objective = "diversity", "variance", "kplus"`)
-- `method = "brusco"` now works for `objective = "variance"` and `"kplus"`
-- `anticlustering()` now has an argument `cannot_link`, which works with options for `method`
-- Add lpSolve solver, and import it when installing (so an ILP solver is always available, and lpSolve has no system dependencies); it is now also the default solver
+- `method = "brusco"` now works for `objective = "variance"` and `"objective = kplus"`
+- `anticlustering()` now has an argument `cannot_link`, which can be used to forbid pairs of elements from being assigned to the same cluster
+- anticlust now depends on package lpSolve (via Imports)
+- Added lpSolve solver as backend for the optimal methods, is now the default solver
+- `optimal_anticlustering()` and `optimal_dispersion()` now have an additional argument `time_limit`
+- Bug fix in `optimal_dispersion()`: Output element `$edges` no longer includes edges that were investigated in the last iteration of the algorithm (and which are not relevant for finding the optimal dispersion)
 
 # anticlust 0.8.5
 
@@ -19,7 +20,6 @@
 
 - The default selection of ILP solvers in `anticlustering()`, `balanced_clustering()` and `optimal_dispersion()` was changed due to a reoccurring CRAN issue: If both the Rglpk and the Rsymphony packages are available, the GLPK will now be prioritized. This is because the SYMPHONY solver sometimes crashes on Macs (or at least on one CRAN test station). The `optimal_anticlustering()`, `optimal_dispersion()`, and `balanced_clustering()` functions have an argument `solver` that can be used to circumvent this default behaviour.
 - `anticlust` now uses [`tinytest`](https://cran.r-project.org/package=tinytest) instead of [`testthat`](https://cran.r-project.org/package=testthat) for unit tests.
->>>>>>> main
 
 # anticlust 0.8.3
 
