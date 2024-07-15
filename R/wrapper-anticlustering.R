@@ -307,8 +307,14 @@
 #'   standardize = TRUE # ususally recommended
 #' )
 #' 
-#' mean_sd_tab(schaper2019[, 3:6], anticlusters)
-#' table(anticlusters, schaper2019$room)
+#' # Use cannot_link constraints: Element 1 must not be linked with elements 2 to 10:
+#' cl_matrix <- matrix(c(rep(1, 9), 2:10), ncol = 2)
+#' cl <- anticlustering(
+#'   schaper2019[, 3:6],
+#'   K = 10,
+#'   cannot_link = cl_matrix
+#' )
+#' all(cl[1] != cl[2:10])
 #' 
 #' # Use the heuristic by Brusco et al. (2020) for k-plus anticlustering
 #' # Include categorical variable as part of the optimization criterion rather 
