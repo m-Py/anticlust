@@ -5,9 +5,9 @@
 - `bicriterion_anticlustering()` has new arguments: `dispersion_distances`, `average_diversity`, `init_partitions`, `return`.
 - `anticlustering()` now has new `objective = "average-diversity"`
 - In `anticlustering()`, `method = "brusco"` now works for `objective = "variance"` and `"objective = kplus"`
-- `anticlustering()` now has an argument `cannot_link`, which can be used to forbid pairs of elements from being assigned to the same cluster. 
 - Added `lpSolve` solver as backend for the optimal methods, and it is now the default solver
 - `optimal_anticlustering()` and `optimal_dispersion()` now have an additional argument `time_limit`
+- `anticlustering()` now has an argument `cannot_link`, which can be used to forbid pairs of elements from being assigned to the same cluster. When used, this solves the same (NP hard) graph coloring problem as `optimal_dispersion()`. Unlike the other optimal methods, it uses the Symphony solver with priority, when it is found (otherwise the `lpSolve`)
 
 ## Bug fixes
 

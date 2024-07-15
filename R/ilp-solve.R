@@ -100,8 +100,7 @@ find_ilp_solver <- function() {
     return("lpSolve")
   } else if (requireNamespace("Rglpk", quietly = TRUE)) {
     return("glpk")
-  }
-  else if (requireNamespace("Rsymphony", quietly = TRUE)) {
+  } else if (requireNamespace("Rsymphony", quietly = TRUE)) {
     return("symphony")
   }
   check_if_solver_is_available() # throws an error here!
