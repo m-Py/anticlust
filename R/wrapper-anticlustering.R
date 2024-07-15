@@ -418,7 +418,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   
   # BILS by Brusco et al.:
   if (method == "brusco") {
-    average_diversity <- FALSE
+    average_diversity <- ifelse(objective == "average-diversity", TRUE, FALSE)
     if (objective == "kplus") {
       x <- kplus_moment_variables(x, 2)
       objective <- "variance"
@@ -426,7 +426,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
     if (objective == "variance") {
       x <- convert_to_distances(x)^2
       average_diversity <- TRUE
-      objective <- "diversity"
+      objective <- "average-diversity"
     }
     return(bicriterion_anticlustering(x, K, repetitions, average_diversity = average_diversity, return = paste0("best-", objective)))
   }

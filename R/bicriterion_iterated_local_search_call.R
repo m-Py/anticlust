@@ -318,10 +318,10 @@ input_validation_bicriterion_anticlustering <- function(
   )
   
   if (average_diversity && return == "best-diversity") {
-    stop("Cannot use 'return = best-diversity' with 'average_diversity = TRUE' (probably you want to use 'return = best-average-diversity'.")
+    stop("Cannot use 'return = best-diversity' with 'average_diversity = TRUE' (probably you want to use 'return = best-average-diversity').")
   }
   if (!average_diversity && return == "best-average-diversity") {
-    stop("Cannot use 'return = best-average-diversity' with 'average_diversity = TRUE' (probably you want to use 'return = best-diversity'.")
+    stop("Cannot use 'return = best-average-diversity' with 'average_diversity = FALSE' (probably you want to use 'return = best-diversity').")
   }
 
   if (argument_exists(dispersion_distances)) {
