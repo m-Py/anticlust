@@ -133,3 +133,8 @@ expect_error(
   anticlustering(data, K = K, cannot_link = rbind(1:2, 2:3),preclustering = TRUE),
   pattern = "preclustering"
 )
+
+expect_error(
+  anticlustering(data, K = K, cannot_link = rbind(1:3, 5:7)),
+  pattern = "columns"
+)
