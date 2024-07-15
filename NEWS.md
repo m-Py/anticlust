@@ -1,13 +1,21 @@
-# anticlust 0.8.5.9999
+# anticlust 0.8.6
 
-- `bicriterion_anticlustering()` has new arguments: `dispersion_distances`, `average_diversity`, `init_partitions`, `return`
+## New features 
+
+- `bicriterion_anticlustering()` has new arguments: `dispersion_distances`, `average_diversity`, `init_partitions`, `return`.
 - `anticlustering()` now has new `objective = "average-diversity"`
-- `method = "brusco"` now works for `objective = "variance"` and `"objective = kplus"`
-- `anticlustering()` now has an argument `cannot_link`, which can be used to forbid pairs of elements from being assigned to the same cluster
-- anticlust now depends on package lpSolve (via Imports)
-- Added lpSolve solver as backend for the optimal methods, is now the default solver
+- In `anticlustering()`, `method = "brusco"` now works for `objective = "variance"` and `"objective = kplus"`
+- `anticlustering()` now has an argument `cannot_link`, which can be used to forbid pairs of elements from being assigned to the same cluster. 
+- Added `lpSolve` solver as backend for the optimal methods, and it is now the default solver
 - `optimal_anticlustering()` and `optimal_dispersion()` now have an additional argument `time_limit`
+
+## Bug fixes
+
 - Bug fix in `optimal_dispersion()`: Output element `$edges` no longer includes edges that were investigated in the last iteration of the algorithm (and which are not relevant for finding the optimal dispersion)
+
+## Other
+
+- `anticlust` now depends on package `lpSolve`
 
 # anticlust 0.8.5
 
