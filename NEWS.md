@@ -13,8 +13,9 @@
 
 - Bug fix in `optimal_dispersion()`: Output element `$edges` no longer includes edges that were investigated in the last iteration of the algorithm (and which are not relevant for finding the optimal dispersion)
 
-## Other
+## Internal changes / Other 
 
+- Speed improvements for `anticlustering(..., objective = "diversity")` when using `method = "local-maximum"` and `repetitions` (the restart algorithm is now entirely implemented in C and does not call `method = "exchange"` repeatedly from R)
 - `anticlust` now depends on package `lpSolve`
 
 # anticlust 0.8.5
