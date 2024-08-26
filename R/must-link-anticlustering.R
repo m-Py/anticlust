@@ -62,7 +62,7 @@ must_link_anticlustering <- function(x, K, must_link, method = "exchange", objec
   
   must_link <- replace_na_by_index(must_link)
   
-  dt <- adjusted_distances_must_link(distances, must_link)
+  dt <- adjusted_distances_must_link(x, must_link)
   
   target_groups <- table(initialize_clusters(N, K, NULL))
   
