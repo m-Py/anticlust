@@ -30,6 +30,9 @@ input_validation_anticlustering <- function(x, K, objective, method,
     if (isTRUE(preclustering)) {
       stop("It is not possible to combine preclustering with must-link constraints.")
     }
+    if (argument_exists(cannot_link)) {
+      stop("Currently, it is not possible to use both cannot-link and must-link constraints.")
+    }
   }
   
   if (argument_exists(cannot_link)) {

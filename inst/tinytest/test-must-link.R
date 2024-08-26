@@ -72,6 +72,10 @@ expect_error(
   pattern = "diversity"
 )
 
+expect_error(
+  anticlustering(data, K = K, must_link = must_link, cannot_link = rbind(1:2, 2:3)),
+  pattern = "cannot-link"
+)
 
 expect_error(
   anticlustering(data, K = K, must_link = matrix(NA))
