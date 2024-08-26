@@ -45,6 +45,8 @@
 #'     argument is silently ignored if \code{x} is a distance matrix.
 #' @param cannot_link A 2 column matrix where each row has the indices 
 #'     of two elements that must not be assigned to the same anticluster.
+#' @param must_link A numeric vector of length \code{NROW(x)}. Elements having 
+#'     the same value in this vector are assigned to the same anticluster.
 #'
 #' @return A vector of length N that assigns a group (i.e, a number
 #'     between 1 and \code{K}) to each input element.
@@ -358,12 +360,14 @@
 
 anticlustering <- function(x, K, objective = "diversity", method = "exchange",
                            preclustering = FALSE, categories = NULL, 
-                           repetitions = NULL, standardize = FALSE, cannot_link = NULL) {
+                           repetitions = NULL, standardize = FALSE, cannot_link = NULL,
+                           must_link = NULL) {
 
 
   ## Get data into required format
   input_validation_anticlustering(x, K, objective, method, preclustering, 
-                                  categories, repetitions, standardize, cannot_link)
+                                  categories, repetitions, standardize, cannot_link,
+                                  must_link)
 
   x <- to_matrix(x)
   N <- nrow(x)
@@ -396,6 +400,12 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
       objective = objective,
       method = method
     ))
+  }
+  
+  if (argument_exists(must_link)) {
+    return(
+      must_link_anticlustering(x, K, must_link = must_link, method = method, objective = "diversity", repetitions = repetitions)
+    )
   }
 
   # Preclustering and categorical constraints are both processed in the

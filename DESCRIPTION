@@ -1,7 +1,7 @@
 Type: Package
 Package: anticlust
 Title: Subset Partitioning via Anticlustering
-Version: 0.8.6
+Version: 0.8.6.9999
 Authors@R: c(
     person("Martin", "Papenberg", , "martin.papenberg@hhu.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-9900-4268")),
@@ -76,7 +76,7 @@ VignetteBuilder:
 Encoding: UTF-8
 LazyData: true
 NeedsCompilation: yes
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 SystemRequirements: The exact (anti)clustering algorithms require that either the GNU linear programming kit (GLPK
              library) is installed (<http://www.gnu.org/software/glpk/>) or the SYMPHONY open source MILP solver
              (<https://github.com/coin-or/SYMPHONY>). Rendering the vignette requires pandoc

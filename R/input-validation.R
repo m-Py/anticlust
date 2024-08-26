@@ -7,7 +7,30 @@
 #' @noRd
 input_validation_anticlustering <- function(x, K, objective, method,
                                           preclustering, categories,
-                                          repetitions, standardize = FALSE, cannot_link = NULL) {
+                                          repetitions, standardize = FALSE, cannot_link = NULL,
+                                          must_link = NULL) {
+  
+  if (argument_exists(must_link)) {
+    must_link <- as.matrix(must_link)
+    validate_input(must_link, "must_link", 
+                   objmode = "numeric", must_be_integer = TRUE, 
+                   greater_than = 0, smaller_than = NROW(x)+1, 
+                   not_na = TRUE, not_function = TRUE)
+    if (ncol(must_link) != 1) {
+      stop("Argument must_link must be a vector.")
+    }
+    if (objective %in% c("dispersion", "kplus", "variance")) {
+      stop("Currently, must-link constraints only work with objective = 'diversity'.")
+    }
+    if (argument_exists(categories)) {
+      stop("\nCombining the `categories` argument together with must-link constraints \n",
+           "is currently not supported; use the categorical variables as part of the first argument\n",
+           "`x` instead (see the vignette on categorical variables).")
+    }
+    if (isTRUE(preclustering)) {
+      stop("It is not possible to combine preclustering with must-link constraints.")
+    }
+  }
   
   if (argument_exists(cannot_link)) {
     cannot_link <- as.matrix(cannot_link)

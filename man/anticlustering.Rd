@@ -13,7 +13,8 @@ anticlustering(
   categories = NULL,
   repetitions = NULL,
   standardize = FALSE,
-  cannot_link = NULL
+  cannot_link = NULL,
+  must_link = NULL
 )
 }
 \arguments{
@@ -60,6 +61,9 @@ argument is silently ignored if \code{x} is a distance matrix.}
 
 \item{cannot_link}{A 2 column matrix where each row has the indices 
 of two elements that must not be assigned to the same anticluster.}
+
+\item{must_link}{A numeric vector of length \code{NROW(x)}. Elements having 
+the same value in this vector are assigned to the same anticluster.}
 }
 \value{
 A vector of length N that assigns a group (i.e, a number

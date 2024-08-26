@@ -36,9 +36,12 @@ c_anticlustering <- function(data, K, categories = NULL, objective, exchange_par
     init_partitions <- 0
   } else {
     R <- nrow(init_partitions)
+    if (min(init_partitions) > 0) {
+      stop("You forgot 0 indexing in C again.")
+    }
     use_init_partitions <- 1
   }
-  
+
   if (argument_exists(categories)) {
     USE_CATEGORIES <- TRUE
     categories <- merge_into_one_variable(categories) - 1
