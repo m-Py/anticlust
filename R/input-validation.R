@@ -214,6 +214,13 @@ validate_input <- function(obj, argument_name, len = NULL, greater_than = NULL,
     }
   }
 
+  ## - Check mode of input
+  if (argument_exists(objmode)) {
+    if (mode(obj) != objmode) {
+      stop(argument_name, " must be ", objmode, ", but is ", mode(obj))
+    }
+  }
+  
   ## - Check if input has to be greater than some value
   if (argument_exists(greater_than)) {
     if (any(obj <= greater_than)) {
@@ -251,13 +258,6 @@ validate_input <- function(obj, argument_name, len = NULL, greater_than = NULL,
     if (!obj %in% input_set) {
       stop(argument_name, " can either be set to '",
            paste(input_set, collapse = "' or '"), "'")
-    }
-  }
-
-  ## - Check mode of input
-  if (argument_exists(objmode)) {
-    if (mode(obj) != objmode) {
-      stop(argument_name, " must be ", objmode, ", but is ", mode(obj))
     }
   }
 
