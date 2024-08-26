@@ -62,6 +62,20 @@ expect_error(
 )
 
 expect_error(
+  anticlustering(data, K = K, must_link = must_link, objective = "kplus"),
+  pattern = "diversity"
+)
+expect_error(
+  anticlustering(data, K = K, must_link = must_link, objective = "variance"),
+  pattern = "diversity"
+)
+expect_error(
+  anticlustering(data, K = K, must_link = must_link, objective = "dispersion"),
+  pattern = "diversity"
+)
+
+
+expect_error(
   anticlustering(data, K = K, must_link = matrix(NA))
 )
 
