@@ -12,7 +12,7 @@ data <- matrix(rnorm(N * M), ncol = M)
 distances <- as.matrix(dist(data))
 
 # Generate random patient IDs
-ID <- sample(N, replace = TRUE)
+must_link <- sample(N, replace = TRUE)
 
 tt <- anticlustering(distances, K, must_link = must_link, method = "exchange")
 
@@ -22,28 +22,26 @@ for (i in same) {
   expect_true(all(tt[must_link == i] == tt[must_link == i][1]))
 }
 
-tt <- must_link_anticlustering(x, K, must_link, method = "exchange", repetitions = 2)
+tt <- anticlustering(distances, K, must_link = must_link, method = "exchange", repetitions = 2)
 # validate that must-link constraints were preserved
 same <- as.numeric(names(table(must_link)[table(must_link) > 1]))
 for (i in same) {
   expect_true(all(tt[must_link == i] == tt[must_link == i][1]))
 }
 
-tt <- must_link_anticlustering(x, K, must_link, method = "local-maximum")
+tt <- anticlustering(distances, K, must_link = must_link, method = "local-maximum")
 # validate that must-link constraints were preserved
 same <- as.numeric(names(table(must_link)[table(must_link) > 1]))
 for (i in same) {
   expect_true(all(tt[must_link == i] == tt[must_link == i][1]))
 }
 
-tt <- must_link_anticlustering(x, K, must_link, method = "local-maximum", repetitions = 2)
+tt <- anticlustering(distances, K, must_link = must_link, method = "local-maximum", repetitions = 2)
 # validate that must-link constraints were preserved
 same <- as.numeric(names(table(must_link)[table(must_link) > 1]))
 for (i in same) {
   expect_true(all(tt[must_link == i] == tt[must_link == i][1]))
 }
-
-
 
 ## Expect errors
 
