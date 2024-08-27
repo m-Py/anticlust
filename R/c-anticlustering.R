@@ -23,12 +23,7 @@ c_anticlustering <- function(data, K, categories = NULL, objective, exchange_par
   frequencies <- table(clusters)
   N <- NROW(data)
   M <- NCOL(data)
-  
-  # Each cluster must occur more than once
-  if (any(frequencies <= 1)) {
-    stop("No clusters with only one member allowed.")
-  }
-  
+
   # Case: initial partitions may be passed as a matrix (rows = partitions; cols = elements)
   if (!argument_exists(init_partitions)) {
     R <- 1
