@@ -1,3 +1,12 @@
+# anticlust development (target 0.8.7)
+
+- `anticlustering()` now has an argument `must_link`, which can be used force elements into the same cluster
+
+## Internal changes / Other 
+
+- It is now possible that an cluster initialization given to `anticlustering()` only has 1 member (this threw an error before)
+- Updated the documentation
+
 # anticlust 0.8.6
 
 ## New features 
