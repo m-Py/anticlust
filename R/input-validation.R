@@ -10,8 +10,13 @@ input_validation_anticlustering <- function(x, K, objective, method,
                                           repetitions, standardize = FALSE, cannot_link = NULL,
                                           must_link = NULL) {
   
+  ## Validate feature input
+  validate_data_matrix(x)
+  x <- as.matrix(x)
+  N <- nrow(x)
+  
   if (argument_exists(must_link)) {
-    validate_input(must_link, "must_link", not_function = TRUE)
+    validate_input(must_link, "must_link", not_function = TRUE, len = N)
     must_link <- as.matrix(must_link)
 
     validate_input(objective, "objective", input_set = c("diversity"), not_na = TRUE, len = 1) 
@@ -70,11 +75,6 @@ input_validation_anticlustering <- function(x, K, objective, method,
   ## Merge categories variable so that `length` can be applied:
   categories <- merge_into_one_variable(categories)
   
-  ## Validate feature input
-  validate_data_matrix(x)
-  x <- as.matrix(x)
-  N <- nrow(x)
-
   validate_input(preclustering, "preclustering", len = 1,
                  input_set = c(TRUE, FALSE), not_na = TRUE, not_function = TRUE)
 
