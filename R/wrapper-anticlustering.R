@@ -404,7 +404,13 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   
   if (argument_exists(must_link)) {
     return(
-      must_link_anticlustering(x, K, must_link = must_link, method = method, objective = "diversity", repetitions = repetitions)
+      must_link_anticlustering(
+        convert_to_distances(x), 
+        K, must_link = must_link, 
+        method = method, 
+        objective = "diversity", 
+        repetitions = repetitions
+      )
     )
   }
 
