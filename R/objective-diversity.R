@@ -85,7 +85,7 @@ diversity_objective_by_group <- function(cl, data) {
   } else {
     objectives <- sapply(
       sort(unique(cl)), 
-      function(x) sum(dist(data[cl == x, ]))
+      function(x) sum(dist(data[cl == x, , drop = FALSE]))
     )
   }
   objectives
