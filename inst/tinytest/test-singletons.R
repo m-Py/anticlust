@@ -2,11 +2,13 @@
 library(tinytest)
 library(anticlust)
 
-# Since version (0.8.7) it is possible that a singleton cluster exists in anticlustering
-# make sure, this does not cause any problems (prior to that, requesting a singleton
-# cluster just threw an error because it can also be left out completely from anticlustering.
-# but with the implementation of must-link constraints, it is possible that we "accidentally"
-# have a singleton cluster)
+# Since version (0.8.7) it is possible that a singleton cluster exists in anticlustering().
+# This test files tries to make sure that this does not cause any problems (prior to 
+# that, requesting a singleton cluster just threw an error because it can also 
+# be left out completely from anticlustering. However, with the implementation of 
+# must-link constraints, it is now possible that we "accidentally" have a singleton 
+# without intention of the user cluster)
+
 features <- schaper2019[, 3:6]
 cluster_sizes <- c(1, 1, 1, 49, nrow(features) - (49+1+1+1))
 tt <- anticlustering(
