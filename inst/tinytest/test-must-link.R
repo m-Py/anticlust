@@ -56,7 +56,7 @@ expect_error(
 
 expect_error(
   anticlustering(data, K = K, must_link = "A"),
-  pattern = "numeric"
+  pattern = "length"
 )
 
 expect_error(
