@@ -68,3 +68,8 @@ expect_true(all(tt == uu))
 
 # - Ensure that objective is computed correctly when there are singleton clusters
 # - C implementation has same result as R implementation when there are singletons
+
+
+### TODO:
+
+# - Test for singleton created via must-link constraint
