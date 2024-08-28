@@ -54,12 +54,12 @@ adjusted_distances_must_link <- function(distances, must_link) {
 
 #' This is the function that is called from anticlustering()
 must_link_anticlustering <- function(x, K, must_link, method = "exchange", objective = "diversity", repetitions = NULL) {
-  validate_input(objective, "objective", input_set = c("diversity"), not_na = TRUE, len = 1) 
-  validate_input(method, "method", input_set = c("local-maximum", "exchange"), not_na = TRUE, len = 1) 
-  stopifnot(is_distance_matrix(x))
+  
   x <- to_matrix(x)
   N <- nrow(x)
+  stopifnot(is_distance_matrix(x)) # caller must ensure that the distance matrix is here
   
+  must_link <- to_numeric(must_link)
   must_link <- replace_na_by_index(must_link)
   
   dt <- adjusted_distances_must_link(x, must_link)
