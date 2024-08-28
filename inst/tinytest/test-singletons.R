@@ -60,16 +60,62 @@ uu <- anticlustering(
   objective = diversity_objective
 )
 
-
 expect_true(all(tt == uu))
 
 
-### TODO: Do these tests for other objectives:
+### Do these tests for other objectives:
 
-# - Ensure that objective is computed correctly when there are singleton clusters
-# - C implementation has same result as R implementation when there are singletons
+# Variance
 
+init <- sample(tt)
+
+tt <- anticlustering(
+  features,
+  K = init,
+  objective = "variance"
+)
+
+uu <- anticlustering(
+  features, 
+  K = init,
+  objective = variance_objective
+)
+
+expect_true(all(tt == uu))
+
+# Dispersion
+
+init <- sample(tt)
+
+tt <- anticlustering(
+  features,
+  K = init,
+  objective = "dispersion"
+)
+
+uu <- anticlustering(
+  features, 
+  K = init,
+  objective = dispersion_objective
+)
+
+expect_true(all(tt == uu))
 
 ### TODO:
 
 # - Test for singleton created via must-link constraint
+N <- nrow(features)
+K <- 12
+must_link <- rep(NA, N)
+must_link[1:(N/K)] <- 1
+cl <- anticlustering(features, K = K, must_link = must_link)
+expect_true(all(cl[1] == cl[1:(N/K)]))
+expect_true(all(cl[1] != cl[((N/K)+1):N]))
+
+# now make it impossible to fulfill the constraints:
+must_link[1:((N/K)+1)] <- 1
+expect_error(
+  anticlustering(features, K = K, must_link = must_link),
+  pattern = "must_link"
+)
+
