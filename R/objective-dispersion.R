@@ -60,7 +60,8 @@ dispersion_objective <- function(x, clusters) {
 dispersion_objective_ <- function(clusters, distances) {
   objectives <- sapply(
     sort(unique(clusters)), 
-    function(x) min(as.dist(distances[clusters == x, clusters == x]))
+    # min() gives warning for clusters of length 0 (but its behaviour is as intended)
+    function(x) suppressWarnings(min(as.dist(distances[clusters == x, clusters == x])))
   )
   min(objectives)
 }

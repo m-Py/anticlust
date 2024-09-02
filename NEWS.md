@@ -1,13 +1,37 @@
-# anticlust 0.8.5.9999
+# anticlust development (target 0.8.7)
 
-- `bicriterion_anticlustering()` has new arguments: `dispersion_distances`, `average_diversity`, `init_partitions`, `return`
+## User visible changes
+
+- `anticlustering()` now has an argument `must_link`, which can be used force elements into the same cluster
+- It is now possible that an cluster initialization given to `anticlustering()` only has 1 member (this threw an error before)
+
+## Bug fixes
+
+- `diversity_objective()` is now computed correctly when a cluster only has one member (fixed via [https://github.com/m-Py/anticlust/commit/8403fab1461b2cda8](8403fab1461b2c))
+
+## Internal changes / Other 
+
+- Updated the documentation
+
+# anticlust 0.8.6
+
+## New features 
+
+- `bicriterion_anticlustering()` has new arguments: `dispersion_distances`, `average_diversity`, `init_partitions`, `return`.
 - `anticlustering()` now has new `objective = "average-diversity"`
-- `method = "brusco"` now works for `objective = "variance"` and `"objective = kplus"`
-- `anticlustering()` now has an argument `cannot_link`, which can be used to forbid pairs of elements from being assigned to the same cluster
-- anticlust now depends on package lpSolve (via Imports)
-- Added lpSolve solver as backend for the optimal methods, is now the default solver
+- In `anticlustering()`, `method = "brusco"` now works for `objective = "variance"` and `"objective = kplus"`
+- Added `lpSolve` solver as backend for the optimal methods, and it is now the default solver
 - `optimal_anticlustering()` and `optimal_dispersion()` now have an additional argument `time_limit`
+- `anticlustering()` now has an argument `cannot_link`, which can be used to forbid pairs of elements from being assigned to the same cluster. When used, this solves the same (NP hard) graph coloring problem as `optimal_dispersion()`. Unlike the other optimal methods, it uses the Symphony solver with priority, when it is found (otherwise the `lpSolve`)
+
+## Bug fixes
+
 - Bug fix in `optimal_dispersion()`: Output element `$edges` no longer includes edges that were investigated in the last iteration of the algorithm (and which are not relevant for finding the optimal dispersion)
+
+## Internal changes / Other 
+
+- Speed improvements for `anticlustering(..., objective = "diversity")` when using `method = "local-maximum"` and `repetitions` (the restart algorithm is now entirely implemented in C and does not call `method = "exchange"` repeatedly from R)
+- `anticlust` now depends on package `lpSolve`
 
 # anticlust 0.8.5
 

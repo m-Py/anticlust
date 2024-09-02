@@ -509,12 +509,10 @@ constraintV9 <- function(number_clusters, edges, target_groups, solver_name) {
 optimal_cannot_link <- function(N, K, target_groups, cannot_link, repetitions) {
   repetitions <- ifelse(is.null(repetitions), 1, repetitions)
   all_nns_reordered <- reorder_edges(cannot_link)
-  if (K > 5) {
-    solution <- constraintV9(K, all_nns_reordered, target_groups, "Gecode")
-  } else {
-    ilp <- k_coloring_ilp(all_nns_reordered, N, K, target_groups)
-    solution <- solve_ilp(ilp)
-  }
+  ilp <- k_coloring_ilp(all_nns_reordered, N, K, target_groups)
+  solution <- solve_ilp(
+    ilp, solver = ifelse(requireNamespace("Rsymphony", quietly = TRUE), "gurobi", find_ilp_solver())
+  )
   if (solution$status != 0) {
     stop("The cannot-link constraints cannot be fulfilled.")
   }

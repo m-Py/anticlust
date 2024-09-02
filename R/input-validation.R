@@ -7,7 +7,39 @@
 #' @noRd
 input_validation_anticlustering <- function(x, K, objective, method,
                                           preclustering, categories,
-                                          repetitions, standardize = FALSE, cannot_link = NULL) {
+                                          repetitions, standardize = FALSE, cannot_link = NULL,
+                                          must_link = NULL) {
+  
+  ## Validate feature input
+  validate_data_matrix(x)
+  x <- as.matrix(x)
+  N <- nrow(x)
+  
+  if (argument_exists(must_link)) {
+    validate_input(must_link, "must_link", not_function = TRUE, len = N)
+    must_link <- as.matrix(must_link)
+
+    validate_input(objective, "objective", input_set = c("diversity"), not_na = TRUE, len = 1) 
+    validate_input(method, "method", input_set = c("local-maximum", "exchange"), not_na = TRUE, len = 1) 
+    
+    if (ncol(must_link) != 1) {
+      stop("Argument must_link must be a vector.")
+    }
+    if (objective %in% c("dispersion", "kplus", "variance")) {
+      stop("Currently, must-link constraints only work with objective = 'diversity'.")
+    }
+    if (argument_exists(categories)) {
+      stop("\nCombining the `categories` argument together with must-link constraints \n",
+           "is currently not supported; use the categorical variables as part of the first argument\n",
+           "`x` instead (see the vignette on categorical variables).")
+    }
+    if (isTRUE(preclustering)) {
+      stop("It is not possible to combine preclustering with must-link constraints.")
+    }
+    if (argument_exists(cannot_link)) {
+      stop("Currently, it is not possible to use both cannot-link and must-link constraints.")
+    }
+  }
   
   if (argument_exists(cannot_link)) {
     cannot_link <- as.matrix(cannot_link)
@@ -43,11 +75,6 @@ input_validation_anticlustering <- function(x, K, objective, method,
   ## Merge categories variable so that `length` can be applied:
   categories <- merge_into_one_variable(categories)
   
-  ## Validate feature input
-  validate_data_matrix(x)
-  x <- as.matrix(x)
-  N <- nrow(x)
-
   validate_input(preclustering, "preclustering", len = 1,
                  input_set = c(TRUE, FALSE), not_na = TRUE, not_function = TRUE)
 
@@ -191,6 +218,13 @@ validate_input <- function(obj, argument_name, len = NULL, greater_than = NULL,
     }
   }
 
+  ## - Check mode of input
+  if (argument_exists(objmode)) {
+    if (mode(obj) != objmode) {
+      stop(argument_name, " must be ", objmode, ", but is ", mode(obj))
+    }
+  }
+  
   ## - Check if input has to be greater than some value
   if (argument_exists(greater_than)) {
     if (any(obj <= greater_than)) {
@@ -228,13 +262,6 @@ validate_input <- function(obj, argument_name, len = NULL, greater_than = NULL,
     if (!obj %in% input_set) {
       stop(argument_name, " can either be set to '",
            paste(input_set, collapse = "' or '"), "'")
-    }
-  }
-
-  ## - Check mode of input
-  if (argument_exists(objmode)) {
-    if (mode(obj) != objmode) {
-      stop(argument_name, " must be ", objmode, ", but is ", mode(obj))
     }
   }
 
