@@ -13,6 +13,7 @@ opt <- tryCatch(
   anticlust:::optimal_binpacking_(capacities, weights),
   error = function(e) e
 )
+table(opt)
 
 error <- "simpleError" %in% class(opt)
 
@@ -25,18 +26,18 @@ if (!error) {
 
 ## Test bin packing as used in must-link anticlustering
 
-N <- 200
-K <- 4
+N <- 120
+K <- 10
 capacities <- rep(N/K, K)
 must_link <- sample(N, replace = TRUE)
 
 start <- Sys.time()
 opt <- tryCatch(
-  optimal_binpacking_(capacities, table(must_link), solver = "symphony"),
+  anticlust:::optimal_binpacking_(capacities, table(must_link), solver = "lpSolve"),
   error = function(e) e
 )
 Sys.time() - start
-
+table(opt)
 
 ## TODO ALWAYS USE TRYCATCH WITH MUST LINK CONSTRAINTS IN CASE THEY CANNOT BE FULFILLED
 # (and then the test cases would fail!)
