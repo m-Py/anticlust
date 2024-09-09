@@ -8,14 +8,18 @@ optimal_binpacking_ <- function(capacities, weights, solver = NULL, time_limit =
   # We get names for the decision variables to keep track of everything
   variables <- get_col_names(n_batches, n)
   
+  # Decision variables: Is item i assigned to batch j (so there are 
+  # N x C constraints for N items and C batches)
+  
   # Two types of constraints:
-  # a. Capacity of batches must not be exceeded
+  # a. Capacity of batches must not be exceeded (1 constraint per batch)
   constraints1 <- matrix(0, ncol = length(variables), nrow = n_batches)
   colnames(constraints1) <- variables
   for (i in 1:nrow(constraints1)) {
     constraints1[i, grepl(paste0("b", i, "_"), variables)] <- weights
   }
   
+  # b. Each item can only be filled into one bin (1 constraint per variable)
   constraints2 <- matrix(0, ncol = length(variables), nrow = n)
   colnames(constraints2) <- variables
   for (i in 1:nrow(constraints2)) {
