@@ -29,7 +29,7 @@ optimal_binpacking_ <- function(capacities, weights, solver = NULL, time_limit =
   ilp$constraints  <- rbind(constraints1, constraints2)
   ilp$equalities   <- dirs
   ilp$rhs          <- rhs
-  ilp$obj_function <- rep(weights, each = n_batches)
+  ilp$obj_function <- rep(1, ncol(constraints1))
   
   ilp_solution <- solve_ilp(ilp, objective = "min", solver = solver, time_limit = time_limit)
   if (ilp_solution$status != 0) {
