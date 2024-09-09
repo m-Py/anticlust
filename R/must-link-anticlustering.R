@@ -61,7 +61,7 @@ init_must_link_groups <- function(N, IDs_initial, IDs_reduced, target_groups) {
     )
   }
   if ("simpleError" %in% class(init)) {
-    stop("The cannot-link constraints cannot be fulfilled! I really tried.")
+    stop("The must-link constraints cannot be fulfilled! I really tried.")
   }
   init <- add_unassigned_elements(target_groups, init, N, length(target_groups))
   # only return one index per must-link group:
