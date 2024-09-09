@@ -1,6 +1,6 @@
 # Optimal algorithm for one dimensional bin packing
 
-optimal_binpacking_ <- function(capacities, weights) {
+optimal_binpacking_ <- function(capacities, weights, solver = NULL, time_limit = NULL) {
   
   n_batches <- length(capacities)
   n <- length(weights)
@@ -31,7 +31,7 @@ optimal_binpacking_ <- function(capacities, weights) {
   ilp$rhs          <- rhs
   ilp$obj_function <- rep(weights, each = n_batches)
   
-  ilp_solution <- solve_ilp(ilp, "min")
+  ilp_solution <- solve_ilp(ilp, objective = "min", solver = solver, time_limit = time_limit)
   if (ilp_solution$status != 0) {
     stop("The constraints cannot be fulfilled (really).")
   }

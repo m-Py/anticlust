@@ -1,7 +1,28 @@
 
+
+get_init_assignments <- function(N, ID, target_groups, method = "heuristic") {
+  if (method == "optimal") {
+    get_init_assignments_optimal(N, ID, target_groups)
+  } 
+  get_init_assignments_heuristic(N, ID, target_groups)
+}
+
+get_init_assignments_optimal <- function(N, ID, target_groups) {
+  weights <- table(ID)[table(ID) > 1]
+  multiple_IDs <- as.numeric(names(weights))
+  opt_assignment <- optimal_binpacking_(target_groups, weights)
+  # Optimal assignment is done for the "reduced" data set, we have to assign cluster
+  # label to all elements that are part of must-link group:
+  full_clusters <- rep(NA, N)
+  for (i in seq_along(multiple_IDs)) {
+    full_clusters[ID == multiple_IDs[i]] <- opt_assignment[i]
+  }
+  full_clusters
+}
+
 # Initialize must-link constraints by assigning all elements having the same ID to the same set
 # all others remain free (i.e., as NA). This is a "randomized fit" algorithm for bin packing
-get_init_assignments <- function(N, ID, target_groups) {
+get_init_assignments_heuristic <- function(N, ID, target_groups) {
   # Initialize all as NA
   init <- rep(NA, N)
   K <- length(target_groups)
@@ -29,7 +50,19 @@ get_init_assignments <- function(N, ID, target_groups) {
 
 # Initialize the groupings for the reduced sample, for all elements:
 init_must_link_groups <- function(N, IDs_initial, IDs_reduced, target_groups) {
-  init <- get_init_assignments(N, IDs_initial, target_groups)
+  init <- tryCatch(
+    get_init_assignments(N, IDs_initial, target_groups, method = "heuristic"),
+    error = function(e) e
+  )
+  if ("simpleError" %in% class(init)) {
+    init <- tryCatch(
+      get_init_assignments(N, IDs_initial, target_groups, method = "optimal"),
+      error = function(e) e
+    )
+  }
+  if ("simpleError" %in% class(init)) {
+    stop("The cannot-link constraints cannot be fulfilled! I really tried.")
+  }
   init <- add_unassigned_elements(target_groups, init, N, length(target_groups))
   # only return one index per must-link group:
   init[sapply(IDs_reduced, FUN = "[", 1)]
