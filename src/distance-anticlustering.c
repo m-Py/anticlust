@@ -107,6 +107,7 @@ void distance_anticlustering(double *data, int *N, int *K, int *frequencies, int
         double BEST_OBJ = 0;
         int BEST_PARTITION[n];
         size_t partition_counter = 0;
+        double *OBJ_RESULT = malloc(sizeof(double));
         for (size_t a = 0; a < *R; a++) {
                 if (*use_init_partitions == 1) {
                         for (size_t i = 0; i < n; i++) {
@@ -114,9 +115,6 @@ void distance_anticlustering(double *data, int *N, int *K, int *frequencies, int
                               partition_counter++;
                         }
                 }
-               
-                double *OBJ_RESULT;
-                OBJ_RESULT = malloc(sizeof(double));
                 
                 distance_anticlustering_(
                         n, k, c, DISTANCES, POINTS, CATEGORY_HEADS, frequencies, clusters, USE_CATS,
@@ -136,6 +134,7 @@ void distance_anticlustering(double *data, int *N, int *K, int *frequencies, int
                 clusters[i] = BEST_PARTITION[i];
         }
         
+        free(OBJ_RESULT); OBJ_RESULT= NULL;
         free_points(n, POINTS, n);
         free_category_indices(c, CATEGORY_HEADS, c);
         free_distances(n, DISTANCES, n);
