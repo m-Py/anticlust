@@ -1,5 +1,17 @@
 
 
+## The functions `get_init_assignments*()` get the assignments for the items
+# that are restricted via cannot-link constraints. The other items still need 
+# to be assigned (via `add_unassigned_elements()`, which is done in 
+# init_must_link_groups()). 
+# - get_init_assignments_optimal() implements an optimal
+# bin packing algorithm. It is just a decision version because we are not interested
+# in minimizing the number of bins (so the objective function is constant for 
+# all possible assignments). 
+# - get_init_assignments_heuristic() implements a randomized fit heuristic,
+# where each must-link cluster is assigned to a random group where it fits.
+# Only if this heuristic fails, the optimal algorithm will be called.
+
 get_init_assignments <- function(N, ID, target_groups, method = "heuristic") {
   if (method == "optimal") {
     get_init_assignments_optimal(N, ID, target_groups)
