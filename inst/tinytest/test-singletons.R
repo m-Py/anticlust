@@ -118,6 +118,5 @@ expect_true(all(cl[1] != cl[((N/K)+1):N]))
 must_link[1:((N/K)+1)] <- 1
 expect_error(
   anticlustering(features, K = K, must_link = must_link),
-  pattern = "must_link"
+  pattern = "must-link"
 )
-
