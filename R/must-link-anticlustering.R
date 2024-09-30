@@ -97,7 +97,7 @@ adjusted_distances_must_link <- function(distances, must_link) {
   list(distances = new_distances, IDs = list_must_link_indices)
 }
 
-#' This is the function that is called from anticlustering()
+# This is the function that is called from anticlustering()
 must_link_anticlustering <- function(x, K, must_link, method = "exchange", objective = "diversity", repetitions = NULL) {
   
   x <- to_matrix(x)
