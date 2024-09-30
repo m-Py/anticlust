@@ -1,4 +1,4 @@
-# anticlust development (target 0.8.7)
+# anticlust 0.8.7
 
 ## User visible changes
 
