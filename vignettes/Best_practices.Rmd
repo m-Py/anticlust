@@ -33,10 +33,6 @@ This document uses somewhat imperative language; nuance and explanations are giv
 
 [^whydefault]: You might ask why `standardize = TRUE` is not the default. Actually, there are two reasons. First, the argument was not always available in `anticlust` and changing the default behaviour of a function when releasing a new version is oftentimes undesirable. Second, it seems like a big decision to me to just change users' data by default (which is done when standardizing the data). In doubt, just compare the results of using `standardize = TRUE` and `standardize = FALSE` and decide for yourself which you like best. Standardization may not be the best choice in all settings.
 
-[^optdispersion]: The maximum dispersion problem can be solved optimally for rather large data sets, especially for $K = 2$. For $K = 3$ and $K = 4$, several 100 elements can usually be processed, especially when installing the SYMPHONY solver.
-
-[^whatisverylarge]: What is considered very large may depend on the specifications of your computer. I used to have problems computing a distance matrix for $N > 20000$.
-
 ## References 
 
 Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition data sets into equivalent parts. *Psychological Methods, 26*(2), 161--174. https://doi.org/10.1037/met0000301.
