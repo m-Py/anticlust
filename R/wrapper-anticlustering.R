@@ -24,7 +24,7 @@
 #'     to anticlusters before the optimization starts.
 #' @param objective The objective to be maximized. The options
 #'     "diversity" (default; previously called "distance", which is
-#'     still supported), "variance", "kplus" and "dispersion" are
+#'     still supported), "average-diversity", "variance", "kplus" and "dispersion" are
 #'     natively supported. May also be a user-defined function. See
 #'     Details.
 #' @param method One of "exchange" (default) , "local-maximum",

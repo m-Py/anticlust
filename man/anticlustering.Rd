@@ -34,7 +34,7 @@ to anticlusters before the optimization starts.}
 
 \item{objective}{The objective to be maximized. The options
 "diversity" (default; previously called "distance", which is
-still supported), "variance", "kplus" and "dispersion" are
+still supported), "average-diversity", "variance", "kplus" and "dispersion" are
 natively supported. May also be a user-defined function. See
 Details.}
 
