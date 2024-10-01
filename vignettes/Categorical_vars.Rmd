@@ -76,9 +76,11 @@ table(groups, df$species)
 
 The results for the sex variable are worse than previously when we only considered one variable at a time. This is because when using multiple variables with the `categories` argument, all columns are "merged" into a single column, and each combination of sex / species is treated as a separate category. Some information on the original variables is lost, and the results may become less optimal---while being still pretty okay here. Alas, using only the `categories` argument, we cannot improve this balancing even if a better split with regard to both categorical variables would be possible.
 
-## K-Means Anticlustering
+## Categorical variables as numeric variables
 
-K-means anticlustering offers a second possibility to distribute categorical variables evenly between groups. This approach can lead to better results when multiple categorical variables are available, and / or if the group sizes are unequal. To use this approach, we first generate a matrix of the categorical variables in binary representation using the `anticlust` convenience function `categories_to_binary()`.[^modelmatrix] Because k-means anticlustering optimizes similarity with regard to means, k-means anticlustering applied to this binary matrix will even out the proportion of each category in each group (this is because the mean of a binary variable is the proportion of `1`s in that variable).
+A second possibility to incorporate categorical variables is to treat them as numeric variables and use them as part of the first argument `x`, which is used to compute the anticlustering objective (e.g., the diversity or variance). This approach can lead to better results when multiple categorical variables are available, and / or if the group sizes are unequal. I discuss the approach by the example of k-means anticlustering, but using the diversity objective is also possible (in principle, any reasonable way to transform categorical variables to pairwise dissimilarities would work).
+
+To use categorical variables as part of the anticlustering objective, we first generate a matrix of the categorical variables in binary representation using the `anticlust` convenience function `categories_to_binary()`.[^modelmatrix] Because k-means anticlustering optimizes similarity with regard to means, k-means anticlustering applied to this binary matrix will even out the proportion of each category in each group (this is because the mean of a binary variable is the proportion of `1`s in that variable).
 
 [^modelmatrix]: Internally, `categories_to_binary()` is just a thin wrapper around the base `R` function `model.matrix()`.
 
@@ -119,7 +121,7 @@ table(groups, df$species)
 table(groups, df$sex, df$species)
 ```
 
-Note that we only evenly distributed the categorical variable between groups and did not consider the numeric variables---which is however why we would usually call `anticlustering()`. Fortunately, also considering the numeric variables is possible, and can we accomplish that in two different ways: 
+Note that we only evenly distributed the categorical variable between groups and did not consider any numeric variables. Fortunately, also considering the numeric variables is possible, and can we accomplish that in two different ways: 
 
 (a) we first optimize similarity with regard to the categorical variable(s) via k-means anticlustering, and then insert the resulting group assignment as a "hard constraint" into `anticlustering()`
 (b) we simultaneous optimize similarity with regard to numeric and categorical variables
