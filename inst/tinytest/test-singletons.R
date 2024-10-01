@@ -103,7 +103,6 @@ uu <- anticlustering(
 
 expect_true(all(tt == uu))
 
-### TODO:
 
 # - Test for singleton created via must-link constraint
 N <- nrow(features)
