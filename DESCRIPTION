@@ -36,8 +36,8 @@ Description: The method of anticlustering partitions a pool of elements
     <doi:10.1037/met0000301>), Brusco et al. (2020;
     <doi:10.1111/bmsp.12186>), and Papenberg (2024;
     <doi:10.1111/bmsp.12315>). The optimal algorithms require that an
-    integer linear programming solver is installed. anticlust will install
-    the 'lpSolve' package (<https://cran.r-project.org/package=lpSolve>)
+    integer linear programming solver is installed. This package will install
+    'lpSolve' (<https://cran.r-project.org/package=lpSolve>)
     as a default solver, but it is also possible to 
     use the package 'Rglpk' (<https://cran.r-project.org/package=Rglpk>), 
     which requires the GNU linear programming 
