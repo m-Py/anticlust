@@ -41,7 +41,13 @@ The stable release of `anticlust` is available from [CRAN](https://CRAN.R-projec
 install.packages("anticlust")
 ```
 
-A (potentially more recent) version of `anticlust` can also be installed directly via Github:
+A (potentially more recent) version of `anticlust` can also be installed via [R Universe](https://m-py.r-universe.dev/anticlust):
+
+```R
+install.packages('anticlust', repos = c('https://m-py.r-universe.dev', 'https://cloud.r-project.org'))
+```
+
+or directly via Github:
 
 ```R
 library("remotes") # if not available: install.packages("remotes")
@@ -108,14 +114,15 @@ knitr::kable(mean_sd_tab(iris[, -5], anticlusters), row.names = TRUE)
 
 As illustrated in the example, we can use the function `anticlustering()` to create similar groups of plants. In this case "similar" primarily means that the means and standard deviations (in parentheses) of the variables are pretty much the same across the five groups. The function `anticlustering()` takes as input a data table describing the elements that should be assigned to sets. In the data table, each row represents an element (here a plant, but it can be anything; for example a person, word, or a photo). Each column is a numeric variable describing one of the elements' features. The number of groups is specified through the argument `K`. The argument `objective` specifies how between-group similarity is quantified; the argument `method` specifies the algorithm by which this measure is optimized. See the documentation `?anticlustering` for more details. 
 
-Four anticlustering objectives are natively supported in `anticlustering()`:
+Five anticlustering objectives are natively supported in `anticlustering()`:
 
 - the "diversity" objective, setting `objective = "diversity"` (default)
+- the "average-diversity", setting `objective = "average-diversity"`, which normalizes the diversity by cluster size
 - the k-means objective (i.e., the "variance") setting `objective = "variance"`
 - the "k-plus" objective, an extension of the k-means variance criterion, setting `objective = "kplus"`
 - the "dispersion" objective (the minimum distance between any two elements within the same cluster), setting `objective = "dispersion"`
 
-The anticlustering objectives are described in detail in the documentation (`?diversity_objective`, `?variance_objective`, `?kplus_anticlustering`, `?dispersion_objective`) and the references therein. It is also possible to optimize user-defined measures of cluster similarity, which is also described in the documentation (`?anticlustering`).
+The anticlustering objectives are described in detail in the documentation (`?anticlustering`, `?diversity_objective`, `?variance_objective`, `?kplus_anticlustering`, `?dispersion_objective`) and the references therein. It is also possible to optimize user-defined objectives, which is also described in the documentation (`?anticlustering`).
 
 ## Categorical variables
 
