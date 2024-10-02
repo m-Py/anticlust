@@ -7,8 +7,8 @@
 
 ## Bug fixes
 
-- `diversity_objective()` is now computed correctly when a cluster only has one member (fixed via [https://github.com/m-Py/anticlust/commit/8403fab1461b2cda8](8403fab1461b2c))
-- Fixed a memory leak in `anticlustering(..., objective = "diversity")` thanks to @Hanney100 (via [https://github.com/m-Py/anticlust/commit/24c244faf8b2c07740710cac957a7](24c244faf8b2c07740710cac957a7)
+- `diversity_objective()` is now computed correctly when a cluster only has one member (fixed via [https://github.com/m-Py/anticlust/commit/8403fab1461b2cda8](8403fab1461b2cda8dda768d8e80c5ec92552e4a))
+- Fixed a memory leak in `anticlustering(..., objective = "diversity")` thanks to @Hanney100 (via [https://github.com/m-Py/anticlust/commit/24c244faf8b2c07740710cac957a753f96f545fc](24c244faf8b2c07740710cac957a753f96f545fc)
 
 # anticlust 0.8.6
 
