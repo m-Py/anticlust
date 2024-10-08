@@ -12,7 +12,7 @@
 #' @param K The number of groups or a vector describing the size of
 #'     each group.
 #' @param solver Optional argument; currently supports "lpSolve", 
-#'     "glpk", "symphony", "gurobi", and "Gecode". See \code{\link{optimal_anticlustering}}.
+#'     "glpk", "symphony", and "gurobi". See \code{\link{optimal_anticlustering}}.
 #' @param max_dispersion_considered Optional argument used for early
 #'     stopping. If the dispersion found is equal to or exceeds this
 #'     value, a solution having the previous best dispersion is
@@ -219,12 +219,8 @@ optimal_dispersion <- function(
     # Reorder edge labels so that they start from 1 to C, where C is the number
     # of relevant edges (Better for creating K-coloring ILP).
     all_nns_reordered <- reorder_edges(all_nns)
-    if (solver == "Gecode") {
-      solution <- constraintV9(K, all_nns_reordered, target_groups, solver)
-    } else {
-      ilp <- k_coloring_ilp(all_nns_reordered, N, K, target_groups)
-      solution <- solve_ilp(ilp, objective = "min", solver = solver, time_limit = time_limit)
-    }
+    ilp <- k_coloring_ilp(all_nns_reordered, N, K, target_groups)
+    solution <- solve_ilp(ilp, objective = "min", solver = solver, time_limit = time_limit)
     dispersion_found <- solution$status != 0
     if (argument_exists(time_limit) && (as.numeric(difftime(Sys.time(), start, units = "s")) > time_limit)) {
       stop("Could not find the optimal dispersion in the given time limit.")
@@ -467,51 +463,14 @@ remove_redundant_edges <- function(df) {
   df[!duplicated(df), ]
 }
 
-# Written by Lars Torben Schwabe: 
-constraintV9 <- function(number_clusters, edges, target_groups, solver_name) {
-  number_edges <- nrow(edges)
-  number_nodes <- max(edges)
-  data <- paste("number_nodes = ",as.character(number_nodes),"; number_clusters = ",
-                as.character(number_clusters),"; number_edges = ",as.character(number_edges),
-                "; edges1 = [",paste(edges[,1], collapse = ", "),"]; edges2 = [",paste(edges[,2], collapse = ", "),"]; target_groups = [",
-                paste(target_groups, collapse = ", "),"];")
-  dzn_file <- file.path(tempdir(), "minizinc_input.dzn")
-  writeLines(data, con = dzn_file)
-  modelfile <- system.file("MinizincModel20.mzn", package="anticlust")
-  out <- system(paste("minizinc --solver ", solver_name,"--disable-all-satisfaction", modelfile, dzn_file), intern = TRUE, ignore.stderr = TRUE)
-  if(out[1] != "=====UNSATISFIABLE====="){
-    num <- as.numeric(unlist(stringr::str_extract_all(out, "\\d+")))
-    color_of_nodes <- num
-    dispersion_found <- 0;
-    colors_matrix <- matrix(0,number_nodes,number_clusters)
-    for(i in 1:number_nodes){
-      colors_matrix[i,color_of_nodes[i]]=1
-    }
-    colors_vector <- unlist(t(colors_matrix))
-    names(colors_vector) <- paste("x" ,rep(1:number_nodes, each = number_clusters),
-                                  rep(1:number_clusters, times = number_nodes), sep = "_")
-    w_vector <- rep(1,number_clusters)  
-    names(w_vector) <- paste("w" ,1:number_clusters, sep = "_")
-    x_vector <- c(w_vector, colors_vector)
-    solution <- list(x = x_vector, obj = number_clusters, status = dispersion_found)
-    return(solution)
-  }else{
-    dispersion_found <- 1;
-    solution <- list(obj = 0, status = dispersion_found)
-    return(solution)
-  }
-}
-
-
 # Function to solve optimal cannot_link constraints, used for the argument 
 # cannot_link in anticlustering().
-# In constraint-programming branch I use Gecode solver for K > 4
 optimal_cannot_link <- function(N, K, target_groups, cannot_link, repetitions) {
   repetitions <- ifelse(is.null(repetitions), 1, repetitions)
   all_nns_reordered <- reorder_edges(cannot_link)
   ilp <- k_coloring_ilp(all_nns_reordered, N, K, target_groups)
   solution <- solve_ilp(
-    ilp, solver = ifelse(requireNamespace("Rsymphony", quietly = TRUE), "gurobi", find_ilp_solver())
+    ilp, solver = ifelse(requireNamespace("Rsymphony", quietly = TRUE), "Rsymphony", find_ilp_solver())
   )
   if (solution$status != 0) {
     stop("The cannot-link constraints cannot be fulfilled.")

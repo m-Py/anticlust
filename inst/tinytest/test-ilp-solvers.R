@@ -47,9 +47,6 @@ Sys.time() - start
 start <- Sys.time()
 val4 <- optimal_dispersion(x, K = 3, solver = "gurobi")$dispersion
 Sys.time() - start
-start <- Sys.time()
-val5 <- optimal_dispersion(x, K = 3, solver = "Gecode")$dispersion
-Sys.time() - start
 
 expect_equal(val1, val2)
 expect_equal(val1, val3)

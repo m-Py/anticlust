@@ -150,10 +150,7 @@ validate_input_optimal_anticlustering <- function(x, K, objective, solver, time_
   # Solver
   if (argument_exists(solver)) {
     validate_input(solver, "solver", objmode = "character", len = 1,
-                  input_set = c("glpk", "symphony", "lpSolve", "Gecode", "gurobi"), not_na = TRUE, not_function = TRUE)
-    if (solver == "Gecode" && objective != "dispersion") {
-      stop("The Gecode solver is only available for the dispersion objective.")
-    }
+                  input_set = c("glpk", "symphony", "lpSolve", "gurobi"), not_na = TRUE, not_function = TRUE)
     if (solver == "glpk") {
       if (!requireNamespace("Rglpk", quietly = TRUE)) {
         stop("The package Rglpk must be installed to use `solver = glpk`.\n", 
