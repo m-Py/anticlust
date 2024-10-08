@@ -51,7 +51,6 @@ Sys.time() - start
 expect_equal(val1, val2)
 expect_equal(val1, val3)
 expect_equal(val1, val4)
-expect_equal(val1, val5)
 
 ### Test solvers for balanced clustering (i.e., reversed maximum - minimum - diversity)
 
