@@ -1,7 +1,40 @@
 
+
+## The functions `get_init_assignments*()` get the assignments for the items
+# that are restricted via cannot-link constraints. The other items still need 
+# to be assigned (via `add_unassigned_elements()`, which is done in 
+# init_must_link_groups()). 
+# - get_init_assignments_optimal() implements an optimal
+# bin packing algorithm. It is just a decision version because we are not interested
+# in minimizing the number of bins (so the objective function is constant for 
+# all possible assignments). 
+# - get_init_assignments_heuristic() implements a randomized fit heuristic,
+# where each must-link cluster is assigned to a random group where it fits.
+# Only if this heuristic fails, the optimal algorithm will be called.
+
+get_init_assignments <- function(N, ID, target_groups, method = "heuristic") {
+  if (method == "optimal") {
+    get_init_assignments_optimal(N, ID, target_groups)
+  } 
+  get_init_assignments_heuristic(N, ID, target_groups)
+}
+
+get_init_assignments_optimal <- function(N, ID, target_groups) {
+  weights <- table(ID)[table(ID) > 1]
+  multiple_IDs <- as.numeric(names(weights))
+  opt_assignment <- optimal_binpacking_(target_groups, weights)
+  # Optimal assignment is done for the "reduced" data set, we have to assign cluster
+  # label to all elements that are part of must-link group:
+  full_clusters <- rep(NA, N)
+  for (i in seq_along(multiple_IDs)) {
+    full_clusters[ID == multiple_IDs[i]] <- opt_assignment[i]
+  }
+  full_clusters
+}
+
 # Initialize must-link constraints by assigning all elements having the same ID to the same set
 # all others remain free (i.e., as NA). This is a "randomized fit" algorithm for bin packing
-get_init_assignments <- function(N, ID, target_groups) {
+get_init_assignments_heuristic <- function(N, ID, target_groups) {
   # Initialize all as NA
   init <- rep(NA, N)
   K <- length(target_groups)
@@ -29,7 +62,19 @@ get_init_assignments <- function(N, ID, target_groups) {
 
 # Initialize the groupings for the reduced sample, for all elements:
 init_must_link_groups <- function(N, IDs_initial, IDs_reduced, target_groups) {
-  init <- get_init_assignments(N, IDs_initial, target_groups)
+  init <- tryCatch(
+    get_init_assignments(N, IDs_initial, target_groups, method = "heuristic"),
+    error = function(e) e
+  )
+  if ("simpleError" %in% class(init)) {
+    init <- tryCatch(
+      get_init_assignments(N, IDs_initial, target_groups, method = "optimal"),
+      error = function(e) e
+    )
+  }
+  if ("simpleError" %in% class(init)) {
+    stop("The must-link constraints cannot be fulfilled! I really tried.")
+  }
   init <- add_unassigned_elements(target_groups, init, N, length(target_groups))
   # only return one index per must-link group:
   init[sapply(IDs_reduced, FUN = "[", 1)]
@@ -52,7 +97,7 @@ adjusted_distances_must_link <- function(distances, must_link) {
   list(distances = new_distances, IDs = list_must_link_indices)
 }
 
-#' This is the function that is called from anticlustering()
+# This is the function that is called from anticlustering()
 must_link_anticlustering <- function(x, K, must_link, method = "exchange", objective = "diversity", repetitions = NULL) {
   
   x <- to_matrix(x)

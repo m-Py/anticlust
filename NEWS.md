@@ -1,17 +1,14 @@
-# anticlust development (target 0.8.7)
+# anticlust 0.8.7
 
 ## User visible changes
 
 - `anticlustering()` now has an argument `must_link`, which can be used force elements into the same cluster
-- It is now possible that an cluster initialization given to `anticlustering()` only has 1 member (this threw an error before)
+- It is now possible that a cluster (e.g., in `anticlustering()`) only has 1 member (this threw an error before)
 
 ## Bug fixes
 
-- `diversity_objective()` is now computed correctly when a cluster only has one member (fixed via [https://github.com/m-Py/anticlust/commit/8403fab1461b2cda8](8403fab1461b2c))
-
-## Internal changes / Other 
-
-- Updated the documentation
+- `diversity_objective()` is now computed correctly when a cluster only has one member (fixed via [8403fab1461b2cda8](https://github.com/m-Py/anticlust/commit/8403fab1461b2cda8dda768d8e80c5ec92552e4a))
+- Fixed a memory leak in `anticlustering(..., objective = "diversity")` thanks to [@Hanney100](https://github.com/Hanney100) (via [24c244faf8b2c0774071](https://github.com/m-Py/anticlust/commit/24c244faf8b2c07740710cac957a753f96f545fc))
 
 # anticlust 0.8.6
 

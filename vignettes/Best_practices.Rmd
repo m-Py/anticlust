@@ -24,21 +24,14 @@ This document uses somewhat imperative language; nuance and explanations are giv
 - If speed is not an issue (it usually is not), use `method = "local-maximum"` instead of the default  `method = "exchange"`. **It is unambiguously better.**
 - If speed is not an issue (it usually is not), use several `repetitions`.
 - Use `standardize = TRUE` instead of the default `standardize = FALSE`.[^whydefault]
-- Do not use the default `objective = "diversity"` when the group sizes are not equal (preferably, use `objective = "kplus"`).
+- Do not use the default `objective = "diversity"` when the group sizes are not equal (preferably, use `objective = "kplus"` or `objective = "average-diversity"`).
 - If you only care about similarity in mean values, use `objective = "variance"`.
 - **You should (probably) not only care about similarity in mean values**: prefer `objective = "kplus"` over `objective = "variance"` (or check out the function `kplus_anticlustering()`).
 - If you (only) care about similarity in means and standard deviations, use `objective = "kplus"` instead of the default `objective = "diversity"`.
 - With k-plus anticlustering, **always** use `standardize = TRUE`.
 - If you want to apply anticlustering on a large data set, read the vignette "Speeding up Anticlustering".
-- If you have a very large[^whatisverylarge] data set, do not use the default `objective = "diversity"` because computing the distance matrix may overwhelm your computer. Instead use `objective = "variance"` or `objective = "kplus"`.
-- For the optimal anticlustering algorithms (i.e., `method = "ilp"`): Install the SYMPHONY solver instead of the GLPK solver. 
-- The `objective = "dispersion"` is the only objective where you should first try out the optimal method instead of a heuristic, i.e., use `method = "ilp"` or the function `optimal_dispersion()`.[^optdispersion]
 
 [^whydefault]: You might ask why `standardize = TRUE` is not the default. Actually, there are two reasons. First, the argument was not always available in `anticlust` and changing the default behaviour of a function when releasing a new version is oftentimes undesirable. Second, it seems like a big decision to me to just change users' data by default (which is done when standardizing the data). In doubt, just compare the results of using `standardize = TRUE` and `standardize = FALSE` and decide for yourself which you like best. Standardization may not be the best choice in all settings.
-
-[^optdispersion]: The maximum dispersion problem can be solved optimally for rather large data sets, especially for $K = 2$. For $K = 3$ and $K = 4$, several 100 elements can usually be processed, especially when installing the SYMPHONY solver.
-
-[^whatisverylarge]: What is considered very large may depend on the specifications of your computer. I used to have problems computing a distance matrix for $N > 20000$.
 
 ## References 
 

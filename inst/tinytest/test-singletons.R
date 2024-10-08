@@ -103,7 +103,6 @@ uu <- anticlustering(
 
 expect_true(all(tt == uu))
 
-### TODO:
 
 # - Test for singleton created via must-link constraint
 N <- nrow(features)
@@ -118,6 +117,5 @@ expect_true(all(cl[1] != cl[((N/K)+1):N]))
 must_link[1:((N/K)+1)] <- 1
 expect_error(
   anticlustering(features, K = K, must_link = must_link),
-  pattern = "must_link"
+  pattern = "must-link"
 )
-

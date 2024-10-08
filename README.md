@@ -1,4 +1,5 @@
-# anticlust <a href='https://m-py.github.io/anticlust/'><img src='man/figures/anticlustStickerV1-0.svg' style="float:right; height:160px" /></a>
+anticlust <a href='https://m-py.github.io/anticlust/'><img src='man/figures/anticlustStickerV1-0.svg' style="float:right; height:160px" /></a>
+==============================================================================================================================================
 
 Anticlustering partitions a pool of elements into clusters (or
 *anticlusters*) with the goal of achieving high between-cluster
@@ -7,11 +8,15 @@ by maximizing instead of minimizing a clustering objective function,
 such as the intra-cluster variance (used in k-means clustering) or the
 sum of pairwise distances within clusters. The package `anticlust`
 implements anticlustering methods as described in Papenberg and Klau
-(2021; <https://doi.org/10.1037/met0000301>), Brusco et al. (2020;
-<https://doi.org/10.1111/bmsp.12186>), and Papenberg (2024;
-<https://doi.org/10.1111/bmsp.12315>).
+(2021;
+<a href="https://doi.org/10.1037/met0000301" class="uri">https://doi.org/10.1037/met0000301</a>),
+Brusco et al. (2020;
+<a href="https://doi.org/10.1111/bmsp.12186" class="uri">https://doi.org/10.1111/bmsp.12186</a>),
+and Papenberg (2024;
+<a href="https://doi.org/10.1111/bmsp.12315" class="uri">https://doi.org/10.1111/bmsp.12315</a>).
 
-## Installation
+Installation
+------------
 
 The stable release of `anticlust` is available from
 [CRAN](https://CRAN.R-project.org/package=anticlust) and can be
@@ -20,19 +25,25 @@ installed via:
     install.packages("anticlust")
 
 A (potentially more recent) version of `anticlust` can also be installed
-directly via Github:
+via [R Universe](https://m-py.r-universe.dev/anticlust):
+
+    install.packages('anticlust', repos = c('https://m-py.r-universe.dev', 'https://cloud.r-project.org'))
+
+or directly via Github:
 
     library("remotes") # if not available: install.packages("remotes")
     install_github("m-Py/anticlust")
 
-## Citation
+Citation
+--------
 
 If you use `anticlust` in your research, it would be courteous if you
 cite the following reference:
 
 -   Papenberg, M., & Klau, G. W. (2021). Using anticlustering to
     partition data sets into equivalent parts. *Psychological Methods,
-    26*(2), 161–174. <https://doi.org/10.1037/met0000301>
+    26*(2), 161–174.
+    <a href="https://doi.org/10.1037/met0000301" class="uri">https://doi.org/10.1037/met0000301</a>
 
 Depending on which `anticlust` functions you are using, including other
 references may also be fair. [Here you can find out in detail how to
@@ -41,17 +52,20 @@ cite `anticlust`](./inst/HOW_TO_CITE_ANTICLUST.md).
 Another great way of showing your appreciation of `anticlust` is to
 leave a star on this Github repository.
 
-## How do I learn about `anticlust`
+How do I learn about `anticlust`
+--------------------------------
 
 This README contains some basic information on the `R` package
 `anticlust`. More information is available via the following sources:
 
 -   A paper is available describing the theoretical background of
     anticlustering and the `anticlust` package in detail
-    (<https://doi.org/10.1037/met0000301>). The freely available
-    preprint can be retrieved from <https://psyarxiv.com/3razc/>. A more
-    recent paper focusing on the k-plus anticlustering method can be
-    retrieved from <https://psyarxiv.com/7jw6v/>.
+    (<a href="https://doi.org/10.1037/met0000301" class="uri">https://doi.org/10.1037/met0000301</a>).
+    The freely available preprint can be retrieved from
+    <a href="https://psyarxiv.com/3razc/" class="uri">https://psyarxiv.com/3razc/</a>.
+    A more recent paper focusing on the k-plus anticlustering method can
+    be retrieved from
+    <a href="https://psyarxiv.com/7jw6v/" class="uri">https://psyarxiv.com/7jw6v/</a>.
 -   The `R` documentation of the main functions is actually quite rich
     and up to date, so you should definitely check that out when using
     the `anticlust` package (primarily `?anticlustering`,
@@ -65,7 +79,8 @@ This README contains some basic information on the `R` package
     website also lists four package vignettes, while additional
     vignettes are planned.
 
-## A quick start
+A quick start
+-------------
 
 In this initial example, I use the main function `anticlustering()` to
 create five similar sets of plants using the classical iris data set:
@@ -88,11 +103,11 @@ The output is a vector that assigns a group (i.e, a number between 1 and
 `K`) to each input element:
 
     anticlusters
-    #>   [1] 1 2 2 5 5 4 3 4 4 5 1 1 2 1 2 5 3 5 3 1 5 2 1 3 5 3 3 4 3 1 2 4 2 3 1 4 5
-    #>  [38] 4 5 3 1 2 2 4 1 4 2 3 5 4 2 4 2 2 3 4 2 5 3 3 1 5 4 1 5 1 2 3 1 3 2 2 4 4
-    #>  [75] 5 4 1 5 5 2 4 3 3 5 5 1 2 1 5 4 2 1 5 4 3 3 4 3 1 5 4 2 1 2 1 2 3 1 2 4 2
-    #> [112] 5 4 2 3 1 4 3 3 5 3 4 5 4 1 5 2 4 3 3 4 4 5 1 1 5 5 2 1 2 3 1 3 5 2 1 5 3
-    #> [149] 4 1
+    #>   [1] 1 2 4 5 3 4 2 3 2 2 1 5 1 2 4 1 2 3 2 5 1 5 4 5 1 1 3 4 5 5 5 4 5 2 1 1 3
+    #>  [38] 4 3 3 4 2 3 5 2 5 3 4 3 1 2 2 5 1 2 3 3 4 4 1 5 1 2 3 3 1 2 4 4 4 4 1 3 4
+    #>  [75] 2 4 5 2 5 2 3 3 1 5 4 1 5 3 2 1 2 5 3 4 1 4 1 2 4 5 2 2 3 1 4 1 3 4 4 5 3
+    #> [112] 2 3 1 5 2 5 3 1 5 4 1 2 5 1 2 3 1 3 3 5 1 2 5 5 4 3 5 4 3 5 5 1 4 4 1 3 4
+    #> [149] 2 2
 
 By default, each group has the same number of elements (but the argument
 `K` can be adjusted to request different group sizes):
@@ -128,30 +143,30 @@ groups to find out if the five groups are similar to each other:
 <tr class="even">
 <td style="text-align: left;">2</td>
 <td style="text-align: left;">5.84 (0.84)</td>
-<td style="text-align: left;">3.06 (0.44)</td>
+<td style="text-align: left;">3.06 (0.45)</td>
 <td style="text-align: left;">3.76 (1.79)</td>
 <td style="text-align: left;">1.20 (0.77)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">3</td>
 <td style="text-align: left;">5.84 (0.84)</td>
-<td style="text-align: left;">3.06 (0.45)</td>
+<td style="text-align: left;">3.06 (0.44)</td>
 <td style="text-align: left;">3.75 (1.79)</td>
 <td style="text-align: left;">1.20 (0.77)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">4</td>
-<td style="text-align: left;">5.84 (0.84)</td>
-<td style="text-align: left;">3.06 (0.44)</td>
-<td style="text-align: left;">3.75 (1.79)</td>
-<td style="text-align: left;">1.20 (0.77)</td>
+<td style="text-align: left;">5.85 (0.84)</td>
+<td style="text-align: left;">3.05 (0.45)</td>
+<td style="text-align: left;">3.76 (1.79)</td>
+<td style="text-align: left;">1.21 (0.77)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">5</td>
-<td style="text-align: left;">5.85 (0.84)</td>
+<td style="text-align: left;">5.84 (0.84)</td>
 <td style="text-align: left;">3.06 (0.44)</td>
 <td style="text-align: left;">3.76 (1.79)</td>
-<td style="text-align: left;">1.19 (0.77)</td>
+<td style="text-align: left;">1.19 (0.78)</td>
 </tr>
 </tbody>
 </table>
@@ -170,11 +185,13 @@ specifies how between-group similarity is quantified; the argument
 `method` specifies the algorithm by which this measure is optimized. See
 the documentation `?anticlustering` for more details.
 
-Four anticlustering objectives are natively supported in
+Five anticlustering objectives are natively supported in
 `anticlustering()`:
 
 -   the “diversity” objective, setting `objective = "diversity"`
     (default)
+-   the “average-diversity”, setting `objective = "average-diversity"`,
+    which normalizes the diversity by cluster size
 -   the k-means objective (i.e., the “variance”) setting
     `objective = "variance"`
 -   the “k-plus” objective, an extension of the k-means variance
@@ -184,13 +201,14 @@ Four anticlustering objectives are natively supported in
     `objective = "dispersion"`
 
 The anticlustering objectives are described in detail in the
-documentation (`?diversity_objective`, `?variance_objective`,
-`?kplus_anticlustering`, `?dispersion_objective`) and the references
-therein. It is also possible to optimize user-defined measures of
-cluster similarity, which is also described in the documentation
+documentation (`?anticlustering`, `?diversity_objective`,
+`?variance_objective`, `?kplus_anticlustering`, `?dispersion_objective`)
+and the references therein. It is also possible to optimize user-defined
+objectives, which is also described in the documentation
 (`?anticlustering`).
 
-## Categorical variables
+Categorical variables
+---------------------
 
 Sometimes, it is required that sets are not only similar with regard to
 some numeric variables, but we also want to ensure that each set
@@ -213,7 +231,8 @@ use the argument `categories` as follows:
     #>            2     17         16        17
     #>            3     16         17        17
 
-## Matching and clustering
+Matching and clustering
+-----------------------
 
 Anticlustering creates sets of dissimilar elements; the heterogenity
 within anticlusters is maximized. This is the opposite of clustering
@@ -247,7 +266,8 @@ small groups of similar elements, e.g., triplets as in this example:
 
 <img src="man/figures/matching-1.png" style="display: block; margin: auto;" />
 
-## Questions and suggestions
+Questions and suggestions
+-------------------------
 
 If you have any question on the `anticlust` package or find some bugs, I
 encourage you to open an [issue on the Github
