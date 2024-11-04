@@ -1,0 +1,74 @@
+name: R-CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - github_actions
+      - tpspd_heurestic
+      - add_dispersion
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        r-version: ['4.4.1', 'release']
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up R
+      uses: r-lib/actions/setup-r@v2
+      with:
+        r-version: ${{ matrix.r-version }}
+
+    - name: Install system dependencies on Linux
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev build-essential libglpk-dev coinor-libsymphony-dev
+        sudo apt-get install texlive texlive-latex-extra texlive-fonts-recommended
+
+    - name: Install dependencies
+      run: |
+        install.packages(c("remotes", "rcmdcheck"))
+        remotes::install_deps(dependencies = TRUE)
+        install.packages('Rglpk', dependencies = TRUE)
+        install.packages('Rsymphony', dependencies = TRUE)
+        install.packages('gurobi', dependencies = TRUE)
+      shell: Rscript {0}  
+
+    - name: Build and install the package
+      run: |
+        R CMD build . --no-build-vignettes
+            
+    - name: Install the package
+      run: |
+        remotes::install_local()
+      shell: Rscript {0}
+
+    - name: Check package
+      run: |
+        rcmdcheck::rcmdcheck(args = "--no-examples", build_args = "--no-build-vignettes", error_on = "error")
+      shell: Rscript {0}
+      env:
+        _R_CHECK_FORCE_SUGGESTS_: false
+
+
+    - name: Run tinytest
+      run: |
+       tinytest::test_package("anticlust")
+      shell: Rscript {0} 
+
+    - name: Show session info
+      run: |
+        sessionInfo()
+      shell: Rscript {0}  
