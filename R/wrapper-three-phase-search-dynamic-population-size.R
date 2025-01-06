@@ -154,7 +154,7 @@ three_phase_search_anticlustering <- function(x, K, N, objective = "diversity",
        stop("Could not allocate enough memory.")
      }
 
-    return(results$result)
+    return(results$result + 1)
 }
 
 input_validation_threephase_search <- function(x, K, N, objective, clusters, number_iterations, upper_bound, lower_bound, 
