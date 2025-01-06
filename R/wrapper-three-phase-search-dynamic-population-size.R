@@ -7,11 +7,11 @@
 #' Pseudocode in Algorithm 1).
 #' 
 #' 
-#' @param matrix The data input. Currently just a vector.
+#' @param x The data input, as in \code{\link{anticlustering}}.
 #' @param K Number of anticlusters to be formed.
-#' @param N Number of elememts.
+#' @param N Number of elements.
 #' @param objective The anticlustering objective, can be "diversity" or "dispersion".
-#' @param number_iterations: A number that defines how many times the steps in the search algorithm are repeated.
+#' @param number_iterations A number that defines how many times the steps in the search algorithm are repeated.
 #' @param clusters A vector of length K that specifies the number of elements each cluster can contain. 
 #' If this vector is not NULL, the lower and upper bounds will be disregarded.
 #' @param beta_max The algorithm begins with a pool of random initial solutions of size beta_max. 
@@ -27,12 +27,12 @@
 #' which decreases linearly over time from theta_max to theta_min.
 #' @param eta_max Parameter that specifies how many times the steps in the direct perturbation are executed.
 #' @param alpha Parameter for weighing the discrimination of a slightly worse local optimal child solution.
-#' @param return results contains everything, including vector result and its cost
 #'     
 #' @details Details of the implementation of the algorithm can be found 
-#'  in the pseudocode of the paper Yang et al. (2022). However, instead of setting a timing for the algorithm,
-#'  we define the number of iterations the algorithm performs before terminating 
-#'  (via argument \code{number_iterations}).
+#'  in the pseudocode of the paper Yang et al. (2022). However, we performed one change
+#'  as compared to the original description of the algorithm: Instead of 
+#'  setting a time limit, we define the number of iterations the algorithm 
+#'  performs before terminating (via argument \code{number_iterations}).
 #' 
 #' @return A vector of length N that assigns a group (i.e, a number
 #'     between 1 and \code{K}) to each input element
