@@ -733,7 +733,7 @@ void CrossoverDispersion(int partition1[], int partition2[], int solutionChild[]
 
     // Main crossover process
     for (i = 0; i < K; i++) {
-        if (((double)rand() / RAND_MAX) < 0.5) {
+        if (uniform_rnd_number() < 0.5) {
             // Process partition1
             //find group with highest dispersion
             maxGroupDispersion = -1;
