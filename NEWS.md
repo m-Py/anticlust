@@ -1,3 +1,9 @@
+# anticlust 0.8.8
+
+## User visible changes
+
+- `three_phase_search_anticlustering()` implements the three phase search algorithm by [Yang et al.](https://doi.org/10.1016/j.ejor.2022.02.003), contributed by Hannah Hengelbrock ([@HanneyAI](https://github.com/HanneyAI))
+
 # anticlust 0.8.7
 
 ## User visible changes
