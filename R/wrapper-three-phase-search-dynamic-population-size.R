@@ -26,17 +26,16 @@
 #' @param theta_min Parameter for the strength of undirected perturbation, 
 #' which decreases linearly over time from theta_max to theta_min.
 #' @param eta_max Parameter that specifies how many times the steps in the direct perturbation are executed.
-#' @param alpha Parameter for weitghing the discrimitation of a slighlty worse local optiomal child solution.
+#' @param alpha Parameter for weighing the discrimination of a slightly worse local optimal child solution.
 #' @param return results contains everything, including vector result and its cost
 #'     
 #' @details Details of the implementation of the algorithm can be found 
-#'  in the pseudocode of the paper Yang et al. (2022)
+#'  in the pseudocode of the paper Yang et al. (2022). However, instead of setting a timing for the algorithm,
+#'  we define the number of iterations the algorithm performs before terminating 
+#'  (via argument \code{number_iterations}).
 #' 
-#' @return a list including information about the cost, the result and the elapsed_time.
-#'  variable$result: A vector of length N that assigns a group (i.e, a number
-#'     between 1 and \code{K}) to each input element.
-#'  variable$score: calculated score of the objective function
-#'  variable$elapsed_time: runtime of the algorithm
+#' @return A vector of length N that assigns a group (i.e, a number
+#'     between 1 and \code{K}) to each input element
 #' 
 #' @author Hannah Hengelbrock \email{Hannah.Hengelbrock@@hhu.de}, 
 #' Martin Papenberg \email{martin.papenberg@@hhu.de}
@@ -46,37 +45,28 @@
 #' @examples 
 #' 
 #' # Generate some random data
-#' N <- 12
+#' N <- 120
 #' M <- 5
-#' K <- 2
+#' K <- 4
 #' dat <- matrix(rnorm(N * M), ncol = M)
 #' distances <- dist(dat)
 #'
 #' # Perform three hase serach algorithm
-#' ergebnis <- anticlust:::three_phase_search_anticlustering(dat, K, N)
+#' result1 <- three_phase_search_anticlustering(dat, K, N)
 #'
-#' # Compute objectives funtion
-#' diversity_objective(distances, ergebnis$result)
+#' # Compute objectives function
+#' diversity_objective(distances, result1)
 #' 
-#' # Compute comparision function
-#' ergebnis2 <- anticlustering(distances, K=K, method="local-maximum", repetitions = 10)
-#' diversity_objective(distances, ergebnis3)
+#' # Standard algorithm:
+#' result2 <- anticlustering(distances, K=K, method="local-maximum", repetitions = 10)
+#' diversity_objective(distances, result2)
 #' 
-#' # Compare both results
-#' print(ergebnis$result)
-#' print(ergebnis2)
-#' 
-#' @note
-#' Important! for windows and linux there is a differnt definition of thie run time due to clock(),
-#' so the time_limit acts differnetly depending on zour operating system
-#' On windows it is the wall time, on linux the CPU time
 #' 
 #' @references
 #' 
-#' Xiao Yang et al. “A three-phase search approach with dynamic population size for solving # nolint
+#' Xiao Yang et al. “A three-phase search approach with dynamic population size for solving 
 #' the maximally diverse grouping problem”. In: European Journal of Operational Research
-#' 302.3 (2022). [SOURCE-CODE: https://raw.githubusercontent.com/toyamaailab/toyamaailab.github.io/main/resource/TPSDP_Code.zip],
-#'  pp. 925–953. ISSN: 0377-2217. DOI: https://doi.org/10.1016/j.ejor.2022.02.003. 
+#' 302.3 (2022) <doi:10.1016/j.ejor.2022.02.003>
 #' 
 three_phase_search_anticlustering <- function(x, K, N, objective = "diversity",
     number_iterations=50, clusters = NULL, upper_bound  = NULL, lower_bound  = NULL, 
@@ -165,7 +155,7 @@ three_phase_search_anticlustering <- function(x, K, N, objective = "diversity",
        stop("Could not allocate enough memory.")
      }
 
-    return(results)
+    return(results$result)
 }
 
 input_validation_threephase_search <- function(x, K, N, objective, clusters, number_iterations, upper_bound, lower_bound, 
