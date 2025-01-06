@@ -125,7 +125,6 @@ three_phase_search_anticlustering <- function(x, K, N, objective = "diversity",
                   PACKAGE = "anticlust"
                   )
      } else if (objective == "dispersion") {
-      print("goes into dispersion")
       results <- .C("three_phase_search_dispersion",
                   distances = as.double(distances),
                   N_in = as.integer(N),
@@ -180,7 +179,4 @@ theta_max, theta_min, beta_max, beta_min, eta_max, alpha) {
     validate_input(theta_min, "theta_min", greater_than = 0.0)
     validate_input(eta_max, "eta_max", greater_than = 0, must_be_integer = TRUE)
     validate_input(alpha, "alpha", greater_than = 0.0)
-    #input_validation_anticlustering(x, K, objective = "diversity", method = "brusco", 
-    #   preclustering = FALSE, categories = NULL,
-    #  repetitions = 1, standardize = FALSE)
 }
