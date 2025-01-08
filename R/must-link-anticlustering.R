@@ -162,13 +162,13 @@ improved_must_link_exchange <- function(x, full_clusters, must_link) {
   for (i in seq_along(cliques)) {
     n_clique <- length(cliques[[i]])
     for (j in 1:2) {
-      if (j == 1) {
+      if (j == 1 || n_clique <= 2) {
         exchange_cluster <- get_exchange_partners_singletons( # generate exchange partner from singletons / not part of clique
           singletons, 
           singleton_clusters, 
           n_clique
         )
-      } else if (j == 2 && n_clique > 2) {
+      } else { # only do the clique swapping for clique larger than 2 samples
         exchange_cluster <- get_exchange_partners_clique(cliques, i, full_clusters, must_link) # generate exchange partner from other cliques
       }
       if (!is.null(exchange_cluster$cluster_id)) {
@@ -259,12 +259,16 @@ get_exchange_partners_clique <- function(cliques, index, full_clusters, must_lin
       selected_cluster <- full_clusters == one_cluster_id_that_fit
       # select IDs of elements that serve as exchange ṕartners, via size of cliques
       tab2 <- table(full_clusters[selected_cluster], must_link[selected_cluster])
-      sample_ids <- as.numeric(dimnames(tab2)[[2]][match(nl[[i]], tab2)])
+      must_link_ids <- as.numeric(dimnames(tab2)[[2]][match(nl[[i]], tab2)])
+      # from IDs from selected must-link groups, get sample IDs
+      sample_ids <- which(must_link %in% must_link_ids)
+      stopifnot(length(sample_ids) == n_clique)
       return(list(
         cluster_id = one_cluster_id_that_fit, 
         sample_ids = sample_ids
       ))
     }
+
   }
   return(list(
     cluster_id = NULL, 
