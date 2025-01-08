@@ -71,5 +71,9 @@ categories_to_binary <- function(categories, use_combinations = FALSE) {
   categories <- as.data.frame(lapply(categories, as.factor))
   combine_by <- ifelse(use_combinations, " * ", " + ")
   formula_string <- paste("~", paste(colnames(categories), collapse = combine_by), collapse = "")
-  model.matrix(as.formula(formula_string), data = categories)[ ,-1, drop = FALSE]
+  model.matrix(
+    as.formula(formula_string), 
+    data = categories,
+    contrasts.arg = lapply(categories, contrasts, contrasts=FALSE)
+  )[ ,-1, drop = FALSE]
 }
