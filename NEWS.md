@@ -1,3 +1,7 @@
+# anticlust 0.8.9
+
+- anticlustering() has new `method = "must-link"`, which is an improved heuristic algorithm when using must-link constraints
+
 # anticlust 0.8.8
 
 ## User visible changes

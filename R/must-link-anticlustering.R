@@ -129,7 +129,7 @@ must_link_anticlustering <- function(x, K, must_link, method = "exchange", objec
     K = init,
     categories = lengths(dt$IDs), # restrict exchanges to node with same number of elements
     objective = "diversity",
-    local_maximum = ifelse(method == "local-maximum", TRUE, FALSE),
+    local_maximum = ifelse(method == "exchange", FALSE, TRUE),
     init_partitions = init_partitions
   )
   
@@ -137,5 +137,66 @@ must_link_anticlustering <- function(x, K, must_link, method = "exchange", objec
   for (i in seq_along(dt$IDs)) {
     full_clusters[dt$IDs[[i]]] <- reduced_clusters[i]
   }
+  
+  if (method == "must-link") {
+    iterations <- ifelse(is.null(repetitions), 1, repetitions)
+    for (i in 1:iterations) {
+      full_clusters <- improved_must_link_exchange(x, full_clusters, must_link)
+    }
+  }
   full_clusters
+}
+
+
+## Do an improvement phase to overcome bad local optima
+# For each must-link clique
+improved_must_link_exchange <- function(x, full_clusters, must_link) {
+  N <- length(full_clusters)
+  OBJ <- diversity_objective_(full_clusters, x)
+  list_must_link_indices <- tapply(1:N, must_link, c)
+  singletons <- unname(unlist(list_must_link_indices[lengths(list_must_link_indices) == 1]))
+  singleton_clusters <- full_clusters[singletons]
+  cliques <- list_must_link_indices[lengths(list_must_link_indices) > 1]
+  # do swapping phase over cliques, switch with singletons
+  for (i in seq_along(cliques)) {
+    exchange_cluster <- get_exchange_partners_clique(
+      singletons, 
+      singleton_clusters, 
+      length(cliques[[i]])
+    )
+    if (!is.null(exchange_cluster$cluster_id)) {
+      ## Do the swap
+      tmp <- full_clusters[cliques[[i]]]
+      full_clusters[cliques[[i]]] <- exchange_cluster$cluster_id
+      full_clusters[exchange_cluster$sample_ids] <- tmp
+      # reverse swap if it does not improve objective
+      OBJ_NEW <- diversity_objective_(full_clusters, x)
+      if (OBJ >= OBJ_NEW) {
+        tmp <- full_clusters[cliques[[i]]]
+        full_clusters[cliques[[i]]] <- full_clusters[exchange_cluster$sample_ids]
+        full_clusters[exchange_cluster$sample_ids] <- tmp
+      } else {
+        OBJ <- OBJ_NEW
+      }
+    }
+  }
+  full_clusters
+}
+
+# determine a random cluster that fits a clique (and sample IDs for the exchange)
+get_exchange_partners_clique <- function(singletons, singleton_clusters, n_clique) {
+  tab <- table(singleton_clusters)
+  fitting_clusters <- as.numeric(names(tab[tab >= n_clique]))
+  # If no swap attempt is possible, return list will NULL
+  if (length(fitting_clusters) == 0) {
+    return(list(
+        cluster_id = NULL, 
+        sample_ids = NULL
+    ))
+  }
+  cluster_id <- sample_(fitting_clusters, size = 1)
+  list(
+    cluster_id = cluster_id, 
+    sample_ids = sample(singletons[singleton_clusters == cluster_id], size = n_clique)
+  )
 }
