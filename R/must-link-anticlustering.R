@@ -157,26 +157,33 @@ improved_must_link_exchange <- function(x, full_clusters, must_link) {
   singletons <- unname(unlist(list_must_link_indices[lengths(list_must_link_indices) == 1]))
   singleton_clusters <- full_clusters[singletons]
   cliques <- list_must_link_indices[lengths(list_must_link_indices) > 1]
-  # do swapping phase over cliques, switch with singletons
+  # do swapping phase; iterate over cliques
+  # for each clique, generate exchange partners twice
   for (i in seq_along(cliques)) {
-    exchange_cluster <- get_exchange_partners_clique(
-      singletons, 
-      singleton_clusters, 
-      length(cliques[[i]])
-    )
-    if (!is.null(exchange_cluster$cluster_id)) {
-      ## Do the swap
-      tmp <- full_clusters[cliques[[i]]]
-      full_clusters[cliques[[i]]] <- exchange_cluster$cluster_id
-      full_clusters[exchange_cluster$sample_ids] <- tmp
-      # reverse swap if it does not improve objective
-      OBJ_NEW <- diversity_objective_(full_clusters, x)
-      if (OBJ >= OBJ_NEW) {
-        tmp <- full_clusters[cliques[[i]]]
-        full_clusters[cliques[[i]]] <- full_clusters[exchange_cluster$sample_ids]
-        full_clusters[exchange_cluster$sample_ids] <- tmp
-      } else {
-        OBJ <- OBJ_NEW
+    n_clique <- length(cliques[[i]])
+    for (j in 1:2) {
+      if (j == 1) {
+        exchange_cluster <- get_exchange_partners_singletons( # generate exchange partner from singletons / not part of clique
+          singletons, 
+          singleton_clusters, 
+          n_clique
+        )
+      } else if (j == 2 && n_clique > 2) {
+        exchange_cluster <- get_exchange_partners_clique(cliques, i, full_clusters, must_link) # generate exchange partner from other cliques
+      }
+      if (!is.null(exchange_cluster$cluster_id)) {
+        ## Do the swap
+        tmp_clusters <- full_clusters
+        tmp <- tmp_clusters[cliques[[i]]][1]
+        tmp_clusters[cliques[[i]]] <- exchange_cluster$cluster_id
+        tmp_clusters[exchange_cluster$sample_ids] <- tmp
+        # reverse swap if it does not improve objective
+        OBJ_NEW <- diversity_objective_(tmp_clusters, x)
+        if (OBJ_NEW > OBJ) {
+          OBJ <- OBJ_NEW
+          full_clusters <- tmp_clusters
+          singleton_clusters <- full_clusters[singletons]
+        }
       }
     }
   }
@@ -184,7 +191,7 @@ improved_must_link_exchange <- function(x, full_clusters, must_link) {
 }
 
 # determine a random cluster that fits a clique (and sample IDs for the exchange)
-get_exchange_partners_clique <- function(singletons, singleton_clusters, n_clique) {
+get_exchange_partners_singletons <- function(singletons, singleton_clusters, n_clique) {
   tab <- table(singleton_clusters)
   fitting_clusters <- as.numeric(names(tab[tab >= n_clique]))
   # If no swap attempt is possible, return list will NULL
@@ -199,4 +206,68 @@ get_exchange_partners_clique <- function(singletons, singleton_clusters, n_cliqu
     cluster_id = cluster_id, 
     sample_ids = sample(singletons[singleton_clusters == cluster_id], size = n_clique)
   )
+}
+
+
+## This function is quite horrible right now and I hope to make it better
+# It generates multiple exchange partners for a must-link clique, using
+# a combination of cliques / singletons. It randomly selects one combination that
+# fits. First it has to generate all possible combinations that generates 
+# the size of a must-link group (e.g., 6 = 1+2+3; 2+4; 5+1). This is quite hard
+# in general I think.
+get_exchange_partners_clique <- function(cliques, index, full_clusters, must_link) {
+  
+  n_clique <- length(cliques[[index]])
+  stopifnot(n_clique > 2) # this must be here
+  # keep track of combinations of cliques that are as large as the clique we have
+  l <- list(combn(n_clique, 2))
+  if (n_clique > 3) {
+    c <- 2
+    for (i in 3:(n_clique-1)) {
+      l[[c]] <- combn(n_clique, i)
+      c <- c +1
+    }
+  }
+  all_sums <- lapply(l, function(x) colSums(x))
+  indices_good <- lapply(l, function(x) which(colSums(x) == n_clique))
+  nl <- list()
+  for (i in seq_along(l)) {
+    values <- l[[i]][, indices_good[[i]], drop = FALSE]
+    nl[[i]] <- values
+  }
+  # nl now has all combinations that sum up to `n_clique` (per list element column wise)
+  # clean nl up to one list!
+  nl <- unlist(lapply(nl, function(x) as.list(as.data.frame(x))), recursive = FALSE)
+  # each list element is the combination of number that sum up to n_clique. e.g. for 6 we have
+  # $V1
+  # [1] 1 5
+  # $V2
+  # [1] 2 4
+  # $V1
+  # [1] 1 2 3
+  
+  # now check if any of these combinations exists in a cluster
+  tab <- table(full_clusters, must_link)
+  # iterate through combinations in random order and use the first exchange partners that work
+  random_order <- sample(length(nl))
+  for (i in random_order) {
+    # determine where all samples are available
+    cluster_ids_that_fit <- which(colSums(!apply(tab, 1, function(x) nl[[i]] %in% x)) == 0)
+    # found fit!
+    if (length(cluster_ids_that_fit) > 0) {
+      one_cluster_id_that_fit <- sample_(cluster_ids_that_fit, size = 1)
+      selected_cluster <- full_clusters == one_cluster_id_that_fit
+      # select IDs of elements that serve as exchange ṕartners, via size of cliques
+      tab2 <- table(full_clusters[selected_cluster], must_link[selected_cluster])
+      sample_ids <- as.numeric(dimnames(tab2)[[2]][match(nl[[i]], tab2)])
+      return(list(
+        cluster_id = one_cluster_id_that_fit, 
+        sample_ids = sample_ids
+      ))
+    }
+  }
+  return(list(
+    cluster_id = NULL, 
+    sample_ids = NULL
+  ))
 }
