@@ -20,7 +20,7 @@ input_validation_anticlustering <- function(x, K, objective, method,
     must_link <- as.matrix(must_link)
 
     validate_input(objective, "objective", input_set = c("diversity"), not_na = TRUE, len = 1) 
-    validate_input(method, "method", input_set = c("local-maximum", "exchange"), not_na = TRUE, len = 1) 
+    validate_input(method, "method", input_set = c("local-maximum", "exchange", "must-link"), not_na = TRUE, len = 1) 
     
     if (ncol(must_link) != 1) {
       stop("Argument must_link must be a vector.")
@@ -80,7 +80,7 @@ input_validation_anticlustering <- function(x, K, objective, method,
 
   validate_input(
     method, "method", len = 1,
-    input_set = c("ilp", "exchange", "heuristic", "centroid", "local-maximum", "brusco"), 
+    input_set = c("ilp", "exchange", "heuristic", "centroid", "local-maximum", "brusco", "must-link"), 
     not_na = TRUE, not_function = TRUE
   )
   
