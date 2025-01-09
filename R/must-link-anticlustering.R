@@ -133,24 +133,55 @@ must_link_anticlustering <- function(x, K, must_link, method = "exchange", objec
     init_partitions = init_partitions
   )
   
-  full_clusters <- rep(NA, N)
-  for (i in seq_along(dt$IDs)) {
-    full_clusters[dt$IDs[[i]]] <- reduced_clusters[i]
-  }
+  full_clusters <- merged_cluster_to_original_cluster(reduced_clusters, must_link)
   
   if (method == "must-link") {
     iterations <- ifelse(is.null(repetitions), 1, repetitions)
+    BEST <- diversity_objective_(full_clusters, x)
     for (i in 1:iterations) {
-      full_clusters <- improved_must_link_exchange(x, full_clusters, must_link)
+      full_clusters_new <- iterated_local_search(x, full_clusters, must_link)
+      # full clusters new is a pertubed partition, not locally optimal -> restore local optimality!
+      reduced_clusters_new <- original_cluster_to_merged_cluster(full_clusters_new, must_link)
+      reduced_clusters_new <- c_anticlustering(
+        dt$distances,
+        K = reduced_clusters_new,
+        categories = lengths(dt$IDs), # restrict exchanges to node with same number of elements
+        objective = "diversity",
+        local_maximum = TRUE
+      )
+      tmp_full_clusters <- merged_cluster_to_original_cluster(reduced_clusters_new, must_link)
+      TMP <- diversity_objective_(tmp_full_clusters, x)
+      if (TMP > BEST) {
+        BEST <- TMP
+        full_clusters <- tmp_full_clusters
+      }
     }
   }
   full_clusters
 }
 
+# Given an assignment of original elements to clusters, generate the
+# corresponding clusters for the merged elements. 
+original_cluster_to_merged_cluster <- function(clusters, must_link) {
+  df <- data.frame(clusters, must_link)
+  new_df <- df[!duplicated(df$must_link), ]
+  # order by must_link grouping
+  new_df[order(new_df$must_link), ]$clusters
+}
+
+# Given an assignment of "merged" elements to clusters, re-establish the
+# corresponding clusters for the original elements. 
+merged_cluster_to_original_cluster <- function(merged_clusters, must_link) {
+  df <- data.frame(must_link, order = 1:length(must_link))
+  new_order <- order(must_link)
+  df <- df[new_order, ]
+  df$clusters <- rep(merged_clusters, table(must_link))
+  df[order(df$order), "clusters"]
+}
 
 ## Do an improvement phase to overcome bad local optima
 # For each must-link clique
-improved_must_link_exchange <- function(x, full_clusters, must_link) {
+iterated_local_search <- function(x, full_clusters, must_link) {
   N <- length(full_clusters)
   OBJ <- diversity_objective_(full_clusters, x)
   list_must_link_indices <- tapply(1:N, must_link, c)
@@ -161,30 +192,22 @@ improved_must_link_exchange <- function(x, full_clusters, must_link) {
   # for each clique, generate exchange partners twice
   for (i in seq_along(cliques)) {
     n_clique <- length(cliques[[i]])
-    for (j in 1:2) {
-      if (j == 1 || n_clique <= 2) {
-        exchange_cluster <- get_exchange_partners_singletons( # generate exchange partner from singletons / not part of clique
-          singletons, 
-          singleton_clusters, 
-          n_clique
-        )
-      } else { # only do the clique swapping for clique larger than 2 samples
-        exchange_cluster <- get_exchange_partners_clique(cliques, i, full_clusters, must_link) # generate exchange partner from other cliques
-      }
-      if (!is.null(exchange_cluster$cluster_id)) {
-        ## Do the swap
-        tmp_clusters <- full_clusters
-        tmp <- tmp_clusters[cliques[[i]]][1]
-        tmp_clusters[cliques[[i]]] <- exchange_cluster$cluster_id
-        tmp_clusters[exchange_cluster$sample_ids] <- tmp
-        # reverse swap if it does not improve objective
-        OBJ_NEW <- diversity_objective_(tmp_clusters, x)
-        if (OBJ_NEW > OBJ) {
-          OBJ <- OBJ_NEW
-          full_clusters <- tmp_clusters
-          singleton_clusters <- full_clusters[singletons]
-        }
-      }
+    singleton_change <- sample(c(TRUE, FALSE), size = 1)
+    if (singleton_change || n_clique <= 2) {
+      exchange_cluster <- get_exchange_partners_singletons( # generate exchange partner from singletons / not part of clique
+        singletons, 
+        singleton_clusters, 
+        n_clique
+      )
+    } else { # only do the clique swapping for clique larger than 2 samples
+      exchange_cluster <- get_exchange_partners_clique(cliques, i, full_clusters, must_link) # generate exchange partner from other cliques
+    }
+    if (!is.null(exchange_cluster$cluster_id) && runif(1) > .90) {
+      ## Do the swap
+      tmp <- full_clusters[cliques[[i]]][1]
+      full_clusters[cliques[[i]]] <- exchange_cluster$cluster_id
+      full_clusters[exchange_cluster$sample_ids] <- tmp
+      singleton_clusters <- full_clusters[singletons]
     }
   }
   full_clusters
