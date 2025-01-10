@@ -149,12 +149,7 @@ must_link_anticlustering <- function(x, K, must_link, method = "exchange", objec
         objective = "diversity",
         local_maximum = TRUE
       )
-      tmp_full_clusters <- merged_cluster_to_original_cluster(reduced_clusters_new, must_link)
-      TMP <- diversity_objective_(tmp_full_clusters, x)
-      if (TMP > BEST) {
-        BEST <- TMP
-        full_clusters <- tmp_full_clusters
-      }
+      full_clusters <- merged_cluster_to_original_cluster(reduced_clusters_new, must_link)
     }
   }
   full_clusters
@@ -208,7 +203,7 @@ iterated_local_search <- function(x, full_clusters, must_link) {
       tmp <- tmp_clusters[cliques[[i]]][1]
       tmp_clusters[cliques[[i]]] <- exchange_cluster$cluster_id
       tmp_clusters[exchange_cluster$sample_ids] <- tmp
-      # reverse swap if it does not improve objective
+      # perform swap if it improves objective
       OBJ_NEW <- diversity_objective_(tmp_clusters, x)
       if (OBJ_NEW > OBJ) {
         OBJ <- OBJ_NEW
