@@ -212,21 +212,16 @@ iterated_local_search <- function(x, full_clusters, must_link) {
       tmp_clusters[exchange_cluster$sample_ids] <- tmp
       # perform swap if it improves objective
       ## TODO: use local updating here, should improve speed quite a bit
-      local_updating <- FALSE
-      if (local_updating) {
-        OBJ_BY_CLUSTER_NEW <- update_diversity_must_link(
-          x, OBJ_BY_CLUSTER, 
-          tmp_clusters, 
-          indices_1 = cliques[[i]], 
-          indices_2 = exchange_cluster$samples_id, 
-          cluster_1 = tmp, 
-          cluster_2 = exchange_cluster$cluster_id
-        )
-        OBJ_NEW <- sum(OBJ_BY_CLUSTER_NEW)
-      } else {
-        OBJ_BY_CLUSTER_NEW <- diversity_objective_by_group(tmp_clusters, x)
-        OBJ_NEW <- sum(OBJ_BY_CLUSTER_NEW)
-      }
+      OBJ_BY_CLUSTER_NEW <- update_diversity_must_link(
+        x, OBJ_BY_CLUSTER, 
+        full_clusters, 
+        tmp_clusters, 
+        indices_1 = cliques[[i]], 
+        indices_2 = exchange_cluster$sample_ids, 
+        cluster_1 = tmp, 
+        cluster_2 = exchange_cluster$cluster_id
+      )
+      OBJ_NEW <- sum(OBJ_BY_CLUSTER_NEW)
       if (OBJ_NEW > OBJ) {
         OBJ <- OBJ_NEW
         OBJ_BY_CLUSTER <- OBJ_BY_CLUSTER_NEW
@@ -238,12 +233,11 @@ iterated_local_search <- function(x, full_clusters, must_link) {
   full_clusters
 }
 
-update_diversity_must_link <- function(x, OBJ_BY_CLUSTER, clusters, indices_1, indices_2, cluster_1, cluster_2) {
-  N <- nrow(x)
-  sum_distances_element_1_cluster_1 <- sum(x[indices_1, , drop = FALSE][, clusters == cluster_1, drop = FALSE])
-  sum_distances_element_1_cluster_2 <- sum(x[indices_1, , drop = FALSE][, clusters == cluster_2, drop = FALSE])
-  sum_distances_element_2_cluster_2 <- sum(x[indices_2, , drop = FALSE][, clusters == cluster_2, drop = FALSE])
-  sum_distances_element_2_cluster_1 <- sum(x[indices_2, , drop = FALSE][, clusters == cluster_1, drop = FALSE])
+update_diversity_must_link <- function(x, OBJ_BY_CLUSTER, clusters_old, clusters_new, indices_1, indices_2, cluster_1, cluster_2) {
+  sum_distances_element_1_cluster_1 <- sum(x[indices_1, , drop = FALSE][, clusters_old == cluster_1, drop = FALSE])
+  sum_distances_element_1_cluster_2 <- sum(x[indices_1, , drop = FALSE][, clusters_new == cluster_2, drop = FALSE])
+  sum_distances_element_2_cluster_2 <- sum(x[indices_2, , drop = FALSE][, clusters_old == cluster_2, drop = FALSE])
+  sum_distances_element_2_cluster_1 <- sum(x[indices_2, , drop = FALSE][, clusters_new == cluster_1, drop = FALSE])
   OBJ_BY_CLUSTER[cluster_1] <- OBJ_BY_CLUSTER[cluster_1] + sum_distances_element_2_cluster_1 - sum_distances_element_1_cluster_1
   OBJ_BY_CLUSTER[cluster_2] <- OBJ_BY_CLUSTER[cluster_2] + sum_distances_element_1_cluster_2 - sum_distances_element_2_cluster_2
   OBJ_BY_CLUSTER
