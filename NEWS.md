@@ -1,7 +1,7 @@
 # anticlust 0.8.9
 
-- `categories_to_binary()` no longer uses dummy coding with a reference category, but instead codes each levels of a categorical variable with a separate variable (thanks to Gunnar Klau for spotting this)
-- anticlustering() has new `method = "must-link"`, which is an improved heuristic algorithm when using must-link constraints
+- `categories_to_binary()` no longer uses dummy coding with a reference category, but instead codes each levels of a categorical variable with a separate variable (thanks to [Gunnar Klau](https://github.com/guwek) for spotting potential problems with dummy coding).
+- anticlustering() has new `method = "2PML"`, which is an improved heuristic when using must-link constraints
 
 # anticlust 0.8.8
 

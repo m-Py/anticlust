@@ -82,7 +82,7 @@ A second possibility to incorporate categorical variables is to treat them as nu
 
 To use categorical variables as part of the anticlustering objective, we first generate a matrix of the categorical variables in binary representation using the `anticlust` convenience function `categories_to_binary()`.[^modelmatrix] Because k-means anticlustering optimizes similarity with regard to means, k-means anticlustering applied to this binary matrix will even out the proportion of each category in each group (this is because the mean of a binary variable is the proportion of `1`s in that variable).
 
-[^modelmatrix]: Internally, `categories_to_binary()` is just a thin wrapper around the base `R` function `model.matrix()`.
+[^modelmatrix]: Internally, `categories_to_binary()` is wrapper around the base `R` function `model.matrix()`.
 
 ```{r}
 binary_categories <- categories_to_binary(df[, c("species", "sex")])
