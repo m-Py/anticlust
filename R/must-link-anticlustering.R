@@ -140,7 +140,7 @@ must_link_anticlustering <- function(x, K, must_link, method = "exchange", objec
     BEST <- diversity_objective_(full_clusters, x)
     for (i in 1:iterations) {
       full_clusters_new <- iterated_local_search(x, full_clusters, must_link)
-      # full clusters new is a pertubed partition, not locally optimal -> restore local optimality!
+      # full clusters new is a perturbed partition, not locally optimal -> restore local optimality!
       reduced_clusters_new <- original_cluster_to_merged_cluster(full_clusters_new, must_link)
       reduced_clusters_new <- c_anticlustering(
         dt$distances,
