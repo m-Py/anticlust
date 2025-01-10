@@ -11,10 +11,14 @@
 #' @details
 #' 
 #' The conversion of categorical variable to binary variables is done via
-#' \code{\link[stats]{model.matrix}}. Each category
+#' \code{\link[stats]{model.matrix}}. Since version 0.8.9, each category
 #' of a categorical variable is coded by a separate variable. So this is not
 #' 'dummy' coding, which is often used to encode predictors in statistical 
-#' analysis.
+#' analysis. Dummy coding uses a reference category that has only zeros for 
+#' each variable, while all other categories consist of a 1 and otherwise zeros. 
+#' This implies that there is a different distance to the reference category 
+#' than among the other categories, which is unwarranted in anticlustering 
+#' (which usually relies on distances as input).
 #' 
 #' This function can be used to include 
 #' categorical variables as part of the optimization criterion in k-means / 
