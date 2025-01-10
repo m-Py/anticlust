@@ -114,7 +114,7 @@ must_link_anticlustering <- function(x, K, must_link, method = "exchange", objec
   # possibly use multiple initializing partitions:
   if (argument_exists(repetitions)) {
     init_partitions <- t(replicate(
-      n = repetitions,
+      n = ifelse(method == "must-link", max(round(repetitions/2), 1), repetitions), # half repetitions for first phase
       init_must_link_groups(N, IDs_initial = must_link, IDs_reduced = dt$IDs, target_groups = target_groups)
     ))
     init_partitions <- init_partitions - 1 # yeah, this is not good code (where should this go?)
@@ -136,7 +136,7 @@ must_link_anticlustering <- function(x, K, must_link, method = "exchange", objec
   full_clusters <- merged_cluster_to_original_cluster(reduced_clusters, must_link)
   
   if (method == "must-link") {
-    iterations <- ifelse(is.null(repetitions), 1, repetitions)
+    iterations <- ifelse(is.null(repetitions), 1, max(round(repetitions/2), 1)) # half repetitions for second phase
     BEST <- diversity_objective_(full_clusters, x)
     for (i in 1:iterations) {
       full_clusters_new <- iterated_local_search(x, full_clusters, must_link)
