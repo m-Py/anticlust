@@ -193,9 +193,9 @@ iterated_local_search <- function(x, full_clusters, must_link) {
   # for each clique, generate exchange partners twice
   for (i in seq_along(cliques)) {
     n_clique <- length(cliques[[i]])
-    # randomly determine if the clique is exchanged with singletons only or with other clique (and possiblity singletons in combination)
+    # randomly determine if the clique is exchanged with singletons only or with other cliques (that is, clique(s) + possibly singleton(s) in combination) 
     singleton_change <- sample(c(TRUE, FALSE), size = 1)
-    if (singleton_change || n_clique <= 2) {
+    if (singleton_change || n_clique <= 2) { # for cliques of size 2, we can only exchange with two singletons
       exchange_cluster <- get_exchange_partners_singletons( # generate exchange partner from singletons / not part of clique
         singletons, 
         singleton_clusters, 
@@ -211,7 +211,7 @@ iterated_local_search <- function(x, full_clusters, must_link) {
       tmp_clusters[cliques[[i]]] <- exchange_cluster$cluster_id
       tmp_clusters[exchange_cluster$sample_ids] <- tmp
       # perform swap if it improves objective
-      ## TODO: use local updating here, should improve speed quite a bit
+      ## Use local updating here instead of recomputing entirely, improves speed quite a bit
       OBJ_BY_CLUSTER_NEW <- update_diversity_must_link(
         x, OBJ_BY_CLUSTER, 
         full_clusters, 
