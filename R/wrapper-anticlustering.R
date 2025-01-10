@@ -257,7 +257,7 @@
 #' Must-link constraints are passed as a single vector of length \code{nrow(x)}.
 #' Positions that have the same numeric index are assigned to the same anticluster 
 #' (if the constraints can be fulfilled). When including must-link constraints, 
-#' \code{method = "2PML"} perform a specialized search heuristic that potentially
+#' \code{method = "2PML"} performs a specialized search heuristic that potentially
 #' yields better results than \code{method = "local-maximum"}.
 #' 
 #' The examples illustrate the usage of the \code{must_link} and \code{cannot_link}
