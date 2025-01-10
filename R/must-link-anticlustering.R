@@ -135,7 +135,7 @@ must_link_anticlustering <- function(x, K, must_link, method = "exchange", objec
   
   full_clusters <- merged_cluster_to_original_cluster(reduced_clusters, must_link)
   
-  if (method == "must-link") {
+  if (method == "2PML") {
     iterations <- ifelse(is.null(repetitions), 1, max(round(repetitions/2), 1)) # half repetitions for second phase
     BEST <- diversity_objective_(full_clusters, x)
     for (i in 1:iterations) {
