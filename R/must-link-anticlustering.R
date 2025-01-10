@@ -210,7 +210,7 @@ iterated_local_search <- function(x, full_clusters, must_link) {
       tmp_clusters[exchange_cluster$sample_ids] <- tmp
       # reverse swap if it does not improve objective
       OBJ_NEW <- diversity_objective_(tmp_clusters, x)
-      if (OBJ_NEW > OBJ || runif(1) > .90) { # random component for ILS
+      if (OBJ_NEW > OBJ) {
         OBJ <- OBJ_NEW
         full_clusters <- tmp_clusters
         singleton_clusters <- full_clusters[singletons]
