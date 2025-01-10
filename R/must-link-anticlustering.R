@@ -135,13 +135,15 @@ must_link_anticlustering <- function(x, K, must_link, method = "exchange", objec
   
   full_clusters <- merged_cluster_to_original_cluster(reduced_clusters, must_link)
   
+  ## This is the second phase of the 2PML algorithm:
   if (method == "2PML") {
     iterations <- ifelse(is.null(repetitions), 1, max(round(repetitions/2), 1)) # half repetitions for second phase
     BEST <- diversity_objective_(full_clusters, x)
     for (i in 1:iterations) {
-      full_clusters_new <- iterated_local_search(x, full_clusters, must_link)
+      full_clusters_new <- improvement_search_2pml(x, full_clusters, must_link)
       # full clusters new is a perturbed partition, not locally optimal -> restore local optimality!
       reduced_clusters_new <- original_cluster_to_merged_cluster(full_clusters_new, must_link)
+      # restore local optimality
       reduced_clusters_new <- c_anticlustering(
         dt$distances,
         K = reduced_clusters_new,
@@ -176,7 +178,7 @@ merged_cluster_to_original_cluster <- function(merged_clusters, must_link) {
 
 ## Do an improvement phase to overcome bad local optima
 # For each must-link clique
-iterated_local_search <- function(x, full_clusters, must_link) {
+improvement_search_2pml <- function(x, full_clusters, must_link) {
   N <- length(full_clusters)
   # get current objective for optimization
   OBJ_BY_CLUSTER <- diversity_objective_by_group(full_clusters, x)
