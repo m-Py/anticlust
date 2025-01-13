@@ -35,14 +35,25 @@ expect_true(all(ep$sample_ids %in% 8:10))
 # (this does not work because clique must be larger than 2)
 expect_error(anticlust:::get_exchange_partners_clique(cliques, 1, init, must_link))
 
-## Third clique has size of 3. 
-# THIS IS CURRENTLY A FAILING TEST. ENSURE THAT THE ALGORITHM DOES NOT ALWAYS GENERATE THE SAME
-# COMBINATION OF EXCHANGE PARTNERS. IT MATCHES THE FIRST FIT (which is the first clique of size 2 + the first singleton on position 8)
-# INSTEAD OF A RANDOM FIT. 
+## Third clique has size of 3. It must be matched against positions 1 and 2, and (8, 9, or 10)
+
 anticlust:::get_exchange_partners_clique(cliques, 3, init, must_link)[["sample_ids"]]
-expect_true(
-  any(!replicate(1000, anticlust:::get_exchange_partners_clique(cliques, 3, init, must_link)[["sample_ids"]]) == c(1, 2, 8))
-)
+tt <- replicate(1000, anticlust:::get_exchange_partners_clique(cliques, 3, init, must_link)[["sample_ids"]])
+
+# Test that only c(1:2, 8), c(1:2, 9), and c(1:2, 10) are matched
+expect_true(all(apply(tt, 2, function(x) x == c(1:2, 8) | x == c(1:2, 9) | x == c(1:2, 10))))
+
+## But not always c(1:2, 8)! (which we get when using `base::match()` rather than `anticlust:::random_match()`)
+expect_true(any(!tt == c(1:2, 8)))
+
+# Test random match function. The match should always include 5 and 1, but 2, 3 or 4 is arbitrary.
+combination <- c(1, 2, 3)
+frequencies <- c(2, 1, 1, 1, 3)
+match(combination, frequencies) # always c(2, 1, 5); we also like to have c(3, 1, 5), c(4, 1, 5)
+# However, positions 1 and 5 must always be matched
+expect_true(all(replicate(100, 1 %in% anticlust:::random_match(combination, frequencies))))
+expect_false(all(replicate(100, 2 %in% anticlust:::random_match(combination, frequencies))))
+expect_true(all(replicate(100, 5 %in% anticlust:::random_match(combination, frequencies))))
 
 ### Now do some general testing on the must-link constraints. E.g., are they valid after anticlustering?
 
@@ -71,3 +82,44 @@ expect_true(all(
 ))
 
 
+
+## now a random larger data set
+
+K <- 20
+group_sizes <- 12
+N <- group_sizes * K # here 128
+M <- 5
+data <- matrix(rnorm(N * M), ncol = M)
+distances <- as.matrix(dist(data))
+
+# Generate random patient IDs
+must_link <- sample(N, replace = TRUE)
+
+
+tt1 <- tryCatch(
+  anticlustering(distances, K, must_link = must_link, method = "2PML"),
+  error = function(e) e
+)
+
+if (!"simpleError" %in% class(tt1)) {
+  expect_true(must_link_constraints_valid(tt1, must_link))
+}
+
+
+tt2 <- tryCatch(
+  anticlustering(distances, K, must_link = must_link, method = "2PML", repetitions = 10),
+  error = function(e) e
+)
+
+if (!"simpleError" %in% class(tt2)) {
+  expect_true(must_link_constraints_valid(tt2, must_link))
+}
+
+
+tt0 <- anticlustering(distances, K, must_link = must_link)
+
+if (!"simpleError" %in% class(tt0)) {
+  diversity_objective(distances, tt0)
+  diversity_objective(distances, tt1)
+  diversity_objective(distances, tt2)
+}
