@@ -40,11 +40,15 @@ expect_error(anticlust:::get_exchange_partners_clique(cliques, 1, init, must_lin
 anticlust:::get_exchange_partners_clique(cliques, 3, init, must_link)[["sample_ids"]]
 tt <- replicate(1000, anticlust:::get_exchange_partners_clique(cliques, 3, init, must_link)[["sample_ids"]])
 
-# Test that only c(1:2, 8), c(1:2, 9), and c(1:2, 10) are matched
-expect_true(all(apply(tt, 2, function(x) x == c(1:2, 8) | x == c(1:2, 9) | x == c(1:2, 10))))
+# We have two cliques of size 2. (1) Indices 1, 2; (2) Indices 3, 4.
+# These two cliques must be partnered with (a) the clique of size 3, (b) the 3 singletons.
 
-## But not always c(1:2, 8)! (which we get when using `base::match()` rather than `anticlust:::random_match()`)
-expect_true(any(!tt == c(1:2, 8)))
+# Test that only those matches occur are matched
+expect_true(all(apply(tt, 2, function(x) x == c(1:2, 8) | x == c(1:2, 9) | x == c(1:2, 10) | x == c(3:4, 8) | x == c(3:4, 9) | x == c(3:4, 10))))
+
+## But not always c(1:2, 8) or c(3:4, 8)! (which we get when using `base::match()` rather than `anticlust:::random_match()`)
+expect_true(any(!tt == c(c(1:2, 8))))
+expect_true(any(!tt == c(c(3:4, 8))))
 
 # Test random match function. The match should always include 5 and 1, but 2, 3 or 4 is arbitrary.
 combination <- c(1, 2, 3)
