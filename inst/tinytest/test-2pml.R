@@ -127,3 +127,5 @@ if (!"simpleError" %in% class(tt0)) {
   diversity_objective(distances, tt1)
   diversity_objective(distances, tt2)
 }
+
+## TODO: Test that 5 clique can be exchanged with 2, 2, 1
