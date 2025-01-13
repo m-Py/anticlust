@@ -114,7 +114,7 @@ must_link_anticlustering <- function(x, K, must_link, method = "exchange", objec
   # possibly use multiple initializing partitions:
   if (argument_exists(repetitions)) {
     init_partitions <- t(replicate(
-      n = ifelse(method == "must-link", max(round(repetitions/2), 1), repetitions), # half repetitions for first phase
+      n = ifelse(method == "2PML", max(round(repetitions/2), 1), repetitions), # half repetitions for first phase
       init_must_link_groups(N, IDs_initial = must_link, IDs_reduced = dt$IDs, target_groups = target_groups)
     ))
     init_partitions <- init_partitions - 1 # yeah, this is not good code (where should this go?)
