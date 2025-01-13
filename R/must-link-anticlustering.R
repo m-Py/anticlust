@@ -317,6 +317,10 @@ get_exchange_partners_clique <- function(cliques, index, full_clusters, must_lin
   # [1] 2 4
   # $V1
   # [1] 1 2 3
+
+  ## NOTE THAT THERE IS NO 0 THAT IS USED AS COMBINATION (BECAUSE THAT WOULD LEAD 
+  ## TO EXCHANGES WITH OTHER CLIQUES OF THE SAME SIZE, WHICH IS ALREADY DONE 
+  ## IN PHASE 1 OF THE ALGORITHM)
   
   # now check if any of these combinations exists in a cluster
   tab <- table(full_clusters, must_link)
@@ -331,7 +335,7 @@ get_exchange_partners_clique <- function(cliques, index, full_clusters, must_lin
       selected_cluster <- full_clusters == one_cluster_id_that_fit
       # select IDs of elements that serve as exchange ṕartners, via size of cliques
       tab2 <- table(full_clusters[selected_cluster], must_link[selected_cluster])
-      must_link_ids <- as.numeric(dimnames(tab2)[[2]][match(nl[[i]], tab2)])
+      must_link_ids <- as.numeric(dimnames(tab2)[[2]][random_match(nl[[i]], tab2)])
       # from IDs from selected must-link groups, get sample IDs
       sample_ids <- which(must_link %in% must_link_ids)
       stopifnot(length(sample_ids) == n_clique)
@@ -346,4 +350,13 @@ get_exchange_partners_clique <- function(cliques, index, full_clusters, must_lin
     cluster_id = NULL, 
     sample_ids = NULL
   ))
+}
+
+## get a random (match for a) combination of fitting cliques rather than the first, which is returned by match()
+random_match <- function(combination, frequencies) {
+  frequencies <- c(frequencies) # comes in as table, not vector
+  df <- data.frame(frequencies)
+  df$original_order <- 1:nrow(df)
+  df <- df[sample(1:nrow(df)), ]
+  df$original_order[match(combination, df$frequencies)]
 }
