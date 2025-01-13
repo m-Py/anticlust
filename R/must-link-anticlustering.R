@@ -88,7 +88,7 @@ adjusted_distances_must_link <- function(distances, must_link) {
   stopifnot(N == length(must_link))
   N_reduced <- length(unique(must_link))
   new_distances <- matrix(NA, ncol = N_reduced, nrow = N_reduced)
-  list_must_link_indices <- tapply(1:N, must_link, c)
+  list_must_link_indices <- get_must_link_indices(must_link)
   for (i in 1:N_reduced) {
     for (j in 1:N_reduced) {
       new_distances[i, j] <- sum(distances[list_must_link_indices[[i]], list_must_link_indices[[j]]])
@@ -187,10 +187,11 @@ improvement_search_2pml <- function(x, full_clusters, must_link) {
   diag(x) <- 0
 
   # book keeping of indices (separately for must-linked elements and "singletons" that are not must-linked)
-  list_must_link_indices <- tapply(1:N, must_link, c)
-  singletons <- unname(unlist(list_must_link_indices[lengths(list_must_link_indices) == 1]))
+  list_must_link_indices <- get_must_link_indices(must_link) 
+  cliques <- get_cliques(list_must_link_indices) 
+  singletons <- get_singletons(list_must_link_indices)
   singleton_clusters <- full_clusters[singletons]
-  cliques <- list_must_link_indices[lengths(list_must_link_indices) > 1]
+  
   # do swapping phase; iterate over cliques
   # for each clique, generate exchange partners twice
   for (i in seq_along(cliques)) {
@@ -243,6 +244,22 @@ update_diversity_must_link <- function(x, OBJ_BY_CLUSTER, clusters_old, clusters
   OBJ_BY_CLUSTER[cluster_1] <- OBJ_BY_CLUSTER[cluster_1] + sum_distances_element_2_cluster_1 - sum_distances_element_1_cluster_1
   OBJ_BY_CLUSTER[cluster_2] <- OBJ_BY_CLUSTER[cluster_2] + sum_distances_element_1_cluster_2 - sum_distances_element_2_cluster_2
   OBJ_BY_CLUSTER
+}
+
+# get list of indices of must-link cliques (and singletons)
+get_must_link_indices <- function(must_link) {
+  N <- length(must_link)
+  tapply(1:N, must_link, c)
+}
+
+# using the list of must-link indices as input, get singleton indices (as vector)
+get_singletons <- function(list_must_link_indices) {
+  unname(unlist(list_must_link_indices[lengths(list_must_link_indices) == 1]))
+}
+
+#using the list  of must-link indices as input, get indices of cliques  (as list)
+get_cliques <- function(list_must_link_indices) {
+  list_must_link_indices[lengths(list_must_link_indices) > 1]
 }
 
 # determine a random cluster that fits a clique (and sample IDs for the exchange)
