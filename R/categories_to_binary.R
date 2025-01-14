@@ -27,7 +27,7 @@
 #' categorical variables or when the group sizes are unequal (or both).
 #' See examples.
 #' 
-#' @importFrom stats as.formula model.matrix
+#' @importFrom stats as.formula model.matrix contrasts
 #'
 #'
 #' @author
