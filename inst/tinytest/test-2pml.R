@@ -59,6 +59,43 @@ expect_true(all(replicate(100, 1 %in% anticlust:::random_match(combination, freq
 expect_false(all(replicate(100, 2 %in% anticlust:::random_match(combination, frequencies))))
 expect_true(all(replicate(100, 5 %in% anticlust:::random_match(combination, frequencies))))
 
+
+## Test that a 4 clique can be exchanged with 2, 2 ### FAILS!
+
+must_link <- c(1, 1, 1, 1, 1, 2, 2, 3, 3, 4)
+
+ml_indices <- anticlust:::get_must_link_indices(must_link)
+cliques <- anticlust:::get_cliques(ml_indices)
+init <- anticlust:::merged_cluster_to_original_cluster(
+  anticlust:::init_must_link_groups(
+    length(must_link), 
+    IDs_initial = must_link, 
+    IDs_reduced = anticlust:::get_must_link_indices(must_link), 
+    target_groups = c(5, 5)
+  ), must_link
+)
+
+expect_true(!is.null(anticlust:::get_exchange_partners_clique(cliques, 1, init, must_link)$cluster_id))
+
+
+## Test that a 5 clique can be exchanged with 2, 2, 1 ### FAILS!
+
+must_link <- c(1, 1, 1, 1, 1, 2, 2, 3, 3, 4)
+
+ml_indices <- anticlust:::get_must_link_indices(must_link)
+cliques <- anticlust:::get_cliques(ml_indices)
+init <- anticlust:::merged_cluster_to_original_cluster(
+  anticlust:::init_must_link_groups(
+    length(must_link), 
+    IDs_initial = must_link, 
+    IDs_reduced = anticlust:::get_must_link_indices(must_link), 
+    target_groups = c(5, 5)
+  ), must_link
+)
+
+expect_true(!is.null(anticlust:::get_exchange_partners_clique(cliques, 1, init, must_link)$cluster_id))
+
+########################################
 ### Now do some general testing on the must-link constraints. E.g., are they valid after anticlustering?
 
 # Function that test if constraints are valid
@@ -127,5 +164,3 @@ if (!"simpleError" %in% class(tt0)) {
   diversity_objective(distances, tt1)
   diversity_objective(distances, tt2)
 }
-
-## TODO: Test that 5 clique can be exchanged with 2, 2, 1
