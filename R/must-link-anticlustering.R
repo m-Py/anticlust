@@ -291,36 +291,8 @@ get_exchange_partners_clique <- function(cliques, index, full_clusters, must_lin
   
   n_clique <- length(cliques[[index]])
   stopifnot(n_clique > 2) # this must be here
-  # keep track of combinations of cliques that are as large as the clique we have
-  l <- list(combn(n_clique, 2))
-  if (n_clique > 3) {
-    c <- 2
-    for (i in 3:(n_clique-1)) {
-      l[[c]] <- combn(n_clique, i)
-      c <- c +1
-    }
-  }
-  all_sums <- lapply(l, function(x) colSums(x))
-  indices_good <- lapply(l, function(x) which(colSums(x) == n_clique))
-  nl <- list()
-  for (i in seq_along(l)) {
-    values <- l[[i]][, indices_good[[i]], drop = FALSE]
-    nl[[i]] <- values
-  }
-  # nl now has all combinations that sum up to `n_clique` (per list element column wise)
-  # clean nl up to one list!
-  nl <- unlist(lapply(nl, function(x) as.list(as.data.frame(x))), recursive = FALSE)
-  # each list element is the combination of number that sum up to n_clique. e.g. for 6 we have
-  # $V1
-  # [1] 1 5
-  # $V2
-  # [1] 2 4
-  # $V1
-  # [1] 1 2 3
 
-  ## NOTE THAT THERE IS NO 0 THAT IS USED AS COMBINATION (BECAUSE THAT WOULD LEAD 
-  ## TO EXCHANGES WITH OTHER CLIQUES OF THE SAME SIZE, WHICH IS ALREADY DONE 
-  ## IN PHASE 1 OF THE ALGORITHM)
+  nl <- valid_sums_clique(n_clique, full_clusters, must_link) # return a list of combinations that sum to n_clique
   
   # now check if any of these combinations exists in a cluster
   tab <- table(full_clusters, must_link)
@@ -350,6 +322,27 @@ get_exchange_partners_clique <- function(cliques, index, full_clusters, must_lin
     cluster_id = NULL, 
     sample_ids = NULL
   ))
+}
+
+valid_sums_clique <- function(n_clique) { # return a list of combinations that sum to n_clique
+  all_combs(rep(1:n_clique, n_clique:1), n_clique)
+}
+
+# all combinations of a vector that have sum = n_clique
+all_combs <- function(x, n_clique) {
+  l <- list()
+  for (i in 1:(length(x)-1)) {
+    l[[i]] <- combn(x, i+1)
+  }
+  all_sums <- lapply(l, function(x) colSums(x))
+  indices_good <- lapply(l, function(x) which(colSums(x) == n_clique))
+  nl <- list()
+  for (i in seq_along(l)) {
+    values <- l[[i]][, indices_good[[i]], drop = FALSE]
+    nl[[i]] <- values
+  }
+  nl <- unlist(lapply(nl, function(x) as.list(as.data.frame(x))), recursive = FALSE)
+  unname(nl[!duplicated(nl)])
 }
 
 ## get a random (match for a) combination of fitting cliques rather than the first, which is returned by match()

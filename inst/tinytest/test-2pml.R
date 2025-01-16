@@ -95,6 +95,29 @@ init <- anticlust:::merged_cluster_to_original_cluster(
 
 expect_true(!is.null(anticlust:::get_exchange_partners_clique(cliques, 1, init, must_link)$cluster_id))
 
+
+
+## Test stuff
+
+N <- 100
+must_link <- sample(N, N, replace = TRUE)
+
+ml_indices <- anticlust:::get_must_link_indices(must_link)
+cliques <- anticlust:::get_cliques(ml_indices)
+init <- anticlust:::merged_cluster_to_original_cluster(
+  anticlust:::init_must_link_groups(
+    length(must_link), 
+    IDs_initial = must_link, 
+    IDs_reduced = anticlust:::get_must_link_indices(must_link), 
+    target_groups = c(N/2, N/2)
+  ), must_link
+)
+
+expect_true(all(apply(table(init, must_link), 2, function(x) sum(x == 0) == 1)))
+
+table(init, must_link)
+valid_sums_clique(2, init, must_link = must_link)
+
 ########################################
 ### Now do some general testing on the must-link constraints. E.g., are they valid after anticlustering?
 
