@@ -324,6 +324,7 @@ get_exchange_partners_clique <- function(cliques, index, full_clusters, must_lin
   ))
 }
 
+# I fear this problem is the subset sum problem,..
 valid_sums_clique <- function(n_clique) { # return a list of combinations that sum to n_clique
   all_combs(rep(1:n_clique, n_clique:1), n_clique)
 }

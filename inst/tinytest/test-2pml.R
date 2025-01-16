@@ -116,7 +116,7 @@ init <- anticlust:::merged_cluster_to_original_cluster(
 expect_true(all(apply(table(init, must_link), 2, function(x) sum(x == 0) == 1)))
 
 table(init, must_link)
-valid_sums_clique(2, init, must_link = must_link)
+valid_sums_clique(3)
 
 ########################################
 ### Now do some general testing on the must-link constraints. E.g., are they valid after anticlustering?
