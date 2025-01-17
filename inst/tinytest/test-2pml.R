@@ -62,6 +62,25 @@ expect_true(all(replicate(100, 5 %in% anticlust:::random_match(combination, freq
 
 ## Test that a 4 clique can be exchanged with 2, 2 ### FAILS!
 
+must_link <- c(1, 1, 1, 1, 5, 2, 2, 3, 3, 4)
+
+ml_indices <- anticlust:::get_must_link_indices(must_link)
+cliques <- anticlust:::get_cliques(ml_indices)
+init <- anticlust:::merged_cluster_to_original_cluster(
+  anticlust:::init_must_link_groups(
+    length(must_link), 
+    IDs_initial = must_link, 
+    IDs_reduced = anticlust:::get_must_link_indices(must_link), 
+    target_groups = c(5, 5)
+  ), must_link
+)
+
+exchanges <- anticlust:::get_exchange_partners_clique(cliques, 1, init, must_link)
+expect_true(!is.null(exchanges$cluster_id))
+expect_true(all(exchanges$sample_ids == 6:9))
+
+## Test that a 5 clique can be exchanged with 2, 2, 1
+
 must_link <- c(1, 1, 1, 1, 1, 2, 2, 3, 3, 4)
 
 ml_indices <- anticlust:::get_must_link_indices(must_link)
@@ -75,27 +94,9 @@ init <- anticlust:::merged_cluster_to_original_cluster(
   ), must_link
 )
 
-expect_true(!is.null(anticlust:::get_exchange_partners_clique(cliques, 1, init, must_link)$cluster_id))
-
-
-## Test that a 5 clique can be exchanged with 2, 2, 1 ### FAILS!
-
-must_link <- c(1, 1, 1, 1, 1, 2, 2, 3, 3, 4)
-
-ml_indices <- anticlust:::get_must_link_indices(must_link)
-cliques <- anticlust:::get_cliques(ml_indices)
-init <- anticlust:::merged_cluster_to_original_cluster(
-  anticlust:::init_must_link_groups(
-    length(must_link), 
-    IDs_initial = must_link, 
-    IDs_reduced = anticlust:::get_must_link_indices(must_link), 
-    target_groups = c(5, 5)
-  ), must_link
-)
-
-expect_true(!is.null(anticlust:::get_exchange_partners_clique(cliques, 1, init, must_link)$cluster_id))
-
-
+exchanges <- anticlust:::get_exchange_partners_clique(cliques, 1, init, must_link)
+expect_true(!is.null(exchanges$cluster_id))
+expect_true(all(exchanges$sample_ids == 6:10))
 
 ## Test stuff
 
@@ -113,10 +114,10 @@ init <- anticlust:::merged_cluster_to_original_cluster(
   ), must_link
 )
 
-expect_true(all(apply(table(init, must_link), 2, function(x) sum(x == 0) == 1)))
+exchanges <- anticlust:::get_exchange_partners_clique(cliques, which(sapply(cliques, function(x) length(x) > 2))[1], init, must_link)
+# there must at least be one clique among the exchange partners:
+expect_true(any(duplicated(must_link[exchanges$sample_ids])))
 
-table(init, must_link)
-valid_sums_clique(3)
 
 ########################################
 ### Now do some general testing on the must-link constraints. E.g., are they valid after anticlustering?
@@ -131,8 +132,12 @@ must_link_constraints_valid <- function(cl, must_link) {
   all(all_good)
 }
 
-tt <- anticlustering(1:10, K = 2, must_link = must_link)
-tt2 <- anticlustering(1:10, K = 2, must_link = must_link, method = "2PML")
+N <- 10
+
+must_link <- sample(N, size = N, replace = TRUE)
+
+tt <- anticlustering(1:N, K = 2, must_link = must_link)
+tt2 <- anticlustering(1:N, K = 2, must_link = must_link, method = "2PML")
 
 expect_true(must_link_constraints_valid(tt, must_link))
 expect_true(must_link_constraints_valid(tt2, must_link))
@@ -171,7 +176,7 @@ if (!"simpleError" %in% class(tt1)) {
 
 
 tt2 <- tryCatch(
-  anticlustering(distances, K, must_link = must_link, method = "2PML", repetitions = 10),
+  anticlustering(distances, K, must_link = must_link, method = "2PML", repetitions = 40),
   error = function(e) e
 )
 
@@ -179,8 +184,7 @@ if (!"simpleError" %in% class(tt2)) {
   expect_true(must_link_constraints_valid(tt2, must_link))
 }
 
-
-tt0 <- anticlustering(distances, K, must_link = must_link)
+tt0 <- anticlustering(distances, K, must_link = must_link) # exchange method / Phase 1 of 2PML without ensured local optimality
 
 if (!"simpleError" %in% class(tt0)) {
   diversity_objective(distances, tt0)
