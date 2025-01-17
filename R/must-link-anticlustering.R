@@ -310,7 +310,9 @@ get_exchange_partners_clique <- function(cliques, index, full_clusters, must_lin
       must_link_ids <- as.numeric(dimnames(tab2)[[2]][random_match(nl[[i]], tab2)])
       # from IDs from selected must-link groups, get sample IDs
       sample_ids <- which(must_link %in% must_link_ids)
-      stopifnot(length(sample_ids) == n_clique)
+      if (any(is.na(must_link_ids)) || length(sample_ids) != n_clique) {
+        next
+      }
       return(list(
         cluster_id = one_cluster_id_that_fit, 
         sample_ids = sample_ids
