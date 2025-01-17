@@ -292,7 +292,7 @@ get_exchange_partners_clique <- function(cliques, index, full_clusters, must_lin
   n_clique <- length(cliques[[index]])
   stopifnot(n_clique > 2) # this must be here
 
-  nl <- valid_sums_clique(n_clique, full_clusters, must_link) # return a list of combinations that sum to n_clique
+  nl <- valid_sums_clique(n_clique) # returns a list of combinations that sum to n_clique
   
   # now check if any of these combinations exists in a cluster
   tab <- table(full_clusters, must_link)
@@ -324,26 +324,71 @@ get_exchange_partners_clique <- function(cliques, index, full_clusters, must_lin
   ))
 }
 
-# I fear this problem is the subset sum problem,..
+## I generated these sums separately because recomputation is too expensive
 valid_sums_clique <- function(n_clique) { # return a list of combinations that sum to n_clique
-  all_combs(rep(1:n_clique, n_clique:1), n_clique)
+  if (n_clique <= 10) {
+    return(
+        list("3" = list(1:2), "4" = list(c(1L, 3L), c(2L, 2L), c(1L, 
+1L, 2L)), "5" = list(c(1L, 4L), 2:3, c(1L, 1L, 3L), c(1L, 2L, 
+2L), c(1L, 1L, 1L, 2L)), "6" = list(c(1L, 5L), c(2L, 4L), c(3L, 
+3L), c(1L, 1L, 4L), 1:3, c(2L, 2L, 2L), c(1L, 1L, 1L, 3L), c(1L, 
+1L, 2L, 2L), c(1L, 1L, 1L, 1L, 2L)), "7" = list(c(1L, 6L), c(2L, 
+5L), 3:4, c(1L, 1L, 5L), c(1L, 2L, 4L), c(1L, 3L, 3L), c(2L, 
+2L, 3L), c(1L, 1L, 1L, 4L), c(1L, 1L, 2L, 3L), c(1L, 2L, 2L, 
+2L), c(1L, 1L, 1L, 1L, 3L), c(1L, 1L, 1L, 2L, 2L), c(1L, 1L, 
+1L, 1L, 1L, 2L)), "8" = list(c(1L, 7L), c(2L, 6L), c(3L, 5L), 
+    c(4L, 4L), c(1L, 1L, 6L), c(1L, 2L, 5L), c(1L, 3L, 4L), c(2L, 
+    2L, 4L), c(2L, 3L, 3L), c(1L, 1L, 1L, 5L), c(1L, 1L, 2L, 
+    4L), c(1L, 1L, 3L, 3L), c(1L, 2L, 2L, 3L), c(2L, 2L, 2L, 
+    2L), c(1L, 1L, 1L, 1L, 4L), c(1L, 1L, 1L, 2L, 3L), c(1L, 
+    1L, 2L, 2L, 2L), c(1L, 1L, 1L, 1L, 1L, 3L), c(1L, 1L, 1L, 
+    1L, 2L, 2L), c(1L, 1L, 1L, 1L, 1L, 1L, 2L)), "9" = list(c(1L, 
+8L), c(2L, 7L), c(3L, 6L), 4:5, c(1L, 1L, 7L), c(1L, 2L, 6L), 
+    c(1L, 3L, 5L), c(1L, 4L, 4L), c(2L, 2L, 5L), 2:4, c(3L, 3L, 
+    3L), c(1L, 1L, 1L, 6L), c(1L, 1L, 2L, 5L), c(1L, 1L, 3L, 
+    4L), c(1L, 2L, 2L, 4L), c(1L, 2L, 3L, 3L), c(2L, 2L, 2L, 
+    3L), c(1L, 1L, 1L, 1L, 5L), c(1L, 1L, 1L, 2L, 4L), c(1L, 
+    1L, 1L, 3L, 3L), c(1L, 1L, 2L, 2L, 3L), c(1L, 2L, 2L, 2L, 
+    2L), c(1L, 1L, 1L, 1L, 1L, 4L), c(1L, 1L, 1L, 1L, 2L, 3L), 
+    c(1L, 1L, 1L, 2L, 2L, 2L), c(1L, 1L, 1L, 1L, 1L, 1L, 3L), 
+    c(1L, 1L, 1L, 1L, 1L, 2L, 2L), c(1L, 1L, 1L, 1L, 1L, 1L, 
+    1L, 2L)), "10" = list(c(1L, 9L), c(2L, 8L), c(3L, 7L), c(4L, 
+6L), c(5L, 5L), c(1L, 1L, 8L), c(1L, 2L, 7L), c(1L, 3L, 6L), 
+    c(1L, 4L, 5L), c(2L, 2L, 6L), c(2L, 3L, 5L), c(2L, 4L, 4L
+    ), c(3L, 3L, 4L), c(1L, 1L, 1L, 7L), c(1L, 1L, 2L, 6L), c(1L, 
+    1L, 3L, 5L), c(1L, 1L, 4L, 4L), c(1L, 2L, 2L, 5L), 1:4, c(1L, 
+    3L, 3L, 3L), c(2L, 2L, 2L, 4L), c(2L, 2L, 3L, 3L), c(1L, 
+    1L, 1L, 1L, 6L), c(1L, 1L, 1L, 2L, 5L), c(1L, 1L, 1L, 3L, 
+    4L), c(1L, 1L, 2L, 2L, 4L), c(1L, 1L, 2L, 3L, 3L), c(1L, 
+    2L, 2L, 2L, 3L), c(2L, 2L, 2L, 2L, 2L), c(1L, 1L, 1L, 1L, 
+    1L, 5L), c(1L, 1L, 1L, 1L, 2L, 4L), c(1L, 1L, 1L, 1L, 3L, 
+    3L), c(1L, 1L, 1L, 2L, 2L, 3L), c(1L, 1L, 2L, 2L, 2L, 2L), 
+    c(1L, 1L, 1L, 1L, 1L, 1L, 4L), c(1L, 1L, 1L, 1L, 1L, 2L, 
+    3L), c(1L, 1L, 1L, 1L, 2L, 2L, 2L), c(1L, 1L, 1L, 1L, 1L, 
+    1L, 1L, 3L), c(1L, 1L, 1L, 1L, 1L, 1L, 2L, 2L), c(1L, 1L, 
+    1L, 1L, 1L, 1L, 1L, 1L, 2L)))[[as.character(n_clique)]]
+    )
+  } else {
+    # heuristic: return equal-sized cliques, but add 1s to compensate if n_clique is not divisible by X
+    # (e.g., for n_clique = 12, we have 6x2, 4x3, 2x5+2x1, 2x6)
+    max_number <- floor(n_clique/2)
+    candidates <- get_set_for_subset_problem(n_clique)
+    candidates <- candidates[candidates <= max_number] 
+    subsets_init <- lapply(1:max_number, function(x) candidates[candidates == x])[-1] # first entry is the 1s, which we don't use here
+    diffs <- lapply(lapply(subsets_init, sum), "-", n_clique) # get difference of sum to each 
+    lapply(subsets_init, function(x) c(x, rep(1, n_clique - sum(x))))
+  }
 }
 
-# all combinations of a vector that have sum = n_clique
-all_combs <- function(x, n_clique) {
-  l <- list()
-  for (i in 1:(length(x)-1)) {
-    l[[i]] <- combn(x, i+1)
-  }
-  all_sums <- lapply(l, function(x) colSums(x))
-  indices_good <- lapply(l, function(x) which(colSums(x) == n_clique))
-  nl <- list()
-  for (i in seq_along(l)) {
-    values <- l[[i]][, indices_good[[i]], drop = FALSE]
-    nl[[i]] <- values
-  }
-  nl <- unlist(lapply(nl, function(x) as.list(as.data.frame(x))), recursive = FALSE)
-  unname(nl[!duplicated(nl)])
+get_set_for_subset_problem <- function(n_clique) {
+  init <- rep(1:n_clique, n_clique:1)
+  init_list <- mapply(FUN = rep, 1:n_clique, n_clique:1)
+  cumsums <- lapply(1:n_clique, function(x) cumsum(init[init == x]))
+  valid_cumsums <- lapply(cumsums, function(x) x[x <= n_clique])
+  indices <- lapply(valid_cumsums, function(x) 1:length(x))
+  set <- unlist(mapply("[", init_list, indices)) # set of numbers that can add up to n_clique
+  set <- set[!is.na(set)] # some cleanup
+  set
 }
 
 ## get a random (match for a) combination of fitting cliques rather than the first, which is returned by match()
