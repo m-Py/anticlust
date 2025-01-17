@@ -27,8 +27,7 @@ of a categorical variable is coded by a separate variable. So this is not
 analysis. Dummy coding uses a reference category that has only zeros for 
 each variable, while all other categories consist of a 1 and otherwise zeros. 
 This implies that there is a different distance to the reference category 
-than among the other categories, which is unwarranted in anticlustering 
-(which usually relies on distances as input).
+than among the other categories, which is unwarranted in anticlustering.
 
 This function can be used to include categorical variables as part of the 
 optimization criterion in anticlustering, rather than including them as hard constraints as done when using the 
