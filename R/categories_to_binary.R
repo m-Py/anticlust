@@ -10,22 +10,23 @@
 #'
 #' @details
 #' 
-#' The conversion of categorical variable to binary variables is done via
+#' The conversion of categorical variables to binary variables is done via
 #' \code{\link[stats]{model.matrix}}. Since version 0.8.9, each category
 #' of a categorical variable is coded by a separate variable. So this is not
 #' 'dummy' coding, which is often used to encode predictors in statistical 
 #' analysis. Dummy coding uses a reference category that has only zeros for 
 #' each variable, while all other categories consist of a 1 and otherwise zeros. 
 #' This implies that there is a different distance to the reference category 
-#' than among the other categories, which is unwarranted in anticlustering 
-#' (which usually relies on distances as input).
+#' than among the other categories, which is unwarranted in anticlustering.
 #' 
-#' This function can be used to include 
-#' categorical variables as part of the optimization criterion in k-means / 
-#' k-plus anticlustering, rather than including them as hard constraints as 
-#' done in \code{\link{anticlustering}}. This can be useful when there are several
+#' This function can be used to include categorical variables as part of the 
+#' optimization criterion in anticlustering, rather than including them as hard constraints as done when using the 
+#' argument \code{categories} in \code{\link{anticlustering}} (or \code{\link{fast_anticlustering}}). 
+#' This way, categorical variables are treated as numeric variables, 
+#' which can be useful when there are several
 #' categorical variables or when the group sizes are unequal (or both).
-#' See examples.
+#' See examples. Please see the vignette 'Using categorical variables with anticlustering'
+#' for more information on this approach.
 #' 
 #' @importFrom stats as.formula model.matrix contrasts
 #'
