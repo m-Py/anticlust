@@ -193,7 +193,7 @@ void three_phase_search_dynamic_population_size(
 }
 
 
-void SearchAlgorithmDiversity() {
+void SearchAlgorithmDiversity(void) {
     /* Algorithm 1: The main procedure of TPSDP. */
 
     int eta;
@@ -923,7 +923,7 @@ double LocalSearchCriterionCalculation(Solution* sol1, Solution* sol2) {
     return sol1->objective / sol2->objective + alpha * dissimilarityFactor;
 }
 
-void ClearDeltaMatrix() {
+void ClearDeltaMatrix(void) {
 	/* Resets the delta_f matrix */
     for (int i = 0; i < N; ++i) {
         // should this not be over N ?!
@@ -981,7 +981,7 @@ void OneMoveUpdateDeltaMatrix(int i, int oldGroup, int newGroup) {
 	}
 }
 
-void AssignMemoryDiversity() {
+void AssignMemoryDiversity(void) {
     /*  Allocates memory dynamically for various arrays and matrices necessary 
 	for the algorithm's execution. This includes structures for population management, 
 	distance matrices, diversity measures, and neighborhood exploration.
@@ -1029,7 +1029,7 @@ void AssignMemoryDiversity() {
     s2 = (int*)malloc(N * sizeof(int));
 }
 
-void ReleaseMemoryDiversity() {
+void ReleaseMemoryDiversity(void) {
     /* responsible for reading the input file, 
     initializing matrices, and setting constraints on group sizes. */ 
     
