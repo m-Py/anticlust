@@ -65,8 +65,8 @@ void DoubleNeighborhoodLocalSearchDispersion(int s[], int SizeGroup[], double* o
 void SearchAlgorithmDisperion(void);
 void CrossoverDispersion(int partition1[], int partition2[], int score[], int scSizeGroup[]);
 void DirectPerturbationDispersion(int eta_max, int s[], int SizeG[]);
-void AssignMemoryDispersion();
-void ReleaseMemoryDispersion();
+void AssignMemoryDispersion(void);
+void ReleaseMemoryDispersion(void);
 
 /* TPSPD for Anticlustering Based on a Distance matrix
  * 
@@ -343,7 +343,7 @@ void swapping(int ind1, int ind2, int *partition, int **s_min_distance_tuple, do
 }
 
 
-void SearchAlgorithmDisperion() {
+void SearchAlgorithmDisperion(void) {
     /* Algorithm 1: The main procedure of TPSDP. */
 
     int eta;
@@ -974,7 +974,7 @@ void CrossoverDispersion(int partition1[], int partition2[], int solutionChild[]
     }
 }
 
-void AssignMemoryDispersion() {
+void AssignMemoryDispersion(void) {
     /*  Allocates memory dynamically for various arrays and matrices necessary 
 	for the algorithm's execution. This includes structures for population management, 
 	distance matrices, diversity measures, and neighborhood exploration.
@@ -1011,7 +1011,7 @@ void AssignMemoryDispersion() {
     s2 = (int*)malloc(N * sizeof(int));
 }
 
-void ReleaseMemoryDispersion() {
+void ReleaseMemoryDispersion(void) {
     /* responsible for reading the input file, 
     initializing matrices, and setting constraints on group sizes. */ 
 
