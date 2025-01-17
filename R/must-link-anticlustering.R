@@ -397,5 +397,16 @@ random_match <- function(combination, frequencies) {
   df <- data.frame(frequencies)
   df$original_order <- 1:nrow(df)
   df <- df[sample(1:nrow(df)), ]
-  df$original_order[match(combination, df$frequencies)]
+  df$original_order[match_only_once(combination, df$frequencies)]
+}
+
+# match() will return the same index repeatedly, but we can't use that because it is "used" once found
+# so match each value individually sequentially and remove indices afterwards.
+match_only_once <- function(combination, frequencies) {
+  matches <- rep(NA, length(combination))
+  for (i in seq_along(combination)) {
+    matches[i] <- match(combination[i], frequencies)
+    frequencies[matches[i]] <- NA
+  }
+  matches
 }
