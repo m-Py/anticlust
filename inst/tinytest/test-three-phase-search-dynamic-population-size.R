@@ -105,8 +105,23 @@ expect_error(
 )
 
 
-### Test dispersion ###
+## Larger data set
 
+N <- 200
+M <- 5
+K <- 10
+
+data <- matrix(rnorm(N*M), ncol = M)
+
+g1 <- anticlustering(data, K = K)
+g2 <- anticlustering(data, K = K, method = "local-maximum")
+g3 <- three_phase_search_anticlustering(data, K, N)
+
+diversity_objective(data, g1)
+diversity_objective(data, g2)
+diversity_objective(data, g3)
+
+### Test dispersion ###
 
 set.seed(123)
 
