@@ -1,6 +1,6 @@
 # anticlust 0.8.9-1
 
-- Minor change in three phase search algorithm to fix CRAN issue
+- Minor fix in `three_phase_search_anticlustering()` for `objective = "dispersion"` to address CRAN issue
 
 # anticlust 0.8.9
 
