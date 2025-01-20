@@ -1,3 +1,7 @@
+# anticlust 0.8.9-1
+
+- Minor change in three phase search algorithm to fix CRAN issue
+
 # anticlust 0.8.9
 
 ## User visible changes
