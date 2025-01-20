@@ -1,6 +1,7 @@
 # anticlust 0.8.9-1
 
-- Minor fix in `three_phase_search_anticlustering()` for `objective = "dispersion"` to address CRAN issue
+- [Minor fix](https://github.com/m-Py/anticlust/commit/e184b1fd1a9403254cdcb) in 
+ `three_phase_search_anticlustering()` for `objective = "dispersion"` to address CRAN issue
 
 # anticlust 0.8.9
 
