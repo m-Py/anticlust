@@ -441,7 +441,7 @@ void SearchAlgorithmDisperion(void) {
     // Stop measuring time and calculate the elapsed time
     clock_t end_time = clock();
     double elapsed_time = (double) (end_time - start_time)/CLOCKS_PER_SEC;
-    Rprintf("The run time of the distance_clustering algortihm in seconds is: %f\n", elapsed_time);
+    // Rprintf("The run time of the distance_clustering algortihm in seconds is: %f\n", elapsed_time);
 }
 
 void DoubleNeighborhoodLocalSearchDispersion(int s[], int SizeGroup[], double* objective) {
