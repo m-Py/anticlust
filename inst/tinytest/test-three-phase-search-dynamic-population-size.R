@@ -123,20 +123,21 @@ diversity_objective(data, g3)
 
 ### Test dispersion ###
 
-set.seed(123)
-
-N <- 12
-M <- 2
+N <- 90
+M <- 20
 K <- 3
 
 dat <- matrix(rnorm(N * M), ncol = M)
-distances <- dist(dat)
 
-result_cluster1 <- anticlust:::three_phase_search_anticlustering(dat, K, N, objective = "dispersion", number_iterations = 1, beta_max = 5)
+result_cluster1 <- three_phase_search_anticlustering(dat, K, N, objective = "dispersion", number_iterations = 10)
+result_cluster2 <- anticlustering(dat, K = K, objective = "dispersion", method = "brusco", repetitions = 10)
 
-result_cluster2 <- optimal_anticlustering(distances, objective = "dispersion", K=K, solver = "lpSolve")
-results <- optimal_dispersion(dat, K=K, solver = "symphony")$dispersion
+optimal_dispersion <- optimal_dispersion(dat, K=K, solver = "symphony")$dispersion
+dispersion_3phase <- dispersion_objective(dat, result_cluster1)
+dispersion_bils <- dispersion_objective(dat, result_cluster2)
+optimal_dispersion
+dispersion_3phase
+dispersion_bils
 
-dispersion1 <- dispersion_objective(distances, result_cluster1)
-dispersion2 <- dispersion_objective(distances, result_cluster2)
-
+expect_true(dispersion_3phase <= optimal_dispersion)
+expect_true(dispersion_bils <= optimal_dispersion)
