@@ -109,7 +109,7 @@ void three_phase_search_dynamic_population_size(
 											double *Theta_min,
 											int *Beta_min,
 											int *Eta_max,
-                                            double *Alpha,
+                      double *Alpha,
 											int *result,
 											double *score,
 											int *mem_error) {

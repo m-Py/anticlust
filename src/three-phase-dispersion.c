@@ -695,7 +695,8 @@ void DirectPerturbationDispersion(int eta_max, int s[], int SizeGroup[]) {
 void CrossoverDispersion(int partition1[], int partition2[], int solutionChild[], int scSizeGroup[]) {
     /* Algorithm 5: combines partitions in a way that maintains group constraints */
 
-    int i, j, maxGroupDispersion, selectedGroup;
+    int i, j, selectedGroup;
+    double maxGroupDispersion;
     int elementCount, groupCount;
     int targetGroup = -1;
     int processedCount;
