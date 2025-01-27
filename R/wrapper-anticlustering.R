@@ -28,7 +28,7 @@
 #'     natively supported. May also be a user-defined function. See
 #'     Details.
 #' @param method One of "exchange" (default) , "local-maximum",
-#'     "brusco", or "ilp".  See Details.
+#'     "brusco", "ilp", or "2PML".  See Details.
 #' @param preclustering Boolean. Should a preclustering be conducted
 #'     before anticlusters are created? Defaults to \code{FALSE}. See
 #'     Details.
@@ -37,8 +37,8 @@
 #'     between groups. See Details.
 #' @param repetitions The number of times a search heuristic is
 #'     initiated when using \code{method = "exchange"}, \code{method =
-#'     "local-maximum"}, or \code{method = "brusco"}. In the end, the
-#'     best objective found across the repetitions is returned.
+#'     "local-maximum"}, \code{method = "brusco"}, or \code{method = "2PML"}. 
+#'     In the end, the best objective found across the repetitions is returned.
 #' @param standardize Boolean. If \code{TRUE} and \code{x} is a
 #'     feature matrix, the data is standardized through a call to
 #'     \code{\link{scale}} before the optimization starts. This
@@ -256,7 +256,9 @@
 #' 
 #' Must-link constraints are passed as a single vector of length \code{nrow(x)}.
 #' Positions that have the same numeric index are assigned to the same anticluster 
-#' (if the constraints can be fulfilled).
+#' (if the constraints can be fulfilled). When including must-link constraints, 
+#' \code{method = "2PML"} performs a specialized search heuristic that potentially
+#' yields better results than \code{method = "local-maximum"}.
 #' 
 #' The examples illustrate the usage of the \code{must_link} and \code{cannot_link}
 #' arguments. Currently, the different kinds of constraints (arguments \code{must_link}, 

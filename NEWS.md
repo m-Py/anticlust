@@ -1,3 +1,21 @@
+# anticlust 0.8.9-1
+
+- [Minor fix](https://github.com/m-Py/anticlust/commit/e184b1fd1a9403254cdcb) in 
+ `three_phase_search_anticlustering()` for `objective = "dispersion"`
+
+# anticlust 0.8.9
+
+## User visible changes
+
+- `categories_to_binary()` no longer uses dummy coding with a reference category, but instead codes each levels of a categorical variable with a separate variable (thanks to [Gunnar Klau](https://github.com/guwek) for spotting potential problems with dummy coding).
+- `anticlustering()` has new `method = "2PML"`, which is an improved heuristic when using must-link constraints
+
+# anticlust 0.8.8
+
+## User visible changes
+
+- `three_phase_search_anticlustering()` implements the three phase search algorithm by [Yang et al.](https://doi.org/10.1016/j.ejor.2022.02.003), contributed by Hannah Hengelbrock ([@HanneyAI](https://github.com/HanneyAI))
+
 # anticlust 0.8.7
 
 ## User visible changes
