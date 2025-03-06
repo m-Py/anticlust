@@ -60,7 +60,7 @@ If you use `anticlust` in your research, it would be courteous if you cite the f
 
 - Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition data sets into equivalent parts. *Psychological Methods, 26*(2), 161--174. https://doi.org/10.1037/met0000301
 
-Depending on which `anticlust` functions you are using, including other references may also be fair. [Here you can find out in detail how to cite `anticlust`](./inst/HOW_TO_CITE_ANTICLUST.md).
+Depending on which `anticlust` functions you are using, including other references may also be fair. [Here you can find out in detail how to cite `anticlust`](https://github.com/m-Py/anticlust/blob/main/inst/HOW_TO_CITE_ANTICLUST.md).
 
 Another great way of showing your appreciation of `anticlust` is to leave a star on this Github repository.
 
