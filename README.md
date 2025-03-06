@@ -47,7 +47,8 @@ cite the following reference:
 
 Depending on which `anticlust` functions you are using, including other
 references may also be fair. [Here you can find out in detail how to
-cite `anticlust`](./inst/HOW_TO_CITE_ANTICLUST.md).
+cite
+`anticlust`](https://github.com/m-Py/anticlust/blob/main/inst/HOW_TO_CITE_ANTICLUST.md).
 
 Another great way of showing your appreciation of `anticlust` is to
 leave a star on this Github repository.
@@ -61,15 +62,14 @@ This README contains some basic information on the `R` package
 -   A paper is available describing the theoretical background of
     anticlustering and the `anticlust` package in detail
     (<a href="https://doi.org/10.1037/met0000301" class="uri">https://doi.org/10.1037/met0000301</a>).
-    The freely available preprint can be retrieved from
-    <a href="https://psyarxiv.com/3razc/" class="uri">https://psyarxiv.com/3razc/</a>.
-    A more recent paper focusing on the k-plus anticlustering method can
-    be retrieved from
-    <a href="https://psyarxiv.com/7jw6v/" class="uri">https://psyarxiv.com/7jw6v/</a>.
+    The freely available preprint can be retrieved
+    [here](https://doi.org/10.31234/osf.io/3razc). A more recent paper
+    focusing on the k-plus anticlustering method can be retrieved
+    [here](https://doi.org/10.31234/osf.io/7jw6v).
 -   The `R` documentation of the main functions is actually quite rich
     and up to date, so you should definitely check that out when using
-    the `anticlust` package (primarily `?anticlustering`,
-    `?kplus_anticlustering`, `?balanced_clustering`, and `?matching`).
+    the `anticlust` package. The most important background is provided
+    in `?anticlustering`.
 -   A [video](https://youtu.be/YGrhSmi1oA8) is available in German
     language where I illustrate the main functionalities of the
     `anticlustering()` function. My plan is to make a similar video in
