@@ -12,8 +12,10 @@ implements anticlustering methods as described in Papenberg and Klau
 <a href="https://doi.org/10.1037/met0000301" class="uri">https://doi.org/10.1037/met0000301</a>),
 Brusco et al. (2020;
 <a href="https://doi.org/10.1111/bmsp.12186" class="uri">https://doi.org/10.1111/bmsp.12186</a>),
-and Papenberg (2024;
-<a href="https://doi.org/10.1111/bmsp.12315" class="uri">https://doi.org/10.1111/bmsp.12315</a>).
+Papenberg (2024;
+<a href="https://doi.org/10.1111/bmsp.12315" class="uri">https://doi.org/10.1111/bmsp.12315</a>),
+and Papenberg et al. (2025;
+<a href="https://doi.org/10.1101/2025.03.03.641320" class="uri">https://doi.org/10.1101/2025.03.03.641320</a>).
 
 Installation
 ------------
@@ -59,25 +61,32 @@ How do I learn about `anticlust`
 This README contains some basic information on the `R` package
 `anticlust`. More information is available via the following sources:
 
--   A paper is available describing the theoretical background of
-    anticlustering and the `anticlust` package in detail
-    (<a href="https://doi.org/10.1037/met0000301" class="uri">https://doi.org/10.1037/met0000301</a>).
-    The freely available preprint can be retrieved
-    [here](https://doi.org/10.31234/osf.io/3razc). A more recent paper
-    focusing on the k-plus anticlustering method can be retrieved
-    [here](https://doi.org/10.31234/osf.io/7jw6v).
--   The `R` documentation of the main functions is actually quite rich
-    and up to date, so you should definitely check that out when using
-    the `anticlust` package. The most important background is provided
-    in `?anticlustering`.
+-   Up until now, we published 3 papers describing the theoretical
+    background of `anticlust`.
+    -   The initial presentation of the `anticlust` package is given in
+        Papenberg and Klau (2021)
+        (<a href="https://doi.org/10.1111/bmsp.12315" class="uri">https://doi.org/10.1111/bmsp.12315</a>;
+        [Preprint](https://doi.org/10.31234/osf.io/7jw6v)).
+    -   The k-plus anticlustering method is described in
+        Papenberg (2024)
+        (<a href="https://doi.org/10.1037/met0000527" class="uri">https://doi.org/10.1037/met0000527</a>;
+        [Preprint](https://doi.org/10.31234/osf.io/dhzrc)).
+    -   A new paper describes the must-link feature and provides
+        additional comparisons to alternative methods, focusing on
+        categorical variables (Papenberg et al., 2025;
+        <a href="https://doi.org/10.1101/2025.03.03.641320" class="uri">https://doi.org/10.1101/2025.03.03.641320</a>).
+    -   The R documentation of the main functions is actually quite rich
+        and up to date, so you should definitely check that out when
+        using the `anticlust` package. The most important background is
+        provided in `?anticlustering`.
 -   A [video](https://youtu.be/YGrhSmi1oA8) is available in German
     language where I illustrate the main functionalities of the
     `anticlustering()` function. My plan is to make a similar video in
     English in the future.
 -   The [package website](https://m-py.github.io/anticlust/) contains
     all documentation as a convenient website. At the current time, the
-    website also lists four package vignettes, while additional
-    vignettes are planned.
+    website also has four package vignettes, while additional vignettes
+    are planned.
 
 A quick start
 -------------
