@@ -106,6 +106,7 @@ expect_equal(val1, val3)
 
 if (requireNamespace("gurobi", quietly = TRUE)) {
   gurobi <- wce(agreements, solver = "gurobi")
-  expect_equal(val1, val4)
   val4 <- diversity_objective(agreements, gurobi)
+  expect_equal(val1, val4)
 }
+
