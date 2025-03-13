@@ -49,4 +49,4 @@ Encoding: UTF-8
 LazyData: true
 NeedsCompilation: yes
 RoxygenNote: 7.3.2
-SystemRequirements: Rendering the vignette requires pandoc (<https://pandoc.org/>). It is possible to use the gurobi solver, which requires gurobi.
+SystemRequirements: Rendering the vignette requires pandoc (<https://pandoc.org/>). 
