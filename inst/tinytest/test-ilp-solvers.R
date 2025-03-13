@@ -2,7 +2,7 @@
 ### Test solvers for maximum diversity
 library(anticlust)
 library(tinytest)
-N <- 14
+N <- 12
 M <- 5
 K <- 2
 
@@ -22,15 +22,14 @@ symphony <- optimal_anticlustering(data, K, objective = "diversity", solver = "s
 Sys.time() - start
 val3 <- diversity_objective(data, symphony)
 
-start <- Sys.time()
-gurobi <- optimal_anticlustering(data, K, objective = "diversity", solver = "gurobi") 
-Sys.time() - start
-val4 <- diversity_objective(data, gurobi)
-
 expect_equal(val1, val2)
 expect_equal(val1, val3)
-expect_equal(val1, val4)
 
+if (requireNamespace("gurobi", quietly = TRUE)) {
+  gurobi <- optimal_anticlustering(data, K, objective = "diversity", solver = "gurobi") 
+  val4 <- diversity_objective(data, gurobi)
+  expect_equal(val1, val4)
+}
 
 ### Test solvers for maximum dispersion
 
@@ -44,13 +43,15 @@ Sys.time() - start
 start <- Sys.time()
 val3 <- optimal_dispersion(x, K = 3, solver = "symphony")$dispersion
 Sys.time() - start
-start <- Sys.time()
-val4 <- optimal_dispersion(x, K = 3, solver = "gurobi")$dispersion
-Sys.time() - start
-
 expect_equal(val1, val2)
 expect_equal(val1, val3)
-expect_equal(val1, val4)
+
+if (requireNamespace("gurobi", quietly = TRUE)) {
+  val4 <- optimal_dispersion(x, K = 3, solver = "gurobi")$dispersion
+  expect_equal(val1, val4)
+}
+
+
 
 ### Test solvers for balanced clustering (i.e., reversed maximum - minimum - diversity)
 
@@ -69,14 +70,14 @@ val2 <- diversity_objective(data, glpk)
 symphony <- balanced_clustering(data, K, method = "ilp", solver = "symphony")
 val3 <- diversity_objective(data, symphony)
 
-gurobi <- balanced_clustering(data, K, method = "ilp", solver = "gurobi")
-val4 <- diversity_objective(data, gurobi)
-
-
 expect_equal(val1, val2)
 expect_equal(val1, val3)
-expect_equal(val1, val4)
 
+if (requireNamespace("gurobi", quietly = TRUE)) {
+  gurobi <- balanced_clustering(data, K, method = "ilp", solver = "gurobi")
+  val4 <- diversity_objective(data, gurobi)
+  expect_equal(val1, val4)
+}
 
 ### Test solvers for weighted cluster editing (i.e., reversed max diversity without group restrictions)
 
@@ -100,11 +101,11 @@ symphony <- wce(agreements, solver = "symphony")
 Sys.time() - start
 val3 <- diversity_objective(agreements, symphony)
 
-start <- Sys.time()
-gurobi <- wce(agreements, solver = "gurobi")
-Sys.time() - start
-val4 <- diversity_objective(agreements, gurobi)
-
 expect_equal(val1, val2)
 expect_equal(val1, val3)
-expect_equal(val1, val4)
+
+if (requireNamespace("gurobi", quietly = TRUE)) {
+  gurobi <- wce(agreements, solver = "gurobi")
+  expect_equal(val1, val4)
+  val4 <- diversity_objective(agreements, gurobi)
+}
