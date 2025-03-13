@@ -128,15 +128,14 @@ solve_ilp_gurobi <- function(ilp, objective, time_limit) {
 
 # Function to find a solver package
 find_ilp_solver <- function() {
-  if (requireNamespace("lpSolve", quietly = TRUE)) {
+  if (requireNamespace("gurobi", quietly = TRUE)) {
+    return("gurobi")
+  } else if (requireNamespace("lpSolve", quietly = TRUE)) {
     return("lpSolve")
   } else if (requireNamespace("Rglpk", quietly = TRUE)) {
     return("glpk")
   } else if (requireNamespace("Rsymphony", quietly = TRUE)) {
     return("symphony")
-  } else if (requireNamespace("gurobi", quietly = TRUE)) {
-    return("gurobi")
   }
   check_if_solver_is_available() # throws an error here!
 }
-
