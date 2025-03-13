@@ -107,7 +107,8 @@ solve_ilp_gurobi <- function(ilp, objective, time_limit) {
   model$modelsense <- objective
   model$rhs        <- ilp$rhs
   model$sense      <- ilp$equalities
-  model$vtypes     <- "B"
+  model$vtype     <- "B"
+  
   ## solve
   if (argument_exists(time_limit)) {
     ilp_solution <- gurobi::gurobi(model, params = list(LogToConsole = 0, TimeLimit = time_limit, MIPGap = 0))
