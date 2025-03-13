@@ -469,9 +469,10 @@ optimal_cannot_link <- function(N, K, target_groups, cannot_link, repetitions) {
   repetitions <- ifelse(is.null(repetitions), 1, repetitions)
   all_nns_reordered <- reorder_edges(cannot_link)
   ilp <- k_coloring_ilp(all_nns_reordered, N, K, target_groups)
-  solution <- solve_ilp(
-    ilp, solver = ifelse(requireNamespace("Rsymphony", quietly = TRUE), "Rsymphony", find_ilp_solver())
-  )
+  # select solver: gurobi > symphony > lpSolve > Glpk
+  solver <- ifelse(requireNamespace("Rsymphony", quietly = TRUE), "Rsymphony", NA)
+  solver <- ifelse(requireNamespace("gurobi", quietly = TRUE), "gurobi", find_ilp_solver())
+  solution <- solve_ilp(ilp, solver = solver)
   if (solution$status != 0) {
     stop("The cannot-link constraints cannot be fulfilled.")
   }
