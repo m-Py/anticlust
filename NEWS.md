@@ -1,3 +1,8 @@
+# anticlust 0.8.10
+
+- The commercial Gurobi solver is now available as backened for the exact anticlustering methods
+- The documentation refers to a new anticlustering paper, available from [bioRxiv](https://doi.org/10.1101/2025.03.03.641320)
+
 # anticlust 0.8.9-1
 
 - [Minor fix](https://github.com/m-Py/anticlust/commit/e184b1fd1a9403254cdcb) in 
