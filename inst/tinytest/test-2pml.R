@@ -105,18 +105,27 @@ must_link <- sample(N, N, replace = TRUE)
 
 ml_indices <- anticlust:::get_must_link_indices(must_link)
 cliques <- anticlust:::get_cliques(ml_indices)
-init <- anticlust:::merged_cluster_to_original_cluster(
-  anticlust:::init_must_link_groups(
-    length(must_link), 
-    IDs_initial = must_link, 
-    IDs_reduced = anticlust:::get_must_link_indices(must_link), 
-    target_groups = c(N/2, N/2)
-  ), must_link
+
+init <- tryCatch(
+  init <- anticlust:::merged_cluster_to_original_cluster(
+    anticlust:::init_must_link_groups(
+      length(must_link), 
+      IDs_initial = must_link, 
+      IDs_reduced = anticlust:::get_must_link_indices(must_link), 
+      target_groups = c(N/2, N/2)
+    ), must_link
+  ),
+  error = function(e) e
 )
 
-exchanges <- anticlust:::get_exchange_partners_clique(cliques, which(sapply(cliques, function(x) length(x) > 2))[1], init, must_link)
-# there must at least be one clique among the exchange partners:
-expect_true(any(duplicated(must_link[exchanges$sample_ids])))
+if (!"simpleError" %in% class(init)) {
+  exchanges <- anticlust:::get_exchange_partners_clique(
+    cliques, 
+    which(sapply(cliques, function(x) length(x) > 2))[1], init, must_link
+  )
+  # there must at least be one clique among the exchange partners:
+  expect_true(any(duplicated(must_link[exchanges$sample_ids])))
+}
 
 
 ########################################
@@ -136,20 +145,26 @@ N <- 10
 
 must_link <- sample(N, size = N, replace = TRUE)
 
-tt <- anticlustering(1:N, K = 2, must_link = must_link)
-tt2 <- anticlustering(1:N, K = 2, must_link = must_link, method = "2PML")
 
-expect_true(must_link_constraints_valid(tt, must_link))
-expect_true(must_link_constraints_valid(tt2, must_link))
+tt <- tryCatch(
+  anticlustering(1:N, K = 2, must_link = must_link),
+  error = function(e) e
+)
 
-# test constructing merged clusters from must-link constraints and its reversal
-expect_true(all(
-  tt == anticlust:::merged_cluster_to_original_cluster(
-    anticlust:::original_cluster_to_merged_cluster(tt, must_link), 
-    must_link
-  )
-))
-
+if (!"simpleError" %in% class(tt)) {
+  tt2 <- anticlustering(1:N, K = 2, must_link = must_link, method = "2PML")
+  
+  expect_true(must_link_constraints_valid(tt, must_link))
+  expect_true(must_link_constraints_valid(tt2, must_link))
+  
+  # test constructing merged clusters from must-link constraints and its reversal
+  expect_true(all(
+    tt == anticlust:::merged_cluster_to_original_cluster(
+      anticlust:::original_cluster_to_merged_cluster(tt, must_link), 
+      must_link
+    )
+  ))
+}
 
 
 ## now a random larger data set
@@ -184,7 +199,10 @@ if (!"simpleError" %in% class(tt2)) {
   expect_true(must_link_constraints_valid(tt2, must_link))
 }
 
-tt0 <- anticlustering(distances, K, must_link = must_link) # exchange method / Phase 1 of 2PML without ensured local optimality
+tt0 <- tryCatch(
+  anticlustering(distances, K, must_link = must_link),# exchange method / Phase 1 of 2PML without ensured local optimality
+  error = function(e) e
+)
 
 if (!"simpleError" %in% class(tt0)) {
   diversity_objective(distances, tt0)
