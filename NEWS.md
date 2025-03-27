@@ -1,6 +1,6 @@
 # anticlust 0.8.10-1
 
-- Fixed uncatched error in tests for CRAN "additional issues" via 75cb7d5760be08b0bb
+- Minor: Fixed uncatched potential error in tests for CRAN "additional issues" via [75cb7d5760be08b0bb](https://github.com/m-Py/anticlust/commit/75cb7d5760be08b0b)
 
 # anticlust 0.8.10
 
