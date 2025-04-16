@@ -61,13 +61,20 @@ K <- 4
 
 data <- matrix(rnorm(N*M), ncol = M)
 
+start <- Sys.time()
 lpsolve <- balanced_clustering(data, K, method = "ilp", solver = "lpSolve")
+Sys.time() - start
+
 val1 <- diversity_objective(data, lpsolve)
 
+start <- Sys.time()
 glpk <- balanced_clustering(data, K, method = "ilp", solver = "glpk")
+Sys.time() - start
 val2 <- diversity_objective(data, glpk)
 
+start <- Sys.time()
 symphony <- balanced_clustering(data, K, method = "ilp", solver = "symphony")
+Sys.time() - start
 val3 <- diversity_objective(data, symphony)
 
 expect_equal(val1, val2)
