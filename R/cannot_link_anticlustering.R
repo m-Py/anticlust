@@ -16,11 +16,12 @@
 cannot_link_anticlustering <- function(x, init_clusters, cannot_link, objective, method) {
   
   cannot_link <- as.matrix(cannot_link)
-  
+
   if (ncol(cannot_link) == 1) { # cannot_link is ID/grouping vector
+    cannot_link <- to_numeric(c(cannot_link))
     cannot_link <- get_partners(cannot_link)
   }
-  
+
   if (objective == "kplus") {
     x <- kplus_moment_variables(x, 2)
     objective <- "variance"
@@ -99,5 +100,8 @@ get_partners <- function(x) {
 }
 
 get_partners_ <- function(x, i) {
+  if (sum(x==i) == 1) {
+    return(NULL)
+  }
   t(combn(which(x == i), 2))
 }

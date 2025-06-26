@@ -1,4 +1,7 @@
 
+library(anticlust)
+library(tinytest)
+
 # Test if cannot_link constraint works
 a <- anticlustering(rnorm(6), K = 2, cannot_link = cbind(1, 2))
 expect_true(a[1] != a[2])
@@ -138,3 +141,13 @@ expect_error(
   anticlustering(data, K = K, cannot_link = rbind(1:3, 5:7)),
   pattern = "columns"
 )
+
+# Test cannot-link constraints via vector
+
+cannot_link <- sample(N/2, size = N, replace = TRUE)
+K <- max(table(cannot_link))
+a <- anticlustering(data, K = K, cannot_link = cannot_link)
+
+expect_true(all(table(a, cannot_link) <= 1))
+
+expect_error(anticlustering(data, K = K-1, cannot_link = cannot_link))

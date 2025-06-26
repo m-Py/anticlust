@@ -451,9 +451,8 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   
   if (argument_exists(cannot_link)) {
     cannot_link <- as.matrix(cannot_link)
-    if (length(K) == N) {
-      init <- initialize_clusters(N, K, NULL) # only used if clustering is already given
-    } else {
+    init <- initialize_clusters(N, K, NULL) # only used if clustering is already given
+    if (length(K) != N) {
       if (NCOL(cannot_link) == 1) {# cannot_link is an ID/grouping vector
         if (max(table(c(cannot_link))) > K) {
           stop("Cannot-link constraints cannot be fulfilled.")
