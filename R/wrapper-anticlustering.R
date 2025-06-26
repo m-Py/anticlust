@@ -45,7 +45,9 @@
 #'     \code{\link{scale}} before the optimization starts. This
 #'     argument is silently ignored if \code{x} is a distance matrix.
 #' @param cannot_link A 2 column matrix where each row has the indices 
-#'     of two elements that must not be assigned to the same anticluster.
+#'     of two elements that must not be assigned to the same anticluster. 
+#'     Alternatively a vector of length \code{nrow(x)}; elements having 
+#'     the same value in this vector cannot be assigned to the same anticluster.
 #' @param must_link A numeric vector of length \code{nrow(x)}. Elements having 
 #'     the same value in this vector are assigned to the same anticluster.
 #'
