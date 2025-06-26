@@ -17,6 +17,10 @@ cannot_link_anticlustering <- function(x, init_clusters, cannot_link, objective,
   
   cannot_link <- as.matrix(cannot_link)
   
+  if (ncol(cannot_link) == 1) { # cannot_link is ID/grouping vector
+    cannot_link <- get_partners(cannot_link)
+  }
+  
   if (objective == "kplus") {
     x <- kplus_moment_variables(x, 2)
     objective <- "variance"
@@ -85,3 +89,15 @@ cleanup_cannot_link_indices <- function(cannot_link) {
   cannot_link <- rbind(cannot_link, t(apply(cannot_link, 1, rev))) # use (1, 2) and (2, 1)
   cannot_link[!duplicated(cannot_link), ] # but do not use (1, 2), (2, 1), (1, 2) and (2, 1)
 } 
+
+# helper funciton to convert the category labels to pairwise constraints
+get_partners <- function(x) {
+  n_clusters <- length(unique(x))
+  indices <- lapply(1:n_clusters, function(i) get_partners_(x, i))
+  indices <- do.call(rbind, indices)
+  indices[indices[, 1] != indices[, 2], ]
+}
+
+get_partners_ <- function(x, i) {
+  t(combn(which(x == i), 2))
+}

@@ -272,7 +272,10 @@ a necessary dependency with anticlust. It is therefore recommended to
 manually install the Rsymphony package, which is then automatically 
 selected as solver when using the \code{must_link} argument. If you have
 access to the gurobi solver and have the gurobi R package installed, it will
-be selected as solver (which is even faster than Symphony).
+be selected as solver (which is even faster than Symphony). As of version 0.8.11, 
+it is also possible to use \code{cannot_link} as a vector. In this case it 
+is ensured that elements having the same value in \code{cannot_link} are not
+linked in the same cluster. 
 
 Must-link constraints are passed as a single vector of length \code{nrow(x)}.
 Positions that have the same numeric index are assigned to the same anticluster 

@@ -255,7 +255,10 @@
 #' manually install the Rsymphony package, which is then automatically 
 #' selected as solver when using the \code{must_link} argument. If you have
 #' access to the gurobi solver and have the gurobi R package installed, it will
-#' be selected as solver (which is even faster than Symphony).
+#' be selected as solver (which is even faster than Symphony). As of version 0.8.11, 
+#' it is also possible to use \code{cannot_link} as a vector. In this case it 
+#' is ensured that elements having the same value in \code{cannot_link} are not
+#' linked in the same cluster. 
 #' 
 #' Must-link constraints are passed as a single vector of length \code{nrow(x)}.
 #' Positions that have the same numeric index are assigned to the same anticluster 
@@ -445,11 +448,20 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   }
   
   if (argument_exists(cannot_link)) {
-    init <- initialize_clusters(N, K, NULL)
     cannot_link <- as.matrix(cannot_link)
-    if (length(K) != N) { # no initial clustering was passed! Solve cannot-link constraints here
-      init <- optimal_cannot_link(N, NUMBER_OF_ANTICLUSTERS, table(init), cannot_link, repetitions)
+    if (length(K) == N) {
+      init <- initialize_clusters(N, K, NULL) # only used if clustering is already given
+    } else {
+      if (NCOL(cannot_link) == 1) {# cannot_link is an ID/grouping vector
+        if (max(table(c(cannot_link))) > K) {
+          stop("Cannot-link constraints cannot be fulfilled.")
+        }
+        init <- t(replicate(max(1, repetitions), categorical_sampling(c(cannot_link), K = K)))
+      } else if (NCOL(cannot_link) == 2) {
+        init <- optimal_cannot_link(N, NUMBER_OF_ANTICLUSTERS, table(init), cannot_link, repetitions)
+      }
     }
+
     return(cannot_link_anticlustering(
       x = x, 
       init_clusters = init,
