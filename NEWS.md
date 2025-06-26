@@ -1,6 +1,7 @@
 # anticlust 0.8.11
 
-- In `anticlustering()`, argument cannot_link can now be a vector, via [93158fb98a375](https://github.com/m-Py/anticlust/commit/93158fb98a37550e15ca9174cebf35b6adeb819f)
+- In `anticlustering()`, argument cannot_link can now be a vector, via [93158fb98a375](https://github.com/m-Py/anticlust/commit/93158fb98a37550e15ca9174cebf35b6adeb819f), inspiration thanks to @einGlasRotwein 
+  * Makes the computation much faster (and does not rely on a solver) if cannnot-link constraints are induced via a grouping variable.
 
 # anticlust 0.8.10-1
 
