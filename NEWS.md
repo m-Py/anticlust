@@ -1,6 +1,7 @@
 # anticlust 0.8.12
 
 - `anticlustering()` with `must_link` constraints now supports `objective = "kplus"` and `objective = "variance"` (for equal-sized groups)
+- `anticlustering()` now supports method = "3phase", calling the three phase search algorithm by [Yang et al.](https://doi.org/10.1016/j.ejor.2022.02.003), contributed by Hannah Hengelbrock ([@HanneyAI](https://github.com/HanneyAI))
 
 # anticlust 0.8.11-1
 
