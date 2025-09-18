@@ -92,13 +92,15 @@ expect_error(
 )
 
 # no error for unequal-sized groups with diversity
-anticlustering(1:100, K = 3, must_link = sample(100, replace = TRUE))
+anticlustering(1:100, K = c(10, 10, 80), must_link = sample(100, replace = TRUE))
 # no error for unequal-sized groups with k-means/k-plus
 expect_error(
-  anticlustering(1:100, K = 3, must_link = sample(100, replace = TRUE), objective = "variance")
+  anticlustering(1:100, K = c(10, 10, 80), must_link = sample(100, replace = TRUE), objective = "variance"),
+  pattern = "equal-sized"
 )
 expect_error(
-  anticlustering(1:100, K = 3, must_link = sample(100, replace = TRUE), objective = "kplus")
+  anticlustering(1:100, K = c(10, 10, 80), must_link = sample(100, replace = TRUE), objective = "kplus"),
+  pattern = "equal-sized"
 )
 
 
