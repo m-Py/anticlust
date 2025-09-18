@@ -79,14 +79,6 @@ expect_error(
   pattern = "length"
 )
 expect_error(
-  anticlustering(data, K = K, must_link = must_link, objective = "kplus"),
-  pattern = "diversity"
-)
-expect_error(
-  anticlustering(data, K = K, must_link = must_link, objective = "variance"),
-  pattern = "diversity"
-)
-expect_error(
   anticlustering(data, K = K, must_link = must_link, objective = "dispersion"),
   pattern = "diversity"
 )
@@ -99,3 +91,22 @@ expect_error(
   anticlustering(data, K = K, must_link = matrix(NA))
 )
 
+# no error for unequal-sized groups with diversity
+anticlustering(1:100, K = 3, must_link = sample(100, replace = TRUE))
+# no error for unequal-sized groups with k-means/k-plus
+expect_error(
+  anticlustering(1:100, K = 3, must_link = sample(100, replace = TRUE), objective = "variance")
+)
+expect_error(
+  anticlustering(1:100, K = 3, must_link = sample(100, replace = TRUE), objective = "kplus")
+)
+
+
+#try k-plus objective with schaper data set
+
+data <- schaper2019[, 3:6]
+must_link <- rep(NA, nrow(data))
+must_link[1:5] <- 1
+gr <- anticlustering(data, K = 4, objective = "kplus", repetitions = 100, must_link = must_link)
+expect_true(all(gr[1:5] == gr[1]))
+mean_sd_tab(data, gr) #nice!

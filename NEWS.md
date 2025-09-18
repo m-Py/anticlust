@@ -1,5 +1,7 @@
 # anticlust 0.8.12
 
+- `anticlustering()` with `must_link` constraints now supports `objective = "kplus"` and `objective = "variance"` (for equal-sized groups)
+
 # anticlust 0.8.11-1
 
 - Fixes some edges cases of functionality introduced in last update

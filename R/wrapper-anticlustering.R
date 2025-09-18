@@ -475,10 +475,10 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   if (argument_exists(must_link)) {
     return(
       must_link_anticlustering(
-        convert_to_distances(x), 
+        convert_to_distances(x, objective = objective), # implent objective by manipulating distance matrix
         K, must_link = must_link, 
         method = method, 
-        objective = "diversity", 
+        objective = "diversity", # always uses diversity computation in optimization algorithm
         repetitions = repetitions
       )
     )

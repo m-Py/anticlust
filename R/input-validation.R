@@ -19,20 +19,25 @@ input_validation_anticlustering <- function(x, K, objective, method,
     validate_input(must_link, "must_link", not_function = TRUE, len = N)
     must_link <- as.matrix(must_link)
 
-    validate_input(objective, "objective", input_set = c("diversity"), not_na = TRUE, len = 1) 
-    validate_input(method, "method", input_set = c("local-maximum", "exchange", "2PML"), not_na = TRUE, len = 1) 
-    
-    if (ncol(must_link) != 1) {
-      stop("Argument must_link must be a vector.")
-    }
-    if (objective %in% c("dispersion", "kplus", "variance")) {
-      stop("Currently, must-link constraints only work with objective = 'diversity'.")
-    }
     if (argument_exists(categories)) {
       stop("\nCombining the `categories` argument together with must-link constraints \n",
            "is currently not supported; use the categorical variables as part of the first argument\n",
            "`x` instead (see the vignette on categorical variables).")
     }
+    
+    validate_input(objective, "objective", input_set = c("diversity","kplus", "variance"), not_na = TRUE, len = 1) 
+    validate_input(method, "method", input_set = c("local-maximum", "exchange", "2PML"), not_na = TRUE, len = 1) 
+    
+    unequal_group_sizes <- sd(table(initialize_clusters(N, K, NULL))) != 0
+    
+    if (unequal_group_sizes && objective %in% c("kplus", "variance")) {
+      stop("K-means and k-plus anticlustering are only possible with equal-sized groups when must-link constraints are used.")
+    }
+    
+    if (ncol(must_link) != 1) {
+      stop("Argument must_link must be a vector.")
+    }
+
     if (isTRUE(preclustering)) {
       stop("It is not possible to combine preclustering with must-link constraints.")
     }
