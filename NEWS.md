@@ -1,3 +1,5 @@
+# anticlust 0.8.12
+
 # anticlust 0.8.11-1
 
 - Fixes some edges cases of functionality introduced in last update
