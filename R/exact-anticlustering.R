@@ -49,11 +49,18 @@ exact_anticlustering <- function(data, K, preclustering, cannot_link) {
 }
 
 # Ensure that a distance matrix is passed
-convert_to_distances <- function(data) {
+convert_to_distances <- function(data, objective = "diversity") {
   if (!is_distance_matrix(data)) {
-    distances <- as.matrix(dist(data))
+    if (objective == "diversity") {
+      distances <- dist(data)
+    } else if (objective == "variance") {
+      distances <- dist(data)^2
+    } else if (objective == "kplus") {
+      data <- kplus_moment_variables(data, 2)
+      distances <- dist(data)^2
+    }
   } else {
-    distances <- as.matrix(data)
+    distances <- data
   }
-  distances
+  as.matrix(distances)
 }
