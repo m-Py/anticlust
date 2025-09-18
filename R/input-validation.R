@@ -58,6 +58,9 @@ input_validation_anticlustering <- function(x, K, objective, method,
     if (objective == "dispersion") {
       stop("objective = dispersion does not work with cannot_link constraints.")
     }
+    if (!method %in% c("brusco", "exchange", "local-maximum", "ilp")) {
+      stop("Cannot-link constraints currently work with method = 'brusco', 'exchange', 'local-maximum', or 'ilp'.")
+    }
     if (argument_exists(categories)) {
       stop("\nCombining the `categories` argument together with cannot-link constraints \n",
            "is currently not supported; use the categorical variables as part of the first argument\n",
