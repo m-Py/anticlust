@@ -1,0 +1,134 @@
+---
+title: "Practical tipps for anticlustering"
+output: rmarkdown::html_vignette
+author: Martin Papenberg
+vignette: >
+  %\VignetteIndexEntry{Anticlustering_in_2025}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(anticlust)
+```
+
+This vignette is (in September 2025) the most up-to-date reference for doing anticlustering. Here, I summarize some of the things I learned about---or implemented for---anticlustering, which may not be documented in earlier work (e.g., papers, other vignettes). 
+
+I use the penguins data set to illustrate the anticlustering method, which as of R version 4.5 has been available in Base R. 
+
+## Problems with the data / missing values
+
+In another vignette using the penguin data set, I simply removed observations with missing values in the data set. Unfortunately, this approach may not be satisfactory for most users who have a reason for including such cases in the data set. So what should we do? As of now, `anticlust` does not by itsself support missing values. This is a measurement / user problem. You must decide for your data if the missing values are a problem and how to deal with them. For example, is it okay to use mean imputation, or some more sophisticated method? Here I show one way to deal with NAs. 
+
+Let us investigate missing values in the data:
+
+```{r}
+head(penguins)
+
+penguins[!complete.cases(penguins), ]
+```
+
+We have `sum(!complete.cases(penguins))` penguins with missing data, 2 of which are quite severe because we do not seem to really know anything about them apart from their `species`, where they were located (column `island`) and in which year they were "investigated". Still, if they are in our data, we might want to assign them to a group. Unfortunately, `anticlust` will not let you do this:
+
+```{r, error = TRUE}
+numeric_variables <- penguins[, c("bill_len", "bill_dep", "flipper_len", "body_mass")]
+anticlustering(numeric_variables, K = 5)
+```
+
+In most cases, one possibility would be to use a distance matrix as input. That means: We do not use the data matrix of cases (penguins) and variables (measurements of the penguins), but a quadratic matrix that quantified the pairwise dissimilarity among all penguins. 
+
+Converting to distances would be done internally anyway when using the default `objective`---the diversity. Fortunately, the `dist()` function which does this conversion is usually okay with missing values if an observation has some non-missing values. However, here two cases only consist of missing values, and in this case even dist() will result in an NA for all distances involving these cases:
+
+```{r, error = TRUE}
+distances <- dist(numeric_variables)
+sum(is.na(distances))
+anticlustering(distances, K = 5)
+```
+
+One possibility would be to replace the NAs in the distance matrix with `0`. When using the default anticlustering objective (diversity), this transformation ensures that these cases will not be relevant when computing the objective: 
+
+```{r, error = TRUE}
+distances[is.na(distances)] <- 0
+groups <- anticlustering(distances, K = 5)
+```
+
+This worked! Let's check out the descriptive statistics (means + standard deviations in brackets) for each of the 5 groups I just created:
+
+```{r, error = TRUE}
+mean_sd_tab(numeric_variables, groups, na.rm = TRUE)
+```
+
+So, this method worked---for the diversity objective. The k-means objective (the *variance*) or the k-plus objective are traditionally not computed using pairwise distances as input, but there is a way to accomplish that as well, as I will explain below. For categorical variables, there is another way to deal with NAs, as I also suggest below.
+
+## Standardization
+
+Let's recap the descriptive statistics:
+
+```{r, error = TRUE}
+mean_sd_tab(numeric_variables, groups, na.rm = TRUE)
+```
+
+These results are actually not entirely impressive. You might not immediately see that when you are not anticlustering all the time, but you may believe me. One problem is that the variables have strongly different ranges, for example compare the mean value of `body_mass` (`r mean(penguins$body_mass, na.rm = TRUE)`) and `bill_dep` (`r mean(penguins$bill_dep, na.rm = TRUE)`). When doing anticlustering this matters because the optimization objective is computed on the basis of these values. The traditional solution is standardization of the input variables, for which `anticlustering()` has the argument `standardize`. It actually does not do a lot internally; it simply calls `scale()` on the input data---however: it can only be used on the original variables and not on the distance matrix. But we can do this ourselves: 
+
+```{r}
+scaled_variables <- scale(numeric_variables)
+distances <- dist(scaled_variables)
+distances[is.na(distances)] <- 0.00001
+groups1 <- anticlustering(distances, K = 5)
+mean_sd_tab(numeric_variables, groups1, na.rm = TRUE)
+```
+
+With some imagination, we see an improvement in similarity for the variable `bill_dep`, which was previously neglected due to it having much smaller number than for example `body_mass`. Still we can do more to improve the results.
+
+## Improving the results
+
+We can use a better algorithm:
+
+```{r}
+groups2 <- anticlustering(distances, K = 5, method = "local-maximum")
+mean_sd_tab(numeric_variables, groups2, na.rm = TRUE)
+```
+
+Just inspecting the descriptive statistics may not always be helpful to decide which solution is better. For now, we optimized the diversity objective, so we can compute the diversity for the different solutions: 
+
+```{r}
+diversity_objective(distances, groups1)
+diversity_objective(distances, groups2)
+```
+
+A higher value is better. Apart from that, the diversity is not really interpretable because its magnitude depends on the specific data set (number of groups, number of observations, etc.).
+
+We may use more repetitions for better results (this takes longer):
+
+```{r}
+groups3 <- anticlustering(distances, K = 5, method = "local-maximum", repetitions = 5)
+diversity_objective(distances, groups3)
+```
+
+## Using a better algorithm
+
+As of now in 2025, the three phase search algorithm by [Yang et al.](https://doi.org/10.1016/j.ejor.2022.02.003) seems to be the most powerful anticlustering algorithm implemented in `anticlust`. From version 0.8.12 onward, it can be called from the main function `anticlustering()`. Sometimes, it is even faster than using `"local-maximum"` with many repetitions.
+
+```{r}
+
+## this fails when there are zeros in the distance matrix...
+groups4 <- anticlustering(distances, K = 5, method = "3phase")
+diversity_objective(distances, groups4)
+mean_sd_tab(numeric_variables, groups4, na.rm = TRUE)
+
+```
+
+
+## Categorical variables
+
+## Constraints
+
+
+
