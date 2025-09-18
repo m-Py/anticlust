@@ -141,3 +141,19 @@ dispersion_bils
 
 expect_true(dispersion_3phase <= optimal_dispersion)
 expect_true(dispersion_bils <= optimal_dispersion)
+
+
+## Also test this algorithm via interface in anticlustering()
+
+data <- schaper2019[, 3:6]
+
+a1 <- anticlustering(data, K = 3, standardize = TRUE, objective = "kplus")
+a2 <- anticlustering(data, K = 3, method = "3phase", standardize = TRUE, objective = "kplus")
+mean_sd_tab(data, a1)
+mean_sd_tab(data, a2)
+
+expect_error(
+  anticlustering(data, K = c(12, 12, 96-24), method = "3phase"),
+  pattern = "equal-sized"
+)
+

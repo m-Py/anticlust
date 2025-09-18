@@ -441,6 +441,16 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   NUMBER_OF_ANTICLUSTERS <- length(table(initialize_clusters(N, K, NULL)))
   TARGET_GROUPS <- table(initialize_clusters(N, K, NULL))
 
+  if (method == "3phase") {
+    distances <- convert_to_distances(x, objective = objective)
+    return(
+      three_phase_search_anticlustering(
+        distances, K = NUMBER_OF_ANTICLUSTERS, N = N, 
+        number_iterations = min(repetitions, 50)
+      )
+    )
+  }
+  
   ## Exact method using ILP
   if (method == "ilp") {
     if (objective == "dispersion") {

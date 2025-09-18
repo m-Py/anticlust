@@ -14,6 +14,23 @@ input_validation_anticlustering <- function(x, K, objective, method,
   validate_data_matrix(x)
   x <- as.matrix(x)
   N <- nrow(x)
+  unequal_group_sizes <- (length(K) != 1) && (sd(table(initialize_clusters(N, K, NULL))) != 0)
+  
+  
+  validate_input(
+    method, "method", len = 1,
+    input_set = c("ilp", "exchange", "heuristic", "centroid", "local-maximum", "brusco", "2PML", "3phase"), 
+    not_na = TRUE, not_function = TRUE
+  )
+  
+  if (method == "3phase") {
+    if (objective == "dispersion") {
+      stop("objective = dispersion does not work with the 3 phase search algorithm.")
+    }
+    if (unequal_group_sizes) {
+      stop("The 3 phase algorithm currently only works with equal-sized groups.")
+    }
+  }
   
   if (argument_exists(must_link)) {
     validate_input(must_link, "must_link", not_function = TRUE, len = N)
@@ -27,8 +44,6 @@ input_validation_anticlustering <- function(x, K, objective, method,
     
     validate_input(objective, "objective", input_set = c("diversity","kplus", "variance"), not_na = TRUE, len = 1) 
     validate_input(method, "method", input_set = c("local-maximum", "exchange", "2PML"), not_na = TRUE, len = 1) 
-    
-    unequal_group_sizes <- sd(table(initialize_clusters(N, K, NULL))) != 0
     
     if (unequal_group_sizes && objective %in% c("kplus", "variance")) {
       stop("K-means and k-plus anticlustering are only possible with equal-sized groups when must-link constraints are used.")
@@ -86,11 +101,6 @@ input_validation_anticlustering <- function(x, K, objective, method,
   validate_input(preclustering, "preclustering", len = 1,
                  input_set = c(TRUE, FALSE), not_na = TRUE, not_function = TRUE)
 
-  validate_input(
-    method, "method", len = 1,
-    input_set = c("ilp", "exchange", "heuristic", "centroid", "local-maximum", "brusco", "2PML"), 
-    not_na = TRUE, not_function = TRUE
-  )
   if (method == "2PML") {
     if (!argument_exists(must_link)) {
       stop("Method 2PML only works with must-link constraints.")
