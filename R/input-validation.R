@@ -15,11 +15,10 @@ input_validation_anticlustering <- function(x, K, objective, method,
   x <- as.matrix(x)
   N <- nrow(x)
   unequal_group_sizes <- (length(K) != 1) && (sd(table(initialize_clusters(N, K, NULL))) != 0)
-  
-  
+
   validate_input(
     method, "method", len = 1,
-    input_set = c("ilp", "exchange", "heuristic", "centroid", "local-maximum", "brusco", "2PML", "3phase"), 
+    input_set = c("ilp", "exchange", "heuristic", "local-maximum", "brusco", "2PML", "3phase"), 
     not_na = TRUE, not_function = TRUE
   )
   
