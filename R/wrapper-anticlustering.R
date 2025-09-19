@@ -441,14 +441,14 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   # Convert input into usable features for anticlustering, if feature matrix is passed and not custom objective used
   if (!is_distance_matrix(x) && !is.function(objective)) {
     x <- get_anticlustering_features(x, objective, standardize)
-    if (rowSums(is.na(x)) == ncol(x)) {
+    if (any(rowSums(is.na(x)) == ncol(x))) {
       stop("Some observations only consist of NA, I cannot deal with this.")
     }
     if (objective == "kplus") {
       objective <- "variance" # now has the kplus variables, it is now standard kmeans
     }
   }
-
+  x <- to_matrix(x)
   N <- nrow(x)
 
   NUMBER_OF_ANTICLUSTERS <- length(table(initialize_clusters(N, K, NULL)))
@@ -467,7 +467,6 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
     need_distance_matrix <- need_distance_matrix | argument_exists(must_link)
     need_distance_matrix <- need_distance_matrix | sum(is.na(x)) > 0 # use dist() to deal with NAs.
   }
-  print(need_distance_matrix)
 
   if (need_distance_matrix) {
     kmeans_type_objective <- objective == "variance"
@@ -607,14 +606,23 @@ replace_na_by_index <- function(matches) {
 get_anticlustering_features <- function(x, objective, standardize) {
   x <- data.frame(x)
   is_categorical <- sapply(x, class) == "factor"
-  categorical_variables <- categories_to_binary(x[, is_categorical])
-  numeric_variables <- x[, !is_categorical]
-  if (objective == "kplus") {
-    numeric_variables <- kplus_moment_variables(numeric_variables, 2, FALSE)
+  if (sum(is_categorical) > 0) {
+    categorical_variables <- categories_to_binary(x[, is_categorical])
+  } else {
+    categorical_variables <- NULL
+  } 
+  if (sum(!is_categorical) > 0) {
+    numeric_variables <- as.matrix(x[, !is_categorical])
+    if (objective == "kplus") {
+      numeric_variables <- kplus_moment_variables(numeric_variables, 2, FALSE)
+    }
+  } else {
+    numeric_variables <- NULL
   }
+  
+  all_ <- cbind(numeric_variables, categorical_variables)
   if (standardize) {
-    numeric_variables <- scale(numeric_variables)
+    all_ <- scale(all_)
   }
-  cbind(numeric_variables, categories)
+  all_
 }
-
