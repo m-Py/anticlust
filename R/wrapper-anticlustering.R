@@ -440,12 +440,25 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   
   NUMBER_OF_ANTICLUSTERS <- length(table(initialize_clusters(N, K, NULL)))
   TARGET_GROUPS <- table(initialize_clusters(N, K, NULL))
+  
+  ## Some data handling; in particular, determine whether we need a distance matrix even though we might not have one
+  need_distance_matrix <- objective %in% c("diversity", "average-diversity", "dispersion") # this case is clear - computed from distances
+  # some algorithms always use distance matrix even for kmeans/kplus that are usually computed from the features directly
+  need_distance_matrix <- need_distance_matrix | method %in% c("3phase", "brusco")
+  need_distance_matrix <- need_distance_matrix | argument_exists(cannot_link)
+  need_distance_matrix <- need_distance_matrix | argument_exists(must_link)
 
+  if (need_distance_matrix) {
+    x <- convert_to_distances(x, objective = objective)
+    if (objective %in% c("variance", "kplus")) { # when using distance matrix, kmeans/kplus are equivalent to average diversity.
+      objective <- "average-diversity"
+    }
+  }
+  
   if (method == "3phase") {
-    distances <- convert_to_distances(x, objective = objective)
     return(
       three_phase_search_anticlustering(
-        distances, K = NUMBER_OF_ANTICLUSTERS, N = N, 
+        x, K = NUMBER_OF_ANTICLUSTERS, N = N, 
         number_iterations = min(repetitions, 50)
       )
     )
@@ -485,7 +498,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   if (argument_exists(must_link)) {
     return(
       must_link_anticlustering(
-        convert_to_distances(x, objective = objective), # implent objective by manipulating distance matrix
+        x, 
         K, must_link = must_link, 
         method = method, 
         objective = "diversity", # always uses diversity computation in optimization algorithm
@@ -498,12 +511,13 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   # variable `categories` after this step:
   categories <- get_categorical_constraints(x, K, preclustering, categories)
 
+  # Rework data for kplus objective
   if (!inherits(objective, "function")) {
     if (objective == "kplus") {
       x <- cbind(x, squared_from_mean(x))
       objective <- "variance"
     }
-    if (objective == "distance") {
+    if (objective == "distance") { # for compatibility with very old version...
       objective <- "diversity"
     }
   }
@@ -515,15 +529,6 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   # BILS by Brusco et al.:
   if (method == "brusco") {
     average_diversity <- ifelse(objective == "average-diversity", TRUE, FALSE)
-    if (objective == "kplus") {
-      x <- kplus_moment_variables(x, 2)
-      objective <- "variance"
-    } 
-    if (objective == "variance") {
-      x <- convert_to_distances(x)^2
-      average_diversity <- TRUE
-      objective <- "average-diversity"
-    }
     return(bicriterion_anticlustering(x, K, repetitions, average_diversity = average_diversity, return = paste0("best-", objective)))
   }
   
