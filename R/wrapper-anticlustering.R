@@ -145,6 +145,10 @@
 #' In the standard case, groups of equal size are generated. Adjust
 #' the argument \code{K} to create groups of different size (see
 #' Examples).
+#' 
+#' As of version 0.8.12, this function supports handling of missing values (\code{NA}). 
+#' In this case the function \code{\link[stats]{dist}} handles the (\code{NA}) when converting
+#' features to pairwise distances. 
 #'
 #' \strong{Algorithms for anticlustering}
 #'
@@ -238,6 +242,15 @@
 #' when using the bicriterion algorithm by Bruso et al. Using the argument 
 #' \code{categories} is only available for the classical exchange procedures, 
 #' that is, for \code{method = "exchange"} and \code{method = "local-maximum"}. 
+#' 
+#' As of version 0.8.12, the data input \code{x} can contain variables of type \code{factor}
+#' to represent categorical variables. In this case, they are internally converted to 
+#' binary via \code{\link{categories_to_binary}}, which no longer needs to be done 
+#' manually by users (and which can be tricky in particular when combining categorical 
+#' and numeric variables, and when using the k-plus objective). However note that the internal
+#' conversion always uses \code{use_combinations = FALSE}, which may not always 
+#' what users need. In this case, I still recommend using \code{\link{categories_to_binary}} 
+#' manually.
 #' 
 #' \strong{Anticlustering with constraints}
 #' 
