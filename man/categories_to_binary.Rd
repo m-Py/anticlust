@@ -37,6 +37,11 @@ which can be useful when there are several
 categorical variables or when the group sizes are unequal (or both).
 See examples. Please see the vignette 'Using categorical variables with anticlustering'
 for more information on this approach.
+
+Since version 0.8.12, this function treats NA in the categorical input variables
+as a distinct category. This implies that different observations having an NA are treated
+as having the same value on this variable. If this is not desired, you need to do some other
+preprocessing of the NAs before calling this function.
 }
 \examples{
 

@@ -28,6 +28,11 @@
 #' See examples. Please see the vignette 'Using categorical variables with anticlustering'
 #' for more information on this approach.
 #' 
+#' Since version 0.8.12, this function treats NA in the categorical input variables
+#' as a distinct category. This implies that different observations having an NA are treated
+#' as having the same value on this variable. If this is not desired, you need to do some other
+#' preprocessing of the NAs before calling this function.
+#' 
 #' @importFrom stats as.formula model.matrix contrasts
 #'
 #'
@@ -79,8 +84,10 @@
 categories_to_binary <- function(categories, use_combinations = FALSE) {
   validate_input(use_combinations, "use_combinations", objmode = "logical", len = 1,
                  input_set = c(TRUE, FALSE), not_na = TRUE, not_function = TRUE)
+  validate_input(na_as_category, "na_as_category", objmode = "logical", len = 1,
+                 input_set = c(TRUE, FALSE), not_na = TRUE, not_function = TRUE)
   categories <- data.frame(categories)
-  categories <- as.data.frame(lapply(categories, as.factor))
+  categories <- as.data.frame(lapply(categories, factor, exclude = NULL))
   combine_by <- ifelse(use_combinations, " * ", " + ")
   formula_string <- paste("~", paste(colnames(categories), collapse = combine_by), collapse = "")
   model.matrix(
