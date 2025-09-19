@@ -51,7 +51,7 @@ exact_anticlustering <- function(data, K, preclustering, cannot_link) {
 # Ensure that a distance matrix is passed
 convert_to_distances <- function(data, objective = "diversity") {
   if (!is_distance_matrix(data)) {
-    if (objective %in% c("diversity", "dispersion")) {
+    if (objective %in% c("average-diversity", "diversity", "dispersion")) {
       distances <- dist(data)
     } else if (objective == "variance") {
       distances <- dist(data)^2
