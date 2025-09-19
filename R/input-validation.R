@@ -100,6 +100,10 @@ input_validation_anticlustering <- function(x, K, objective, method,
   validate_input(preclustering, "preclustering", len = 1,
                  input_set = c(TRUE, FALSE), not_na = TRUE, not_function = TRUE)
 
+  if (any(is.na(x)) && preclustering) {
+    stop("Cannot use preclustering when there is NAs in the input.")
+  }
+  
   if (method == "2PML") {
     if (!argument_exists(must_link)) {
       stop("Method 2PML only works with must-link constraints.")
@@ -291,11 +295,14 @@ validate_input <- function(obj, argument_name, len = NULL, greater_than = NULL,
 }
 
 ## Validate feature input
-validate_data_matrix <- function(x) {
+validate_data_matrix <- function(x, NA_allowed = TRUE) {
   x <- data.frame(x)
   modes <- sapply(x, mode)
   if (any(modes != "numeric")) {
     stop("Your data (the first argument `x`) should only consist of numeric and factor variables.")
+  }
+  if (any(is.na(x)) && !NA_allowed) {
+    stop("Missing values are not allowed.")
   }
 }
 
@@ -377,7 +384,7 @@ input_validation_matching <- function(
   match_extreme_first, 
   target_group
 ) {
-  validate_data_matrix(x)
+  validate_data_matrix(x, FALSE)
   N <- nrow(as.matrix(x))
   validate_input(
     p, "p", 
