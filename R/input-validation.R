@@ -293,13 +293,10 @@ validate_input <- function(obj, argument_name, len = NULL, greater_than = NULL,
 
 ## Validate feature input
 validate_data_matrix <- function(x) {
-  x <- as.matrix(x)
-  if (mode(x) != "numeric") {
-    stop("Your data (the first argument `x`) should only contain numeric entries, but this is not the case.")
-  }
-  if (any(is.na(x))) {
-    stop("Your data contains `NA`. I cannot proceed because ",
-         "I cannot estimate similarity for data that has missing values. Sorry!")
+  x <- data.frame(x)
+  modes <- sapply(x, mode)
+  if (any(modes != "numeric")) {
+    stop("Your data (the first argument `x`) should only consist of numeric and factor variables.")
   }
 }
 
