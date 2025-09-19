@@ -11,14 +11,11 @@ expect_error(
   balanced_clustering(iris[, -5], K = 3)
 )
 
-# exported functions cannot be used with non-numeric input"
+# some exported functions cannot be used with non-numeric input (anticlustering now can!)
 data(iris)
-expect_error(
-  anticlustering(iris, K = 3)
-)
 expect_error(
   matching(iris, p = 3)
 )
 expect_error(
-  balanced_clustering(iris, p = 3)
+  balanced_clustering(iris, K = 3)
 )
