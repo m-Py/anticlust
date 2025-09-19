@@ -514,18 +514,14 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   # Rework data for kplus objective
   if (!inherits(objective, "function")) {
     if (objective == "kplus") {
-      x <- cbind(x, squared_from_mean(x))
+      x <- kplus_moment_variables(x, 2, standardize)
       objective <- "variance"
     }
     if (objective == "distance") { # for compatibility with very old version...
       objective <- "diversity"
     }
   }
-  
-  if (!is_distance_matrix(x) && standardize == TRUE) {
-    x <- scale(x)
-  }
-  
+
   # BILS by Brusco et al.:
   if (method == "brusco") {
     average_diversity <- ifelse(objective == "average-diversity", TRUE, FALSE)
