@@ -431,30 +431,48 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
                                   categories, repetitions, standardize, cannot_link,
                                   must_link)
 
-  x <- to_matrix(x)
-  N <- nrow(x)
-  # there is a reason why scaling happens here and below (because of ILP + kplus)
-  if (!is_distance_matrix(x) && standardize == TRUE) {
-    x <- scale(x)
-  }
-  
-  NUMBER_OF_ANTICLUSTERS <- length(table(initialize_clusters(N, K, NULL)))
-  TARGET_GROUPS <- table(initialize_clusters(N, K, NULL))
   
   # Preclustering and categorical constraints are both processed in the
   # variable `categories` after this step:
+  # Preclustering must be done first because it needs the raw features and not (potentially) kplus features, which
+  # would be appended in the next step via get_anticlustering_features()
   categories <- get_categorical_constraints(x, K, preclustering, categories)
   
+  # Convert input into usable features for anticlustering, if feature matrix is passed and not custom objective used
+  if (!is_distance_matrix(x) && !is.function(objective)) {
+    x <- get_anticlustering_features(x, objective, standardize)
+    if (rowSums(is.na(x)) == ncol(x)) {
+      stop("Some observations only consist of NA, I cannot deal with this.")
+    }
+    if (objective == "kplus") {
+      objective <- "variance" # now has the kplus variables, it is now standard kmeans
+    }
+  }
+
+  N <- nrow(x)
+
+  NUMBER_OF_ANTICLUSTERS <- length(table(initialize_clusters(N, K, NULL)))
+  TARGET_GROUPS <- table(initialize_clusters(N, K, NULL))
+  
   ## Some data handling; in particular, determine whether we need a distance matrix even though we might not have one
-  need_distance_matrix <- !is.function(objective) && objective %in% c("diversity", "average-diversity", "dispersion") # this case is clear - computed from distances
-  # some algorithms always use distance matrix even for kmeans/kplus that are usually computed from the features directly
-  need_distance_matrix <- need_distance_matrix | method %in% c("3phase", "brusco")
-  need_distance_matrix <- need_distance_matrix | argument_exists(cannot_link)
-  need_distance_matrix <- need_distance_matrix | argument_exists(must_link)
+  need_distance_matrix <- FALSE
+  if (!is.function(objective)) { # when custom objective is passed, users need to ensure the data is correct
+    if (objective == "distance") { # for compatibility with very old version...
+      objective <- "diversity"
+    }
+    need_distance_matrix <- objective %in% c("diversity", "average-diversity", "dispersion") # this case is clear - objectives are computed from distances
+    # some algorithms always use distance matrix even for kmeans/kplus that are usually computed from the features directly
+    need_distance_matrix <- need_distance_matrix | method %in% c("3phase", "brusco")
+    need_distance_matrix <- need_distance_matrix | argument_exists(cannot_link)
+    need_distance_matrix <- need_distance_matrix | argument_exists(must_link)
+    need_distance_matrix <- need_distance_matrix | sum(is.na(x)) > 0 # use dist() to deal with NAs.
+  }
+  print(need_distance_matrix)
 
   if (need_distance_matrix) {
-    x <- convert_to_distances(x, objective = objective)
-    if (objective %in% c("variance", "kplus")) { # when using distance matrix, kmeans/kplus are equivalent to average diversity.
+    kmeans_type_objective <- objective == "variance"
+    x <- convert_to_distances(x, squared = kmeans_type_objective)
+    if (kmeans_type_objective) { # when using distance matrix, kmeans/kplus are equivalent to average diversity.
       objective <- "average-diversity"
     }
   }
@@ -509,17 +527,6 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
         repetitions = repetitions
       )
     )
-  }
-
-  # Rework data for kplus objective
-  if (!inherits(objective, "function")) {
-    if (objective == "kplus") {
-      x <- kplus_moment_variables(x, 2, standardize)
-      objective <- "variance"
-    }
-    if (objective == "distance") { # for compatibility with very old version...
-      objective <- "diversity"
-    }
   }
 
   # BILS by Brusco et al.:
@@ -595,3 +602,19 @@ replace_na_by_index <- function(matches) {
   matches[na_matches] <- max_group + 1:NAs 
   matches
 }
+
+# Convert user input to useful feature matrix
+get_anticlustering_features <- function(x, objective, standardize) {
+  x <- data.frame(x)
+  is_categorical <- sapply(x, class) == "factor"
+  categorical_variables <- categories_to_binary(x[, is_categorical])
+  numeric_variables <- x[, !is_categorical]
+  if (objective == "kplus") {
+    numeric_variables <- kplus_moment_variables(numeric_variables, 2, FALSE)
+  }
+  if (standardize) {
+    numeric_variables <- scale(numeric_variables)
+  }
+  cbind(numeric_variables, categories)
+}
+
