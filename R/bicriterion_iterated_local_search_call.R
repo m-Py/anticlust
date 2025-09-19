@@ -201,6 +201,11 @@ bicriterion_anticlustering <- function(
   input_validation_bicriterion_anticlustering(x, K, R, W, Xi, dispersion_distances, average_diversity, init_partitions, return)
 
   distances <- convert_to_distances(x) 
+  
+  if (any(as.dist(distances) <= 0)) {
+    stop("The three phase algorithm cannot deal with dissimilarities <= 0.")
+  }
+  
   N <- NROW(distances)
   WL <- length(W)
   if (is.null(R)) {
@@ -376,5 +381,4 @@ checkneighborhood <- function(Xi) {
     stop("First neighborhood percentage needs to be smaller than the second.")
   }
 }
-
 
