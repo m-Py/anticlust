@@ -441,8 +441,12 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   NUMBER_OF_ANTICLUSTERS <- length(table(initialize_clusters(N, K, NULL)))
   TARGET_GROUPS <- table(initialize_clusters(N, K, NULL))
   
+  # Preclustering and categorical constraints are both processed in the
+  # variable `categories` after this step:
+  categories <- get_categorical_constraints(x, K, preclustering, categories)
+  
   ## Some data handling; in particular, determine whether we need a distance matrix even though we might not have one
-  need_distance_matrix <- objective %in% c("diversity", "average-diversity", "dispersion") # this case is clear - computed from distances
+  need_distance_matrix <- !is.function(objective) && objective %in% c("diversity", "average-diversity", "dispersion") # this case is clear - computed from distances
   # some algorithms always use distance matrix even for kmeans/kplus that are usually computed from the features directly
   need_distance_matrix <- need_distance_matrix | method %in% c("3phase", "brusco")
   need_distance_matrix <- need_distance_matrix | argument_exists(cannot_link)
@@ -506,10 +510,6 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
       )
     )
   }
-
-  # Preclustering and categorical constraints are both processed in the
-  # variable `categories` after this step:
-  categories <- get_categorical_constraints(x, K, preclustering, categories)
 
   # Rework data for kplus objective
   if (!inherits(objective, "function")) {
