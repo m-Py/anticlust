@@ -84,8 +84,6 @@
 categories_to_binary <- function(categories, use_combinations = FALSE) {
   validate_input(use_combinations, "use_combinations", objmode = "logical", len = 1,
                  input_set = c(TRUE, FALSE), not_na = TRUE, not_function = TRUE)
-  validate_input(na_as_category, "na_as_category", objmode = "logical", len = 1,
-                 input_set = c(TRUE, FALSE), not_na = TRUE, not_function = TRUE)
   categories <- data.frame(categories)
   categories <- as.data.frame(lapply(categories, factor, exclude = NULL))
   combine_by <- ifelse(use_combinations, " * ", " + ")
