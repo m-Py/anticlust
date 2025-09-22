@@ -4,12 +4,11 @@ If you use any anticlustering methods from the `anticlust` package in your resea
 
 - Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition data sets into equivalent parts. *Psychological Methods, 26*(2), 161--174. https://doi.org/10.1037/met0000301
 
-The functions that implement anticlustering methods are currently:
+If you are using `anticlust` in the context of medical research (in particular, to assign samples to batches for high-throughput sequencing), this paper may also serve as a generic citation of the `anticlust` package:
 
-- `anticlustering()`
-- `kplus_anticlustering()`
-- `bicriterion_anticlustering()`
-- `fast_anticlustering()`
+- Papenberg, M., Wang, C., Diop, M., Bukhari, S. H., Oskotsky, B., Davidson, B. R., ... & Oskotsky, T. T. (2025). Anticlustering for sample allocation to minimize batch effects. *Cell Reports Methods, 5*(8). https://doi.org/10.1016/j.crmeth.2025.101137
+
+However, not all methods implemented in `anticlust` have been described in these papers. To give appropriate credit, note the following contributions: 
 
 If you use the bicriterion anticlustering heuristic by Brusco et al. (2020), you should also cite their paper: 
 
@@ -17,11 +16,35 @@ If you use the bicriterion anticlustering heuristic by Brusco et al. (2020), you
 
 You are using the algorithm by Brusco et al. (2020) if you use the function `anticlustering()` with the argument `method = "brusco"` or if you are using the function `bicriterion_anticlustering()`.
 
-If you use k-plus anticlustering, you should cite the following reference:
+If you use *k*-plus anticlustering, you should cite the following reference:
 
 - Papenberg, M. (2024). K-plus Anticlustering: An Improved k-means Criterion for Maximizing Between-Group Similarity. *British Journal of Mathematical and Statistical Psychology, 77* (1), 80--102. https://doi.org/10.1111/bmsp.12315
 
-You are using k-plus anticlustering if you use the function `anticlustering()` with the argument `objective = "kplus"` or if you are using the function `kplus_anticlustering()` or `kplus_moment_variables()` (e.g. as input for `fast_anticlustering()`).
+You are using *k*-plus anticlustering if you use the function `anticlustering()` with the argument `objective = "kplus"` or if you are using the function `kplus_anticlustering()` or `kplus_moment_variables()` (e.g. as input for `fast_anticlustering()`).
+
+If you are using the three phase search algorithm you should cite the paper by Yang et al (2022):
+
+- Yang, X., Cai, Z., Jin, T., Tang, Z., & Gao, S. (2022). A three-phase search approach with dynamic population size for solving the maximally diverse grouping problem. *European Journal of Operational Research, 302*(3), 925--953. https://doi.org/10.1016/j.ejor.2022.02.003
+
+You are using the three phase search algorithm if you are using `anticlustering()` with `method = "3phase"` or if you are using the function `three_phase_search_anticlustering()`.
+
+If you are using cannot-link constraints by using the argument `cannot_link` in `anticlustering()`, this is the relevant paper:
+
+- Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. (in press). Extending the Bicriterion Approach for Anticlustering: Exact and Hybrid Approaches. *Psychometrika*.
+
+If you are using must-link constraints by using the argument `must_link` in `anticlustering()`, this is the relevant paper:
+
+- Papenberg, M., Wang, C., Diop, M., Bukhari, S. H., Oskotsky, B., Davidson, B. R., ... & Oskotsky, T. T. (2025). Anticlustering for sample allocation to minimize batch effects. *Cell Reports Methods, 5*(8). https://doi.org/10.1016/j.crmeth.2025.101137
+
+If you are using the average diversity objective, the following is the appropriate reference:
+
+- Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. (in press). Extending the Bicriterion Approach for Anticlustering: Exact and Hybrid Approaches. *Psychometrika*.
+
+You are using the average diversity objective when you are using `objective = "average-diversity"` in `anticlustering()` or `average_diversity = TRUE` in `bicriterion_anticlustering()`.
+
+If you are using the function `optimal_dispersion()`, this is the appropriate reference: 
+
+- Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. (in press). Extending the Bicriterion Approach for Anticlustering: Exact and Hybrid Approaches. *Psychometrika*.
 
 ## References for anticlustering algorithms
 
@@ -29,7 +52,11 @@ The default anticlustering algorithm `method = "exchange"` was described in Pape
 
 Papenberg and Klau (2021) presented an adaptation of the LCW method to incorporate categorical constraints in the anticlustering process (i.e,, ensure that a nominal variable is as evenly distributed as possible between groups). This extension is used when specifying the `categories` argument in `anticlustering()`. The function `categorical_sampling()` implements the stratified split that initially balances the categories across clusters, and is internally called by `anticlustering()`. Papenberg and Klau (2021) also discuss using a reduced number of exchange partners when the LCW algorithm runs; this happens when using the function `fast_anticlustering()` and specifying the argument `k_neighbours`.
 
-The optimal anticlustering method based on integer linear programming (i.e., `method = "ilp"`) was presented in Papenberg and Klau (2021). This ILP is an extension of the model by Grötschel and Wakabayashi (1989).
+The optimal anticlustering method for maximum **diversity** based on integer linear programming (i.e., `method = "ilp"`) was presented in Papenberg and Klau (2021). This ILP is an extension of the model by Grötschel and Wakabayashi (1989).
+
+The optimal anticlustering method for maximum **dispersion** based on integer linear programming was presented in Papenberg, Breuer, et al. (in press). This method is also used by the function `optimal_dispersion()`. 
+
+The three phase search algorithm algorithm was developed by Yang et al. (2022).
 
 ## References for anticlustering objectives
 
@@ -41,7 +68,7 @@ In the context of anticlustering problems, the **dispersion** objective has for 
 
 **K-plus** anticlustering was introduced by Papenberg (2024). The k-plus criterion extends the k-means objective, but it no longer has a (reversed) clustering interpretation. Thus, no earlier references exist that discuss the k-plus criterion in the context of cluster analysis. 
 
-This list on literature on anticlustering objectives is necessarily not exhaustive. However, if you feel that important references are missing, please tell me <a href="mailto:martin.papenberg@hhu.de">via email</a>.
+The average diversity (`objective = "average-diversity"`) was discussed in Papenberg, Breuer, et al. (2025), where the term average diversity was first employed. The objective (without the term average diversity) was also used by Mohebi et al. (2022). I am not aware of other earlier usages in the context of anticlustering applications. In the context of cluster analysis, the mathematical reversal of the average diversity objective was already considerd by Friedman and Rubin (1967); maybe earlier references exist.
 
 ## Cluster analysis
 
@@ -71,13 +98,21 @@ Gallego, M., Laguna, M., Marti, R., & Duarte, A. (2013). Tabu search with strate
 maximally diverse grouping problem. *Journal of the Operational Research Society, 64*, 724--
 734. https://doi.org/10.1057/jors.2012.66
 
+Friedman, H. P., & Rubin, J. (1967). On some invariant criteria for grouping data. *Journal of the American Statistical Association, 62*(320), 1159--1178.
+
 Grötschel, M., & Wakabayashi, Y. (1989). A cutting plane algorithm for a clustering problem. *Mathematical Programming, 45*, 59-96.
 
 Jain, A. K. (2010). Data clustering: 50 years beyond k-means. *Pattern Recognition Letters, 31*, 651--666.
 
-Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition data sets into equivalent parts. *Psychological Methods, 26*(2), 161--174. https://doi.org/10.1037/met0000301
+Mohebi, S., Zanella, A., & Zorzi, M. (2022). *Pilot reuse in cell-free massive MIMO systems: A diverse clustering approach*. arXiv. https://doi.org/10.48550/arXiv.2212.08872
 
 Papenberg, M. (2024). K-plus Anticlustering: An Improved k-means Criterion for Maximizing Between-Group Similarity. *British Journal of Mathematical and Statistical Psychology, 77* (1), 80--102. https://doi.org/10.1111/bmsp.12315
+
+Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. (in press). Extending the Bicriterion Approach for Anticlustering: Exact and Hybrid Approaches. *Psychometrika*.
+
+Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition data sets into equivalent parts. *Psychological Methods, 26*(2), 161--174. https://doi.org/10.1037/met0000301
+
+Papenberg, M., Wang, C., Diop, M., Bukhari, S. H., Oskotsky, B., Davidson, B. R., ... & Oskotsky, T. T. (2025). Anticlustering for sample allocation to minimize batch effects. *Cell Reports Methods, 5*(8). https://doi.org/10.1016/j.crmeth.2025.101137
 
 Späth, H. (1986). Anticlustering: Maximizing the variance criterion. *Control and Cybernetics*, 15, 213--218.
 
