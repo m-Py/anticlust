@@ -8,8 +8,9 @@
 #' Implements anticlustering methods as described in Papenberg and
 #' Klau (2021; <doi:10.1037/met0000301>), Brusco et al. 
 #' (2020; <doi:10.1111/bmsp.12186>), Papenberg (2024; 
-#' <doi:10.1111/bmsp.12315>), and Papenberg et al. (2025; 
-#' <doi:10.1101/2025.03.03.641320>).
+#' <doi:10.1111/bmsp.12315>), Papenberg, Wang, et al. (2025; 
+#' <doi:10.1016/j.crmeth.2025.101137>), Papenberg, Breuer, et al. (2025; 
+#' <doi:10.31234/osf.io/wkqhx_v1), and Yang et al. (2022; <doi:10.1016/j.ejor.2022.02.003>). 
 #'
 #' @param x The data input. Can be one of two structures: (1) A
 #'     feature matrix where rows correspond to elements and columns
@@ -29,7 +30,7 @@
 #'     natively supported. May also be a user-defined function. See
 #'     Details.
 #' @param method One of "exchange" (default) , "local-maximum",
-#'     "brusco", "ilp", or "2PML".  See Details.
+#'     "brusco", "ilp", "2PML", or "3phase".  See Details.
 #' @param preclustering Boolean. Should a preclustering be conducted
 #'     before anticlusters are created? Defaults to \code{FALSE}. See
 #'     Details.
@@ -189,6 +190,14 @@
 #' objectives (diversity and dispersion). Thus, to fully utilize the
 #' BILS algorithm, use the function
 #' \code{\link{bicriterion_anticlustering}}.
+#' 
+#' Since version 0.8.12, \code{method = "3phase"} calls the three phase search algorithm 
+#' for anticlustering by Yang et al. (2022). For anticlust, we implemented some
+#' changes of their default procedure, in particular they used a maximum "time"
+#' that the algorithm runs before terminating. For consistency with our other 
+#' methods in anticlust, we are however using a maximum number of repetitions. 
+#' Our default is 50 repetitions, which may be increased (but not decreased!) 
+#' with the \code{repetitions} argument. 
 #'
 #' \strong{Optimal anticlustering}
 #'
@@ -273,14 +282,15 @@
 #' be selected as solver (which is even faster than Symphony). As of version 0.8.11, 
 #' it is also possible to use \code{cannot_link} as a vector. In this case it 
 #' is ensured that elements having the same value in \code{cannot_link} are not
-#' linked in the same cluster. 
+#' linked in the same cluster. The methods for handling \code{cannot_link} constraints
+#' have been described in Papenberg, Breuer, et al. (2025). 
 #' 
 #' Must-link constraints are passed as a single vector of length \code{nrow(x)}.
 #' Positions that have the same numeric index are assigned to the same anticluster 
 #' (if the constraints can be fulfilled). When including must-link constraints, 
 #' \code{method = "2PML"} performs a specialized search heuristic that potentially
 #' yields better results than \code{method = "local-maximum"}. The must-link 
-#' functionality and the 2PML algorithm was introduced in Papenberg et al. (2025).
+#' functionality and the 2PML algorithm was introduced in Papenberg, Wang, et al. (2025).
 #' 
 #' The examples illustrate the usage of the \code{must_link} and \code{cannot_link}
 #' arguments. Currently, the different kinds of constraints (arguments \code{must_link}, 
@@ -411,6 +421,10 @@
 #' approach. British Journal of Mathematical and Statistical
 #' Psychology, 73, 275-396. https://doi.org/10.1111/bmsp.12186
 #' 
+#' Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. 
+#' (in press). Extending the Bicriterion Approach for Anticlustering: 
+#' Exact and Hybrid Approaches. Psychometrika.
+#' 
 #' Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition 
 #' data sets into equivalent parts. Psychological Methods, 26(2), 
 #' 161–174. https://doi.org/10.1037/met0000301.
@@ -431,6 +445,11 @@
 #' Weitz, R. R., & Lakshminarayanan, S. (1998). An empirical comparison of 
 #' heuristic methods for creating maximally diverse groups. Journal of the 
 #' Operational Research Society, 49(6), 635-646. https://doi.org/10.1057/palgrave.jors.2600510
+#' 
+#' Yang, X., Cai, Z., Jin, T., Tang, Z., & Gao, S. (2022). A three-phase search 
+#' approach with dynamic population size for solving the maximally diverse grouping 
+#' problem. European Journal of Operational Research, 302(3), 925-953. 
+#' https://doi.org/10.1016/j.ejor.2022.02.003
 #'
 
 anticlustering <- function(x, K, objective = "diversity", method = "exchange",
@@ -490,9 +509,14 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   }
   
   if (method == "3phase") {
+    if (length(K) == NUMBER_OF_ANTICLUSTERS) {
+      clusters <- K
+    } else {
+      clusters <- NULL
+    }
     return(
       three_phase_search_anticlustering(
-        x, K = NUMBER_OF_ANTICLUSTERS, N = N, 
+        x, K = NUMBER_OF_ANTICLUSTERS, N = N, clusters = clusters,
         number_iterations = min(repetitions, 50)
       )
     )
