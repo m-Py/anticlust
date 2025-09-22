@@ -36,7 +36,7 @@ Imports:
     lpSolve
 Suggests: 
     knitr,
-    palmerpenguins,
+    MASS,
     Rglpk,
     rmarkdown,
     Rsymphony,
