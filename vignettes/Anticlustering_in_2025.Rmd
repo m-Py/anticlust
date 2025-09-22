@@ -1,5 +1,5 @@
 ---
-title: "Data handling for anticlustering"
+title: "Anticlustering in 2025"
 output: rmarkdown::html_vignette
 author: Martin Papenberg
 vignette: >
@@ -21,15 +21,23 @@ set.seed(1)
 library(anticlust)
 ```
 
-This vignette is (in September 2025) the most up-to-date reference for doing anticlustering. Here, I summarize some of the things I learned about---or implemented for---anticlustering, which may not be documented in earlier work (e.g., papers, other vignettes). 
+This vignette is (in September 2025) the most up-to-date reference for doing anticlustering. Here, I summarize some of the things I learned about---or implemented for---anticlustering, which may not be documented in earlier work (e.g., papers, other vignettes). For example, if you have used `anticlust` before, you may be interested to know about recent changes, available from version 0.8.12 onward: 
 
-To reproduce the following example, install the "MASS" package that contains the `survey` data set that is used.
+- Categorical variables can now be directly included as the data input when defined as `factor`s (which is R's data structure for categorical variables)
+- Missing values are now handled directly by `anticlustering()`
+
+I will use these changes in the running example below. Of course, in both cases (categorical variables and `NA`s), a more specialized handling could be preferred in certain settings; defaults can never be optimal for all applications. 
+
+Moreover, we have implemented the three phase search algorithm by [Yang et al.](https://doi.org/10.1016/j.ejor.2022.02.003), which seems to be the most powerful algorithm for anticlustering that we have included so far. I will showcase it below. 
+
+To reproduce the running example, install the "MASS" package that contains the `survey` data set that is used.
 
 ```{r}
 library(MASS)
 data(survey)       # load data set
 nrow(survey)       # number of students
 head(survey, n=10) # look at the data
+sapply(survey, anyNA) # most variables contain missing values
 ``` 
 
 The `survey` data set contains some demographic information on a student sample. Imagine you wish to assign students to three different dormitories and want to create a similar groups of students in each house. In this example I will use the following features (brackets contain the description contained in the R documentation, `?MASS::survey`):
@@ -41,23 +49,245 @@ The `survey` data set contains some demographic information on a student sample.
 - `Exer`: how often the student exercises. (Factor, with levels "Freq" (frequently), "Some", "None".)
 - `Smoke`: how much the student smokes. (Factor, levels "Heavy", "Regul" (regularly), "Occas" (occasionally), "Never".)
 
+All of the categorical features are already defined as factor variables, which I will make use of. 
 
-**Categorical features:**
+**Numeric features:**
 
 - `Pulse`: pulse rate of student (beats per minute).
 - `Height`: height of the student in centimetres.
 - `Age`: age of the student in years.
 
-I will select these features as two separate data frames, one for categorical features and one for the numeric features. 
+I will select these features as a new data frame and apply the default anticlustering method to create 3 equal-sized groups.
 
 ```{r}
 
 features <- c("Sex", "W.Hnd", "Exer", "Smoke", "Pulse", "Height", "Age")
 
-survey$House <- anticlustering(survey[, features], K = 3, objective = "kplus", standardize = TRUE, method = "3phase")
+survey$House <- anticlustering(
+  survey[, features], 
+  K = 3
+)
 
+```
+
+I use the `tableone` package to illustrate the descriptive statistics by group. For numeric variables, we get means and standard deviations; for categorical variables, we get counts and percentages. It even gives a *p*-value as a (sort of) measure of imbalance among houses for each variable. For categorical variables, the *p*-value is the result of a chi squared test. Higher values indicate that the observed distribution of categories among houses is more uniform. For numeric variables, the `oneway.test` is used, which compares 2 or several means (for 2 means, it is equivalent to the *t*-test). Higher *p*-values indicate less discrepancy between group means (however, other characteristics such as the standard deviation are not considered).
+
+```{r}
 library(tableone)
 
 CreateTableOne(features, strata = "House", data = survey)
 
 ```
+
+By default, the `anticlustering()` method maximizes the `diversity` objective, which strives for a similar overall data distribution among groups. It is difficult to assess the adequateness of the solution without a comparison. So let us first add an random assignment as baseline comparison: 
+
+```{r}
+survey$Rnd_House <- sample(survey$House)
+
+CreateTableOne(features, strata = "Rnd_House", data = survey)
+
+```
+
+The *p*-values tend to be lower, and the *p*-value for height would even be considered "significant" in an inference testing setting (however, note that such an interpretation is not appropriate in this setting). So, apparently, anticlustering helped to form a more even observed distribution of the input variables among houses. 
+
+## Improving the results
+
+I think that the result from the "default" anticlustering method are okay'ish. However, let's assume we want to ensure an even more optimized assignment where the variables are more even among houses. Here I list three options:
+
+- Use standardization (**always recommended**)
+- Use better algorithm (**always recommended**)
+- Change the objective function (**recommended depending on requirements of application**)
+
+### Standardization
+
+A first step to improve results is using standardization. It always should be used (especially when using categorical and numeric variables), but as discussed elsewhere, it is not the default. Let's repeat our previous code but now use standardization with the `standardize` argument. 
+
+```{r}
+survey$House2 <- anticlustering(
+  survey[, features], 
+  K = 3,
+  standardize = TRUE
+)
+
+CreateTableOne(features, strata = "House2", data = survey)
+
+```
+
+Standardization has a remarkable effect, in particular on the categorical variables. So you definitely should use it: It ensures that all variables are equally important when conducting anticlustering. 
+
+### Using a better algorithm
+
+The `method` argument determines the algorithm, which conducts the anticlustering optimization. The default is `exchange`, which is a compromise between speed and solution quality. In many applications, it is possible to use a better algorithm because speed is not an issue. Using method = `local-maximum` basically maintains the same algorithm, but runs longer until a so-called local maximum is reached. It would be a good next step. However, here I directly use the tree phase search algorithm, which is new in `anticlust` and outperforms the `local-maximum` method. Oftentimes, it is even faster. 
+
+```{r}
+survey$House3 <- anticlustering(
+  survey[, features], 
+  K = 3,
+  standardize = TRUE,
+  method = "3phase"
+)
+CreateTableOne(features, strata = "House3", data = survey)
+```
+
+It seems that using the improved algorithm also translated into a more even distribution of variables among groups. 
+
+### Changing the objective function
+
+In some settings we may be interests in optimizing similarity with regard to certain distribution characteristics among groups. One possibility is to focus on the average of each variable. Though I strongly discourage focusing on mean values alone (e.g., see Papenberg, 2024), let's discuss here how it could be done. To just focus on mean values, we can replace the default diversity objective by the *k*-means criterion (also called the *variance*). The objective function is set via the `objective` argument. It defines how the similarity between groups is computed and it is the so called optimization criterion; the anticlustering algorithm proceeds in such a way that the grouping maximizes the objective function. 
+
+```{r}
+survey$House4 <- anticlustering(
+  survey[, features], 
+  K = 3,
+  standardize = TRUE,
+  method = "3phase",
+  objective = "variance"
+)
+CreateTableOne(features, strata = "House4", data = survey)
+
+```
+
+Overall, using the variance objective does not really seem to improve results. Maybe, the mean values for `Pulse` are more evenly distributed. Additionally, we can see that the standard deviations for some of the numeric variables (in particular, `Pulse`) are highly dissimilar. Thus, the distribution of this variable is not similar between groups even though the means are similar: Group 1 has little spread around the mean and thus consists of "average" students regarding pulse; group 3 has a large spread around the mean and therefore tends to consist of students with either very high or very low pulse. This even can be illustrated visually, when using house affiliation to color the Pulse values: 
+
+```{r}
+
+colors <- c("#a9a9a9", "#df536b", "#61d04f")
+
+ord <- order(survey$Pulse)
+# Plot the data while visualizing the different clusters
+plot(
+  survey$Pulse[ord], 
+  col = colors[survey$House4[ord]], 
+  pch = 19, 
+  ylab = "Pulse", 
+  xlab = "Students (ordered by pulse)"
+)
+legend("bottomright", legend = paste("Group", 1:3), col = colors, pch = 19)
+
+```
+
+This plot is an astonishing illustration why the *k*-means objective can be problematic (and why you should not only rely on *p* values to assess whether the distribution of numeric variables differs between groups). Admittedly, this problem also occurred with the previous solution that used the default diversity objective. However, it is more likely to occur with the *k*-means approach.
+
+Let's use the *k*-plus objective that tries to correct for the mean/SD problem by trying to match both means and standard deviations of the input variables:
+
+```{r}
+survey$House5 <- anticlustering(
+  survey[, features], 
+  K = 3,
+  method = "3phase",
+  objective = "kplus",
+  standardize = TRUE
+)
+CreateTableOne(features, strata = "House5", data = survey)
+
+```
+
+This solution has the most even distribution for the pulse variable of all our solutions. However, it is slightly worse with regard to balance in the handedness variable. This shows that there is oftentimes no unique best solution, and there are tradeoffs to consider. For example, using more variables makes the problem harder on an algorithmic level. We might ask if it is necessary to balance handedness between houses? If not, we may leave out the variable? Or is some loss in balance acceptable for some variables? In this application, I would argue that the imbalance in handedness is not severe (right handedness differs between 93.7% and 89.7% between houses). However, the imbalance observed in the standard deviation of the pulse variable---that we obtained when using the diversity and *k*-means objectives---could be considered severe. So we might want to stick with the *k*-plus solution. In an actual application this decision is up to the user, it cannot be done automatically or optimally by an algorithm. You should try out different approaches and use the one which is best for your case. 
+
+### Unequal group sizes
+
+Let's assume we have three different sized houses. We can incorporate this using the `K` argument by describing the size of each group. Some things are to consider with this change in requirements. First, let's just repeat the anticlustering assignment using the default diversity objective, but using different group sizes. 
+
+```{r}
+survey$House6 <- anticlustering(
+  survey[, features], 
+  K = c(137, 50, 50),
+  standardize = TRUE,
+  method = "3phase"
+)
+CreateTableOne(features, strata = "House6", data = survey)
+```
+
+Wow, this is really bad! We certainly would not want such an assignment. For the categorical variables, we now have strongly different distributions. For the numeric variables, mean values are similar between groups, but the standard deviations are highly different. Why did this happen? **The diversity is actually not a good measure of between-group similarity when group sizes are unequal.** We could use the "average diversity", which takes into consideration group sizes. Currently, the three phase algorithm only supports the diversity objective for unequal-sized groups, so we must choose a "classical" algorithm:
+
+```{r}
+survey$House7 <- anticlustering(
+  survey[, features], 
+  K = c(137, 50, 50),
+  standardize = TRUE,
+  method = "local-maximum",
+  repetitions = 10, # increasing repetitions may be helpful with method = "local-maximum"
+  objective = "average-diversity"
+)
+CreateTableOne(features, strata = "House7", data = survey)
+```
+
+This looks much better! Still, the pulse variable seems to produce some weird results with a diversity-based objective, so we may again prefer the *k*-plus objective, which is also adequate for unequal-group sizes: 
+
+```{r}
+survey$House8 <- anticlustering(
+  survey[, features], 
+  K = c(137, 50, 50),
+  standardize = TRUE,
+  method = "local-maximum",
+  repetitions = 10, 
+  objective = "kplus"
+)
+CreateTableOne(features, strata = "House8", data = survey)
+```
+
+It seems that now the age variable suffers from differences in standard deviations, albeit to a lesser degree than the pulse variable when using the average diversity objective. Solving this issue is not trivial. When inspecting the variable, we find out that it is highly skewed with 2 outliers of age > 70:
+
+```{r}
+hist(survey$Age)
+sort(survey$Age, decreasing = TRUE)[1:10]
+```
+
+We can try to enforce passing these two students to different houses. This can be done by creating a new categorical variable encoding if a student is an outlier regarding age. This variable can be passed to the `categories` argument. The `categories` argument implements hard constraints on the assignment of categorical variables. 
+
+```{r}
+survey$is_age_outlier <- factor(survey$Age > 70)
+survey$House9 <- anticlustering(
+  survey[, features], 
+  K = c(137, 50, 50),
+  standardize = TRUE,
+  method = "local-maximum",
+  repetitions = 10, 
+  objective = "kplus",
+  categories = survey$is_age_outlier
+)
+CreateTableOne(features, strata = "House9", data = survey)
+```
+
+The age outliers are now assigned to different houses, which was not the case with our previous assignment: 
+
+```{r}
+table(survey$is_age_outlier, survey$House9) # new assignment using `categories` argument
+table(survey$is_age_outlier, survey$House8) # old assignment not using `categories` argument
+```
+
+In total, I think the the results are now slightly improved due to enforcing to balance the age outliers. Still, with an uneven distribution as observed here for age, creating similar (unequal-sized!) groups with regard to many variables is not a trivial issue. It really is quite a difficult problem; anticlustering is our best shot at solving it satisfactorily nevertheless. However, anticlustering cannot solve issues with the data themselves.
+
+## Further reading
+
+If you require some theoretical background on the stuff discussed here, here you go: 
+
+### Categorical variables
+
+In the original introduction of the `anticlust` package (Papenberg and Klau, 2021), we introduced the handling of categorical variables as hard constraints via the `categories` argument. In Papenberg, Wang., et al. (2025), we discussed using binary ("one hot") encoding for categorical variables and using them as part of the optimization criterion (i.e., the first argument in `anticlustering()`). 
+
+### Objectives
+
+The diversity objective has long been known in the context of anticlustering and cluster analysis. The *k*-plus criterion was presented in Papenberg (2024), and the average diversity was discussed in Papenberg, Breuer, et al. (2025), where the term average diversity was first employed. The objective was also used by Mohebi et al. (2022). I am not aware of other earlier usages in the context of anticlustering applications.
+
+### Algorithms
+
+The default anticlustering algorithm method = "exchange" was described in Papenberg and Klau (2021). However, this algorithm is actually just a shorter version of the local maximum method (i.e., method = "local-maximum"), which corresponds to the algorithm "LCW" by Weitz and Lakshminarayanan (1996, 1998). The three phase search algorithm for anticlustering was presented by Yang et al. (2022). For `anticlust`, we implemented some changes of their default procedure, in particular they used a maximum "time" that the algorithm runs before terminating. For consistency with our other methods in `anticlust`, we are however using a maximum number of "repetitions". Our default is 50 repetitions, which may be increased (but not decreased!) with the `repetitions` argument in `anticlustering()`. This adaptation was described and evaluated by Hengelbrock (2024). 
+
+## References
+
+Hengelbrock, H. (2024). *Evaluating the three-phase search approach with dynamic population size for anticlustering*. Unpublished bachelor thesis.  
+
+Mohebi, S., Zanella, A., & Zorzi, M. (2022). *Pilot reuse in cell-free massive MIMO systems: A diverse clustering approach*. arXiv. https://doi.org/10.48550/arXiv.2212.08872
+
+Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition data sets into equivalent parts. *Psychological Methods, 26*(2), 161--174. https://doi.org/10.1037/met0000301
+
+Papenberg, M., Wang, C., Diop, M., Bukhari, S. H., Oskotsky, B., Davidson, B. R., ... & Oskotsky, T. T. (2025). Anticlustering for sample allocation to minimize batch effects. *Cell Reports Methods, 5*(8). https://doi.org/10.1016/j.crmeth.2025.101137
+
+Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. (in press). Extending the Bicriterion Approach for Anticlustering: Exact and Hybrid Approaches. *Psychometrika*.
+
+Weitz, R. R., & Lakshminarayanan, S. (1996). On a heuristic for the final exam scheduling problem. *Journal of the Operational Research Society, 47*(4), 599--600.
+
+Weitz, R. R., & Lakshminarayanan, S. (1998). An empirical comparison of heuristic methods for creating maximally diverse groups. *Journal of the Operational Research Society, 49*(6), 635--646. https://doi.org/10.1057/palgrave.jors.2600510
+
+Yang, X., Cai, Z., Jin, T., Tang, Z., & Gao, S. (2022). A three-phase search approach with dynamic population size for solving the maximally diverse grouping problem. *European Journal of Operational Research, 302*(3), 925--953. https://doi.org/10.1016/j.ejor.2022.02.003
