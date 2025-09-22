@@ -15,6 +15,7 @@ input_validation_anticlustering <- function(x, K, objective, method,
   x <- as.matrix(x)
   N <- nrow(x)
   unequal_group_sizes <- (length(K) != 1) && (sd(table(initialize_clusters(N, K, NULL))) != 0)
+  initial_grouping_passed <- length(K) == N
 
   validate_input(
     method, "method", len = 1,
@@ -23,11 +24,15 @@ input_validation_anticlustering <- function(x, K, objective, method,
   )
   
   if (method == "3phase") {
-    if (objective == "dispersion") {
+    if (is.function("objective")) stop("objective can only be a function with method = 'exchange' or method = 'local-maximum'.")
+    if (objective %in% "dispersion") {
       stop("objective = dispersion does not work with the 3 phase search algorithm.")
     }
-    if (unequal_group_sizes) {
-      stop("The 3 phase algorithm currently only works with equal-sized groups.")
+    if (unequal_group_sizes && objective %in% c("average-diversity", "variance", "kplus")) {
+      stop("The three phase algorithm does not support the average diversity, variance and k-plus objective for unequal-sized groups.")
+    }
+    if (initial_grouping_passed) {
+      stop("The 3 phase algorithm does not handle passing an initial grouping via argument `K`.")
     }
   }
   
