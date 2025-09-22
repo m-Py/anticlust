@@ -41,7 +41,8 @@ Suggests:
     rmarkdown,
     Rsymphony,
     tinytest,
-    gurobi
+    gurobi,
+    tableone
 VignetteBuilder: 
     knitr,
     rmarkdown
