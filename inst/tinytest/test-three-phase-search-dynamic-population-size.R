@@ -151,9 +151,3 @@ a1 <- anticlustering(data, K = 3, standardize = TRUE, objective = "kplus")
 a2 <- anticlustering(data, K = 3, method = "3phase", standardize = TRUE, objective = "kplus")
 mean_sd_tab(data, a1)
 mean_sd_tab(data, a2)
-
-expect_error(
-  anticlustering(data, K = c(12, 12, 96-24), method = "3phase"),
-  pattern = "equal-sized"
-)
-

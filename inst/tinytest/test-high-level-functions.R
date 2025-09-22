@@ -10,7 +10,7 @@ for (k in 1:nrow(conditions)) {
   features <- matrix(rnorm(n_elements * m_features), ncol = m_features)
   clusters_exact <- balanced_clustering(features, K = n_clusters, method = "ilp")
   clusters_heuristic <- balanced_clustering(features, K = n_clusters,
-                                            method = "heuristic")
+                                            method = "centroid")
   ## Check that output is valid
   expect_equal(anticlust:::legal_number_of_clusters(features, clusters_exact), NULL)
   expect_equal(anticlust:::legal_number_of_clusters(features, clusters_heuristic), NULL)
@@ -72,3 +72,4 @@ for (i in 1:nrow(conditions)) {
 }
 ## Exact solution must be best:
 expect_equal(all(round(storage["no_preclustering", "ilp"], 10) >= round(c(storage), 10)), TRUE)
+

@@ -15,40 +15,25 @@ groups1 <- anticlustering(
 )
 
 groups2 <- anticlustering(
-  cbind(df, anticlust:::squared_from_mean(df)),
-  K = init,
-  objective = "variance"
-)
-
-groups3 <- anticlustering(
   kplus_moment_variables(df, T = 2, standardize = FALSE), 
   K = init,
   objective = "variance"
 )
 
 expect_true(all(groups1 == groups2))
-expect_true(all(groups1 == groups3))
 
 # add test with standardize argument
-groups4 <- anticlustering(
+groups3 <- anticlustering(
   df,
   K = init,
   objective = "kplus",
   standardize = TRUE
 )
 
-groups5 <- anticlustering(
-  scale(cbind(df, anticlust:::squared_from_mean(df))),
-  K = init,
-  objective = "variance",
-  standardize = FALSE
-)
-
-groups6 <- anticlustering(
+groups4 <- anticlustering(
   kplus_moment_variables(df, T = 2), 
   K = init,
   objective = "variance"
 )
 
-expect_true(all(groups4 == groups5))
-expect_true(all(groups4 == groups6))
+expect_true(all(groups3 == groups4))
