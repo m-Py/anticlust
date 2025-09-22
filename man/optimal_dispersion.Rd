@@ -64,22 +64,22 @@ The dispersion is the minimum distance between two elements
   within the same group. This function implements an optimal method
   to maximize the dispersion. If the data input \code{x} is a
   feature matrix and not a dissimilarity matrix, the pairwise
-  Euclidean distance is used. It uses the algorithm presented in
+  Euclidean distance is used. It uses the algorithm OptDispF presented 
+  Papenberg, Breuer, et al. (in press). It was originally developed as part of 
   Max Diekhoff's Bachelor thesis at the Computer Science Department
   at Heinrich Heine University Düsseldorf.
 
   To find out which items are not allowed to be grouped in the same
   cluster for maximum dispersion, the algorithm sequentially builds
   instances of a graph coloring problem, using an integer linear
-  programming (ILP) representation (also see Fernandez et al.,
-  2013).  It is possible to specify the ILP solver via the argument
+  programming (ILP) representation. It is possible to specify the ILP solver via the argument
   \code{solver} (See \code{\link{optimal_anticlustering}} for more
   information on this argument). Optimally solving the maximum
   dispersion problem is NP-hard for K > 2 and therefore
   computationally infeasible for larger data sets. For K = 3 and K
   = 4, it seems that this approach scales up to several 100
   elements, or even > 1000 for K = 3 (at least when using the
-  Symphony solver).  For larger data sets, use the heuristic
+  Symphony or gurobi solver).  For larger data sets, use the heuristic
   approaches in \code{\link{anticlustering}} or
   \code{\link{bicriterion_anticlustering}}. However, note that for
   K = 2, the optimal approach is usually much faster than the
@@ -164,8 +164,9 @@ optimal_dispersion(unsolvable, K = c(2, 4)) # group sizes, not number of groups
 Diekhoff (2023). Maximizing dispersion for anticlustering. Retrieved from 
 https://www.cs.hhu.de/fileadmin/redaktion/Fakultaeten/Mathematisch-Naturwissenschaftliche_Fakultaet/Informatik/Algorithmische_Bioinformatik/Bachelor-_Masterarbeiten/2831963_ba_ifo_AbschlArbeit_klau_mapap102_madie120_20230203_1815.pdf  
 
-Fernández, E., Kalcsics, J., & Nickel, S. (2013). The maximum dispersion 
-problem. Omega, 41(4), 721–730. https://doi.org/10.1016/j.omega.2012.09.005
+Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. (in press). 
+Extending the Bicriterion Approach for Anticlustering: Exact and Hybrid Approaches. 
+Psychometrika.
 }
 \seealso{
 \code{\link{dispersion_objective}} \code{\link{anticlustering}}

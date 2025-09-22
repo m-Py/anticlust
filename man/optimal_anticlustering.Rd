@@ -42,7 +42,7 @@ that are available in anticlust.
 This is a wrapper for all optimal methods supported in anticlust
 (currently and in the future).  As compared to
 \code{\link{anticlustering}}, it allows to specify the solver to
-obtain an optimal solution and it can be used to obtain optimal
+obtain an optimal solution, a time limit, and it can be used to obtain optimal
 solutions for all supported anticlustering objectives (variance,
 diversity, k-plus, dispersion). For the objectives "variance",
 "diversity" and "kplus", the optimal ILP method in Papenberg and
@@ -54,14 +54,19 @@ distance is used. For k-plus anticlustering, the squared Euclidean
 distance based on the extended k-plus data matrix is used (see
 \code{\link{kplus_moment_variables}}).  For the diversity (and the
 dispersion), the Euclidean distance is used by default, but any
-user-defined dissimilarity matrix is possible.
+user-defined dissimilarity matrix is possible. The equivalence
+of the k-means/k-plus objectives and the diversity, which enables 
+using the ILP approach by Papenberg and Klau for the k-means/k-plus 
+objectives, was discussed in Papenberg, Breuer, et al. (in press). 
+Also see the examples. 
 
-The dispersion is solved optimal using the approach described in
-\code{\link{optimal_dispersion}}.
+
+The dispersion is solved optimal using the algorithm OptDispF presented in 
+Papenberg, Breuer, et al. (in press). Also see \code{\link{optimal_dispersion}}.
 
 The optimal methods make use of "solvers" that actually implement
 the algorithm for finding optimal solutions. The package anticlust
-supports three solvers:
+supports four solvers:
 
 \itemize{
   \item{The default solver lpSolve (<https://sourceforge.net/projects/lpsolve/>).}
@@ -74,7 +79,10 @@ supports three solvers:
   \item{The commercial gurobi solver, see https://www.gurobi.com/downloads/.}
 }
 
-For the maximum dispersion problem, it seems that the Symphony
+In general, the commercial gurobi solver is best at solving exact anticlustering
+problems. If you have a license to use it, use it!
+Among the open source alternatives, for the maximum dispersion problem, 
+it seems that the Symphony
 solver is fastest, while the lpSolve solver seems to be good for
 maximum diversity. However, note that in general the dispersion can
 be solved optimally for much larger data sets than the diversity.
@@ -94,6 +102,15 @@ optimal_anticlustering(dist(data)^2, K = 2, objective = "diversity")
 optimal_anticlustering(data, K = 2, objective = "kplus")
 optimal_anticlustering(dist(kplus_moment_variables(data, 2))^2, K = 2, objective = "diversity")
 
+}
+\references{
+Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition 
+data sets into equivalent parts. Psychological Methods, 26(2), 
+161–174. https://doi.org/10.1037/met0000301.
+
+Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. (in press). 
+Extending the Bicriterion Approach for Anticlustering: Exact and Hybrid Approaches. 
+Psychometrika.
 }
 \author{
 Martin Papenberg \email{martin.papenberg@hhu.de}
