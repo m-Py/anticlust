@@ -76,10 +76,6 @@ three_phase_search_anticlustering <- function(x, K, N, objective = "diversity",
     theta_max, theta_min, lower_bound, beta_max, beta_min, eta_max, alpha)
     
     distances <- convert_to_distances(x) 
-    
-    if (any(as.dist(distances) <= 0)) {
-      stop("The three phase algorithm cannot deal with dissimilarities <= 0.")
-    }
 
     if (is.null(lower_bound)) {
        lower_bound <- floor(N/K)
