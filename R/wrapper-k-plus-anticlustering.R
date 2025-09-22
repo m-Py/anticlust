@@ -175,7 +175,7 @@ kplus_anticlustering <- function(
 # function to compute features for variance
 # moment = 2 -> variance; 3 = skew; 4 = kurtosis
 moment_features <- function(data, moment = 2) {
-  apply(data, 2, function(x) (x - mean(x))^moment)
+  apply(data, 2, function(x) (x - mean(x, na.rm = TRUE))^moment)
 }
 
 # Compute k-covariances features for an original number of M features.
@@ -192,7 +192,7 @@ covariance_features <- function(data) {
   for (i in 1:nrow(feature_combinations)) {
     f1 <- feature_combinations[i, 1]
     f2 <- feature_combinations[i, 2]
-    cov_feature_matrix[, i] <- (data[, f1] - mean(data[, f1])) * (data[, f2] - mean(data[, f2]))
+    cov_feature_matrix[, i] <- (data[, f1] - mean(data[, f1], na.rm = TRUE)) * (data[, f2] - mean(data[, f2], na.rm = TRUE))
   }
   cov_feature_matrix
 }
