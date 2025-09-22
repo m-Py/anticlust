@@ -73,13 +73,7 @@ This function implements the bicriterion algorithm BILS for
 anticlustering by Brusco et al. (2020;
 <doi:10.1111/bmsp.12186>). The description of their algorithm is
 given in Section 3 of their paper (in particular, see the
-Pseudocode in their Figure 2). As of anticlust version 0.8.6, this
-function also includes some extensions to the BILS algorithm that
-are implemented through the optional arguments
-\code{dispersion_distances}, \code{average_diversity},
-\code{init_partitions}, and \code{return}. If these arguments are
-not changed, the function performs the "vanilla" BILS as described
-in Brusco et al.
+Pseudocode in their Figure 2).
 }
 \details{
 The bicriterion algorithm by Brusco et al. (2020) aims to
@@ -136,8 +130,14 @@ argument \code{dispersion_distances} can additionally be used if
 the dispersion should be computed on the basis of a different
 distance matrix.
 
-If multiple \code{init_partitions} are given, ensure that each
-partition (i.e., each row of\code{init_partitions}) has the exact
+As of anticlust version 0.8.6, this function includes some extensions 
+to the original BILS by Brusco et al. (2020). These extensions are are 
+implemented through the optional arguments \code{dispersion_distances}, 
+\code{average_diversity}, \code{init_partitions}, and \code{return}. 
+These additions changes were described in Papenberg, Breuer, et al. (in press). 
+If these arguments are not changed, the function performs the "vanilla" BILS 
+as described in Brusco et al. If multiple \code{init_partitions} are given, 
+ensure that each partition (i.e., each row of\code{init_partitions}) has the exact
 same output of \code{\link{table}}.
 }
 \note{
@@ -208,6 +208,10 @@ Psychology, 73, 275-396. https://doi.org/10.1111/bmsp.12186
 
 Breuer (2020). Using anticlustering to maximize diversity and dispersion:
 Comparing exact and heuristic approaches. Bachelor thesis.
+
+Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. 
+(in press). Extending the Bicriterion Approach for Anticlustering: 
+Exact and Hybrid Approaches. Psychometrika.
 }
 \author{
 Martin Breuer \email{M.Breuer@hhu.de}, Martin Papenberg
