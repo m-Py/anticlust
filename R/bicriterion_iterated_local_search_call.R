@@ -202,10 +202,6 @@ bicriterion_anticlustering <- function(
 
   distances <- convert_to_distances(x) 
   
-  if (any(as.dist(distances) <= 0)) {
-    stop("The three phase algorithm cannot deal with dissimilarities <= 0.")
-  }
-  
   N <- NROW(distances)
   WL <- length(W)
   if (is.null(R)) {
