@@ -20,7 +20,7 @@ set.seed(123)
 library(anticlust)
 ```
 
-In this vignette I explore two ways to incorporate categorical variables with anticlustering. The main function of `anticlust` is `anticlustering()`, and it has an argument `categories`. It can be used easily enough: We just pass the numeric variables as first argument (`x`) and our categorical variable(s) to `categories`. I will use the penguin data set to illustrate the usage: 
+In this vignette I explore some ways to incorporate categorical variables with anticlustering. The main function of `anticlust` is `anticlustering()`, and it has an argument `categories`. It can be used easily enough: We just pass the numeric variables as first argument (`x`) and our categorical variable(s) to `categories`. I will use the penguin data set to illustrate the usage: 
 
 ```{r}
 data(penguins)
@@ -78,42 +78,39 @@ The results for the sex variable are worse than previously when we only consider
 
 ## Categorical variables as numeric variables
 
-A second possibility to incorporate categorical variables is to treat them as numeric variables and use them as part of the first argument `x`, which is used to compute the anticlustering objective (e.g., the diversity or variance). This approach can lead to better results when multiple categorical variables are available, and / or if the group sizes are unequal. I discuss the approach by the example of k-means anticlustering, but using the diversity objective is also possible (in principle, any reasonable way to transform categorical variables to pairwise dissimilarities would work).
+A second possibility to incorporate categorical variables is to treat them as numeric variables and use them as part of the first argument `x`, which is used to compute the anticlustering objective (e.g., the diversity or variance). This approach can lead to better results when multiple categorical variables are available, and / or if the group sizes are unequal. Since version 0.8.12, we can use categorical variables as part of the first argument when they are defined as factors. Before that, we manually had to convert categorical variables into a binary representation via `categories_to_binary()`. Manual conversion can still be useful, as shown further below. 
 
-To use categorical variables as part of the anticlustering objective, we first generate a matrix of the categorical variables in binary representation using the `anticlust` convenience function `categories_to_binary()`.[^modelmatrix] Because k-means anticlustering optimizes similarity with regard to means, k-means anticlustering applied to this binary matrix will even out the proportion of each category in each group (this is because the mean of a binary variable is the proportion of `1`s in that variable).
+In the penguin data sets, all variables are already correctly coded, i.e., categorical variables are defined as factors. So I generate a data frame that includes all features -- numeric and categorical features -- and use it as input for anticlustering. 
 
-[^modelmatrix]: Internally, `categories_to_binary()` is wrapper around the base `R` function `model.matrix()`.
 
 ```{r}
-binary_categories <- categories_to_binary(df[, c("species", "sex")])
-# see ?categories_to_binary
-head(binary_categories)
+all_features <- data.frame(numeric_vars, df[, c("species", "sex")])
 ```
 
 ```{r}
 groups <- anticlustering(
-  binary_categories,
+  all_features,
   K = 3,
   method = "local-maximum", 
-  objective = "variance",
-  repetitions = 10,
   standardize = TRUE
 )
 table(groups, df$sex)
 table(groups, df$species)
 ```
 
-The results are quite convincing. In particular, the penguins' sex is better balanced than previously when we used the argument `categories`. If we have multiple categorical variables and / or unequal-sized groups, it may be useful to try out the k-means optimization version of including categorical variables, instead of (only) using the `categories` argument. If we also wish to ensure that the categorical variables *in their combination* are balanced between groups (i.e., the proportion of the penguins' sex is roughly the same for each species in each group), we could set the optional argument `use_combinations` of `categories_to_binary()` to `TRUE`:
+The results are quite convincing. In particular, the penguins' sex is better balanced than previously when we used the argument `categories`. If we have multiple categorical variables and / or unequal-sized groups, it may be useful to try out the k-means optimization version of including categorical variables, instead of (only) using the `categories` argument. 
 
+If we also wish to ensure that the categorical variables *in their combination* are balanced between groups (i.e., the proportion of the penguins' sex is roughly the same for each species in each group), we must do some manual data preparation. To use categorical variables as part of the anticlustering objective, we must generate a matrix of the categorical variables in binary representation using the `anticlust` convenience function `categories_to_binary()`.[^modelmatrix] This is done internally via `anticlustering()`, but in that case, combinations of categorical variables are not considered. To consider combinations, we can manually create our data set with binary categorical variables, setting the optional argument `use_combinations` of `categories_to_binary()` to `TRUE`:
+
+[^modelmatrix]: Internally, `categories_to_binary()` is wrapper around the base `R` function `model.matrix()`.
 
 ```{r}
 binary_categories <- categories_to_binary(df[, c("species", "sex")], use_combinations = TRUE)
+data_input <- data.frame(binary_categories, numeric_vars)
 groups <- anticlustering(
-  binary_categories,
+  data_input,
   K = 3,
-  method = "local-maximum", 
-  objective = "variance",
-  repetitions = 10,
+  method = "local-maximum",
   standardize = TRUE
 )
 table(groups, df$sex)
@@ -121,73 +118,6 @@ table(groups, df$species)
 table(groups, df$sex, df$species)
 ```
 
-Note that we only evenly distributed the categorical variable between groups and did not consider any numeric variables. Fortunately, also considering the numeric variables is possible, and can we accomplish that in two different ways: 
 
-(a) we first optimize similarity with regard to the categorical variable(s) via k-means anticlustering, and then insert the resulting group assignment as a "hard constraint" into `anticlustering()`
-(b) we simultaneous optimize similarity with regard to numeric and categorical variables
+---
 
-We discuss both approaches in the following.
-
-### a. Sequential optimization
-
-We use the output vector `groups` of the previous call to `anticlustering()`---which convincingly balanced our categorical variables---as input to the `K` argument in an additional call to `anticlustering()`. The `groups` vector is used as the initial group assignment before the anticlustering optimization starts. In this group assignment, the categories are already well balanced. We additionally pass the two categorical variables to `categories`, thus ensuring that the balancing of the categorical variable is never changed throughout the optimization process:[^exchange]
-
-[^exchange]: Only elements that have the same value in `categories` are exchanged between clusters throughout the optimization algorithm, so the initial balancing of the categories is never changed when the algorithm runs.
-
-```{r}
-final_groups <- anticlustering(
-  numeric_vars,
-  K = groups,
-  standardize = TRUE,
-  method = "local-maximum",
-  categories = df[, c("species", "sex")]
-)
-
-table(groups, df$sex)
-table(groups, df$species)
-mean_sd_tab(numeric_vars, final_groups)
-```
-
-The results are convincing, both with regard to the numeric variables and the categorical variables. 
-
-### b. Simultaneous optimization
-
-We can simultaneously consider the numeric and categorical variables in the optimization process. Note that this approach only works with the k-means and k-plus objectives, because only k-means adequately deals with the categorical variables (at least when using the approach described here). 
-Using the simultaneous approach, we just pass all variables (representing binary categories and numeric variables) as a single matrix to the first argument of `anticlustering()`. Do not use the `categories` argument here!
-
-```{r}
-final_groups <- anticlustering(
-  cbind(numeric_vars, binary_categories),
-  K = 3,
-  standardize = TRUE,
-  method = "local-maximum", 
-  objective = "variance",
-  repetitions = 10
-)
-
-table(groups, df$sex)
-table(groups, df$species)
-mean_sd_tab(numeric_vars, final_groups)
-```
-
-The following code extends the simultaneous optimization approach towards k-plus anticlustering, which ensures that standard deviations as well as means are similar between groups (and not only the means, which is achieved via standard k-means anticlustering):
-
-```{r}
-final_groups <- anticlustering(
-  cbind(kplus_moment_variables(numeric_vars, T = 2), binary_categories),
-  K = 3,
-  method = "local-maximum", 
-  objective = "variance", 
-  repetitions = 10
-)
-
-table(groups, df$sex)
-table(groups, df$species)
-mean_sd_tab(numeric_vars, final_groups)
-``` 
-
-While we use `objective = "variance"`---indicating that the k-means objective is used---this code actually performs k-plus anticlustering because the first argument takes as input the augmented k-plus variable matrix[^kplus]. We see that the standard deviations are now also quite evenly matched between groups (which is unlike when using standard k-means anticlustering). 
-
-[^kplus]: This is how k-plus anticlustering actually works: It reuses the k-means criterion but uses additional "k-plus" variables as input. More information on the k-plus approach is given in the documentation: `?kplus_moment_variables` and `?kplus_anticlustering`.
-
-In the end: You should try out the different approaches for dealing with categorical variables and see which one works best for you!
