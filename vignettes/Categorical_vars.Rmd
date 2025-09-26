@@ -98,9 +98,32 @@ table(groups, df$sex)
 table(groups, df$species)
 ```
 
-The results are quite convincing. In particular, the penguins' sex is better balanced than previously when we used the argument `categories`. If we have multiple categorical variables and / or unequal-sized groups, it may be useful to try out the k-means optimization version of including categorical variables, instead of (only) using the `categories` argument. 
+The results are quite convincing. In particular, the penguins' sex is better balanced than previously when we used the argument `categories`. If we have multiple categorical variables and / or unequal-sized groups, it may be useful to try out using categorical variables as factors, instead of using the `categories` argument. 
 
-If we also wish to ensure that the categorical variables *in their combination* are balanced between groups (i.e., the proportion of the penguins' sex is roughly the same for each species in each group), we must do some manual data preparation. To use categorical variables as part of the anticlustering objective, we must generate a matrix of the categorical variables in binary representation using the `anticlust` convenience function `categories_to_binary()`.[^modelmatrix] This is done internally via `anticlustering()`, but in that case, combinations of categorical variables are not considered. To consider combinations, we can manually create our data set with binary categorical variables, setting the optional argument `use_combinations` of `categories_to_binary()` to `TRUE`:
+```{r}
+binary_categories <- categories_to_binary(df[, c("species", "year")], use_combinations = FALSE)
+data_input <- data.frame(binary_categories, numeric_vars)
+groups <- anticlustering(
+  data_input,
+  K = 3,
+  method = "local-maximum",
+  standardize = TRUE
+)
+table(groups, df$year, df$species)
+
+binary_categories <- categories_to_binary(df[, c("species", "year")], use_combinations = TRUE)
+data_input <- data.frame(binary_categories, numeric_vars)
+groups <- anticlustering(
+  data_input,
+  K = 3,
+  method = "local-maximum",
+  standardize = TRUE
+)
+table(groups, df$year, df$species)
+
+```
+
+If we also wish to ensure that the categorical variables *in their combination* are balanced between groups (i.e., the proportion of the penguins' sex is roughly the same for each species in each group), we must do some manual data preparation. For anticlustering, categorical variables are converted into a binary representation via "one hot" encoding. The  `anticlust` package has the convenience function `categories_to_binary()`. for this purpose.[^modelmatrix] This is done internally via `anticlustering()` when using categorical variables as part of the data input (as factors). In that case, however, combinations of categorical variables are not considered. To consider combinations, we can manually create our data set with binary categorical variables, setting the optional argument `use_combinations` of `categories_to_binary()` to `TRUE`:
 
 [^modelmatrix]: Internally, `categories_to_binary()` is wrapper around the base `R` function `model.matrix()`.
 
