@@ -23,3 +23,4 @@ HOW_TO_CITE_ANTICLUST.md
 _pkgdown.yml
 .github/*
 
+^data-raw$
