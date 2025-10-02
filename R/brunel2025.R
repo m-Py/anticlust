@@ -1,0 +1,46 @@
+
+#' Completion norms for 403 French sentences
+#'
+#' @format A data frame with 403 rows and 7 variables
+#' \describe{
+#'   \item{target_word}{The word (in French)}
+#'   \item{sentence}{The sentence (in French), which is completed by \code{target_word}}
+#'   \item{target_word_emotionality}{Categorical: Is the target word classified as "positive", "negative" or "neutral"}
+#'   \item{sentence_emotionality}{Categorical: Is the sentence classified as 
+#'     "mixt", "negative", "neutral", "non specified", or "positive"}
+#'   \item{percentage_target_word}{Numeric between 0 and 1; percentage of a test sample that identified the target word}
+#'   \item{valence_target_word}{Numeric, average valence rating for the target word}
+#'   \item{arousal_target_word}{Numeric, average arousal rating for the target word}
+#' }
+#'
+#' @source
+#' This data set was distributed as supplementary online materials to the paper by Brunel et al. (2025), 
+#' and is available from the Open Science Repository via https://osf.io/7pc46. Retrieved on October 2, 2025.
+#' The data was published under a CC-By Attribution 4.0 International license, which permits redistribution.
+#' The anticlust delelopment website also includes the raw and unchanged data file as provided by Jeremy
+#' Brunel, and a script that converts the raw data into the package data.
+#' 
+#' @examples
+#' 
+#' groups <- anticlustering(
+#'   brunel2025[, 3:7],
+#'   K = 4, 
+#'   objective = "kplus", 
+#'   standardize = TRUE,
+#'   method = "3phase"
+#' )
+#' # check out descriptive statistics for each variable for each of 4 groups:
+#' # Numeric variables
+#' mean_sd_tab(brunel2025[, 5:7], groups)
+#' # Categorical variables:
+#' table(groups, brunel2025$target_word_emotionality)
+#' table(groups, brunel2025$sentence_emotionality)
+#' 
+#' @references
+#'
+#' Brunel, J., Dujardin, E., Delord, S. (2025) Emotional valence, cloze 
+#' probability, and entropy: Completion norms for 403 French sentences. 
+#' Behavior Research Methods 57(81). https://doi.org/10.3758/s13428-025-02604-7
+#'
+#'
+"brunel2025"
