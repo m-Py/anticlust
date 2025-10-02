@@ -1,10 +1,11 @@
 # anticlust 0.8.12
 
-- `anticlustering()` now has support for handling NAs (however, it just passes the task to `dist()`)
+- `anticlustering()` now has support for handling NAs
 - `anticlustering()` now accepts `factor` variables as columns of the data argument `x` to handle categorical variables
 - `anticlustering()` with `must_link` constraints now supports `objective = "kplus"` and `objective = "variance"` (for equal-sized groups)
-- `anticlustering()` now supports method = "3phase", calling the three phase search algorithm by [Yang et al.](https://doi.org/10.1016/j.ejor.2022.02.003), contributed by Hannah Hengelbrock ([@HanneyAI](https://github.com/HanneyAI))
+- `anticlustering()` now supports `method = "3phase"`, calling the three phase search algorithm by [Yang et al.](https://doi.org/10.1016/j.ejor.2022.02.003), contributed by Hannah Hengelbrock ([@HanneyAI](https://github.com/HanneyAI))
 - `categories_to_binary()` now treats `NA`s as a separate category
+- A new data set of rating norms is available, published by [Brunel et al. (2025)](https://doi.org/10.3758/s13428-025-02604-7)
 
 # anticlust 0.8.11-1
 
