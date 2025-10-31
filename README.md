@@ -236,12 +236,12 @@ groups, and that the species was evenly assigned to groups. The function
 `anticlustering()` takes as input a data table describing the elements
 that should be assigned to sets. In the data table, each row represents
 an element (here a plant, but it can be anything; for example a person,
-word, or a photo). Each column is a numeric variable describing one of
-the elements’ features. The number of groups is specified through the
-argument `K`. The argument `objective` specifies how between-group
-similarity is quantified; the argument `method` specifies the algorithm
-by which this measure is optimized. See the documentation
-`?anticlustering` for more details.
+word, or a photo). Each column is a variable describing one of the
+elements’ features (numeric or categorical as a `factor`). The number of
+groups is specified through the argument `K`. The argument `objective`
+specifies how between-group similarity is quantified; the argument
+`method` specifies the algorithm by which this measure is optimized. See
+the documentation `?anticlustering` for more details.
 
 Five anticlustering objectives are natively supported in
 `anticlustering()`:
