@@ -65,7 +65,7 @@ How do I learn about `anticlust`
 This README contains some basic information on the `R` package
 `anticlust`. More information is available via the following sources:
 
--   Up until now, we published 3 papers describing the theoretical
+-   Up until now, we published 4 papers describing the theoretical
     background of `anticlust`.
     -   The initial presentation of the `anticlust` package is given in
         Papenberg and Klau (2021)
@@ -232,16 +232,16 @@ As illustrated in the example, we can use the function
 `anticlustering()` to create similar groups of plants. In this case
 “similar” primarily means that the means and standard deviations (in
 parentheses) of the variables are pretty much the same across the five
-groups, and that the species category was evenly assigned to groups. The
-function `anticlustering()` takes as input a data table describing the
-elements that should be assigned to sets. In the data table, each row
-represents an element (here a plant, but it can be anything; for example
-a person, word, or a photo). Each column is a numeric variable
-describing one of the elements’ features. The number of groups is
-specified through the argument `K`. The argument `objective` specifies
-how between-group similarity is quantified; the argument `method`
-specifies the algorithm by which this measure is optimized. See the
-documentation `?anticlustering` for more details.
+groups, and that the species was evenly assigned to groups. The function
+`anticlustering()` takes as input a data table describing the elements
+that should be assigned to sets. In the data table, each row represents
+an element (here a plant, but it can be anything; for example a person,
+word, or a photo). Each column is a numeric variable describing one of
+the elements’ features. The number of groups is specified through the
+argument `K`. The argument `objective` specifies how between-group
+similarity is quantified; the argument `method` specifies the algorithm
+by which this measure is optimized. See the documentation
+`?anticlustering` for more details.
 
 Five anticlustering objectives are natively supported in
 `anticlustering()`:
