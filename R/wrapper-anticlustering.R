@@ -559,7 +559,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
         x, 
         K, must_link = must_link, 
         method = method, 
-        objective = "diversity", # always uses diversity computation in optimization algorithm
+        objective = "diversity", # always uses diversity computation in optimization algorithm, even for other objectives (that are implemented through changes in data)
         repetitions = repetitions
       )
     )
