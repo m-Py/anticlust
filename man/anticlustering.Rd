@@ -81,7 +81,7 @@ Klau (2021; <doi:10.1037/met0000301>), Brusco et al.
 (2020; <doi:10.1111/bmsp.12186>), Papenberg (2024; 
 <doi:10.1111/bmsp.12315>), Papenberg, Wang, et al. (2025; 
 <doi:10.1016/j.crmeth.2025.101137>), Papenberg, Breuer, et al. (2025; 
-<doi:10.31234/osf.io/wkqhx_v1), and Yang et al. (2022; <doi:10.1016/j.ejor.2022.02.003>).
+<doi:10.1017/psy.2025.10052>), and Yang et al. (2022; <doi:10.1016/j.ejor.2022.02.003>).
 }
 \details{
 This function is used to solve anticlustering. That is, the data
@@ -438,8 +438,8 @@ approach. British Journal of Mathematical and Statistical
 Psychology, 73, 275-396. https://doi.org/10.1111/bmsp.12186
 
 Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. 
-(in press). Extending the Bicriterion Approach for Anticlustering: 
-Exact and Hybrid Approaches. Psychometrika.
+(2025). Extending the Bicriterion Approach for Anticlustering: 
+Exact and Hybrid Approaches. Advance online publication. Psychometrika.
 
 Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition 
 data sets into equivalent parts. Psychological Methods, 26(2), 

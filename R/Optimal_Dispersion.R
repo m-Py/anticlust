@@ -44,7 +44,7 @@
 #'   to maximize the dispersion. If the data input \code{x} is a
 #'   feature matrix and not a dissimilarity matrix, the pairwise
 #'   Euclidean distance is used. It uses the algorithm OptDispF presented 
-#'   Papenberg, Breuer, et al. (in press). It was originally developed as part of 
+#'   Papenberg, Breuer, et al. (2025). It was originally developed as part of 
 #'   Max Diekhoff's Bachelor thesis at the Computer Science Department
 #'   at Heinrich Heine University Düsseldorf.
 #'
@@ -102,9 +102,9 @@
 #' Diekhoff (2023). Maximizing dispersion for anticlustering. Retrieved from 
 #' https://www.cs.hhu.de/fileadmin/redaktion/Fakultaeten/Mathematisch-Naturwissenschaftliche_Fakultaet/Informatik/Algorithmische_Bioinformatik/Bachelor-_Masterarbeiten/2831963_ba_ifo_AbschlArbeit_klau_mapap102_madie120_20230203_1815.pdf  
 #' 
-#' Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. (in press). 
-#' Extending the Bicriterion Approach for Anticlustering: Exact and Hybrid Approaches. 
-#' Psychometrika. 
+#' Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. (2025). 
+#' Extending the Bicriterion Approach for Anticlustering: Exact and Hybrid 
+#' Approaches. Psychometrika. Advance online publication. https://doi.org/10.1017/psy.2025.10052
 #' 
 #' @examples
 #' 

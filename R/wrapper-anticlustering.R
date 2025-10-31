@@ -10,7 +10,7 @@
 #' (2020; <doi:10.1111/bmsp.12186>), Papenberg (2024; 
 #' <doi:10.1111/bmsp.12315>), Papenberg, Wang, et al. (2025; 
 #' <doi:10.1016/j.crmeth.2025.101137>), Papenberg, Breuer, et al. (2025; 
-#' <doi:10.31234/osf.io/wkqhx_v1), and Yang et al. (2022; <doi:10.1016/j.ejor.2022.02.003>). 
+#' <doi:10.1017/psy.2025.10052>), and Yang et al. (2022; <doi:10.1016/j.ejor.2022.02.003>). 
 #'
 #' @param x The data input. Can be one of two structures: (1) A
 #'     feature matrix where rows correspond to elements and columns
@@ -39,8 +39,9 @@
 #'     between groups. See Details.
 #' @param repetitions The number of times a search heuristic is
 #'     initiated when using \code{method = "exchange"}, \code{method =
-#'     "local-maximum"}, \code{method = "brusco"}, or \code{method = "2PML"}. 
-#'     In the end, the best objective found across the repetitions is returned.
+#'     "local-maximum"}, \code{method = "brusco"}, \code{method = "3phase"}, 
+#'     or \code{method = "2PML"}. In the end, the best objective found across 
+#'     the repetitions is returned.
 #' @param standardize Boolean. If \code{TRUE} and \code{x} is a
 #'     feature matrix, the data is standardized through a call to
 #'     \code{\link{scale}} before the optimization starts. This
@@ -422,8 +423,8 @@
 #' Psychology, 73, 275-396. https://doi.org/10.1111/bmsp.12186
 #' 
 #' Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. 
-#' (in press). Extending the Bicriterion Approach for Anticlustering: 
-#' Exact and Hybrid Approaches. Psychometrika.
+#' (2025). Extending the Bicriterion Approach for Anticlustering: 
+#' Exact and Hybrid Approaches. Advance online publication. Psychometrika.
 #' 
 #' Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition 
 #' data sets into equivalent parts. Psychological Methods, 26(2), 

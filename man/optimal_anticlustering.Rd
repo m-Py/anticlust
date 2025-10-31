@@ -57,12 +57,12 @@ dispersion), the Euclidean distance is used by default, but any
 user-defined dissimilarity matrix is possible. The equivalence
 of the k-means/k-plus objectives and the diversity, which enables 
 using the ILP approach by Papenberg and Klau for the k-means/k-plus 
-objectives, was discussed in Papenberg, Breuer, et al. (in press). 
+objectives, was discussed in Papenberg, Breuer, et al. (2025). 
 Also see the examples. 
 
 
 The dispersion is solved optimal using the algorithm OptDispF presented in 
-Papenberg, Breuer, et al. (in press). Also see \code{\link{optimal_dispersion}}.
+Papenberg, Breuer, et al. (2025). Also see \code{\link{optimal_dispersion}}.
 
 The optimal methods make use of "solvers" that actually implement
 the algorithm for finding optimal solutions. The package anticlust
@@ -108,9 +108,9 @@ Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition
 data sets into equivalent parts. Psychological Methods, 26(2), 
 161–174. https://doi.org/10.1037/met0000301.
 
-Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. (in press). 
-Extending the Bicriterion Approach for Anticlustering: Exact and Hybrid Approaches. 
-Psychometrika.
+Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. (2025). 
+Extending the Bicriterion Approach for Anticlustering: Exact and Hybrid 
+Approaches. Psychometrika. Advance online publication. https://doi.org/10.1017/psy.2025.10052
 }
 \author{
 Martin Papenberg \email{martin.papenberg@hhu.de}
