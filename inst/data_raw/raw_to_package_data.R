@@ -5,7 +5,7 @@ library(anticlust)
 library(readxl)
 library(usethis)
 
-tt <- read_excel("./data/data_raw/Indices PhraseEM.xlsx")
+tt <- read_excel("./inst/data_raw/Indices_PhraseEM.xlsx")
 
 tt$target_word_emotionality <- factor(tt$`Word Emotionality`)
 tt$sentence_emotionality <- factor(tt$`Sentence Emotionality`)
