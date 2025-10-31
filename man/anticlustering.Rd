@@ -51,8 +51,9 @@ between groups. See Details.}
 
 \item{repetitions}{The number of times a search heuristic is
 initiated when using \code{method = "exchange"}, \code{method =
-"local-maximum"}, \code{method = "brusco"}, or \code{method = "2PML"}. 
-In the end, the best objective found across the repetitions is returned.}
+"local-maximum"}, \code{method = "brusco"}, \code{method = "3phase"}, 
+or \code{method = "2PML"}. In the end, the best objective found across 
+the repetitions is returned.}
 
 \item{standardize}{Boolean. If \code{TRUE} and \code{x} is a
 feature matrix, the data is standardized through a call to
