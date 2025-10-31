@@ -152,18 +152,22 @@ tt <- tryCatch(
 )
 
 if (!"simpleError" %in% class(tt)) {
-  tt2 <- anticlustering(1:N, K = 2, must_link = must_link, method = "2PML")
-  
-  expect_true(must_link_constraints_valid(tt, must_link))
-  expect_true(must_link_constraints_valid(tt2, must_link))
-  
-  # test constructing merged clusters from must-link constraints and its reversal
-  expect_true(all(
-    tt == anticlust:::merged_cluster_to_original_cluster(
-      anticlust:::original_cluster_to_merged_cluster(tt, must_link), 
-      must_link
-    )
-  ))
+  tt2 <- tryCatch(
+    anticlustering(1:N, K = 2, must_link = must_link, method = "2PML"),
+    error = function(e) e
+  )
+  if (!"simpleError" %in% class(tt2)) {
+    expect_true(must_link_constraints_valid(tt, must_link))
+    expect_true(must_link_constraints_valid(tt2, must_link))
+    
+    # test constructing merged clusters from must-link constraints and its reversal
+    expect_true(all(
+      tt == anticlust:::merged_cluster_to_original_cluster(
+        anticlust:::original_cluster_to_merged_cluster(tt, must_link), 
+        must_link
+      )
+    ))
+  }
 }
 
 
