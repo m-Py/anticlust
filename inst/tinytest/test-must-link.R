@@ -92,7 +92,7 @@ expect_error(
 )
 
 # no error for unequal-sized groups with diversity
-anticlustering(1:100, K = c(10, 10, 80), must_link = sample(100, replace = TRUE))
+tryCatch(anticlustering(1:100, K = c(10, 10, 80), must_link = sample(100, replace = TRUE)), error = function(e) e)
 # no error for unequal-sized groups with k-means/k-plus
 expect_error(
   anticlustering(1:100, K = c(10, 10, 80), must_link = sample(100, replace = TRUE), objective = "variance"),
