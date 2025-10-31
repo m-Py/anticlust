@@ -21,8 +21,8 @@ A data frame with 403 rows and 7 variables
 This data set was distributed as supplementary online materials to the paper by Brunel et al. (2025), 
 and is available from the Open Science Repository via https://osf.io/7pc46. Retrieved on October 2, 2025.
 The data was published under a CC-By Attribution 4.0 International license, which permits redistribution.
-The anticlust package also includes the raw and unchanged data file as provided by Jeremy Brunel,
-and a script that converts the raw data into the package data.
+The anticlust packages includes the raw and unchanged data file as provided by Jeremy Brunel, and a 
+script that converts the raw data into the package data.
 }
 \usage{
 brunel2025
