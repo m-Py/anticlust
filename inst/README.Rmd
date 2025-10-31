@@ -9,7 +9,7 @@ output:
 
 # anticlust <a href='https://m-py.github.io/anticlust/'><img src='man/figures/anticlustStickerV1-0.svg' style="float:right; height:160px" /></a>
 
-Anticlustering partitions a pool of elements into clusters (or *anticlusters*) with the goal of achieving high between-cluster similarity and high within-cluster heterogeneity. This is accomplished by maximizing instead of minimizing a clustering objective function, such as the intra-cluster variance (used in k-means clustering) or the sum of pairwise distances within clusters. The package `anticlust` implements anticlustering methods as described in Papenberg and Klau (2021; https://doi.org/10.1037/met0000301), Brusco et al. (2020; https://doi.org/10.1111/bmsp.12186), Papenberg (2024; https://doi.org/10.1111/bmsp.12315), and Papenberg et al. (2025; https://doi.org/10.1101/2025.03.03.641320).
+Anticlustering partitions a pool of elements into clusters (or *anticlusters*) with the goal of achieving high between-cluster similarity and high within-cluster heterogeneity. This is accomplished by maximizing instead of minimizing a clustering objective function, such as the intra-cluster variance (used in k-means clustering) or the sum of pairwise distances within clusters. The package `anticlust` implements anticlustering methods as described in Papenberg and Klau (2021; https://doi.org/10.1037/met0000301), Brusco et al. (2020; https://doi.org/10.1111/bmsp.12186), Papenberg (2024;  https://doi.org/10.1111/bmsp.12315), Papenberg, Wang, et al. (2025; https://doi.org/10.1016/j.crmeth.2025.101137), Papenberg, Breuer, et al. (2025; https://doi.org/10.1017/psy.2025.10052), and Yang et al. (2022; https://doi.org/10.1016/j.ejor.2022.02.003)
 
 ```{r setup, include = FALSE}
 library("anticlust")
@@ -68,13 +68,13 @@ Another great way of showing your appreciation of `anticlust` is to leave a star
 
 This README contains some basic information on the `R` package `anticlust`. More information is available via the following sources:
 
-- Up until now, we published 3 papers describing the theoretical background of `anticlust`. 
+- Up until now, we published 4 papers describing the theoretical background of `anticlust`. 
   * The initial presentation of the `anticlust` package is given in Papenberg and Klau (2021) (https://doi.org/10.1111/bmsp.12315; [Preprint](https://doi.org/10.31234/osf.io/7jw6v)).
   * The k-plus anticlustering method is described in Papenberg (2024) (https://doi.org/10.1037/met0000527; [Preprint](https://doi.org/10.31234/osf.io/dhzrc)).
-  * A new paper describes the must-link feature and provides additional comparisons to alternative methods, focusing on categorical variables (Papenberg et al., 2025; https://doi.org/10.1101/2025.03.03.641320).
+  * A new paper describes the must-link feature and provides additional comparisons to alternative methods, focusing on categorical variables (Papenberg, Wang, et al., 2025; https://doi.org/10.1016/j.crmeth.2025.101137).
+  * Another new paper describes several new algorithms for anticlustering and the cannot-link feature (Papenberg, Breuer, et al., 2025; https://doi.org/10.1017/psy.2025.10052).
   - The R documentation of the main functions is actually quite rich and up to date, so you should definitely check that out when using the `anticlust` package. The most important background is provided in `?anticlustering`.
-- A [video](https://youtu.be/YGrhSmi1oA8) is available in German language where I illustrate the main functionalities of the `anticlustering()` function. My plan is to make a similar video in English in the future. 
-- The [package website](https://m-py.github.io/anticlust/) contains all documentation as a convenient website. At the current time, the website also has four package vignettes, while additional vignettes are planned.
+- The [package website](https://m-py.github.io/anticlust/) contains all documentation as a convenient website. Also check out the vignettes on that website.
 
 ## A quick start
 
@@ -89,11 +89,12 @@ Call the `anticlustering()` method:
 
 ```{r}
 anticlusters <- anticlustering(
-  iris[, -5],
+  iris,
   K = 5,
   objective = "kplus",
   method = "local-maximum",
-  repetitions = 10
+  repetitions = 10,
+  standardize = TRUE
 )
 ```
 
@@ -115,7 +116,14 @@ Last, let's compare the features' means and standard deviations across groups to
 knitr::kable(mean_sd_tab(iris[, -5], anticlusters), row.names = TRUE)
 ```
 
-As illustrated in the example, we can use the function `anticlustering()` to create similar groups of plants. In this case "similar" primarily means that the means and standard deviations (in parentheses) of the variables are pretty much the same across the five groups. The function `anticlustering()` takes as input a data table describing the elements that should be assigned to sets. In the data table, each row represents an element (here a plant, but it can be anything; for example a person, word, or a photo). Each column is a numeric variable describing one of the elements' features. The number of groups is specified through the argument `K`. The argument `objective` specifies how between-group similarity is quantified; the argument `method` specifies the algorithm by which this measure is optimized. See the documentation `?anticlustering` for more details. 
+We can also verify that the species of plants (a categorical feature) is evenly distributed among groups:
+
+
+```{r}
+knitr::kable(table(iris[, 5], anticlusters), row.names = TRUE)
+```
+
+As illustrated in the example, we can use the function `anticlustering()` to create similar groups of plants. In this case "similar" primarily means that the means and standard deviations (in parentheses) of the variables are pretty much the same across the five groups, and that the species was evenly assigned to groups. The function `anticlustering()` takes as input a data table describing the elements that should be assigned to sets. In the data table, each row represents an element (here a plant, but it can be anything; for example a person, word, or a photo). Each column is a numeric variable describing one of the elements' features. The number of groups is specified through the argument `K`. The argument `objective` specifies how between-group similarity is quantified; the argument `method` specifies the algorithm by which this measure is optimized. See the documentation `?anticlustering` for more details. 
 
 Five anticlustering objectives are natively supported in `anticlustering()`:
 
@@ -126,27 +134,6 @@ Five anticlustering objectives are natively supported in `anticlustering()`:
 - the "dispersion" objective (the minimum distance between any two elements within the same cluster), setting `objective = "dispersion"`
 
 The anticlustering objectives are described in detail in the documentation (`?anticlustering`, `?diversity_objective`, `?variance_objective`, `?kplus_anticlustering`, `?dispersion_objective`) and the references therein. It is also possible to optimize user-defined objectives, which is also described in the documentation (`?anticlustering`).
-
-## Categorical variables
-
-Sometimes, it is required that sets are not only similar with regard to
-some numeric variables, but we also want to ensure that each set
-contains an equal number of elements of a certain category. Coming back
-to the initial iris data set, we may want to require that each set has a
-balanced number of plants of the three iris species. To this end, we can
-use the argument `categories` as follows:
-
-```{r}
-anticlusters <- anticlustering(
-  iris[, -5],
-  K = 3,
-  categories = iris$Species
-)
-
-## The species are as balanced as possible across anticlusters:
-table(anticlusters, iris$Species)
-
-```
 
 ## Matching and clustering
 
