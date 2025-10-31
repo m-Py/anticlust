@@ -138,10 +138,16 @@ is_distance_matrix <- function(m) {
   if (nrow(m) != ncol(m)) {
     return(FALSE)
   }
+  # this function needs to test if there is NAs in the data input
+  # this is because I do not rely on class to identify if the input is a distance matrix (which is probably bad)
+  any_na <- any(is.na(m))
+  if (any_na) m[is.na(m)] <- -9999
   lower <- m[lower.tri(m)]
   m <- t(m)
   upper <- m[lower.tri(m)]
-  all(lower == upper)
+  is_dist <- all(lower == upper)
+  if (is_dist && any_na) stop("No NA allowed in distance matrix input.")
+  is_dist
 }
 
 # Subset a distance or feature data matrix (not knowing which one)
