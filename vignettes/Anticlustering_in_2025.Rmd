@@ -21,7 +21,7 @@ set.seed(1)
 library(anticlust)
 ```
 
-This vignette is (in September 2025) the most up-to-date reference for doing anticlustering. Here, I summarize some of the things I learned about---or implemented for---anticlustering, which may not be documented in earlier work (e.g., papers, other vignettes). For example, if you have used `anticlust` before, you may be interested to know about recent changes, available from version 0.8.12 onward: 
+This vignette is (in October 2025) the most up-to-date reference for doing anticlustering. Here, I summarize some of the things I learned about---or implemented for---anticlustering, which may not be documented in earlier work (e.g., papers, other vignettes). For example, if you have used `anticlust` before, you may be interested to know about recent changes, available from version 0.8.12 onward: 
 
 - Categorical variables can now be directly included as the data input when defined as `factor`s (which is R's data structure for categorical variables)
 - Missing values are now handled directly by `anticlustering()`
@@ -95,7 +95,7 @@ The *p*-values tend to be lower, and the *p*-value for height would even be cons
 I think that the result from the "default" anticlustering method are okay'ish. However, let's assume we want to ensure an even more optimized assignment where the variables are more even among houses. Here I list three options:
 
 - Use standardization (**always recommended**)
-- Use better algorithm (**always recommended**)
+- Use better algorithm (**usually recommended**)
 - Change the objective function (**recommended depending on requirements of application**)
 
 ### Standardization
@@ -117,7 +117,7 @@ Standardization has a remarkable effect, in particular on the categorical variab
 
 ### Using a better algorithm
 
-The `method` argument determines the algorithm, which conducts the anticlustering optimization. The default is `exchange`, which is a compromise between speed and solution quality. In many applications, it is possible to use a better algorithm because speed is not an issue. Using method = `local-maximum` basically maintains the same algorithm, but runs longer until a so-called local maximum is reached. It would be a good next step. However, here I directly use the tree phase search algorithm, which is new in `anticlust` and outperforms the `local-maximum` method. Oftentimes, it is even faster. 
+The `method` argument determines the algorithm, which conducts the anticlustering optimization. The default is `exchange`, which is a compromise between speed and solution quality. In many applications, it is possible to use a better algorithm because speed is not an issue. Using method = `local-maximum` basically maintains the same algorithm, but runs longer until a so-called local maximum is reached. It would be a good next step. However, here I directly use the tree phase search algorithm, which is new in `anticlust` and outperforms the `local-maximum` method. Sometimes, it can even be faster. 
 
 ```{r}
 survey$House3 <- anticlustering(
@@ -286,7 +286,7 @@ Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition data sets
 
 Papenberg, M., Wang, C., Diop, M., Bukhari, S. H., Oskotsky, B., Davidson, B. R., ... & Oskotsky, T. T. (2025). Anticlustering for sample allocation to minimize batch effects. *Cell Reports Methods, 5*(8). https://doi.org/10.1016/j.crmeth.2025.101137
 
-Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. (in press). Extending the Bicriterion Approach for Anticlustering: Exact and Hybrid Approaches. *Psychometrika*.
+Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. (2025). Extending the Bicriterion Approach for Anticlustering: Exact and Hybrid Approaches. Psychometrika. Advance online publication. https://doi.org/10.1017/psy.2025.10052
 
 Weitz, R. R., & Lakshminarayanan, S. (1996). On a heuristic for the final exam scheduling problem. *Journal of the Operational Research Society, 47*(4), 599--600.
 

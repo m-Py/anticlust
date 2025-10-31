@@ -5,6 +5,7 @@
 - `anticlustering()` with `must_link` constraints now supports `objective = "kplus"` and `objective = "variance"` (for equal-sized groups)
 - `anticlustering()` now supports method = "3phase", calling the three phase search algorithm by [Yang et al.](https://doi.org/10.1016/j.ejor.2022.02.003), contributed by Hannah Hengelbrock ([@HanneyAI](https://github.com/HanneyAI))
 - `categories_to_binary()` now treats `NA`s as a separate category
+- `anticlust` now suggests packages `MASS` and `tableone` (for vignettes) and no longer suggests package `palmerpenguins`
 
 # anticlust 0.8.11-1
 
