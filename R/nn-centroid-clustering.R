@@ -145,7 +145,7 @@ is_distance_matrix <- function(m) {
   lower <- m[lower.tri(m)]
   m <- t(m)
   upper <- m[lower.tri(m)]
-  is_dist <- all(lower == upper)
+  is_dist <- all(lower == upper) && all(diag(m) == diag(m)[1])
   if (is_dist && any_na) stop("No NA allowed in distance matrix input.")
   is_dist
 }
