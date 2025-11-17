@@ -1,3 +1,7 @@
+# anticlust 0.8.13
+
+- Internal: Some changes in input validation
+
 # anticlust 0.8.12
 
 - `anticlustering()` now has support for handling NAs
