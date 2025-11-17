@@ -12,6 +12,12 @@ input_validation_anticlustering <- function(x, K, objective, method,
   
   ## Validate feature input
   validate_data_matrix(x)
+  
+  is_df <- inherits(x, "data.frame")
+  if (is_df) {
+    x <- get_anticlustering_features(x, objective, standardize) # this is the input that must be considered
+  }
+  
   x <- as.matrix(x)
   N <- nrow(x)
   unequal_group_sizes <- (length(K) != 1) && (sd(table(initialize_clusters(N, K, NULL))) != 0)
