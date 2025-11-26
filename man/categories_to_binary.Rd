@@ -58,7 +58,7 @@ N <- nrow(features)
 # - Generate data input for k-means anticlustering -
 # We conduct k-plus anticlustering by first generating k-plus variables, 
 # and also include the categorical variable as "numeric" input for the 
-# k-means optimization (rather than as input for the argument \code{categories})
+# k-means optimization (rather than as input for the argument categories)
 
 input_data <- cbind(
   kplus_moment_variables(features, T = 2), 
@@ -78,9 +78,11 @@ table(kplus_groups, schaper2019$room) # argument categories was not used!
  
 }
 \references{
-Papenberg, M. (2024). K-plus Anticlustering: An Improved k-means Criterion for 
-Maximizing Between-Group Similarity. British Journal of Mathematical and 
-Statistical Psychology, 77(1), 80--102. https://doi.org/10.1111/bmsp.12315
+Papenberg, M., Wang, C., Diop, M., Bukhari, S. H., Oskotsky, B., Davidson, B. R., 
+Vo, K. C., Liu, B., Irwin, J. C., Combes, A., Gaudilliere, B., Li, J., Stevenson, D. K., 
+Klau, G. W., Giudice, L. C., Sirota, M., & Oskotsky, T. T. (2025). Anticlustering
+for sample allocation to minimize batch effects. Cell Reports Methods, 5(8), 
+101137. https://doi.org/10.1016/j.crmeth.2025.101137
 }
 \author{
 Martin Papenberg \email{martin.papenberg@hhu.de}

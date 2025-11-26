@@ -465,11 +465,11 @@
 #' Maximizing Between-Group Similarity. British Journal of Mathematical and 
 #' Statistical Psychology, 77(1), 80-102. https://doi.org/10.1111/bmsp.12315
 #' 
-#' Papenberg, M., Wang, C., Diop, M., Bukhari, S. H., Oskotsky, B., Davidson, 
-#' B. R., Vo, K. C., Liu, B., Irwin, J. C., Combes, A., Gaudilliere, B., 
-#' Li, J., Stevenson, D. K., Klau, G. W., Giudice, L. C., Sirota, M., 
-#' & Oskotsky, T. T. (2025). Anticlustering for sample allocation to minimize 
-#' batch effects. bioRxiv. https://doi.org/10.1101/2025.03.03.641320
+#' Papenberg, M., Wang, C., Diop, M., Bukhari, S. H., Oskotsky, B., Davidson, B. R., 
+#' Vo, K. C., Liu, B., Irwin, J. C., Combes, A., Gaudilliere, B., Li, J., Stevenson, D. K., 
+#' Klau, G. W., Giudice, L. C., Sirota, M., & Oskotsky, T. T. (2025). Anticlustering
+#' for sample allocation to minimize batch effects. Cell Reports Methods, 5(8), 
+#' 101137. https://doi.org/10.1016/j.crmeth.2025.101137
 #'
 #' Späth, H. (1986). Anticlustering: Maximizing the variance criterion.
 #' Control and Cybernetics, 15, 213-218.

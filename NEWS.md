@@ -1,5 +1,9 @@
 # anticlust 0.8.13
 
+**User visible changes**
+
+- `categories_to_binary()` no longer throws an error when a categorical variable only has 1 level
+
 **Documentation**
 
 - Extended documentation on the data input that is accepted by `anticlustering()`
