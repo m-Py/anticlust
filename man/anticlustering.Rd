@@ -128,10 +128,13 @@ distances of elements within the same groups (see
 \code{\link{diversity_objective}}). Hence, anticlustering using the diversity 
 criterion maximizes between-group similarity
 by maximizing within-group heterogeneity (represented as the sum of all pairwise distances). 
-If it is computed on the basis of the Euclidean distance (which is the default
+In the publication that introduced
+the \code{anticlust} package (Papenberg & Klau, 2021), we used the term "anticluster 
+editing" to refer to the maximization of the diversity, because the reversed 
+procedure - minimizing the diversity - is also known as "cluster editing".
+If the diversity is computed on the basis of the Euclidean distance (which is the default
 behaviour if \code{x} is a feature matrix), the diversity is an all rounder objective that 
-tends to equate all distribution 
-characteristics between groups (such as means, variances, ...). 
+tends to equate all distribution characteristics between groups (such as means, variances, ...). 
 Note that the equivalence of within-group heterogeneity and between-group similarity only
 holds for equal-sized groups. For unequal-sized groups, it is recommended to
 use a different objective when striving for overall between-group similarity,
@@ -139,10 +142,7 @@ e.g., the k-plus objective or the \code{"average-diversity"}. The average divers
 was introduced in version 0.8.6, and it is more useful if groups are not 
 equal-sized. The average diversity normalizes the sum of intra-cluster distances 
 by group size. If all groups are equal-sized, it is equivalent to the 
-regular diversity. In the publication that introduces
-the \code{anticlust} package (Papenberg & Klau, 2021), we used the term "anticluster 
-editing" to refer to the maximization of the diversity, because the reversed 
-procedure - minimizing the diversity - is also known as "cluster editing". 
+regular diversity. 
 
 The "dispersion" is the minimum distance between any two elements
 that are part of the same cluster; maximization of this objective
@@ -154,20 +154,51 @@ and not only the dispersion; to optimize both objectives at the
 same time, see the function
 \code{\link{bicriterion_anticlustering}}.
 
-If the data input \code{x} is a feature matrix (that is: each row
-is a "case" and each column is a "variable") and the option
-\code{objective = "diversity"} or \code{objective = "dispersion"} is used, 
-the Euclidean distance is computed as the basic unit of the objectives. If
-a different measure of dissimilarity is preferred, you may pass a
-self-generated dissimilarity matrix via the argument \code{x}.
-
 In the standard case, groups of equal size are generated. Adjust
 the argument \code{K} to create groups of different size (see
 Examples).
 
+
+\strong{Data input}
+
+The data input \code{x} is usually a feature matrix where each each row
+is a "case" and each column is a "variable". The default
+\code{objective = "diversity"} or the \code{objective = "dispersion"} are computed
+using a dissimilarity matrix as input, however. The default behaviour for 
+feature matrices is to compute the Euclidean distance as the 
+basic unit of these objectives, using a call to \code{\link{dist}}. 
+The combination \code{objective = "diversity"} + 
+Euclidean distance was evaluated by us (e.g., Papenberg and Klau, 2021; Papenberg, 2024
+Papenberg, Wang, et al., 2025) and is generally considered to be a good 
+default for equal-sized groups. For unequal-sized groups, prefer 
+\code{objective = "average-diversity"}). 
+
+If a different type of dissimilarity measure is preferred (e.g., the Gower distance), 
+you may pass a self-generated dissimilarity matrix via the argument \code{x}. This dissimilarity
+matrix can be an object of class \code{dist} (e.g., returned by \code{\link{dist}} 
+or \code{\link{as.dist}}) or a \code{matrix} where the entries of the upper 
+and lower triangular matrix represent pairwise dissimilarities. If the input
+is a matrix rather than of class \code{dist}, the function internally tests if
+the input is a dissimilarity matrix (because a \code{matrix} could also be a 
+feature matrix). It assumes the input is a dissimilarity matrix if the 
+upper and lower triangular consists of the same values, and if the diagonal 
+only consists of the same values. If the input is a \code{data.frame},
+this function always assumes that it is a feature matrix. In a \code{data.frame},
+each column must be either \code{numeric} or \code{factor} (the latter for 
+categorical variables).
+
 As of version 0.8.12, this function supports handling of missing values (\code{NA}). 
 In this case the function \code{\link[stats]{dist}} handles the (\code{NA}) when converting
-features to pairwise distances. 
+features to pairwise distances. Note that \code{\link[stats]{dist}} always handles
+missing values, even for objectives that are usually computed using a feature 
+matrix as input (i.e., \code{objective = "variance"} and \code{objective = "kplus"}).
+In this case, we exploit an equivalence between the \code{objective = "variance"} and
+the \code{objective = "average-diversity"}: When the squared Euclidean distance
+\code{objective = "variance"} and the \code{objective = "average-diversity"}
+are actually equivalent, so we can optimize the \code{objective = "average-diversity"}
+in order to perform k-means (and thus, k-plus) anticlustering. See Papenberg, 
+Breuer, et al. (2025) for details.
+
 
 \strong{Algorithms for anticlustering}
 

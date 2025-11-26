@@ -1,6 +1,12 @@
 # anticlust 0.8.13
 
-- Internal: Some changes in input validation
+**Documentation**
+
+- Extended documentation on the data input that is accepted by `anticlustering()`
+
+**Internal**
+
+- Some changes in input validation
 
 # anticlust 0.8.12
 
