@@ -87,10 +87,9 @@ categories_to_binary <- function(categories, use_combinations = FALSE) {
   categories <- data.frame(categories)
   categories <- as.data.frame(lapply(categories, factor, exclude = NULL))
   combine_by <- ifelse(use_combinations, " * ", " + ")
-  formula_string <- paste("~", paste(colnames(categories), collapse = combine_by), collapse = "")
+  formula_string <- paste("~", paste(colnames(categories), collapse = combine_by), "-1", collapse = "")
   model.matrix(
     as.formula(formula_string), 
-    data = categories,
-    contrasts.arg = lapply(categories, contrasts, contrasts=FALSE) # this ensures that each level of the category has a binary variable
-  )[ ,-1, drop = FALSE]
+    data = categories
+  )
 }
