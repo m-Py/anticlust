@@ -3,6 +3,7 @@
 **User visible changes**
 
 - `categories_to_binary()` no longer throws an error when a categorical variable only has 1 level
+- `anticlustering()` has a new argument `blocks` used to sequentially apply anticlustering to different levels of a categorical variable
 
 **Documentation**
 

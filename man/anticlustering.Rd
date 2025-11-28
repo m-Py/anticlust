@@ -14,7 +14,8 @@ anticlustering(
   repetitions = NULL,
   standardize = FALSE,
   cannot_link = NULL,
-  must_link = NULL
+  must_link = NULL,
+  blocks = NULL
 )
 }
 \arguments{
@@ -67,6 +68,10 @@ the same value in this vector cannot be assigned to the same anticluster.}
 
 \item{must_link}{A numeric vector of length \code{nrow(x)}. Elements having 
 the same value in this vector are assigned to the same anticluster.}
+
+\item{blocks}{A vector, data.frame or matrix representing one
+or several categorical variables. Anticlustering is done sequentially 
+within blocks. See details.}
 }
 \value{
 A vector of length N that assigns a group (i.e, a number
@@ -188,9 +193,9 @@ each column must be either \code{numeric} or \code{factor} (the latter for
 categorical variables).
 
 As of version 0.8.12, this function supports handling of missing values (\code{NA}). 
-In this case the function \code{\link[stats]{dist}} handles the (\code{NA}) when converting
+In this case the function \code{\link[stats]{dist}} handles the \code{NA}s when converting
 features to pairwise distances. Note that \code{\link[stats]{dist}} always handles
-missing values, even for objectives that are usually computed using a feature 
+missing values even for objectives that are usually computed using a feature 
 matrix as input (i.e., \code{objective = "variance"} and \code{objective = "kplus"}).
 In this case, we exploit an equivalence between the \code{objective = "variance"} and
 the \code{objective = "average-diversity"}: When the squared Euclidean distance
@@ -309,6 +314,14 @@ and numeric variables, and when using the k-plus objective). However note that t
 conversion always uses \code{use_combinations = FALSE}, which may not always 
 what users need. In this case, I still recommend using \code{\link{categories_to_binary}} 
 manually.
+
+The argument \code{blocks} (available as of version 0.8.13) is similar 
+to \code{categories}. Anticlustering is repeated within each stratum
+(i.e., each levels or combination of levels of \code{blocks}). Anticlustering
+in later blocks "remembers" the assignment of previous blocks. This way, 
+overall balance and balance within blocks is maximized. This is unlike when 
+using \code{categories}, which only maximizes overall balance, but not 
+specifically within strata. 
 
 \strong{Anticlustering with constraints}
 

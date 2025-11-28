@@ -52,6 +52,9 @@
 #'     the same value in this vector cannot be assigned to the same anticluster.
 #' @param must_link A numeric vector of length \code{nrow(x)}. Elements having 
 #'     the same value in this vector are assigned to the same anticluster.
+#' @param blocks A vector, data.frame or matrix representing one
+#'     or several categorical variables. Anticlustering is done sequentially 
+#'     within blocks. See details.
 #'
 #' @return A vector of length N that assigns a group (i.e, a number
 #'     between 1 and \code{K}) to each input element.
@@ -171,9 +174,9 @@
 #' categorical variables).
 #' 
 #' As of version 0.8.12, this function supports handling of missing values (\code{NA}). 
-#' In this case the function \code{\link[stats]{dist}} handles the (\code{NA}) when converting
+#' In this case the function \code{\link[stats]{dist}} handles the \code{NA}s when converting
 #' features to pairwise distances. Note that \code{\link[stats]{dist}} always handles
-#' missing values, even for objectives that are usually computed using a feature 
+#' missing values even for objectives that are usually computed using a feature 
 #' matrix as input (i.e., \code{objective = "variance"} and \code{objective = "kplus"}).
 #' In this case, we exploit an equivalence between the \code{objective = "variance"} and
 #' the \code{objective = "average-diversity"}: When the squared Euclidean distance
@@ -292,6 +295,14 @@
 #' conversion always uses \code{use_combinations = FALSE}, which may not always 
 #' what users need. In this case, I still recommend using \code{\link{categories_to_binary}} 
 #' manually.
+#' 
+#' The argument \code{blocks} (available as of version 0.8.13) is similar 
+#' to \code{categories}. Anticlustering is repeated within each stratum
+#' (i.e., each levels or combination of levels of \code{blocks}). Anticlustering
+#' in later blocks "remembers" the assignment of previous blocks. This way, 
+#' overall balance and balance within blocks is maximized. This is unlike when 
+#' using \code{categories}, which only maximizes overall balance, but not 
+#' specifically within strata. 
 #' 
 #' \strong{Anticlustering with constraints}
 #' 
@@ -487,13 +498,13 @@
 anticlustering <- function(x, K, objective = "diversity", method = "exchange",
                            preclustering = FALSE, categories = NULL, 
                            repetitions = NULL, standardize = FALSE, cannot_link = NULL,
-                           must_link = NULL) {
+                           must_link = NULL, blocks = NULL) {
 
 
   ## Get data into required format
   input_validation_anticlustering(x, K, objective, method, preclustering, 
                                   categories, repetitions, standardize, cannot_link,
-                                  must_link)
+                                  must_link, blocks)
 
   input_is_a_feature_matrix <- !is_distance_matrix(x) || inherits(x, "data.frame")
   
@@ -539,6 +550,16 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
     if (kmeans_type_objective) { # when using distance matrix, kmeans/kplus are equivalent to average diversity.
       objective <- "average-diversity"
     }
+  }
+  
+  ####### Data handling is done; now call the required algorithm
+  
+  if (argument_exists(blocks)) {
+    return(blocked_anticlustering(
+      x, objective = objective, method = method, 
+      preclustering = preclustering, categories = categories, K = K, 
+      repetitions = repetitions, standardize = standardize, blocks = blocks
+    ))
   }
   
   if (method == "3phase") {
