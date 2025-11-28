@@ -46,7 +46,7 @@ preprocessing of the NAs before calling this function.
 }
 \examples{
 
-# Illustrate why the usualy dummy encoding is not appropriate for anticlustering.
+# Illustrate why dummy encoding is not appropriate for anticlustering.
 # Use 3 elements of the iris data set, with different levels of 'Species'
 input <- iris[c(1, 51, 101), "Species", drop = FALSE]
 input
