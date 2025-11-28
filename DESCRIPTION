@@ -42,7 +42,8 @@ Suggests:
     Rsymphony,
     tinytest,
     gurobi,
-    tableone
+    tableone,
+    palmerpenguins
 VignetteBuilder: 
     knitr,
     rmarkdown

@@ -25,7 +25,7 @@ In this vignette I explore some ways to incorporate categorical variables with a
 ```{r}
 data(penguins)
 # First exclude cases with missing values
-df <- na.omit(penguins)
+df <- na.omit(palmerpenguins::penguins)
 head(df)
 nrow(df)
 ```
@@ -35,7 +35,7 @@ In the data set, each row represents a penguin, and the data set has four numeri
 Let's call `anticlustering()` to divide the `r nrow(df)` penguins into 3 groups. We use the four the numeric variables as first argument (i.e., the anticlustering objective is computed on the basis of the numeric variables), and the penguins' sex as categorical variable:
 
 ```{r}
-numeric_vars <- df[, c("bill_len", "bill_dep", "flipper_len", "body_mass")]
+numeric_vars <- df[, c("bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g")]
 groups <- anticlustering(
   numeric_vars, 
   K = 3,
