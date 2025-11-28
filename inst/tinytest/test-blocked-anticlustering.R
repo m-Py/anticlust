@@ -44,7 +44,10 @@ anticlustering(features, K = 2, objective = "diversity", blocks = blocks, method
 
 groups <- anticlustering(features, K = 2, objective = "kplus", blocks = blocks, method = "local-maximum", repetitions = 10, preclustering = TRUE)
 
-anticlustering(features, K = 2, objective = "kplus", blocks = blocks, method ="3phase")
+foo <- anticlustering(features, K = 2, objective = "kplus", blocks = blocks, method ="3phase")
+
+tab <- table(blocks, foo)
+expect_true(all(abs(tab[ ,1] - tab[, 2]) <= 1))
 
 anticlustering(features, K = 2, objective = "kplus", blocks = blocks, categories = brunel2025$sentence_emotionality)
 
