@@ -26,7 +26,11 @@ blocked_anticlustering <- function(
   for (i in 1:n_blocks) {
     previous_groups <- condition_blocked # just for asserting at the end that no previous assignments were changed
     select <- blocks <= i
-    input <- x[select, , drop = FALSE] 
+    if (is_distance_matrix(x)) {
+      input <- x[select, select, drop = FALSE] 
+    } else {
+      input <- x[select, , drop = FALSE] 
+    }
     target_groups <- table(initialize_clusters(N = sum(select), K = K, NULL))
     initial_groups <- add_unassigned_elements(target_groups, condition_blocked[select], N = N, K = K)
     # ensure that previous conditions are still as before:
