@@ -50,13 +50,6 @@ blocked_anticlustering <- function(
   condition_blocked
 }
 
-## Helper functions for anticlustering with memory for previous blocks:
-# Anticlustering with blocking, but with memory for assignment in previous blocks: 
-restricted_initialization <- function(groups_fixed, K, blocksize) {
-  groups_fixed[is.na(groups_fixed)] <- sample(rep_len(1:K, length.out = sum(is.na(groups_fixed))))
-  groups_fixed
-}
-
 # Create input for categories argument in anticlustering(), that ensures that previously blocked subjects
 # are not changed (only used to compute the anticlustering objective)
 get_blocking_exchange_parters <- function(condition_blocked, select) {
