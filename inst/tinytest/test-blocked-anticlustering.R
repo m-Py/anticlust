@@ -60,3 +60,20 @@ foo <- anticlustering(1:1000, K = 10, blocks = blocks, objective = "variance")
 tab <- table(blocks, foo)
 expect_true(all(abs(tab[ ,1] - tab[, 2]) <= 1))
 
+
+
+## verify that some combinations of arguments throw errors
+data <- 1:10
+must_link <- c(1, 1, 1, 2, 2, 2, 3, 4, 5, 6)
+blocks <- rep(1:2, 5)
+expect_error(
+  anticlustering(data, K = 2, blocks = blocks, must_link = must_link),
+  pattern = "must-link"
+)
+
+cannot_link <- cbind(1, 2)
+expect_error(
+  anticlustering(data, K = 2, blocks = blocks, cannot_link = cannot_link),
+  pattern = "cannot-link"
+)
+
