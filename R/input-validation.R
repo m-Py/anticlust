@@ -117,7 +117,6 @@ input_validation_anticlustering <- function(x, K, objective, method,
     blocks <- merge_into_one_variable(blocks)
     validate_input(blocks, "blocks", not_function = TRUE, len = N)
     if (argument_exists(must_link)) stop("Currently, using must-link constraints is not possible within blocks.")
-    if (argument_exists(cannot_link)) stop("Currently, using cannot-link constraints is not possible within blocks.")
   }
 
   validate_input(preclustering, "preclustering", len = 1,

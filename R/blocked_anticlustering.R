@@ -7,9 +7,10 @@
 # because it is additional work for me.
 
 blocked_anticlustering <- function(
-    x, K, objective = "diversity", method = "exchange", preclustering = FALSE, 
-    categories = NULL, repetitions = NULL, standardize = FALSE, blocks
+    x, K, objective = "diversity", method = "exchange", 
+    categories = NULL, cannot_link = NULL, blocks
 ) {
+  stopifnot(method %in% c("exchange", "local-maximum"))
 
   validate_input(K, "K", len = 1) # here we can only generate equal-sized groups
   
@@ -23,6 +24,16 @@ blocked_anticlustering <- function(
 
   # Anticlustering with blocking: 
   condition_blocked <- rep(NA, N)
+  # different initialization needed if there are cannot-link constraints
+  if (argument_exists(cannot_link)) {
+    condition_blocked <- optimal_cannot_link_reduced(
+      N = N, K = K, 
+      target_groups = table(initialize_clusters(N = N, K = K, NULL)),
+      cannot_link = cannot_link
+    )
+    x <- convert_to_distances(x, squared = objective == "variance")
+    x[cleanup_cannot_link_indices(cannot_link)] <- -(sum(x) + 1) # edit distances to maintain cannot-link restrictions
+  }
   for (i in 1:n_blocks) {
     previous_groups <- condition_blocked # just for asserting at the end that no previous assignments were changed
     select <- blocks <= i

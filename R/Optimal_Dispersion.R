@@ -467,8 +467,9 @@ remove_redundant_edges <- function(df) {
 
 # Function to solve optimal cannot_link constraints, used for the argument 
 # cannot_link in anticlustering().
-optimal_cannot_link <- function(N, K, target_groups, cannot_link, repetitions) {
-  repetitions <- ifelse(is.null(repetitions), 1, repetitions)
+# First function only returns a grouping for all elements that are fixated via the constraints.
+# Second function returns full groupings 
+optimal_cannot_link_reduced <- function(N, K, target_groups, cannot_link, repetitions) {
   all_nns_reordered <- reorder_edges(cannot_link)
   ilp <- k_coloring_ilp(all_nns_reordered, N, K, target_groups)
   # select solver: gurobi > symphony > lpSolve > Glpk
@@ -484,6 +485,12 @@ optimal_cannot_link <- function(N, K, target_groups, cannot_link, repetitions) {
     stop("The cannot-link constraints cannot be fulfilled.")
   }
   groups_fixated <- graph_coloring_to_group_vector(all_nns_reordered, solution$x, K, cannot_link, N)
+  groups_fixated
+}
+
+optimal_cannot_link <- function(N, K, target_groups, cannot_link, repetitions) {
+  repetitions <- ifelse(is.null(repetitions), 1, repetitions)
+  groups_fixated <- optimal_cannot_link_reduced(N, K, target_groups, cannot_link, repetitions)
   if (repetitions > 1) {
     groups <- t(replicate(repetitions, add_unassigned_elements(target_groups, groups_fixated, N, K)))
   } else {
