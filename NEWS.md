@@ -2,16 +2,18 @@
 
 **User visible changes**
 
-- `categories_to_binary()` no longer throws an error when a categorical variable only has 1 level
 - `anticlustering()` has a new argument `blocks` used to sequentially apply anticlustering to different levels of a categorical variable
+- `categories_to_binary()` no longer throws an error when a categorical variable only has 1 level
 
 **Documentation**
 
 - Extended documentation on the data input that is accepted by `anticlustering()`
+- Extended documentation in `categories_ton_binary()`
 
 **Internal**
 
-- Some changes in input validation
+- Some changes in input validation for distance matrices (which is now also explicated in the documentation to `anticlustering()`)
+- `anticlust` again suggests `palmerpenguins` (because the base R data set is not yet available on all CRAN testing machines)
 
 # anticlust 0.8.12
 
