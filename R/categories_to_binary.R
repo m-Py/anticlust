@@ -12,12 +12,13 @@
 #' 
 #' The conversion of categorical variables to binary variables is done via
 #' \code{\link[stats]{model.matrix}}. Since version 0.8.9, each category
-#' of a categorical variable is coded by a separate variable. So this is not
-#' 'dummy' coding, which is often used to encode predictors in statistical 
-#' analysis. Dummy coding uses a reference category that has only zeros for 
-#' each variable, while all other categories consist of a 1 and otherwise zeros. 
-#' This implies that there is a different distance to the reference category 
-#' than among the other categories, which is unwarranted in anticlustering.
+#' of a categorical variable is coded by a separate variable ('one hot' encoding).
+#' So we do not use 'dummy' coding, which is often used to encode predictors 
+#' in statistical analysis. Dummy coding uses a reference category that is not
+#' explicitly modelled via a separate variable. This implies that there is
+#' a different distance to the reference category than among the other 
+#' categories, which is unwarranted in anticlustering (thanks to Gunnar Klau
+#' for noting this). See examples. 
 #' 
 #' This function can be used to include categorical variables as part of the 
 #' optimization criterion in anticlustering, rather than including them as hard constraints as done when using the 
@@ -51,9 +52,24 @@
 #'
 #' @examples
 #' 
-#' # How to encode a categorical variable with three levels:
-#' unique(iris$Species)
-#' categories_to_binary(iris$Species)[c(1, 51, 101), ]
+#' # Illustrate why the usualy dummy encoding is not appropriate for anticlustering.
+#' # Use 3 elements of the iris data set, with different levels of 'Species'
+#' input <- iris[c(1, 51, 101), "Species", drop = FALSE]
+#' input
+#' # Default dummy encoding: 
+#' (dummy <- model.matrix(~ . , input))
+#' dist(dummy) 
+#' # Distance between versicolor and virginica is larger than among setosa and 
+#' # versicolor, and setosa and virginica. This would bias the anticlustering 
+#' # computation.
+#' (one_hot <- categories_to_binary(input))
+#' dist(one_hot) # all the same distances 
+#' dist(one_hot)^2 # or use squared Euclidean distance (corresponds to Manhattan distance in this case)
+#' dist(one_hot, method = "manhattan")
+#' 
+#' # We could also get one-hot encoding directly via model.matrix(), which is 
+#' # used in categories_to_binary():
+#' model.matrix(~ . -1, input) # suppresses the 'intercept'
 #' 
 #' # Use Schaper data set for anticlustering example
 #' data(schaper2019)
