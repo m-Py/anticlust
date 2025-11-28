@@ -268,7 +268,7 @@
 #' 
 #' \strong{Categorical variables}
 #'
-#' There are two ways to balance categorical variables among anticlusters (also 
+#' There are several ways to balance categorical variables among anticlusters (also 
 #' see the package vignette "Using categorical variables with anticlustering").
 #' The first way is to treat them as "hard constraints" via the argument 
 #' \code{categories} (see Papenberg & Klau, 2021). If done so, balancing the 
@@ -298,10 +298,11 @@
 #' 
 #' The argument \code{blocks} (available as of version 0.8.13) is similar 
 #' to \code{categories}. Anticlustering is repeated within each stratum
-#' (i.e., each levels or combination of levels of \code{blocks}). Anticlustering
+#' (i.e., each levels or combination of levels of \code{blocks} -- as in \code{categories}
+#' mulitple variables are merged into a single variable to form strata). Anticlustering
 #' in later blocks "remembers" the assignment of previous blocks. This way, 
-#' overall balance and balance within blocks is maximized. This is unlike when 
-#' using \code{categories}, which only maximizes overall balance, but not 
+#' overall balance as well as balance within blocks is maximized. This is unlike 
+#' when using \code{categories}, which only maximizes overall balance, but not 
 #' specifically within strata. 
 #' 
 #' \strong{Anticlustering with constraints}
