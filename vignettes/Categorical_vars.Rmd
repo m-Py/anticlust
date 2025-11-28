@@ -20,7 +20,7 @@ set.seed(123)
 library(anticlust)
 ```
 
-In this vignette I explore some ways to incorporate categorical variables with anticlustering. The main function of `anticlust` is `anticlustering()`, and it has an argument `categories`. It can be used easily enough: We just pass the numeric variables as first argument (`x`) and our categorical variable(s) to `categories`. I will use the penguin data set to illustrate the usage: 
+In this vignette I explore some ways to incorporate categorical variables with anticlustering, focusing on the main function of `anticlust`: `anticlustering()`. Historically, the first option we had to deal with categorical variables was the `categories` argument (Papenberg & Klau, 2021). It can be used easily enough: We just pass the numeric variables as first argument (`x`) and our categorical variable(s) to `categories`. I will use the penguin data set to illustrate its usage: 
 
 ```{r}
 data(penguins)
@@ -30,7 +30,7 @@ head(df)
 nrow(df)
 ```
 
-In the data set, each row represents a penguin, and the data set has four numeric variables (bill_len, bill_dep, flipper_len, body_mass) and several categorical variables (species, island, sex) as descriptions of the penguins.
+In the data set, each row represents a penguin, and the data set has four numeric variables (bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) and several categorical variables (species, island, sex) as descriptions of the penguins.
 
 Let's call `anticlustering()` to divide the `r nrow(df)` penguins into 3 groups. We use the four the numeric variables as first argument (i.e., the anticlustering objective is computed on the basis of the numeric variables), and the penguins' sex as categorical variable:
 
@@ -82,7 +82,6 @@ A second possibility to incorporate categorical variables is to treat them as nu
 
 In the penguin data sets, all variables are already correctly coded, i.e., categorical variables are defined as factors. So I generate a data frame that includes all features -- numeric and categorical features -- and use it as input for anticlustering. 
 
-
 ```{r}
 all_features <- data.frame(numeric_vars, df[, c("species", "sex")])
 ```
@@ -132,3 +131,49 @@ table(groups, df$year, df$species)
 ```
 
 Now, the year of data collection is perfectly balance across groups for each of the three species, which is not accomplished when setting `use_combinations = FALSE` or when using the categories as factors, which internally sets `use_combinations = FALSE`.
+
+## Blocking
+
+As of version 0.8.13, we have another option of incorporating categorical variables with `anticlustering()`: blocking. It is pretty similar to using the `categories` argument:
+
+```{r}
+groups1 <- anticlustering(
+  numeric_vars, 
+  K = 3,
+  categories = df$sex, 
+  standardize = TRUE,
+  objective = "kplus", 
+  method = "local-maximum"
+)
+groups2 <- anticlustering(
+  numeric_vars, 
+  K = 3,
+  blocks = df$sex, 
+  standardize = TRUE,
+  objective = "kplus", 
+  method = "local-maximum"
+)
+
+table(df$sex, groups1)
+table(df$sex, groups2)
+```
+
+There is one difference: With blocking, we also attempt to balance the numeric variables within each level of the blocking variable across groups; with the categories argument, we only attempt to achieve overall balance. As we can see: 
+
+
+```{r}
+knitr::kable(mean_sd_tab(numeric_vars[df$sex == "female", ], groups1[df$sex == "female"]), row.names = TRUE) # categories argument
+knitr::kable(mean_sd_tab(numeric_vars[df$sex == "female", ], groups2[df$sex == "female"]), row.names = TRUE) # blocks argument
+
+knitr::kable(mean_sd_tab(numeric_vars[df$sex == "male", ], groups1[df$sex == "male"]), row.names = TRUE) # categories argument
+knitr::kable(mean_sd_tab(numeric_vars[df$sex == "male", ], groups2[df$sex == "male"]), row.names = TRUE) # blocks argument
+```
+
+Within each species, there is increased similarity between groups when using the blocks argument. Note that this is currently *only* achieved with the blocks argument; it is also not achieved when using the categorical variables as factors as described above.[^interaction]
+
+[^interaction]: It should be possible to manually construct the input matrix `x` in such a way that it includes an interaction term for the blocking variable and the other variables of interest. In this case, we should also obtain balance within each level of the blocking variable. We are already doing the same thing in `categories_to_binary()` -- however, just with categorical variables -- when using `use_combinations`. With `model.matrix()`, advanced users may be able to construct interaction variables for categorical and numeric variables; future versions of `anticlust` may offer convenience support for this option.
+
+## References 
+
+Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition data sets into equivalent parts. *Psychological Methods, 26*(2), 161--174. https://doi.org/10.1037/met0000301
+
