@@ -42,6 +42,7 @@ blocked_anticlustering <- function(
       input, 
       K = initial_groups, 
       objective = objective,
+      method = method,
       categories = cbind(exchange_partners, categories[select])
     )
     # ensure that previous conditions are still as before:

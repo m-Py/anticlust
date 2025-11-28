@@ -557,9 +557,11 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
   
   if (argument_exists(blocks)) {
     return(blocked_anticlustering(
-      x, objective = objective, method = method, 
-      preclustering = preclustering, categories = categories, K = K, 
-      repetitions = repetitions, standardize = standardize, blocks = blocks
+      x, objective = objective, 
+      method = method, 
+      categories = categories, K = K, 
+      cannot_link = cannot_link, 
+      blocks = blocks
     ))
   }
   
