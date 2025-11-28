@@ -17,6 +17,7 @@ opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+library(tableone)
 # define a method for objects of the class data.frame
 knit_print.matrix = function(x, ...) {
     res = paste(c("", "", kable(x, row.names = TRUE)), collapse = "\n")
@@ -27,344 +28,243 @@ registerS3method("knit_print", "matrix", knit_print.matrix)
 
 ```
 
-This tutorial teaches you how to use the `R` package `anticlust` for 
-stimulus selection in psychological experiments. All code can easily be 
-reproduced via Copy & Paste. The tutorial discusses the following 
-functionalities:
+*Note that I rewrote this vignette in November 2025. The information gathered in this vignette here was quite dated previously, and had a different focus from what I now envision `anticlust` to be used for*
 
-- Match similar stimuli based on covariates of interest
-- Minimize differences between stimulus sets with regard to some variables
-- Maximize differences between stimulus sets with regard to some variables
-- Balance the occurrence of a categorical variable between stimulus sets
+This tutorial shows you how to use the `R` package `anticlust` for stimulus selection in (psychological) experiments. All code can easily be reproduced via Copy & Paste. The tutorial discusses the following functionalities:
 
-To follow the code in this tutorial, load the `anticlust` 
-package first:
+- Subset selection from a larger base of stimuli
+- Divide the selected stimuli into similar groups of stimuli (via anticlustering)
+
+To follow the code in this tutorial, load the `anticlust` package first:
 
 ```{r}
 library(anticlust)
 ```
 
-For the examples in this document, we use norming data for a stimulus 
-set provided by Schaper, Kuhlmann and Bayen (2019a, 2019b). It is 
-available when the package `anticlust` is loaded: 
+For the examples in this document, we use norming data for a stimulus set provided by Brunel et al. (2025). It is available when the package `anticlust` is loaded: 
 
 ```{r}
-data("schaper2019")
-# look at the data
-head(schaper2019)
+# look at the head of the data
+head(brunel2025)
 ```
 
 ```{r, echo = FALSE}
-cols <- toString(paste0("\`", names(schaper2019)[3:6], "\`"))
+cols <- toString(paste0("\`", names(brunel)[3:6], "\`"))
 ```
 
-The item pool consists of 96 German words, given in the column `item`. 
-Each word represents an object that is either typically found in a 
-bathroom or in a kitchen. For their experiments, Schaper et al. 
-partitioned the pool into 3 word lists that should be as similar as 
-possible with regard to four numeric criteria (that is: `r cols`). 
-Typically, stimulus sets may contain more than 96 elements (and the 
-selection usually becomes more effective when the pool is larger), but 
-the logic for stimulus selection that is applied in this tutorial can be 
-transfered to arbitrarily large stimulus sets.
+The item pool consists of 403 German words, given in the column `target_word`. For their experiments, Brunel et al. investigated how often for a `sentence` the target word is identified (given in the column `percentage_target_word`). 
 
-## Example 1a: Maximize differences in frequency
+## Step 1: Subset selection
 
-In the first example, I select two word lists that differ on frequency 
-but are as similar as possible with regard to consistency ratings and 
-the number of syllables. First, I need to define the boundaries that 
-define "high" and "low" frequency. Note that `frequency` is 
-reverse-coded such that low values actually indicate high frequency. 
-Here, I arbitrarily define values below 18 as "high" frequency and above 
-19 as "low" frequency, but any user-defined splits are possible.
+In many cases, researchers are provided with a relatively large set of stimuli, but only need a subset of the entire pool of stimuli. In many cases, the subset selection is done entirely based on substantive considerations -- there may just be a reason to select some stimuli and not some others. In this case, you can use your subset and procede to divide it into subsets immediately, using anticlustering (see below). 
+
+In some cases, however, researchers may be indifferent or not entirely fixated as to which stimuli to select and may prefer a data driven approach. In the following, I present one such data driven approach, based on maximizing the dispersion in the selected subset. The dispersion is defined as the minimum distance between two stimuli; maximizing the dispersion will ensure that we select stimuli across the entire space of the data describing the stimuli. We can use the `anticlustering()` for this purpose, but note that we actually do not perform anticlustering, which would be a grouping of the stimuli, but we exploit the `K` argument to perform a subset selection. Here, I select stimuli based on the valence and arousal rating of the target words:
 
 ```{r}
-schaper2019 <- within(schaper2019, {
-  freq <- ifelse(frequency < 18, "high", NA)
-  freq <- ifelse(frequency > 19, "low", freq)
-})
+
+variables <- brunel2025[, c("valence_target_word", "arousal_target_word")]
+
+N <- nrow(variables)
+N_subset <- 100
+
+groups <- anticlustering(
+  variables,
+  K = c(N_subset, rep(1, N-N_subset)), # crucial that K has this form, for subset selection
+  objective = "dispersion",
+  method = "local-maximum"
+)
+groups
 ```
 
-This code defined a new column `freq` for the data set `schaper2019` 
-that is either "low", "high" or missing (`NA`). Let's check it out:
+For this kind of subset selection, it is crucial to define the input for the `K` argument as above, and to select `objective = "dispersion"`. The `groups` vector is the output of the anticlustering function. The selection is coded with 1, so we might want to do some recoding: 
 
 ```{r}
-schaper2019$freq
+selected <- (groups == 1) +1 # 2 = selected, 1 = not selected
+table(selected)
 ```
 
-Before matching high and low frequency words, it is necessary to remove 
-cases that are not selected, i.e. where the entry in `freq` is `NA`:
+I can graphically display the selection: 
 
 ```{r}
-selected <- subset(schaper2019, !is.na(freq))
-# see how many cases were selected:
-table(selected$freq)
+
+colors <- c("#a9a9a9", "#df536b")
+cex <-  c(0.3, 1.2)
+pch <- c(19, 15)
+
+plot(
+  variables,
+  col = colors[selected],
+  cex = cex[selected],
+  pch = pch[selected]
+)
+
 ```
 
-Now, I use the `anticlust` function `matching()` to find paired words of 
-high and low frequency that are as similar as possible on consistency 
-and the number of syllables:
+The selection is given by the red dots. As we can see, maximizing the dispersion for subset selection ensures that we select stimuli that are representative of the initial sample of stimuli. I think this can be desirable in many applications, but users should decide if this is what they want.
+
+I assume it might also be of interest to select a certain amount of stimuli from different categories. In the current case, we might want to select the same number of words with negative, neutral and positive emotionality. Our first selection did not satisfy this strict condition:
 
 ```{r}
-# Match the conditions based on covariates
-covariates <- scale(selected[, 3:5])
-selected$matches <- matching(
-  covariates, 
-  match_between = selected$freq,
-  match_within = selected$room,
-  match_extreme_first = FALSE
+table(brunel2025$target_word_emotionality[selected == 2])
+```
+
+So we might perform subset selection for each of these word categories separately. Here I assume that I want to select 20 words of each emotionality:
+
+```{r}
+N_subset <- 20
+
+negative <- subset(brunel2025, target_word_emotionality == "Negative")
+negative$selected <- anticlustering(
+  negative[, c("valence_target_word", "arousal_target_word")],
+  K = c(N_subset, rep(1, nrow(negative)-N_subset)), 
+  objective = "dispersion",
+  method = "local-maximum"
+)
+
+neutral <- subset(brunel2025, target_word_emotionality == "Neutral")
+neutral$selected <- anticlustering(
+  neutral[, c("valence_target_word", "arousal_target_word")],
+  K = c(N_subset, rep(1, nrow(neutral)-N_subset)), 
+  objective = "dispersion",
+  method = "local-maximum"
+)
+
+positive <- subset(brunel2025, target_word_emotionality == "Positive")
+positive$selected <- anticlustering(
+  positive[, c("valence_target_word", "arousal_target_word")],
+  K = c(N_subset, rep(1, nrow(positive)-N_subset)), 
+  objective = "dispersion",
+  method = "local-maximum"
+)
+
+# Combine in one data frame again:
+combined <- rbind(negative, neutral, positive)
+combined$selected <- (combined$selected == 1) + 1 # recoding
+```
+
+Again, I can illustrate the selection graphically:
+
+```{r}
+
+colors <- c("#a9a9a9", "#df536b")
+cex <-  c(0.3, 1.2)
+pch <- c(19, 15)
+
+
+plot(
+  combined[, c("valence_target_word", "arousal_target_word")],,
+  col = colors[combined$selected],
+  cex = cex[combined$selected],
+  pch = pch[combined$selected]
+)
+
+```
+
+This still looks good, and I ensured an equal number of stimuli from each emotionality category:
+
+```{r}
+table(combined$target_word_emotionality[combined$selected == 2])
+```
+
+Of course, we can use more than just the two variables (valence and arousal) as a basis for the subset selection. For the purpose of graphical display, I selected two numeric variables, but I could for example also use categorical variables (defined as factors). 
+
+## Step 2: Create stimulus sets via anticlustering
+
+Now I use my selection fo 60 stimuli as input for anticlustering. First, let's actually select the stimuli: 
+
+```{r}
+stimuli <- subset(combined, selected == 2)
+nrow(stimuli)
+table(stimuli$target_word_emotionality)
+```
+
+Assume I want 4 equal-sized groups of stimuli for my experiment. Each list should have 5 negative, 5 neutral, and 5 positive words. Moreover, I want to balance the numeric variables valence, arousal, and percent correct between sets. We can for example call anticlustering like this: 
+
+```{r}
+balancing_variables <- c("target_word_emotionality", "percentage_target_word", "valence_target_word", "arousal_target_word")
+stimuli$Set <- anticlustering(
+  stimuli[, balancing_variables],
+  K = 4, 
+  standardize = TRUE,
+  method = "local-maximum", 
+  repetitions = 10
 )
 ```
 
-The first argument defines the covariates that should be similar in both 
-sets. I used the function `scale()` before passing the covariates to the 
-matching function to standardize the variables. This way, each variable 
-has the same weight in the matching process, which is usually desirable. 
-The argument `match_between` is the grouping variable based on `frequency` 
-that I just defined. The argument `match_within` is used to ensure that 
-matches are selected between words belonging to the same room. The 
-argument `match_extreme_first` is used to guide the behaviour of the 
-matching algorithm, but its precise meaning is not important for now 
-(for more information, see `?matching`). Generally, if we plan to only 
-keep a subset of all matches -- as we do in the current application --, 
-we set `match_extreme_first` to `FALSE`. If we want to keep all 
-elements, `match_extreme_first = TRUE` is usually better. 
-
-Next, let us check out some of the matches we created:
+I use the R package `tableone` to create an overview of the desctiprive statistics of all variables: 
 
 ```{r}
-subset(selected, matches == 1)
-subset(selected, matches == 2)
+CreateTableOne(balancing_variables, strata = "Set", data = stimuli)
 ```
 
-The matches are numbered by similarity, meaning that matches with 
-grouping number 1 are most similar. Therefore, we can easily select the 
-8 best-matched groups of words that we would like include in our 
-experiment:
+This seems to have worked quite well. Each set has the appropriate number of words from each emotion category. Note that this was not guaranteed: If we want to make sure that a categorical variable has strict priority (before the numeric variables), we can use the `categories` argument instead of including the categorical variable as part of the first argument: 
 
 ```{r}
-# Select the 8 best matches:
-final_selection <- subset(selected, matches <= 8)
-```
-
-Last, we check the quality of the results by investigating the 
-descriptive statistics -- means and standard deviations (in brackets) --
-by condition:
-
-```{r}
-# Check quality of the selection:
-mean_sd_tab(
-  final_selection[, 3:6], 
-  final_selection$freq
+numeric_variables <- c("percentage_target_word", "valence_target_word", "arousal_target_word")
+stimuli$Set2 <- anticlustering(
+  stimuli[, numeric_variables],
+  K = 4, 
+  standardize = TRUE,
+  method = "local-maximum", 
+  repetitions = 10,
+  categories = stimuli$target_word_emotionality
 )
+CreateTableOne(balancing_variables, strata = "Set2", data = stimuli)
+
 ```
 
-The descriptive statistics are similar across the sets for the 
-consistency ratings and the number of syllables, and dissimilar for 
-frequency, which is good. In general, the results can even be improved 
-if we can select from a larger item pool (then, more matches are 
-possible).
+In the vignette "Using categorical variables with anticlustering", I explore in more detail when it might make sense to use the `categories` argument or not. 
 
-If we are not sure how many items should be part of our experiment, the 
-function `plot_similarity()` may help. It plots an index of similarity 
-(see `?plot_similarity`) for each match:
+There is some considerations that I might have when doing anticlustering. Note that I set some arguments that I think are useful, which are however not the default: I generally recommend to always use `standardize = FALSE`, especially when combining numeric and categorial variables. Using `method = "local-maximum"` is a potential improvement over the default `method = "exchange"`; using several `repetitions` has the potential to improve results even further. 
 
-```{r, similarity-plot}
-plot_similarity(
-  covariates, 
-  groups = selected$matches
+We might also want to use a different `objective`, which is the argument that controls how the similarity of stimulus sets is computed. If, for example we use `objective = "kplus"`, we specifically require that means and standard deviations are similar: 
+
+```{r}
+numeric_variables <- c("percentage_target_word", "valence_target_word", "arousal_target_word")
+stimuli$Set3 <- anticlustering(
+  stimuli[, numeric_variables],
+  K = 4, 
+  standardize = TRUE,
+  method = "local-maximum", 
+  repetitions = 10,
+  categories = stimuli$target_word_emotionality, 
+  objective = "kplus"
 )
+CreateTableOne(balancing_variables, strata = "Set3", data = stimuli)
+
 ```
 
-The figure depicts the sum of pairwise dissimilarities (based on the 
-Euclidean distance) variance per match; the larger the value, the less 
-homogenous the match. It seems indeed that the first eight matches are 
-most similar; after the 8th match, there is already a notable decline in 
-similarity.
+As we can see, standard deviations are now more evenly matched. We might also focus on mean values alone (using `objective = "variance"`), but I generally do not recommend this unless you are very sure what you are doing. 
 
-## Example 1b: Two-factorial design
+### Other considerations
+
+Sometimes, we would like to ensure that within each level of a categorical variable -- such as word emotionality -- sets are balanced. Note that this is not achieved using the above calls to anticlustering. First, let's look at the descriptive statistics across groups for each word type separately, from our previous anticlustering assignment:
 
 ```{r}
-# Reload the data for next example
-data("schaper2019")
+mean_sd_tab(stimuli[, numeric_variables], groups = paste0(stimuli$target_word_emotionality, " - ", "Set ", stimuli$Set3))
 ```
 
-In another example, we construct a two-factorial design: we create 
-groups that differ on `rating_consistent` and `rating_inconsistent` 
-(these properties are orthogonally crossed) but are similar on frequency 
-and the number of syllables. First, we categorize the variables 
-frequency and syllables into two levels, respectively. This time, I just 
-use median splits, which means that I do not exclude any data in this 
-first step:
+There are quite strong discrepancies in mean values of negative words between sets. 
 
 ```{r}
-schaper2019 <- within(schaper2019, {
-  incon <- ifelse(rating_inconsistent < median(rating_inconsistent), "low incon", NA)
-  incon <- ifelse(rating_inconsistent >= median(rating_inconsistent), "high incon", incon)
-  con <- ifelse(rating_consistent <= median(rating_consistent), "low con", NA)
-  con <- ifelse(rating_consistent > median(rating_consistent), "high con", con)
-})
-```
-
-Let us check how many words are left per condition: 
-
-```{r}
-table(schaper2019$con, schaper2019$incon)
-```
-
-Next, we conduct a matching between the four groups that resulted from 
-crossing frequency and syllables:
-
-```{r}
-# Match the conditions based on covariates
-covariates <- scale(schaper2019[, c("frequency", "syllables")])
-schaper2019$matches <- matching(
-  covariates, 
-  match_between = schaper2019[, c("con", "incon")],
-  match_extreme_first = FALSE
+stimuli$Set4 <- anticlustering(
+  stimuli[, numeric_variables],
+  K = 4, 
+  standardize = TRUE,
+  method = "local-maximum",
+  blocks = stimuli$target_word_emotionality, 
+  objective = "kplus"
 )
+mean_sd_tab(stimuli[, numeric_variables], groups = paste0(stimuli$target_word_emotionality, " - ", "Set ", stimuli$Set4))
+
 ```
 
-In this application, each match consists of 4 words because we have 4 
-conditions, e.g.:
+These results look better. 
 
-```{r}
-subset(schaper2019, matches == 1)
-```
+---
 
-To decide how many matched groups we would like to keep, let's check out 
-the similarity plot:
+**References**
 
-```{r}
-# Plot covariate similarity by match:
-plot_similarity(covariates, schaper2019$matches)
-```
-
-Based on the plot, we select the 10 best matches:
-
-```{r}
-# Select the 5 best matches:
-final_selection <- subset(schaper2019, matches <= 10)
-```
-
-Last, we check quality of the selection by printing the descriptive 
-statistics by condition:
-
-```{r}
-mean_sd_tab(
-  subset(final_selection, select = 3:6), 
-  paste(final_selection$con, final_selection$incon)
-)
-```
-
-Again, the covariates are quite similar between sets, but with a larger 
-item pool even better results could be achieved.
-
-## Example 2: Anticlustering
-
-```{r}
-# Reload the data for next example
-data("schaper2019")
-```
-
-In the next example, we wish to partition the entire pool of 96 items 
-into 3 sets that are as similar as possible on all variables. That means 
-that there is no independent variable that varies between conditions; 
-the experimental manipulation is independent of the intrinsic stimulus 
-properties. Creating stimulus sets that are overall similar to each 
-other can be done using anticlustering (Papenberg & Klau, 2020):
-
-```{r}
-## Conduct anticlustering (assign all items to three similar groups)
-schaper2019$anticluster <- anticlustering(
-  schaper2019[, 3:6], 
-  K = 3,
-  objective = "variance"
-)
-
-## check out quality of the solution
-mean_sd_tab(
-  subset(schaper2019, select = 3:6), 
-  schaper2019$anticluster
-)
-```
-
-## Example 2b: Anticlustering on subset selection
-
-```{r}
-# Reload the data for next example
-data("schaper2019")
-```
-
-If we do not want to include all 96 words in our experiment, we can 
-again use the `matching()` function to select a subset of similar 
-stimuli that we employ. Again, we wish the select three groups that 
-are as similar as possible on all variables, but we only use a subset
-of all 96 items. To achieve this goal, we create triplets of similar
-stimuli using `matching()`; afterwards, the items belonging to the 
-same triplet will be assigned to different experimental sets. 
-We use the argument `match_within` to ensure that all triplets
-consist of items belonging to the same room:
-
-```{r}
-# First, identify triplets of similar word, within room
-covariates <- scale(schaper2019[, 3:6])
-schaper2019$triplet <- matching(
-  covariates,
-  p = 3,
-  match_within = schaper2019$room
-)
-
-# check out the two most similar triplets:
-subset(schaper2019, triplet == 1)
-subset(schaper2019, triplet == 2)
-
-# Select the 10 best triplets
-best <- subset(schaper2019, triplet <= 10)
-```
-
-Now, we use `anticlustering()` to assign the matched words to different
-sets:
-
-
-```{r}
-best$anticluster <- anticlustering(
-  best[, 3:6], 
-  K = 3,
-  categories = best$triplet,
-  objective = "variance"
-)
-```
-
-In this function call, we pass the `triplets` to the argument `categories`, 
-thus ensuring that the matched items are assigned to different sets. We can confirm
-this worked by looking at the cross table of `triplet` and `anticluster`:
-
-```{r}
-table(best$triplet, best$anticluster)
-```
-
-Anticlustering strives to assign the matched triplets to the different sets in 
-such a way that all sets are as similar as possible. Note that by ensuring
-that the triplets only consisted of items from the same room, the room
-was also balanced across anticlusters: 
-
-```{r}
-table(best$room, best$anticluster)
-```
-
-Last, we check out the descriptive statistics by anticluster, confirming 
-that the sets are indeed quite similar on all numeric attributes:
-
-```{r}
-## check out quality of the solution
-mean_sd_tab(
-  subset(best, select = 3:6), 
-  best$anticluster
-)
-```
-
-## References
 
 Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition data sets into equivalent parts. *Psychological Methods, 26*(2), 161–174. https://doi.org/10.1037/met0000301
 
