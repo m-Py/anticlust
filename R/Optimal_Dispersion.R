@@ -416,6 +416,8 @@ add_unassigned_elements <- function(target_groups, init, N, K) {
     table_assigned <- data.frame(K = 1:K, size = 0)
     df <- as.data.frame(table(init, useNA = "always"))
     together <- merge(table_assigned, df, by.x = "K", by.y = "init", all = TRUE)
+    together$K <- as.numeric(together$K)
+    together <- together[order(together$K), ]
     table_assigned <- ifelse(is.na(together$Freq), 0, together$Freq)[-(K+1)]
   }
   freq_not_assigned <- target_groups - table_assigned
