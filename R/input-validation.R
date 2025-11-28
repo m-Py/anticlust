@@ -117,6 +117,15 @@ input_validation_anticlustering <- function(x, K, objective, method,
     blocks <- merge_into_one_variable(blocks)
     validate_input(blocks, "blocks", not_function = TRUE, len = N)
     if (argument_exists(must_link)) stop("Currently, using must-link constraints is not possible within blocks.")
+    if (!method %in% c("exchange", "local-maximum")) {
+      stop("Blocked anticlustering currently only works with method = 'exchange' or 'local-maximum'.")
+    }
+    if (argument_exists(repetitions)) {
+      stop("Cannot use multiple repetitions with blocks.")
+    }
+    if (preclustering) {
+      stop("Cannot use preclustering with blocks.")
+    }
   }
 
   validate_input(preclustering, "preclustering", len = 1,
