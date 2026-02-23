@@ -12,7 +12,7 @@
 #' @param K The number of groups or a vector describing the size of
 #'     each group.
 #' @param solver Optional argument; currently supports "lpSolve", 
-#'     "glpk", "symphony", and "gurobi". See \code{\link{optimal_anticlustering}}.
+#'     "glpk", "symphony", "gurobi", and "gecode". See \code{\link{optimal_anticlustering}}.
 #' @param max_dispersion_considered Optional argument used for early
 #'     stopping. If the dispersion found is equal to or exceeds this
 #'     value, a solution having the previous best dispersion is
@@ -89,6 +89,8 @@
 #' the SYMPHONY library (via the printing function \code{printf}),
 #' which cannot be prevented in R.
 #'
+#' @importFrom gkc.gecode solve_k_graph_coloring_anticlust_with_must_and_cannot_link
+#' 
 #' @author
 #' 
 #' Max Diekhoff
@@ -219,8 +221,32 @@ optimal_dispersion <- function(
     # Reorder edge labels so that they start from 1 to C, where C is the number
     # of relevant edges (Better for creating K-coloring ILP).
     all_nns_reordered <- reorder_edges(all_nns)
-    ilp <- k_coloring_ilp(all_nns_reordered, N, K, target_groups)
-    solution <- solve_ilp(ilp, objective = "min", solver = solver, time_limit = time_limit)
+    if (solver == "gecode") {
+      groups <- solve_k_graph_coloring_anticlust_with_must_and_cannot_link(
+        selection_index = length(unique(all_nns_reordered)), 
+        k = K, 
+        target_groups_sizes = target_groups, 
+        edge_count = nrow(all_nns_reordered),
+        edge_table_u = all_nns_reordered[, 1],
+        edge_table_v = all_nns_reordered[, 2],
+        cannot_link_edge_count = 0,
+        cannot_link_u = NA,
+        cannot_link_v = NA,
+        must_link_edge_count = 0,
+        must_link_u = NA,
+        must_link_v = NA,
+        number_of_threads = 1,
+        number_of_solutions = 1,
+        symmetry_breaking = 1
+      )
+      solution <- list(
+        x = c(as.dist(selection_matrix_from_clusters(c(groups)))),
+        status = ifelse(length(groups) == 1 && groups[[1]] == -1, 1, 0)
+      )
+    } else {
+      ilp <- k_coloring_ilp(all_nns_reordered, N, K, target_groups)
+      solution <- solve_ilp(ilp, objective = "min", solver = solver, time_limit = time_limit)
+    }
     dispersion_found <- solution$status != 0
     if (argument_exists(time_limit) && (as.numeric(difftime(Sys.time(), start, units = "s")) > time_limit)) {
       stop("Could not find the optimal dispersion in the given time limit.")

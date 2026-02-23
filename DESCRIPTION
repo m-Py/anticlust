@@ -1,7 +1,7 @@
 Type: Package
 Package: anticlust
 Title: Subset Partitioning via Anticlustering
-Version: 0.8.13
+Version: 0.8.13-9999
 Authors@R: c(
     person("Martin", "Papenberg", , "martin.papenberg@hhu.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-9900-4268")),
@@ -43,7 +43,8 @@ Suggests:
     tinytest,
     gurobi,
     tableone,
-    palmerpenguins
+    palmerpenguins,
+    gkc.gecode
 VignetteBuilder: 
     knitr,
     rmarkdown

@@ -168,7 +168,7 @@ validate_input_optimal_anticlustering <- function(x, K, objective, solver, time_
   # Solver
   if (argument_exists(solver)) {
     validate_input(solver, "solver", objmode = "character", len = 1,
-                  input_set = c("glpk", "symphony", "lpSolve", "gurobi"), not_na = TRUE, not_function = TRUE)
+                  input_set = c("glpk", "symphony", "lpSolve", "gurobi", "gecode"), not_na = TRUE, not_function = TRUE)
     if (solver == "glpk") {
       if (!requireNamespace("Rglpk", quietly = TRUE)) {
         stop("The package Rglpk must be installed to use `solver = glpk`.\n", 
@@ -196,5 +196,6 @@ validate_input_optimal_anticlustering <- function(x, K, objective, solver, time_
       greater_than = 0,
       must_be_integer = TRUE
     )
+    if (solver == "gecode") stop("Solver gecode currently does not support a time limit.")
   }
 }
