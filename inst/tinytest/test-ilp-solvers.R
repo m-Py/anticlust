@@ -51,7 +51,12 @@ if (requireNamespace("gurobi", quietly = TRUE)) {
   expect_equal(val1, val4)
 }
 
-
+if (requireNamespace("gkc.gecode", quietly = TRUE)) {
+  start <- Sys.time()
+  val5 <- optimal_dispersion(x, K = 3, solver = "gecode")$dispersion
+  Sys.time() - start
+  expect_equal(val1, val5)
+}
 
 ### Test solvers for balanced clustering (i.e., reversed maximum - minimum - diversity)
 
