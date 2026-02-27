@@ -8,7 +8,7 @@
 **Documentation**
 
 - Extended documentation on the data input that is accepted by `anticlustering()`
-- Extended documentation in `categories_ton_binary()`
+- Extended documentation in `categories_to_binary()`
 
 **Internal**
 
