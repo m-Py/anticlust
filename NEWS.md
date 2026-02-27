@@ -1,3 +1,7 @@
+# anticlust Development
+
+- optimal_dispersion() and optimal_anticlustering() now support `solver = "gecode"`, requiring installation of the (now) suggested package `gkc.gecode`
+
 # anticlust 0.8.13
 
 **User visible changes**
