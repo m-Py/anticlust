@@ -476,16 +476,21 @@ remove_redundant_edges <- function(df) {
 # Second function returns full groupings 
 optimal_cannot_link_reduced <- function(N, K, target_groups, cannot_link, repetitions) {
   all_nns_reordered <- reorder_edges(cannot_link)
-  ilp <- k_coloring_ilp(all_nns_reordered, K, target_groups)
-  # select solver: gurobi > symphony > lpSolve > Glpk
-  if (requireNamespace("gurobi", quietly = TRUE)) {
-    solver <- "gurobi"
-  } else if (requireNamespace("Rsymphony", quietly = TRUE)) {
-    solver <- "symphony"
-  } else {
-    solver <- find_ilp_solver()
+  # select solver: Gecode > gurobi > symphony > lpSolve > Glpk
+  if (requireNamespace("gkc.gecode", quietly = TRUE)) {
+    solution <- gecode_solver(all_nns_reordered, K, target_groups)
+  } else  {
+    ilp <- k_coloring_ilp(all_nns_reordered, K, target_groups)
+    if (requireNamespace("gurobi", quietly = TRUE)) {
+      solver <- "gurobi"
+    } else if (requireNamespace("Rsymphony", quietly = TRUE)) {
+      solver <- "symphony"
+    } else {
+      solver <- find_ilp_solver()
+    }
+    solution <- solve_ilp(ilp, solver = solver)
   }
-  solution <- solve_ilp(ilp, solver = solver)
+
   if (solution$status != 0) {
     stop("The cannot-link constraints cannot be fulfilled.")
   }
