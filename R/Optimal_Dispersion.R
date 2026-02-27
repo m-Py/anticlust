@@ -222,29 +222,9 @@ optimal_dispersion <- function(
     # of relevant edges (Better for creating K-coloring ILP).
     all_nns_reordered <- reorder_edges(all_nns)
     if (solver == "gecode") {
-      groups <- solve_k_graph_coloring_anticlust_with_must_and_cannot_link(
-        selection_index = length(unique(all_nns_reordered)), 
-        k = K, 
-        target_groups_sizes = target_groups, 
-        edge_count = nrow(all_nns_reordered),
-        edge_table_u = all_nns_reordered[, 1],
-        edge_table_v = all_nns_reordered[, 2],
-        cannot_link_edge_count = 0,
-        cannot_link_u = NA,
-        cannot_link_v = NA,
-        must_link_edge_count = 0,
-        must_link_u = NA,
-        must_link_v = NA,
-        number_of_threads = 1,
-        number_of_solutions = 1,
-        symmetry_breaking = 1
-      )
-      solution <- list(
-        x = c(as.dist(selection_matrix_from_clusters(c(groups)))),
-        status = ifelse(length(groups) == 1 && groups[[1]] == -1, 1, 0)
-      )
+      solution <- gecode_solver(all_nns_reordered, K, target_groups)
     } else {
-      ilp <- k_coloring_ilp(all_nns_reordered, N, K, target_groups)
+      ilp <- k_coloring_ilp(all_nns_reordered, K, target_groups)
       solution <- solve_ilp(ilp, objective = "min", solver = solver, time_limit = time_limit)
     }
     dispersion_found <- solution$status != 0
@@ -256,7 +236,6 @@ optimal_dispersion <- function(
       all_nns_last <- all_nns
       all_nns_reordered_last <- all_nns_reordered
       dispersions_considered <- c(dispersions_considered, dispersion)
-      
     }
     counter <- counter + 1
     # Take out distances that have been investigated to proceed
@@ -311,7 +290,7 @@ optimal_dispersion <- function(
   )
 }
 
-k_coloring_ilp <- function(all_nns_reordered, N, K, target_groups) {
+k_coloring_ilp <- function(all_nns_reordered, K, target_groups) {
   # Initialize some constant variables
   nr_of_nodes <- max(all_nns_reordered)
   nr_of_edges <- nrow(all_nns_reordered)
@@ -497,7 +476,7 @@ remove_redundant_edges <- function(df) {
 # Second function returns full groupings 
 optimal_cannot_link_reduced <- function(N, K, target_groups, cannot_link, repetitions) {
   all_nns_reordered <- reorder_edges(cannot_link)
-  ilp <- k_coloring_ilp(all_nns_reordered, N, K, target_groups)
+  ilp <- k_coloring_ilp(all_nns_reordered, K, target_groups)
   # select solver: gurobi > symphony > lpSolve > Glpk
   if (requireNamespace("gurobi", quietly = TRUE)) {
     solver <- "gurobi"
@@ -523,4 +502,43 @@ optimal_cannot_link <- function(N, K, target_groups, cannot_link, repetitions) {
     groups <- add_unassigned_elements(target_groups, groups_fixated, N, K)
   }
   groups
+}
+
+gecode_solver <- function(all_nns_reordered, K, target_groups) {
+  nr_of_nodes <- length(unique(c(all_nns_reordered)))
+  groups <- solve_k_graph_coloring_anticlust_with_must_and_cannot_link(
+    selection_index = nr_of_nodes, 
+    k = K, 
+    target_groups_sizes = target_groups, 
+    edge_count = nrow(all_nns_reordered),
+    edge_table_u = all_nns_reordered[, 1],
+    edge_table_v = all_nns_reordered[, 2],
+    cannot_link_edge_count = 0,
+    cannot_link_u = NA,
+    cannot_link_v = NA,
+    must_link_edge_count = 0,
+    must_link_u = NA,
+    must_link_v = NA,
+    number_of_threads = 1,
+    number_of_solutions = 1,
+    symmetry_breaking = 1
+  )
+  # convert grouping to pairwise connections
+  decision_variables <- c(rep(1, K), rep(0, K*nr_of_nodes))
+  names(decision_variables) <- constraint_names(nr_of_nodes, K)
+  decision_variables <- ilp_decision_vars_from_grouping(c(groups), decision_variables)
+  solution <- list(
+    x = decision_variables,
+    status = ifelse(length(groups) == 1 && groups[[1]] == -1, 1, 0),
+    obj = 0 # does not matter here?
+  )
+  solution
+}
+
+# generate ILP decision variables from grouping 
+ilp_decision_vars_from_grouping <- function(x, decision_variables) {
+  for (i in seq_along(x)) {
+    decision_variables[paste0("x_", i, "_", x[i])] <- 1
+  }
+  decision_variables
 }
