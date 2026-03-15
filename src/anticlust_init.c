@@ -19,8 +19,7 @@ extern void three_phase_search_dynamic_population_size(void *, void *, void *, v
 extern void three_phase_search_dispersion(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *,  void *,  void *, void *);
 extern void mahalanobis_out(void *, void *, void *, void *, void *);
 extern void fast_MD_anticlustering(void *, void *, void *, void *, void *, void *, void *, void *, void *);
-
-
+extern void feasible_and_infeasible_region_search(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
 static const R_CMethodDef CEntries[] = {
   {"bicriterion_iterated_local_search_call", (DL_FUNC) &bicriterion_iterated_local_search_call,  14},
   {"dispersion_anticlustering",              (DL_FUNC) &dispersion_anticlustering,               9},
@@ -31,6 +30,7 @@ static const R_CMethodDef CEntries[] = {
   {"three_phase_search_dispersion", (DL_FUNC) &three_phase_search_dispersion, 17},
   {"mahalanobis_out", (DL_FUNC) &mahalanobis_out, 5},
   {"fast_MD_anticlustering",                  (DL_FUNC) &fast_MD_anticlustering,         9},
+  {"feasible_and_infeasible_region_search", (DL_FUNC) &feasible_and_infeasible_region_search, 19},
   {NULL, NULL, 0}
 };
 
