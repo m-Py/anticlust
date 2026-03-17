@@ -12,8 +12,8 @@ library(anticlust)
 #' @param ensure_equal_n_replicates Logical. If `TRUE`, ensures equal numbers of replicates across treatment groups. Defaults to `TRUE`. If `FALSE` all subjects are allocated. 
 #' @param keep_excluded_data Logical. If `TRUE`, retains subjects that were not allocated within the specified constraints. Defaults to `FALSE`.
 #' @param objective A string specifying the objective function for anticlustering. Options include `"variance"` (default), `"diversity"`, `"average-diversity"`, `"kplus"`, and `"dispersion"`. 
-#' @param method. A string specifying the optimization method for anticlustering. Options include `"local-maximum"` (default), `"exchange"`, `"brusco"`, `"ilp"`, and `"2PML"`.
-#' @param repetitions Integer. Specifies the number of times the optimization is repeated when using heuristic methods (`"exchange"`, `"local-maximum"`, `"brusco"`, or `"2PML"`). The best solution is selected. Defaults to `10`.
+#' @param method A string specifying the optimization method for anticlustering. Options include `"local-maximum"` (default), `"exchange"`, `"brusco"`, `"ilp"`, and `"2PML"`.
+#' @param repetitions Integer. Specifies the number of times the optimization is repeated when using heuristic methods (`"exchange"`, `"local-maximum"`, `"brusco"`, or `"2PML"`). The best solution is selected. Defaults to `100`.
 #' @param match_within A column name in `data` (optional). Specifies a variable within which matching should occur, ensuring that subjects are grouped within subsets defined by this variable. Defaults to `NULL`.
 #' @param standardize Logical. If `TRUE`, covariates are standardized via `scale()` before optimization starts. Defaults to `TRUE`.
 #' 
@@ -33,6 +33,16 @@ library(anticlust)
 #' - All required arguments (`data`, `treatments`, `covariates`) are provided.
 #' - Covariates exist in the `data` frame and are numeric.
 #' - Covariates do not have constant values across all rows.
+#' 
+#' @section How to cite:
+#' If you use this function in academic work, please cite:
+#' Wintermantel, D., Osterman, J., Mair, M. M., & Hartig, F. (in preparation).
+#' *Equivalence testing in pesticide risk assessment – Evaluation and practical guidance
+#' for design, analysis and interpretation*.
+#'
+#' The treatment allocation implemented here relies on anticlustering functions.
+#' Users are encouraged to also cite the `anticlust` package where appropriate
+#' (see `citation("anticlust")`).
 #'
 #' @examples
 #' # Example dataset: Bee data
@@ -76,12 +86,13 @@ library(anticlust)
 #' 
 
 allocate_treatments <- function(data, treatments, treatment_var = "Treatment",
-                                covariates, n_replicates = NULL, 
+                                covariates, 
+                                n_replicates = NULL, 
                                 ensure_equal_n_replicates = TRUE, 
                                 keep_excluded_data = FALSE,
                                 objective = "variance", 
                                 method = "local-maximum",
-                                repetitions = 10, 
+                                repetitions = 100, 
                                 match_within = NULL,
                                 standardize = TRUE) {
   
