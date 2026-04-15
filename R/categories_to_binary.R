@@ -108,7 +108,7 @@ categories_to_binary <- function(categories, use_combinations = FALSE) {
   ## Does some variable only have 1 value??? Allow this by converting to numeric (i.e., 1!)
   for (i in 1:ncol(categories)) {
     if (length(levels(categories[, i])) == 1) {
-      categories[, i] <- 1
+      categories[, i] <- factor(1)
     }
   }
   combine_by <- ifelse(use_combinations, " * ", " + ")
@@ -116,6 +116,6 @@ categories_to_binary <- function(categories, use_combinations = FALSE) {
   model.matrix(
     as.formula(formula_string), 
     data = categories,
-    contrasts.arg = lapply(categories, contrasts, contrasts=FALSE) # this ensures that each level of the category has a binary variable
+    contrasts.arg = lapply(categories[, sapply(categories, is.factor), drop = FALSE], contrasts, contrasts=FALSE) # this ensures that each level of the category has a binary variable
   )[ ,-1, drop = FALSE]
 }
