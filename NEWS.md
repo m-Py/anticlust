@@ -1,6 +1,10 @@
 # anticlust 0.8.15
 
-- Fixes a regression from version 0.8.13 `categories_to_binary()`, affecting the way one-hot encoding was conducted internally
+- Fixes a regression from version 0.8.14 in `categories_to_binary()`, affecting the way one-hot encoding was conducted internally
+
+# anticlust 0.8.14
+
+- Fixes a regression from version 0.8.13 in `categories_to_binary()`, affecting the way one-hot encoding was conducted internally
 
 # anticlust 0.8.13
 
