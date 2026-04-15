@@ -108,7 +108,7 @@ categories_to_binary <- function(categories, use_combinations = FALSE) {
   ## Does some variable only have 1 value??? Allow this by converting to numeric (i.e., 1!)
   for (i in 1:ncol(categories)) {
     if (length(levels(categories[, i])) == 1) {
-      categories[, i] <- factor(1)
+      categories[, i] <- 1
     }
   }
   combine_by <- ifelse(use_combinations, " * ", " + ")
