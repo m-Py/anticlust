@@ -21,10 +21,8 @@ double mahalanobis_inv(double *x,
 
 
         // Vectors to track computation of MD
-        double *d = (double *) malloc(m * sizeof(double));     /* d = x - y */
-        if (!d) { perror("malloc"); exit(EXIT_FAILURE); }
-        double *t = (double *)malloc(m * sizeof(double));      /* t = Σ⁻¹ * d */
-        if (!t) { perror("malloc"); exit(EXIT_FAILURE); }
+        double d[m];     /* d = x - y */
+        double t[m];      /* t = Σ⁻¹ * d */
 
         for (size_t i = 0; i < m; ++i) {
                 d[i] = x[i] - y[i];
@@ -43,10 +41,6 @@ double mahalanobis_inv(double *x,
         for (size_t i = 0; i < m; ++i) {
                 dot += d[i] * t[i];
         }
-
-        // clean up
-        free(d);
-        free(t);
 
         return dot;
 }
