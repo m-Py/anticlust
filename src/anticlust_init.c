@@ -17,6 +17,8 @@ extern void kmeans_anticlustering(void *, void *, void *, void *, void *, void *
 extern void fast_kmeans_anticlustering(void *, void *, void *, void *, void *, void *, void *, void *);
 extern void three_phase_search_dynamic_population_size(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *,  void *, void *);
 extern void three_phase_search_dispersion(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *,  void *,  void *, void *);
+extern void mahalanobis_out(void *, void *, void *, void *, void *);
+
 
 static const R_CMethodDef CEntries[] = {
   {"bicriterion_iterated_local_search_call", (DL_FUNC) &bicriterion_iterated_local_search_call,  14},
@@ -26,6 +28,7 @@ static const R_CMethodDef CEntries[] = {
   {"fast_kmeans_anticlustering",                  (DL_FUNC) &fast_kmeans_anticlustering,         8},
   {"three_phase_search_dynamic_population_size", (DL_FUNC) &three_phase_search_dynamic_population_size, 17},
   {"three_phase_search_dispersion", (DL_FUNC) &three_phase_search_dispersion, 17},
+  {"mahalanobis_out", (DL_FUNC) &mahalanobis_out, 5},
   {NULL, NULL, 0}
 };
 

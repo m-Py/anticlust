@@ -249,3 +249,12 @@ double weighted_array_sum(size_t k, int* frequencies, double ARRAY[k]);
 
 // for average diversity implementation:
 double weighted_array_sum2(size_t k, int* frequencies, double ARRAY[k]);
+void mahalanobis_out(double *x,
+                     double *y,
+                     int *m,
+                     double *inv_cov,
+                     double *MD);
+double mahalanobis_inv(double *x,
+                       double *y,
+                       size_t m,
+                       double *inv_cov);
