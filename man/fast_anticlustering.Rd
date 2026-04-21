@@ -9,7 +9,9 @@ fast_anticlustering(
   K,
   k_neighbours = Inf,
   categories = NULL,
-  exchange_partners = NULL
+  exchange_partners = NULL,
+  distance = c("euclidean", "mahalanobis"),
+  lambda = NULL
 )
 }
 \arguments{
@@ -33,6 +35,10 @@ or several categorical constraints.}
 elements that serve as exchange partners. If used, this
 argument overrides the \code{k_neighbours} argument. See
 examples.}
+
+\item{distance}{Is the (squared) Euclidean distance used (default for k-means) or the "mahalanobis" distance?}
+
+\item{lambda}{If \code{distance ="mahalanobis"}, regularization term to compute the mahalanobis distance.}
 }
 \description{
 Increasing the speed of (k-means / k-plus) anticlustering by (1) 
@@ -169,6 +175,7 @@ data <- matrix(rnorm(10000 * 2), ncol = 2)
 start <- Sys.time()
 groups <- fast_anticlustering(data, K = 5, k_neighbours = 5)
 Sys.time() - start 
+
 
 }
 \references{

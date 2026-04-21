@@ -258,3 +258,7 @@ double mahalanobis_inv(double *x,
                        double *y,
                        size_t m,
                        double *inv_cov);
+
+void fast_MD_anticlustering(double *data, int *N, int *M, int *K, int *frequencies,
+                            int *clusters, int *partners, int *k_neighbours,
+                            double *inv_cov);

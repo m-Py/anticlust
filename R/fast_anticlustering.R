@@ -22,6 +22,8 @@
 #'     elements that serve as exchange partners. If used, this
 #'     argument overrides the \code{k_neighbours} argument. See
 #'     examples.
+#' @param distance Is the (squared) Euclidean distance used (default for k-means) or the "mahalanobis" distance?
+#' @param lambda If \code{distance ="mahalanobis"}, regularization term to compute the mahalanobis distance.
 #'
 #' @importFrom RANN nn2
 #'
@@ -189,9 +191,11 @@
 #' groups <- fast_anticlustering(data, K = 5, k_neighbours = 5)
 #' Sys.time() - start 
 #'
+#'
 
 fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL, 
-                                exchange_partners = NULL) {
+                                exchange_partners = NULL, distance = c("euclidean", "mahalanobis"),
+                                lambda = NULL) {
   input_validation_anticlustering(
     x, K, "variance", "exchange", FALSE, categories, NULL
   )
@@ -210,10 +214,24 @@ fast_anticlustering <- function(x, K, k_neighbours = Inf, categories = NULL,
   }
   exchange_partners <- cleanup_exchange_partners(exchange_partners, N)
 
+  distance <- match.arg(distance)
+
+  if (distance == "mahalanobis") {
+    cov_mat <- cov(x)
+    lambda <- ifelse(is.null(lambda), 0, lambda)
+    inv_cov_mat <- MASS::ginv(cov_mat+ lambda * diag(nrow(cov_mat)))
+    return(c_anticlustering(
+    x, initialize_clusters(N, K, categories),
+    categories = NULL, objective = "fast-MD",
+    exchange_partners = exchange_partners - 1,
+    inv_cov_mat = inv_cov_mat
+    ))
+  }
   c_anticlustering(
     x, initialize_clusters(N, K, categories), 
     categories = NULL, objective = "fast-kmeans", 
-    exchange_partners - 1
+    exchange_partners = exchange_partners - 1
+
   )
 }
 

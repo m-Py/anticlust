@@ -9,7 +9,7 @@
 #' 
 #' @noRd
 #' 
-c_anticlustering <- function(data, K, categories = NULL, objective, exchange_partners = NULL, local_maximum = FALSE, init_partitions = NULL) {
+c_anticlustering <- function(data, K, categories = NULL, objective, exchange_partners = NULL, local_maximum = FALSE, init_partitions = NULL, inv_cov_mat = NULL) {
   
   clusters <- initialize_clusters(NROW(data), K, categories)
 
@@ -114,6 +114,21 @@ c_anticlustering <- function(data, K, categories = NULL, objective, exchange_par
       clusters = as.integer(clusters),
       as.integer(exchange_partners),
       as.integer(nrow(exchange_partners)),
+      PACKAGE = "anticlust"
+    )
+    results[["mem_error"]] <- 0
+  } else if (objective == "fast-MD") {
+    results <- .C(
+      "fast_MD_anticlustering",
+      as.double(data),
+      as.integer(N),
+      as.integer(M),
+      as.integer(K),
+      as.integer(frequencies),
+      clusters = as.integer(clusters),
+      as.integer(exchange_partners),
+      as.integer(nrow(exchange_partners)),
+      as.double(inv_cov_mat),
       PACKAGE = "anticlust"
     )
     results[["mem_error"]] <- 0
