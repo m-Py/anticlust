@@ -5,6 +5,10 @@
 #'     or several categorical variables
 #' @param use_combinations Logical, should the output also include columns representing
 #'    the combination / interaction of the categories (defaults to \code{FALSE}).
+#' @param pairwise_combinations Optional, logical. 
+#'    If \code{pairwise_combinations} is \code{TRUE}, only pairwise 
+#'    interactions are encoded (and not all higher order interactions like when 
+#'    only using \code{use_combinations}). 
 #'
 #' @return A matrix encoding the categorical variable(s) in binary form. 
 #'
@@ -99,9 +103,16 @@
 #' 
 #'  
 
-categories_to_binary <- function(categories, use_combinations = FALSE) {
+categories_to_binary <- function(categories, use_combinations = FALSE, pairwise_combinations = NULL) {
   validate_input(use_combinations, "use_combinations", objmode = "logical", len = 1,
                  input_set = c(TRUE, FALSE), not_na = TRUE, not_function = TRUE)
+  if(argument_exists(pairwise_combinations)) {
+    validate_input(pairwise_combinations, "pairwise_combinations", objmode = "logical", len = 1,
+                   input_set = c(TRUE, FALSE), not_na = TRUE, not_function = TRUE)
+  } else {
+    pairwise_combinations <- FALSE
+  }
+  
   categories <- data.frame(categories)
   categories <- as.data.frame(lapply(categories, factor, exclude = NULL))
   colnames(categories) <- paste0("X", 1:ncol(categories))
@@ -111,8 +122,14 @@ categories_to_binary <- function(categories, use_combinations = FALSE) {
       categories[, i] <- 1
     }
   }
-  combine_by <- ifelse(use_combinations, " * ", " + ")
+  combine_by <- ifelse(use_combinations && !pairwise_combinations, " * ", " + ")
   formula_string <- paste("~", paste(colnames(categories), collapse = combine_by), collapse = "")
+  # extend string by pairwise interactions if pairwise_combinations == TRUE
+  if (pairwise_combinations) {
+    interactions <- data.frame(t(combn(colnames(categories), 2)))
+    interactions <- paste(paste(interactions[,1], interactions[,2], sep = ":"), collapse =" + ")
+    formula_string <- paste(formula_string, "+", interactions, collapse = " + ")
+  }
   model.matrix(
     as.formula(formula_string), 
     data = categories,
