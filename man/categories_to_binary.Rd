@@ -4,7 +4,11 @@
 \alias{categories_to_binary}
 \title{Get binary representation of categorical variables}
 \usage{
-categories_to_binary(categories, use_combinations = FALSE)
+categories_to_binary(
+  categories,
+  use_combinations = FALSE,
+  pairwise_combinations = NULL
+)
 }
 \arguments{
 \item{categories}{A vector, data.frame or matrix representing one
@@ -12,6 +16,11 @@ or several categorical variables}
 
 \item{use_combinations}{Logical, should the output also include columns representing
 the combination / interaction of the categories (defaults to \code{FALSE}).}
+
+\item{pairwise_combinations}{Optional, logical. 
+If \code{pairwise_combinations} is \code{TRUE}, only pairwise 
+interactions are encoded (and not all higher order interactions like when 
+only using \code{use_combinations}).}
 }
 \value{
 A matrix encoding the categorical variable(s) in binary form.

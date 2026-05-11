@@ -1,3 +1,8 @@
+
+# anticlust 0.8.16
+
+- `categories_to_binary()` has a new argument `pairwise_combinations`
+
 # anticlust 0.8.15
 
 - Fixes a regression from version 0.8.13 `categories_to_binary()`, affecting the way one-hot encoding was conducted internally
