@@ -50,5 +50,5 @@ VignetteBuilder:
 Encoding: UTF-8
 LazyData: true
 NeedsCompilation: yes
-RoxygenNote: 7.3.3
 SystemRequirements: Rendering the vignette requires pandoc (<https://pandoc.org/>). 
+Config/roxygen2/version: 8.0.0
