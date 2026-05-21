@@ -2,6 +2,10 @@
 
 - optimal_dispersion() and optimal_anticlustering() now support `solver = "gecode"`, requiring installation of the (now) suggested package `gkc.gecode`
 
+# anticlust 0.8.15
+
+- Fixes a regression from version 0.8.13 `categories_to_binary()`, affecting the way one-hot encoding was conducted internally
+
 # anticlust 0.8.13
 
 **User visible changes**
