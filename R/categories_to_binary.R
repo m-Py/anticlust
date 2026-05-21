@@ -5,6 +5,10 @@
 #'     or several categorical variables
 #' @param use_combinations Logical, should the output also include columns representing
 #'    the combination / interaction of the categories (defaults to \code{FALSE}).
+#' @param pairwise_combinations Optional, logical. 
+#'    If \code{pairwise_combinations} is \code{TRUE}, only pairwise 
+#'    interactions are encoded (and not all higher order interactions like when 
+#'    only using \code{use_combinations}). 
 #'
 #' @return A matrix encoding the categorical variable(s) in binary form. 
 #'
@@ -99,9 +103,14 @@
 #' 
 #'  
 
-categories_to_binary <- function(categories, use_combinations = FALSE) {
+categories_to_binary <- function(categories, use_combinations = FALSE, pairwise_combinations = NULL) {
   validate_input(use_combinations, "use_combinations", objmode = "logical", len = 1,
                  input_set = c(TRUE, FALSE), not_na = TRUE, not_function = TRUE)
+  if(argument_exists(pairwise_combinations)) {
+    validate_input(pairwise_combinations, "pairwise_combinations", objmode = "logical", len = 1,
+                   input_set = c(TRUE, FALSE), not_na = TRUE, not_function = TRUE)
+  }
+  
   categories <- data.frame(categories)
   categories <- as.data.frame(lapply(categories, factor, exclude = NULL))
   colnames(categories) <- paste0("X", 1:ncol(categories))
