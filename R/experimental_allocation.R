@@ -12,8 +12,8 @@
 #' @param ensure_equal_n_replicates Logical. If `TRUE`, ensures equal numbers of replicates across groups. Defaults to `TRUE`. If `FALSE`, all subjects are allocated.
 #' @param keep_excluded_data Logical. If `TRUE`, retains subjects that were not allocated within the specified constraints. Defaults to `FALSE`.
 #' @param objective A string specifying the objective function for anticlustering. Options include `"variance"` (default), `"diversity"`, `"average-diversity"`, `"kplus"`, and `"dispersion"`.
-#' @param method A string specifying the optimization method for anticlustering. Options include `"local-maximum"` (default), `"exchange"`, `"brusco"`, `"ilp"`, and `"2PML"`.
-#' @param repetitions Integer. Specifies the number of times the optimization is repeated when using heuristic methods (`"exchange"`, `"local-maximum"`, `"brusco"`, or `"2PML"`). The best solution is selected. Defaults to `10`.
+#' @param method A string specifying the optimization method for anticlustering. Options include `"local-maximum"` (default), `"exchange"`, `"brusco"`, `"ilp"`.
+#' @param repetitions Integer. Specifies the number of times the optimization is repeated when using heuristic methods (`"exchange"`, `"local-maximum"`, `"brusco"`). The best solution is selected. Defaults to `10`.
 #' @param match_within A column name in `data` (optional). Specifies a variable within which matching should occur, ensuring that subjects are grouped within subsets defined by this variable. Defaults to `NULL`.
 #' @param standardize Logical. If `TRUE`, covariates are standardized via `scale()` before optimization starts. Defaults to `TRUE`.
 #'
