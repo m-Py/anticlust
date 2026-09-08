@@ -28,6 +28,12 @@ If you are using the three phase search algorithm you should cite the paper by Y
 
 You are using the three phase search algorithm if you are using `anticlustering()` with `method = "3phase"` or if you are using the function `three_phase_search_anticlustering()`.
 
+If you are using the feasible and infeasible region search algorithm you should cite the paper by Wu et al (2022):
+
+- Wu, X., Feng, J., Yang, J., & Zhang, Y. (2025). Feasible and infeasible region search for the maximally diverse grouping problem. *Computers & Operations Research, 179*, 107030. https://doi.org/10.1016/j.cor.2025.107030
+
+You are using the feasible and infeasible region search if you are using `anticlustering()` with `method = "fifr"` or if you are using the function `feasible_and_infeasible_region_search_anticlustering()`.
+
 If you are using cannot-link constraints by using the argument `cannot_link` in `anticlustering()`, this is the relevant paper:
 
 - Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. (2025). Extending the Bicriterion Approach for Anticlustering: Exact and Hybrid Approaches. *Psychometrika, 90*(5), 1789–1808. https://doi.org/10.1017/psy.2025.10052
@@ -126,6 +132,8 @@ Germany: Springer.
 Weitz, R. R., & Lakshminarayanan, S. (1996). On a heuristic for the final exam scheduling problem. *Journal of the Operational Research Society, 47*(4), 599--600.
 
 Weitz, R. R., & Lakshminarayanan, S. (1998). An empirical comparison of heuristic methods for creating maximally diverse groups. *Journal of the Operational Research Society, 49*(6), 635--646. https://doi.org/10.1057/palgrave.jors.2600510
+
+Wu, X., Feng, J., Yang, J., & Zhang, Y. (2025). Feasible and infeasible region search for the maximally diverse grouping problem. *Computers & Operations Research, 179*, 107030. https://doi.org/10.1016/j.cor.2025.107030
 
 Yang, X., Cai, Z., Jin, T., Tang, Z., & Gao, S. (2022). A three-phase search approach with dynamic population size for solving the maximally diverse grouping problem. *European Journal of Operational Research, 302*(3), 925--953.
 
