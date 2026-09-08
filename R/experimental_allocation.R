@@ -1,6 +1,6 @@
 #' Balanced Allocation of Subjects to Treatments
 #'
-#' Convenience wrapper function for \code{\link{anticlustering}} using different defaults and additional functionality, provided by Dimitry Wintermantel as used in Wintermantel et al (2026; <doi:10.48550/arXiv.2607.07543>) used in . This function assigns subjects to treatment groups while balancing specified covariates and ensuring replicates per group. If a table of groups within treatments is supplied via `group_data`, the subjects (already assigned to treatments) are instead allocated to those groups within each treatment, again balancing the covariates.
+#' Convenience wrapper function for \code{\link{anticlustering}} using different defaults and additional functionality, as used in Wintermantel et al (2026; <doi:10.48550/arXiv.2607.07543>), provided by Dimitry Wintermantel. This function assigns subjects to treatment groups while balancing specified covariates and ensuring replicates per group. If a table of groups within treatments is supplied via `group_data`, the subjects (already assigned to treatments) are instead allocated to those groups within each treatment, again balancing the covariates.
 #'
 #' @param data A data frame containing the subjects to be allocated, including columns for the covariates. If `group_data` is supplied, it must also contain the treatment column named in `treatment_var`.
 #' @param covariates A vector of column names in `data` representing covariates to balance.
@@ -45,7 +45,10 @@
 #'
 #' The treatment allocation implemented here relies on anticlustering algorithms.
 #' Users are encouraged to also cite the `anticlust` package where appropriate
-#' (see `citation("anticlust")`).
+#' (see `citation("anticlust")`)
+#' 
+#' @author
+#' Dimitry Wintermantel \email{dimitry.wintermantel@@nature.uni-freiburg.de}
 #'
 #' @examples
 #'
