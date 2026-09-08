@@ -5,6 +5,8 @@
 #include <stdbool.h>
 #include <string.h>
 #include "fifr_header.h"
+#include <R.h>
+#include <Rinternals.h>
 
 // Global variables (from the paper)
 static int beta_max;
@@ -1151,5 +1153,8 @@ void FIFR_ReleaseMemoryDiversity(void) {
 }
 
 int FIFR_random_int(int max) {
-    return rand() % max;
+  GetRNGstate();
+  double my_number = unif_rand();
+  PutRNGstate();
+  return (int) floor(my_number * max);
 }
