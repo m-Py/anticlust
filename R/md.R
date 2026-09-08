@@ -18,8 +18,8 @@
 
 mahalanobis_distance <- function(x, y, cov_mat, lambda = 0) {
   stopifnot(length(x) == length(y))
-  stopifnot(length(x) == nrow(C))
-  stopifnot(length(x) == ncol(C))
+  stopifnot(length(x) == nrow(cov_mat))
+  stopifnot(length(x) == ncol(cov_mat))
   M <- length(x)
   MD <- double(1)
   INVERTED_COV_MATRIX <- MASS::ginv(cov_mat+lambda*diag(nrow(cov_mat)))

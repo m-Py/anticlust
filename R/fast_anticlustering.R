@@ -27,6 +27,7 @@
 #'
 #' @importFrom RANN nn2 
 #' @importFrom MASS ginv
+#' @importFrom stats cov
 #'
 #' @seealso
 #'
