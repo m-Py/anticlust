@@ -4,11 +4,7 @@
 #include <time.h>
 #include <stdbool.h>
 #include <string.h>
-//#include <R.h>
-//#include <Rinternals.h>
-
 #include "fifr_header.h"
-#include <windef.h>
 
 // Global variables (from the paper)
 static int beta_max;
@@ -88,7 +84,6 @@ void FIFR_ReleaseMemoryDiversity(void);
  * param *upper_bound: Maximum number of elements in each anticluster.
  * param *Beta_max: The algorithm begins with a pool of random initial solutions of size beta_max. 
  *                   Over time, the size of the solution pool decreases linearly until it reaches beta_min.
- * param *elapsed_time: Measures the runtime of the algotihm (in seconds)
  * param *Theta_max: Parameter for the strength of undirected perturbation,
  *                   which decreases linearly over time from theta_max to theta_min..
  * param *Theta_min: Parameter for the strength of undirected perturbation, 
@@ -223,7 +218,6 @@ void FIFR_SearchAlgorithmDiversity() {
 
     //important! for windows and linux there is a differnt definition of this time
     //on windows its the wall time, on linux the CPU time
-    clock_t start_time = clock();
     S_best.objective = -INFINITY;
     
     // Initial population generation
@@ -241,7 +235,6 @@ void FIFR_SearchAlgorithmDiversity() {
     }
     
     noImpCounter = 0;
-    int betaCounter = 0;
     for (int counter = 1; counter <= maxNumberIterations; counter++) {
         L = (int)(theta * N / M);
 
@@ -337,10 +330,6 @@ void FIFR_SearchAlgorithmDiversity() {
         beta = (int)(beta - (beta - 1) * counter / maxNumberIterations);
         theta = theta_max - (theta_max - theta_min) * counter / maxNumberIterations;
     }
-    
-    clock_t end_time = clock();
-    double elapsed_time = (double)(end_time - start_time) / CLOCKS_PER_SEC;
-    Time_limit = elapsed_time;
 }
 
 void FIFR_swap_elements(int *a, int *b) {
@@ -507,7 +496,6 @@ void Perturbation(int L, int s[], int SizeGroup[]){
     int perturb_type;
     int v, g, x, y;
     int NumberNeighbors, oldGroup, swap;
-    int current_index;
     int theta, count = 0;
 
     theta = L;
@@ -841,7 +829,7 @@ double FIFR_LocalSearchCriterionCalculation(Solution* sol1, Solution* sol2){
 }
 
 void BreakGroupConstraints(int partition[], int SizeGroup[], double *objective){
-    int i, j, v, g;
+    int i, v, g;
     int oldGroup;
     double delta_f = -999999.0;
     int imp;
@@ -873,7 +861,7 @@ void BreakGroupConstraints(int partition[], int SizeGroup[], double *objective){
 }
 
 void FitGroupConstraints(int partition[], int SizeGroup[], double *objective){
-    int i,j,k;
+    int i,j;
 
     for (i = 0; i < N; i++) p[i] = partition[i];
     FIFR_BuildDeltaMatrix(p);

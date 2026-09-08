@@ -2,8 +2,7 @@
 #'
 #' This function implements the feasible and infeasible region search algorithm FIFR for
 #' anticlustering by Wu et al. (2025; <doi.org/10.1016/j.cor.2025.107030>).
-#' The description of their algorithm is
-#' given in Section 4 of their paper (in particular, see the
+#' The description of their algorithm is given in Section 4 of their paper (in particular, see the
 #' Pseudocode in Algorithm 1).
 #' 
 #' 
@@ -37,7 +36,7 @@
 #' 
 #' @return a list including information about the cost, the result and the elapsed_time.
 #'  variable$result: A vector of length N that assigns a group (i.e, a number
-#'     between 1 and \code{M}) to each input element.
+#'     between 1 and \code{K}) to each input element.
 #'  variable$score: calculated score of the objective function
 #'  variable$elapsed_time: runtime of the algorithm
 #' 
@@ -49,37 +48,28 @@
 #' @examples 
 #' 
 #' # Generate some random data
-#' N <- 12
+#' N <- 120
 #' M <- 5
-#' K <- 2
+#' K <- 3
 #' dat <- matrix(rnorm(N * M), ncol = M)
 #' distances <- dist(dat)
 #'
 #' # Perform three hase serach algorithm
-#' ergebnis <- anticlust:::feasible_and_infeasible_region_search_anticlustering(dat, K, N)
+#' results <- anticlust:::feasible_and_infeasible_region_search_anticlustering(distances, K, N, number_iterations = 50)
+#' results2 <- anticlustering(distances, K = K, method = "3phase")
+#' results3 <- anticlustering(distances, K = K, method = "local-maximum", repetitions = 50)
 #'
 #' # Compute objectives funtion
-#' diversity_objective(distances, ergebnis$result)
+#' diversity_objective(distances, results$result)
+#' diversity_objective(distances, results2)
+#' diversity_objective(distances, results3)
 #' 
-#' # Compute comparision function
-#' ergebnis2 <- anticlustering(distances, K=K, method="local-maximum", repetitions = 10)
-#' diversity_objective(distances, ergebnis2)
-#' 
-#' # Compare both results
-#' print(ergebnis$result)
-#' print(ergebnis2)
-#' 
-#' @note
-#' Important! for windows and linux there is a differnt definition of thie run time due to clock(),
-#' so the time_limit acts differnetly depending on zour operating system
-#' On windows it is the wall time, on linux the CPU time
 #' 
 #' @references
 #' 
 #' Xiaofan Wu et al. “Feasible and infeasible region search for # nolint
 #' the maximally diverse grouping problem”. In: Computers & Operations Research
-#' 179 (2025). [SOURCE-CODE: https://figshare.com/s/3746a8593c48e6bdeb9a?file=52202792],
-#'  ISSN: 0377-2217. DOI: https://doi.org/10.1016/j.cor.2025.107030. 
+#' 179 (2025). DOI: https://doi.org/10.1016/j.cor.2025.107030. 
 #'
 feasible_and_infeasible_region_search_anticlustering <- function(
     x, K, N, objective = "diversity", number_iterations=50, clusters=NULL, upper_bound=NULL, 
@@ -88,8 +78,6 @@ feasible_and_infeasible_region_search_anticlustering <- function(
 ) {
 
     distances <- convert_to_distances(x)
-
-
 
     if (is.null(lower_bound)) {
         lower_bound <- floor(N/K)
@@ -165,6 +153,8 @@ if (N < 480) {
     if (results[["mem_error"]] == 1) {
        stop("Could not allocate enough memory.")
     }
+    
+    results$clusters <- results$clusters + 1 # in C, we use 0, 1, 2... for cluster labels
 
     return(results)
 }
