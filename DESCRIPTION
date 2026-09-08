@@ -19,7 +19,7 @@ Authors@R: c(
     person("Hannah", "Hengelbrock", role = "ctb",
            comment = "TPSDP heuristic by Yang et al."),
     person("Dimitry", "Wintermantel", role = "ctb",
-           comment = "Function experimental_allocation()"),
+           comment = "Function experimental_allocation()")
     )
 Author: Martin Papenberg [aut, cre] (<https://orcid.org/0000-0002-9900-4268>), Meik Michalke [ctb] (centroid based
              clustering algorithm), Gunnar W. Klau [ths], Juliane V. Nagel [ctb] (package logo), Martin Breuer [ctb]
