@@ -102,9 +102,9 @@ diversity_objective(distances, results3)
 
 }
 \references{
-Xiaofan Wu et al. “Feasible and infeasible region search for # nolint
-the maximally diverse grouping problem”. In: Computers & Operations Research
-179 (2025). DOI: https://doi.org/10.1016/j.cor.2025.107030.
+Wu, X., Feng, J., Yang, J., & Zhang, Y. (2025). Feasible and infeasible region 
+search for the maximally diverse grouping problem. Computers & Operations Research, 179,
+107030. https://doi.org/10.1016/j.cor.2025.107030
 }
 \author{
 David Buczynski \email{david.buczynski@hhu.de}, 

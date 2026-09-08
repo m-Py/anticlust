@@ -25,23 +25,23 @@ input_validation_anticlustering <- function(x, K, objective, method,
 
   validate_input(
     method, "method", len = 1,
-    input_set = c("ilp", "exchange", "heuristic", "local-maximum", "brusco", "2PML", "3phase"), 
+    input_set = c("ilp", "exchange", "heuristic", "local-maximum", "brusco", "2PML", "3phase", "fifr"), 
     not_na = TRUE, not_function = TRUE
   )
   
-  if (method == "3phase") {
+  if (method %in% c("3phase", "fifr")) {
     if (is.function("objective")) stop("objective can only be a function with method = 'exchange' or method = 'local-maximum'.")
     if (objective %in% "dispersion") {
-      stop("objective = dispersion does not work with the 3 phase search algorithm.")
+      stop("objective = dispersion does not work with the 3 phase or FIFR algorithm.")
     }
     if (argument_exists(categories)) {
-      stop("Using the argument categories does not work with the 3 phase search algorithm.")
+      stop("Using the argument categories does not work with the 3 phase or FIFR algorithm.")
     }
     if (unequal_group_sizes && objective %in% c("average-diversity", "variance", "kplus")) {
-      stop("The three phase algorithm does not support the average diversity, variance and k-plus objective for unequal-sized groups.")
+      stop("The three phase and FIFR algorithms do not support the average diversity, variance and k-plus objective for unequal-sized groups.")
     }
     if (initial_grouping_passed) {
-      stop("The 3 phase algorithm does not handle passing an initial grouping via argument `K`.")
+      stop("The 3 phase and FIFR algorithms do not handle passing an initial grouping via argument `K`.")
     }
   }
   

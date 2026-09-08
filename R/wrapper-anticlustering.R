@@ -30,7 +30,7 @@
 #'     natively supported. May also be a user-defined function. See
 #'     Details.
 #' @param method One of "exchange" (default) , "local-maximum",
-#'     "brusco", "ilp", "2PML", or "3phase".  See Details.
+#'     "brusco", "ilp", "2PML", "3phase", or "fifr".  See Details.
 #' @param preclustering Boolean. Should a preclustering be conducted
 #'     before anticlusters are created? Defaults to \code{FALSE}. See
 #'     Details.
@@ -40,8 +40,8 @@
 #' @param repetitions The number of times a search heuristic is
 #'     initiated when using \code{method = "exchange"}, \code{method =
 #'     "local-maximum"}, \code{method = "brusco"}, \code{method = "3phase"}, 
-#'     or \code{method = "2PML"}. In the end, the best objective found across 
-#'     the repetitions is returned.
+#'     \code{method = "fifr"}, or \code{method = "2PML"}. In the end, the 
+#'     best objective found across the repetitions is returned.
 #' @param standardize Boolean. If \code{TRUE} and \code{x} is a
 #'     feature matrix, the data is standardized through a call to
 #'     \code{\link{scale}} before the optimization starts. This
@@ -232,7 +232,9 @@
 #' that the algorithm runs before terminating. For consistency with our other 
 #' methods in anticlust, we are however using a maximum number of repetitions. 
 #' Our default is 50 repetitions, which may be increased (but not decreased!) 
-#' with the \code{repetitions} argument. 
+#' with the \code{repetitions} argument. Using the same adaptation for the repetitions
+#' argument, version 0.8.16 introduced for the Feasible and infeasible region 
+#' search algorithm by Wu et al. (2025) via \code{method = "fifr"}.
 #'
 #' \strong{Optimal anticlustering}
 #'
@@ -494,6 +496,10 @@
 #' approach with dynamic population size for solving the maximally diverse grouping 
 #' problem. European Journal of Operational Research, 302(3), 925-953. 
 #' https://doi.org/10.1016/j.ejor.2022.02.003
+#' 
+#' Wu, X., Feng, J., Yang, J., & Zhang, Y. (2025). Feasible and infeasible region 
+#' search for the maximally diverse grouping problem. Computers & Operations Research, 179,
+#' 107030. https://doi.org/10.1016/j.cor.2025.107030
 #'
 
 anticlustering <- function(x, K, objective = "diversity", method = "exchange",
@@ -539,7 +545,7 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
     }
     need_distance_matrix <- objective %in% c("diversity", "average-diversity", "dispersion") # this case is clear - objectives are computed from distances
     # some algorithms always use distance matrix even for kmeans/kplus that are usually computed from the features directly
-    need_distance_matrix <- need_distance_matrix | method %in% c("3phase", "brusco")
+    need_distance_matrix <- need_distance_matrix | method %in% c("3phase", "brusco", "fifr")
     need_distance_matrix <- need_distance_matrix | argument_exists(cannot_link)
     need_distance_matrix <- need_distance_matrix | argument_exists(must_link)
     need_distance_matrix <- need_distance_matrix | sum(is.na(x)) > 0 # use dist() to deal with NAs.
@@ -565,18 +571,23 @@ anticlustering <- function(x, K, objective = "diversity", method = "exchange",
     ))
   }
   
-  if (method == "3phase") {
+  if (method %in% c("3phase", "fifr")) {
     if (length(K) == NUMBER_OF_ANTICLUSTERS) {
       clusters <- K
     } else {
       clusters <- NULL
     }
-    return(
-      three_phase_search_anticlustering(
+    if (method =="3phase") { 
+      return(three_phase_search_anticlustering(
         x, K = NUMBER_OF_ANTICLUSTERS, N = N, clusters = clusters,
         number_iterations = min(repetitions, 50)
-      )
-    )
+      ))
+    } else if (method == "fifr") {
+      return(feasible_and_infeasible_region_search_anticlustering(
+        x, K = NUMBER_OF_ANTICLUSTERS, N = N, clusters = clusters,
+        number_iterations = min(repetitions, 50)
+      ))
+    }
   }
   
   ## Exact method using ILP

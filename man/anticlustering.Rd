@@ -40,7 +40,7 @@ natively supported. May also be a user-defined function. See
 Details.}
 
 \item{method}{One of "exchange" (default) , "local-maximum",
-"brusco", "ilp", "2PML", or "3phase".  See Details.}
+"brusco", "ilp", "2PML", "3phase", or "fifr".  See Details.}
 
 \item{preclustering}{Boolean. Should a preclustering be conducted
 before anticlusters are created? Defaults to \code{FALSE}. See
@@ -53,8 +53,8 @@ between groups. See Details.}
 \item{repetitions}{The number of times a search heuristic is
 initiated when using \code{method = "exchange"}, \code{method =
 "local-maximum"}, \code{method = "brusco"}, \code{method = "3phase"}, 
-or \code{method = "2PML"}. In the end, the best objective found across 
-the repetitions is returned.}
+\code{method = "fifr"}, or \code{method = "2PML"}. In the end, the 
+best objective found across the repetitions is returned.}
 
 \item{standardize}{Boolean. If \code{TRUE} and \code{x} is a
 feature matrix, the data is standardized through a call to
@@ -251,7 +251,9 @@ changes of their default procedure, in particular they used a maximum "time"
 that the algorithm runs before terminating. For consistency with our other 
 methods in anticlust, we are however using a maximum number of repetitions. 
 Our default is 50 repetitions, which may be increased (but not decreased!) 
-with the \code{repetitions} argument. 
+with the \code{repetitions} argument. Using the same adaptation for the repetitions
+argument, version 0.8.16 introduced for the Feasible and infeasible region 
+search algorithm by Wu et al. (2025) via \code{method = "fifr"}.
 
 \strong{Optimal anticlustering}
 
@@ -512,6 +514,10 @@ Yang, X., Cai, Z., Jin, T., Tang, Z., & Gao, S. (2022). A three-phase search
 approach with dynamic population size for solving the maximally diverse grouping 
 problem. European Journal of Operational Research, 302(3), 925-953. 
 https://doi.org/10.1016/j.ejor.2022.02.003
+
+Wu, X., Feng, J., Yang, J., & Zhang, Y. (2025). Feasible and infeasible region 
+search for the maximally diverse grouping problem. Computers & Operations Research, 179,
+107030. https://doi.org/10.1016/j.cor.2025.107030
 }
 \author{
 Martin Papenberg \email{martin.papenberg@hhu.de}
