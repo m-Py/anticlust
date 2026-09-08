@@ -3,10 +3,10 @@
 
 **User visible changes**
 
+- New function `feasible_and_infeasible_region_search_anticlustering()` provided by David Buczynski
+- New function `experimental_allocation()` provided by Dimitry Wintermantel
 - `categories_to_binary()` has a new argument `pairwise_combinations`
 - `fast_anticlustering()` has new arguments `distance` and `lambda`
-- New function `experimental_allocation()` provided by Dimitry Wintermantel
-- New function `feasible_and_infeasible_region_search_anticlustering()` provided by David Buczynski
 
 **Minor**
 
