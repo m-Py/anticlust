@@ -867,7 +867,7 @@ void FitGroupConstraints(int partition[], int SizeGroup[], double *objective){
     // Violation-Arrays
     int *needLB = (int*)calloc(M, sizeof(int));
     int *excessUB = (int*)calloc(M, sizeof(int));
-    if (!needLB || !excessUB) { perror("calloc"); exit(1); }
+    if (!needLB || !excessUB) { perror("calloc"); return; }
 
     int numa = 0; // missing LB-places
     int numb = 0; // missing UB-excesses
@@ -890,7 +890,7 @@ void FitGroupConstraints(int partition[], int SizeGroup[], double *objective){
     int *gene = NULL;
     if (up_elements > 0){
         gene = (int*)malloc(up_elements * sizeof(int));
-        if (!gene) { perror("malloc"); exit(1); }
+        if (!gene) { perror("malloc"); return; }
         int index = 0;
         for (i = 0; i < M; i++){
             if (excessUB[i] > 0){
