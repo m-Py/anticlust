@@ -68,7 +68,7 @@
 #' 107030. https://doi.org/10.1016/j.cor.2025.107030
 #'
 feasible_and_infeasible_region_search_anticlustering <- function(
-    x, K, N, objective = "diversity", number_iterations=50, clusters=NULL, upper_bound=NULL, 
+    x, K, N, number_iterations=50, clusters=NULL, upper_bound=NULL, 
     lower_bound=NULL, beta_max=NULL, theta_max=NULL, theta_min=NULL, beta_min=NULL, phi=0.8,
     tau=NULL, kmax=4, alpha=NULL
 ) {
@@ -106,7 +106,7 @@ if (N < 480) {
 }
 
 
-    input_validation_fifr_search(x, K, N, objective, clusters, number_iterations, upper_bound, 
+    input_validation_fifr_search(x, K, N, clusters, number_iterations, upper_bound, 
     lower_bound, theta_max, theta_min, beta_max, beta_min, phi, tau, kmax, alpha)
 
     # create result vector for results to use in C
@@ -118,8 +118,7 @@ if (N < 480) {
       clusters <- rep(-1, K)
     }
 
-    if (objective == "diversity") {
-     results <- .C("feasible_and_infeasible_region_search",
+   results <- .C("feasible_and_infeasible_region_search",
                   distances = as.double(distances),
                   N_in = as.integer(N),
                   M_in = as.integer(K),
@@ -140,11 +139,8 @@ if (N < 480) {
                   score = as.double(0.0),
                   mem_error = as.integer(0),
                   PACKAGE = "anticlust"
-                  )
-    } else {
-        stop("Stop objective function for TPSDP is not defined.")
-    }
-
+    )
+    
     results[["mem_error"]]
     if (results[["mem_error"]] == 1) {
        stop("Could not allocate enough memory.")
@@ -154,7 +150,7 @@ if (N < 480) {
 }
 
 input_validation_fifr_search <- function(
-    x, K, N, objective, clusters, number_iterations, upper_bound, lower_bound, 
+    x, K, N, clusters, number_iterations, upper_bound, lower_bound, 
     theta_max, theta_min, beta_max, beta_min, phi, tau, kmax, alpha
 ) {
 
@@ -163,11 +159,6 @@ input_validation_fifr_search <- function(
         validate_input(clusters, "clusters", len = K)
     }
 
-    # Objective
-    validate_input(
-    objective, "objective", objmode = "character", len = 1,
-    input_set = c("diversity"), not_na = TRUE,  not_function = TRUE
-    )
     validate_input(K, "K",  must_be_integer = TRUE, not_na = TRUE)
     validate_input(lower_bound, "lower_bound", greater_than = 0, must_be_integer = TRUE)
     validate_input(upper_bound, "upper_bound", greater_than = 0, must_be_integer = TRUE)
