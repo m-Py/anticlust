@@ -3,7 +3,7 @@
 #'
 #' @param x First vector
 #' @param y First vector
-#' @param C covariance matrix between the features in x and y
+#' @param cov_mat covariance matrix between the features in x and y
 #' @param lambda Regularization, defaults to 0 (no regularization)
 #'
 #' @importFrom MASS ginv

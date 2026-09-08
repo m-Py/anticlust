@@ -11,9 +11,9 @@ mahalanobis_distance(x, y, cov_mat, lambda = 0)
 
 \item{y}{First vector}
 
-\item{lambda}{Regularization, defaults to 0 (no regularization)}
+\item{cov_mat}{covariance matrix between the features in x and y}
 
-\item{C}{covariance matrix between the features in x and y}
+\item{lambda}{Regularization, defaults to 0 (no regularization)}
 }
 \value{
 The mahalanobis distance (scalar value)

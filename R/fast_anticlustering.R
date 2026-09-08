@@ -25,7 +25,8 @@
 #' @param distance Is the (squared) Euclidean distance used (default for k-means) or the "mahalanobis" distance?
 #' @param lambda If \code{distance ="mahalanobis"}, regularization term to compute the mahalanobis distance.
 #'
-#' @importFrom RANN nn2
+#' @importFrom RANN nn2 
+#' @importFrom MASS ginv
 #'
 #' @seealso
 #'
