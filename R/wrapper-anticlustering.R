@@ -493,14 +493,15 @@
 #' heuristic methods for creating maximally diverse groups. Journal of the 
 #' Operational Research Society, 49(6), 635-646. https://doi.org/10.1057/palgrave.jors.2600510
 #' 
+#' Wu, X., Feng, J., Yang, J., & Zhang, Y. (2025). Feasible and infeasible region 
+#' search for the maximally diverse grouping problem. Computers & Operations Research, 179,
+#' 107030. https://doi.org/10.1016/j.cor.2025.107030
+#' 
 #' Yang, X., Cai, Z., Jin, T., Tang, Z., & Gao, S. (2022). A three-phase search 
 #' approach with dynamic population size for solving the maximally diverse grouping 
 #' problem. European Journal of Operational Research, 302(3), 925-953. 
 #' https://doi.org/10.1016/j.ejor.2022.02.003
 #' 
-#' Wu, X., Feng, J., Yang, J., & Zhang, Y. (2025). Feasible and infeasible region 
-#' search for the maximally diverse grouping problem. Computers & Operations Research, 179,
-#' 107030. https://doi.org/10.1016/j.cor.2025.107030
 #'
 
 anticlustering <- function(x, K, objective = "diversity", method = "exchange",
