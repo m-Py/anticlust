@@ -34,11 +34,8 @@
 #' @details Details of the implementation of the algorithm can be found 
 #'  in the pseudocode of the paper Wu et al. (2025)
 #' 
-#' @return a list including information about the cost, the result and the elapsed_time.
-#'  variable$result: A vector of length N that assigns a group (i.e, a number
+#' @return A vector of length N that assigns a group (i.e, a number
 #'     between 1 and \code{K}) to each input element.
-#'  variable$score: calculated score of the objective function
-#'  variable$elapsed_time: runtime of the algorithm
 #' 
 #' @author David Buczynski \email{david.buczynski@@hhu.de}, 
 #' Martin Papenberg \email{martin.papenberg@@hhu.de}
@@ -55,12 +52,12 @@
 #' distances <- dist(dat)
 #'
 #' # Perform three hase serach algorithm
-#' results <- anticlust:::feasible_and_infeasible_region_search_anticlustering(distances, K, N, number_iterations = 50)
+#' results1 <- anticlust:::feasible_and_infeasible_region_search_anticlustering(distances, K, N, number_iterations = 50)
 #' results2 <- anticlustering(distances, K = K, method = "3phase")
 #' results3 <- anticlustering(distances, K = K, method = "local-maximum", repetitions = 50)
 #'
 #' # Compute objectives funtion
-#' diversity_objective(distances, results$result)
+#' diversity_objective(distances, results1)
 #' diversity_objective(distances, results2)
 #' diversity_objective(distances, results3)
 #' 
@@ -154,9 +151,7 @@ if (N < 480) {
        stop("Could not allocate enough memory.")
     }
     
-    results$result <- results$result + 1 # in C, we use 0, 1, 2... for cluster labels
-
-    return(results)
+    results$result + 1 # in C, we use 0, 1, 2... for cluster labels
 }
 
 input_validation_fifr_search <- function(

@@ -67,11 +67,8 @@ triggering the jump-back mechanism}
 \item{return}{results contains everything, including vector result and its cost}
 }
 \value{
-a list including information about the cost, the result and the elapsed_time.
- variable$result: A vector of length N that assigns a group (i.e, a number
+A vector of length N that assigns a group (i.e, a number
     between 1 and \code{K}) to each input element.
- variable$score: calculated score of the objective function
- variable$elapsed_time: runtime of the algorithm
 }
 \description{
 This function implements the feasible and infeasible region search algorithm FIFR for
@@ -93,12 +90,12 @@ dat <- matrix(rnorm(N * M), ncol = M)
 distances <- dist(dat)
 
 # Perform three hase serach algorithm
-results <- anticlust:::feasible_and_infeasible_region_search_anticlustering(distances, K, N, number_iterations = 50)
+results1 <- anticlust:::feasible_and_infeasible_region_search_anticlustering(distances, K, N, number_iterations = 50)
 results2 <- anticlustering(distances, K = K, method = "3phase")
 results3 <- anticlustering(distances, K = K, method = "local-maximum", repetitions = 50)
 
 # Compute objectives funtion
-diversity_objective(distances, results$result)
+diversity_objective(distances, results1)
 diversity_objective(distances, results2)
 diversity_objective(distances, results3)
 
