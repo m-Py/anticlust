@@ -52,7 +52,7 @@
 #' distances <- dist(dat)
 #'
 #' # Perform three hase serach algorithm
-#' results1 <- anticlust:::feasible_and_infeasible_region_search_anticlustering(distances, K, N, number_iterations = 50)
+#' results1 <- feasible_and_infeasible_region_search_anticlustering(distances, K, N)
 #' results2 <- anticlustering(distances, K = K, method = "3phase")
 #' results3 <- anticlustering(distances, K = K, method = "local-maximum", repetitions = 50)
 #'
