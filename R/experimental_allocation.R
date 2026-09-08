@@ -1,8 +1,6 @@
-library(anticlust)
-
 #' Balanced Allocation of Subjects to Treatments
 #'
-#' This function assigns subjects to treatment groups while balancing specified covariates and ensuring replicates per group. If a table of groups within treatments is supplied via `group_data`, the subjects (already assigned to treatments) are instead allocated to those groups within each treatment, again balancing the covariates.
+#' Convenience wrapper function for \code{\link{anticlustering}} using different defaults and additional functionality, provided by Dimitry Wintermantel as used in Wintermantel et al (2026; <doi:10.48550/arXiv.2607.07543>) used in . This function assigns subjects to treatment groups while balancing specified covariates and ensuring replicates per group. If a table of groups within treatments is supplied via `group_data`, the subjects (already assigned to treatments) are instead allocated to those groups within each treatment, again balancing the covariates.
 #'
 #' @param data A data frame containing the subjects to be allocated, including columns for the covariates. If `group_data` is supplied, it must also contain the treatment column named in `treatment_var`.
 #' @param covariates A vector of column names in `data` representing covariates to balance.
@@ -50,7 +48,6 @@ library(anticlust)
 #' (see `citation("anticlust")`).
 #'
 #' @examples
-#' set.seed(123)
 #'
 #' # Example dataset: Bee subjects
 #' example_bee_data <- data.frame(
@@ -94,11 +91,6 @@ library(anticlust)
 #' )
 #' head(allocated_data)
 #'
-#' @section Required Packages:
-#' This function requires the following package:
-#' - `anticlust`: for anticlustering optimization.
-#'
-#' @importFrom anticlust matching anticlustering
 #' @export
 experimental_allocation <- function(data,
                                 covariates,
