@@ -1,5 +1,4 @@
-anticlust <a href='https://m-py.github.io/anticlust/'><img src='man/figures/anticlustStickerV1-0.svg' style="float:right; height:160px" /></a>
-==============================================================================================================================================
+# anticlust <a href='https://m-py.github.io/anticlust/'><img src='man/figures/anticlustStickerV1-0.svg' style="float:right; height:160px" /></a>
 
 Anticlustering partitions a pool of elements into clusters (or
 *anticlusters*) with the goal of achieving high between-cluster
@@ -8,21 +7,15 @@ by maximizing instead of minimizing a clustering objective function,
 such as the intra-cluster variance (used in k-means clustering) or the
 sum of pairwise distances within clusters. The package `anticlust`
 implements anticlustering methods as described in Papenberg and Klau
-(2021;
-<a href="https://doi.org/10.1037/met0000301" class="uri">https://doi.org/10.1037/met0000301</a>),
-Brusco et al. (2020;
-<a href="https://doi.org/10.1111/bmsp.12186" class="uri">https://doi.org/10.1111/bmsp.12186</a>),
-Papenberg (2024;
-<a href="https://doi.org/10.1111/bmsp.12315" class="uri">https://doi.org/10.1111/bmsp.12315</a>),
-Papenberg, Wang, et al. (2025;
-<a href="https://doi.org/10.1016/j.crmeth.2025.101137" class="uri">https://doi.org/10.1016/j.crmeth.2025.101137</a>),
-Papenberg, Breuer, et al. (2025;
-<a href="https://doi.org/10.1017/psy.2025.10052" class="uri">https://doi.org/10.1017/psy.2025.10052</a>),
-and Yang et al. (2022;
-<a href="https://doi.org/10.1016/j.ejor.2022.02.003" class="uri">https://doi.org/10.1016/j.ejor.2022.02.003</a>)
+(2021; <https://doi.org/10.1037/met0000301>), Brusco et al. (2020;
+<https://doi.org/10.1111/bmsp.12186>), Papenberg (2024;
+<https://doi.org/10.1111/bmsp.12315>), Papenberg, Wang, et al. (2025;
+<https://doi.org/10.1016/j.crmeth.2025.101137>), Papenberg, Breuer, et
+al. (2025; <https://doi.org/10.1017/psy.2025.10052>), Yang et al. (2022;
+<https://doi.org/10.1016/j.ejor.2022.02.003>), and Wu et al. (2025;
+<https://doi.org/10.1016/j.cor.2025.107030>).
 
-Installation
-------------
+## Installation
 
 The stable release of `anticlust` is available from
 [CRAN](https://CRAN.R-project.org/package=anticlust) and can be
@@ -40,16 +33,14 @@ or directly via Github:
     library("remotes") # if not available: install.packages("remotes")
     install_github("m-Py/anticlust")
 
-Citation
---------
+## Citation
 
 If you use `anticlust` in your research, it would be courteous if you
 cite the following reference:
 
 -   Papenberg, M., & Klau, G. W. (2021). Using anticlustering to
     partition data sets into equivalent parts. *Psychological Methods,
-    26*(2), 161–174.
-    <a href="https://doi.org/10.1037/met0000301" class="uri">https://doi.org/10.1037/met0000301</a>
+    26*(2), 161–174. <https://doi.org/10.1037/met0000301>
 
 Depending on which `anticlust` functions you are using, including other
 references may also be fair. [Here you can find out in detail how to
@@ -59,8 +50,7 @@ cite
 Another great way of showing your appreciation of `anticlust` is to
 leave a star on this Github repository.
 
-How do I learn about `anticlust`
---------------------------------
+## How do I learn about `anticlust`
 
 This README contains some basic information on the `R` package
 `anticlust`. More information is available via the following sources:
@@ -68,21 +58,18 @@ This README contains some basic information on the `R` package
 -   Up until now, we published 4 papers describing the theoretical
     background of `anticlust`.
     -   The initial presentation of the `anticlust` package is given in
-        Papenberg and Klau (2021)
-        (<a href="https://doi.org/10.1111/bmsp.12315" class="uri">https://doi.org/10.1111/bmsp.12315</a>;
+        Papenberg and Klau (2021) (<https://doi.org/10.1111/bmsp.12315>;
         [Preprint](https://doi.org/10.31234/osf.io/7jw6v)).
     -   The k-plus anticlustering method is described in
-        Papenberg (2024)
-        (<a href="https://doi.org/10.1037/met0000527" class="uri">https://doi.org/10.1037/met0000527</a>;
+        Papenberg (2024) (<https://doi.org/10.1037/met0000527>;
         [Preprint](https://doi.org/10.31234/osf.io/dhzrc)).
     -   A new paper describes the must-link feature and provides
         additional comparisons to alternative methods, focusing on
         categorical variables (Papenberg, Wang, et al., 2025;
-        <a href="https://doi.org/10.1016/j.crmeth.2025.101137" class="uri">https://doi.org/10.1016/j.crmeth.2025.101137</a>).
+        <https://doi.org/10.1016/j.crmeth.2025.101137>).
     -   Another new paper describes several new algorithms for
         anticlustering and the cannot-link feature (Papenberg, Breuer,
-        et al., 2025;
-        <a href="https://doi.org/10.1017/psy.2025.10052" class="uri">https://doi.org/10.1017/psy.2025.10052</a>).
+        et al., 2025; <https://doi.org/10.1017/psy.2025.10052>).
     -   The R documentation of the main functions is actually quite rich
         and up to date, so you should definitely check that out when
         using the `anticlust` package. The most important background is
@@ -91,8 +78,7 @@ This README contains some basic information on the `R` package
     all documentation as a convenient website. Also check out the
     vignettes on that website.
 
-A quick start
--------------
+## A quick start
 
 In this initial example, I use the main function `anticlustering()` to
 create five similar sets of plants using the classical iris data set:
@@ -137,7 +123,7 @@ groups to find out if the five groups are similar to each other:
 
 <table>
 <thead>
-<tr class="header">
+<tr>
 <th style="text-align: left;"></th>
 <th style="text-align: left;">Sepal.Length</th>
 <th style="text-align: left;">Sepal.Width</th>
@@ -146,35 +132,35 @@ groups to find out if the five groups are similar to each other:
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td style="text-align: left;">1</td>
 <td style="text-align: left;">5.85 (0.84)</td>
 <td style="text-align: left;">3.06 (0.44)</td>
 <td style="text-align: left;">3.76 (1.78)</td>
 <td style="text-align: left;">1.20 (0.77)</td>
 </tr>
-<tr class="even">
+<tr>
 <td style="text-align: left;">2</td>
 <td style="text-align: left;">5.84 (0.84)</td>
 <td style="text-align: left;">3.06 (0.44)</td>
 <td style="text-align: left;">3.77 (1.79)</td>
 <td style="text-align: left;">1.20 (0.77)</td>
 </tr>
-<tr class="odd">
+<tr>
 <td style="text-align: left;">3</td>
 <td style="text-align: left;">5.84 (0.84)</td>
 <td style="text-align: left;">3.06 (0.44)</td>
 <td style="text-align: left;">3.76 (1.79)</td>
 <td style="text-align: left;">1.20 (0.77)</td>
 </tr>
-<tr class="even">
+<tr>
 <td style="text-align: left;">4</td>
 <td style="text-align: left;">5.84 (0.84)</td>
 <td style="text-align: left;">3.06 (0.44)</td>
 <td style="text-align: left;">3.75 (1.79)</td>
 <td style="text-align: left;">1.19 (0.77)</td>
 </tr>
-<tr class="odd">
+<tr>
 <td style="text-align: left;">5</td>
 <td style="text-align: left;">5.85 (0.84)</td>
 <td style="text-align: left;">3.06 (0.44)</td>
@@ -191,7 +177,7 @@ evenly distributed among groups:
 
 <table>
 <thead>
-<tr class="header">
+<tr>
 <th style="text-align: left;"></th>
 <th style="text-align: right;">1</th>
 <th style="text-align: right;">2</th>
@@ -201,7 +187,7 @@ evenly distributed among groups:
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td style="text-align: left;">setosa</td>
 <td style="text-align: right;">10</td>
 <td style="text-align: right;">10</td>
@@ -209,7 +195,7 @@ evenly distributed among groups:
 <td style="text-align: right;">10</td>
 <td style="text-align: right;">10</td>
 </tr>
-<tr class="even">
+<tr>
 <td style="text-align: left;">versicolor</td>
 <td style="text-align: right;">10</td>
 <td style="text-align: right;">10</td>
@@ -217,7 +203,7 @@ evenly distributed among groups:
 <td style="text-align: right;">10</td>
 <td style="text-align: right;">10</td>
 </tr>
-<tr class="odd">
+<tr>
 <td style="text-align: left;">virginica</td>
 <td style="text-align: right;">10</td>
 <td style="text-align: right;">10</td>
@@ -265,8 +251,7 @@ and the references therein. It is also possible to optimize user-defined
 objectives, which is also described in the documentation
 (`?anticlustering`).
 
-Matching and clustering
------------------------
+## Matching and clustering
 
 Anticlustering creates sets of dissimilar elements; the heterogenity
 within anticlusters is maximized. This is the opposite of clustering
@@ -282,7 +267,7 @@ ensuring that clusters are of equal size. This is an example:
     cl <- balanced_clustering(lds, K = 7)
     plot_clusters(lds, clusters = cl, show_axes = TRUE)
 
-<img src="man/figures/clustering-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/clustering-1.png" alt="" style="display: block; margin: auto;" />
 
 The function `matching()` is very similar, but is usually used to find
 small groups of similar elements, e.g., triplets as in this example:
@@ -298,10 +283,33 @@ small groups of similar elements, e.g., triplets as in this example:
       show_axes = TRUE
     )
 
-<img src="man/figures/matching-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/matching-1.png" alt="" style="display: block; margin: auto;" />
 
-Questions and suggestions
--------------------------
+## Other implementations of anticlustering
+
+There seems to be a Python implementation of anticlustering algorithms,
+though I have not tested it:
+<https://github.com/SneaksAndData/anti-clustering>
+
+There are some implementations of the Maximum Diverse Grouping Problem,
+which is close enough to just being a different name for anticlustering
+(although there is a stronger focus on the diversity as the objective
+function for anticlustering):
+
+-   [Java code of several algorithms by Gallego et
+    al.](https://grafo.etsii.urjc.es/maximally-diverse-grouping/)
+-   [C++
+    code](https://figshare.com/s/3746a8593c48e6bdeb9a?file=52202792) of
+    the FIFR algorithm as provided by the original authors (*Note:
+    anticlust also includes an implemtation of this algorithm*)
+-   [C++ code](https://toyamaailab.github.io/sourcedata.html.) of the
+    three-phase search algorithm as provided by the original authors
+    (*Note: anticlust also includes an implemtation of this algorithm*)
+
+If you are aware of other openly available implementations, please let
+me know.
+
+## Questions and suggestions
 
 If you have any question on the `anticlust` package or find some bugs, I
 encourage you to open an [issue on the Github
