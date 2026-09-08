@@ -9,7 +9,6 @@ feasible_and_infeasible_region_search_anticlustering(
   x,
   K,
   N,
-  objective = "diversity",
   number_iterations = 50,
   clusters = NULL,
   upper_bound = NULL,
@@ -25,11 +24,18 @@ feasible_and_infeasible_region_search_anticlustering(
 )
 }
 \arguments{
+\item{x}{The data input. Can be one of two structures: (1) A
+feature matrix where rows correspond to elements and columns
+correspond to variables (a single numeric variable can be
+passed as a vector). (2) An N x N matrix dissimilarity matrix;
+can be an object of class \code{dist} (e.g., returned by
+\code{\link{dist}} or \code{\link{as.dist}}) or a \code{matrix}
+where the entries of the upper and lower triangular matrix
+represent pairwise dissimilarities.}
+
 \item{K}{Number of anticlusters to be formed.}
 
-\item{N}{Number of elememts.}
-
-\item{objective}{The anticlustering objective = "diversity".}
+\item{N}{Number of elements.}
 
 \item{number_iterations}{A number that defines how many times the steps in the search algorithm are repeated.}
 
@@ -61,8 +67,6 @@ triggering the jump-back mechanism}
 \item{kmax}{A parameter that determines the maximum degree of constraint violation in the IFR search}
 
 \item{alpha}{Parameter for weitghing the discrimitation of a slighlty worse local optiomal child solution}
-
-\item{matrix}{The data input. Currently just a vector.}
 }
 \value{
 A vector of length N that assigns a group (i.e, a number

@@ -6,10 +6,16 @@
 #' Pseudocode in Algorithm 1).
 #' 
 #' 
-#' @param matrix The data input. Currently just a vector.
+#' @param x The data input. Can be one of two structures: (1) A
+#'     feature matrix where rows correspond to elements and columns
+#'     correspond to variables (a single numeric variable can be
+#'     passed as a vector). (2) An N x N matrix dissimilarity matrix;
+#'     can be an object of class \code{dist} (e.g., returned by
+#'     \code{\link{dist}} or \code{\link{as.dist}}) or a \code{matrix}
+#'     where the entries of the upper and lower triangular matrix
+#'     represent pairwise dissimilarities. 
 #' @param K Number of anticlusters to be formed.
-#' @param N Number of elememts.
-#' @param objective The anticlustering objective = "diversity".
+#' @param N Number of elements.
 #' @param number_iterations A number that defines how many times the steps in the search algorithm are repeated.
 #' @param clusters A vector of length M that specifies the number of elements each cluster can contain. 
 #' If this vector is not NULL, the lower and upper bounds will be disregarded.
