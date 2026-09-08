@@ -240,8 +240,6 @@ void FIFR_SearchAlgorithmDiversity() {
     for (int counter = 1; counter <= maxNumberIterations; counter++) {
         L = (int)(theta * N / M);
 
-        //printf("Beta after %d. iteration: %d\n", counter, beta);
-        
         // Exploration
         if (beta > beta_min) {
             /* Algorithm 4-1: Perturbation*/
@@ -306,7 +304,6 @@ void FIFR_SearchAlgorithmDiversity() {
             if (noImpCounter > tau) {
                 beta = (int) (phi * beta_max);
                 noImpCounter = 0;
-                //printf("Exploitation done, and new beta=%d\n", beta);
                 break;
             }
         }
@@ -806,7 +803,6 @@ double FIFR_LocalSearchCriterionCalculation(Solution* sol1, Solution* sol2){
 
     // Handle potential division by zero
     if (sol2->objective == 0) {
-        printf("Error: Division by zero (sol2->objective is zero).\n");
         return -1;
     }
 
