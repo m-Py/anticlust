@@ -1,7 +1,7 @@
 Type: Package
 Package: anticlust
 Title: Subset Partitioning via Anticlustering
-Version: 0.8.15-9999
+Version: 0.8.16
 Authors@R: c(
     person("Martin", "Papenberg", , "martin.papenberg@hhu.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-9900-4268")),
@@ -36,10 +36,10 @@ Depends:
 Imports: 
     Matrix,
     RANN (>= 2.6.0),
-    lpSolve
+    lpSolve,
+    MASS
 Suggests: 
     knitr,
-    MASS,
     Rglpk,
     rmarkdown,
     Rsymphony,
