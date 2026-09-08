@@ -286,7 +286,7 @@ Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition data sets
 
 Papenberg, M., Wang, C., Diop, M., Bukhari, S. H., Oskotsky, B., Davidson, B. R., ... & Oskotsky, T. T. (2025). Anticlustering for sample allocation to minimize batch effects. *Cell Reports Methods, 5*(8). https://doi.org/10.1016/j.crmeth.2025.101137
 
-Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. (2025). Extending the Bicriterion Approach for Anticlustering: Exact and Hybrid Approaches. Psychometrika. Advance online publication. https://doi.org/10.1017/psy.2025.10052
+Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. (2025). Extending the Bicriterion Approach for Anticlustering: Exact and Hybrid Approaches. *Psychometrika, 90*(5), 1789–1808. https://doi.org/10.1017/psy.2025.10052
 
 Weitz, R. R., & Lakshminarayanan, S. (1996). On a heuristic for the final exam scheduling problem. *Journal of the Operational Research Society, 47*(4), 599--600.
 

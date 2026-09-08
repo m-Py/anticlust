@@ -30,7 +30,7 @@ You are using the three phase search algorithm if you are using `anticlustering(
 
 If you are using cannot-link constraints by using the argument `cannot_link` in `anticlustering()`, this is the relevant paper:
 
-- Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. (2025). Extending the Bicriterion Approach for Anticlustering: Exact and Hybrid Approaches. Psychometrika. Advance online publication. https://doi.org/10.1017/psy.2025.10052
+- Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. (2025). Extending the Bicriterion Approach for Anticlustering: Exact and Hybrid Approaches. *Psychometrika, 90*(5), 1789–1808. https://doi.org/10.1017/psy.2025.10052
 
 If you are using must-link constraints by using the argument `must_link` in `anticlustering()`, this is the relevant paper:
 
@@ -38,13 +38,13 @@ If you are using must-link constraints by using the argument `must_link` in `ant
 
 If you are using the average diversity objective, the following is the appropriate reference:
 
-- Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. (2025). Extending the Bicriterion Approach for Anticlustering: Exact and Hybrid Approaches. Psychometrika. Advance online publication. https://doi.org/10.1017/psy.2025.10052
+- Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. (2025). Extending the Bicriterion Approach for Anticlustering: Exact and Hybrid Approaches. *Psychometrika, 90*(5), 1789–1808. https://doi.org/10.1017/psy.2025.10052
 
 You are using the average diversity objective when you are using `objective = "average-diversity"` in `anticlustering()` or `average_diversity = TRUE` in `bicriterion_anticlustering()`.
 
 If you are using the function `optimal_dispersion()`, this is the appropriate reference: 
 
-Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. (2025). Extending the Bicriterion Approach for Anticlustering: Exact and Hybrid Approaches. Psychometrika. Advance online publication. https://doi.org/10.1017/psy.2025.10052
+- Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. (2025). Extending the Bicriterion Approach for Anticlustering: Exact and Hybrid Approaches. *Psychometrika, 90*(5), 1789–1808. https://doi.org/10.1017/psy.2025.10052
 
 ## References for anticlustering algorithms
 
@@ -108,7 +108,7 @@ Mohebi, S., Zanella, A., & Zorzi, M. (2022). *Pilot reuse in cell-free massive M
 
 Papenberg, M. (2024). K-plus Anticlustering: An Improved k-means Criterion for Maximizing Between-Group Similarity. *British Journal of Mathematical and Statistical Psychology, 77* (1), 80--102. https://doi.org/10.1111/bmsp.12315
 
-Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. (2025). Extending the Bicriterion Approach for Anticlustering: Exact and Hybrid Approaches. Psychometrika. Advance online publication. https://doi.org/10.1017/psy.2025.10052
+Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. (2025). Extending the Bicriterion Approach for Anticlustering: Exact and Hybrid Approaches. *Psychometrika, 90*(5), 1789–1808. https://doi.org/10.1017/psy.2025.10052
 
 Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition data sets into equivalent parts. *Psychological Methods, 26*(2), 161--174. https://doi.org/10.1037/met0000301
 

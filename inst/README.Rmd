@@ -9,7 +9,7 @@ output:
 
 # anticlust <a href='https://m-py.github.io/anticlust/'><img src='man/figures/anticlustStickerV1-0.svg' style="float:right; height:160px" /></a>
 
-Anticlustering partitions a pool of elements into clusters (or *anticlusters*) with the goal of achieving high between-cluster similarity and high within-cluster heterogeneity. This is accomplished by maximizing instead of minimizing a clustering objective function, such as the intra-cluster variance (used in k-means clustering) or the sum of pairwise distances within clusters. The package `anticlust` implements anticlustering methods as described in Papenberg and Klau (2021; https://doi.org/10.1037/met0000301), Brusco et al. (2020; https://doi.org/10.1111/bmsp.12186), Papenberg (2024;  https://doi.org/10.1111/bmsp.12315), Papenberg, Wang, et al. (2025; https://doi.org/10.1016/j.crmeth.2025.101137), Papenberg, Breuer, et al. (2025; https://doi.org/10.1017/psy.2025.10052), and Yang et al. (2022; https://doi.org/10.1016/j.ejor.2022.02.003)
+Anticlustering partitions a pool of elements into clusters (or *anticlusters*) with the goal of achieving high between-cluster similarity and high within-cluster heterogeneity. This is accomplished by maximizing instead of minimizing a clustering objective function, such as the intra-cluster variance (used in k-means clustering) or the sum of pairwise distances within clusters. The package `anticlust` implements anticlustering methods as described in Papenberg and Klau (2021; https://doi.org/10.1037/met0000301), Brusco et al. (2020; https://doi.org/10.1111/bmsp.12186), Papenberg (2024;  https://doi.org/10.1111/bmsp.12315), Papenberg, Wang, et al. (2025; https://doi.org/10.1016/j.crmeth.2025.101137), Papenberg, Breuer, et al. (2025; https://doi.org/10.1017/psy.2025.10052), Yang et al. (2022; https://doi.org/10.1016/j.ejor.2022.02.003), and We et al. (2025; https://doi.org/10.1016/j.cor.2025.107030).
 
 ```{r setup, include = FALSE}
 library("anticlust")
@@ -161,6 +161,18 @@ plot_clusters(
   show_axes = TRUE
 )
 ```
+
+## Other implementations of anticlustering
+
+There seems to be a Python implementation of anticlustering algorithms, though I have not tested it: https://github.com/SneaksAndData/anti-clustering
+
+There are some implementations of the Maximum Diverse Grouping Problem, which is close enough to just being a different name for anticlustering (although there is a stronger focus on the diversity as the objective function for anticlustering): 
+
+- [Java code of several algorithms by Gallego et al.](https://grafo.etsii.urjc.es/maximally-diverse-grouping/)
+- [C++ code](https://figshare.com/s/3746a8593c48e6bdeb9a?file=52202792) of the FIFR algorithm as provided by the original authors (*Note: anticlust also includes an implemtation of this algorithm*)
+- [C++ code](https://toyamaailab.github.io/sourcedata.html.) of the three-phase search algorithm as provided by the original authors (*Note: anticlust also includes an implemtation of this algorithm*)
+
+If you are aware of other openly available implementations, please let me know. 
 
 ## Questions and suggestions
 

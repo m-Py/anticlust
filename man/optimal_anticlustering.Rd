@@ -110,7 +110,7 @@ data sets into equivalent parts. Psychological Methods, 26(2),
 
 Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. (2025). 
 Extending the Bicriterion Approach for Anticlustering: Exact and Hybrid 
-Approaches. Psychometrika. Advance online publication. https://doi.org/10.1017/psy.2025.10052
+Approaches. Psychometrika, 90(5), 1789–1808. https://doi.org/10.1017/psy.2025.10052
 }
 \author{
 Martin Papenberg \email{martin.papenberg@hhu.de}

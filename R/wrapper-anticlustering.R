@@ -468,9 +468,9 @@
 #' approach. British Journal of Mathematical and Statistical
 #' Psychology, 73, 275-396. https://doi.org/10.1111/bmsp.12186
 #' 
-#' Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. 
-#' (2025). Extending the Bicriterion Approach for Anticlustering: 
-#' Exact and Hybrid Approaches. Advance online publication. Psychometrika.
+#' Papenberg, M., Breuer, M., Diekhoff, M., Tran, N. K., & Klau, G. W. (2025). 
+#' Extending the Bicriterion Approach for Anticlustering: Exact and Hybrid 
+#' Approaches. Psychometrika, 90(5), 1789–1808. https://doi.org/10.1017/psy.2025.10052
 #' 
 #' Papenberg, M., & Klau, G. W. (2021). Using anticlustering to partition 
 #' data sets into equivalent parts. Psychological Methods, 26(2), 
