@@ -31,6 +31,8 @@ feasible_and_infeasible_region_search_anticlustering(
 
 \item{objective}{The anticlustering objective = "diversity".}
 
+\item{number_iterations}{A number that defines how many times the steps in the search algorithm are repeated.}
+
 \item{clusters}{A vector of length M that specifies the number of elements each cluster can contain. 
 If this vector is not NULL, the lower and upper bounds will be disregarded.}
 
@@ -56,15 +58,11 @@ triggering the jump-back mechanism}
 
 \item{tau}{Parameter when "noImp" exceeds it, the algorithm transits from exploitation to exploration strategy}
 
-\item{alpha}{Parameter for weitghing the discrimitation of a slighlty worse local optiomal child solution.}
+\item{kmax}{A parameter that determines the maximum degree of constraint violation in the IFR search}
+
+\item{alpha}{Parameter for weitghing the discrimitation of a slighlty worse local optiomal child solution}
 
 \item{matrix}{The data input. Currently just a vector.}
-
-\item{number_iterations:}{A number that defines how many times the steps in the search algorithm are repeated.}
-
-\item{kmax:}{A parameter that determines the maximum degree of constraint violation in the IFR search}
-
-\item{return}{results contains everything, including vector result and its cost}
 }
 \value{
 A vector of length N that assigns a group (i.e, a number

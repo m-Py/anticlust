@@ -10,7 +10,7 @@
 #' @param K Number of anticlusters to be formed.
 #' @param N Number of elememts.
 #' @param objective The anticlustering objective = "diversity".
-#' @param number_iterations: A number that defines how many times the steps in the search algorithm are repeated.
+#' @param number_iterations A number that defines how many times the steps in the search algorithm are repeated.
 #' @param clusters A vector of length M that specifies the number of elements each cluster can contain. 
 #' If this vector is not NULL, the lower and upper bounds will be disregarded.
 #' @param beta_max The algorithm begins with a pool of random initial solutions of size beta_max. 
@@ -27,9 +27,8 @@
 #' @param phi Parameter that determines the population size when initiating a new round of exploration upon
 #' triggering the jump-back mechanism
 #' @param tau Parameter when "noImp" exceeds it, the algorithm transits from exploitation to exploration strategy
-#' @param kmax: A parameter that determines the maximum degree of constraint violation in the IFR search
-#' @param alpha Parameter for weitghing the discrimitation of a slighlty worse local optiomal child solution.
-#' @param return results contains everything, including vector result and its cost
+#' @param kmax A parameter that determines the maximum degree of constraint violation in the IFR search
+#' @param alpha Parameter for weitghing the discrimitation of a slighlty worse local optiomal child solution
 #'     
 #' @details Details of the implementation of the algorithm can be found 
 #'  in the pseudocode of the paper Wu et al. (2025)
