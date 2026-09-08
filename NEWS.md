@@ -1,7 +1,11 @@
 
 # anticlust 0.8.16
 
+**User visible changes**
+
 - `categories_to_binary()` has a new argument `pairwise_combinations`
+- `fast_anticlustering()` has new arguments `distance` and `lambda`
+- New function `experimental_allocation()` provided by Dimitry Wintermantel
 
 # anticlust 0.8.15
 
