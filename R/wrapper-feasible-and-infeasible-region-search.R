@@ -154,7 +154,7 @@ if (N < 480) {
        stop("Could not allocate enough memory.")
     }
     
-    results$clusters <- results$clusters + 1 # in C, we use 0, 1, 2... for cluster labels
+    results$result <- results$result + 1 # in C, we use 0, 1, 2... for cluster labels
 
     return(results)
 }
