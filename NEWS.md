@@ -7,6 +7,10 @@
 - `fast_anticlustering()` has new arguments `distance` and `lambda`
 - New function `experimental_allocation()` provided by Dimitry Wintermantel
 
+**Minor**
+
+- `MASS` is now an IMPORTed package instead of only SUGGESTed
+
 # anticlust 0.8.15
 
 - Fixes a regression from version 0.8.14 in `categories_to_binary()`, affecting the way one-hot encoding was conducted internally
