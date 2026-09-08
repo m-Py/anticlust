@@ -10,7 +10,8 @@
 #' (2020; <doi:10.1111/bmsp.12186>), Papenberg (2024; 
 #' <doi:10.1111/bmsp.12315>), Papenberg, Wang, et al. (2025; 
 #' <doi:10.1016/j.crmeth.2025.101137>), Papenberg, Breuer, et al. (2025; 
-#' <doi:10.1017/psy.2025.10052>), and Yang et al. (2022; <doi:10.1016/j.ejor.2022.02.003>). 
+#' <doi:10.1017/psy.2025.10052>), Yang et al. (2022; <doi:10.1016/j.ejor.2022.02.003>),
+#' and Wu et al. (2025; <doi.org/10.1016/j.cor.2025.107030>).
 #'
 #' @param x The data input. Can be one of two structures: (1) A
 #'     feature matrix where rows correspond to elements and columns

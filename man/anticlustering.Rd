@@ -87,7 +87,8 @@ Klau (2021; <doi:10.1037/met0000301>), Brusco et al.
 (2020; <doi:10.1111/bmsp.12186>), Papenberg (2024; 
 <doi:10.1111/bmsp.12315>), Papenberg, Wang, et al. (2025; 
 <doi:10.1016/j.crmeth.2025.101137>), Papenberg, Breuer, et al. (2025; 
-<doi:10.1017/psy.2025.10052>), and Yang et al. (2022; <doi:10.1016/j.ejor.2022.02.003>).
+<doi:10.1017/psy.2025.10052>), Yang et al. (2022; <doi:10.1016/j.ejor.2022.02.003>),
+and Wu et al. (2025; <doi.org/10.1016/j.cor.2025.107030>).
 }
 \details{
 This function is used to solve anticlustering. That is, the data
