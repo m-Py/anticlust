@@ -90,7 +90,7 @@ This function implements the unweighted sum approach for k-plus
 \examples{
 
 # Generate some data
-N <- 180
+N <- 24
 M <- 4
 features <- matrix(rnorm(N * M), ncol = M)
 # standard k-plus anticlustering: optimize similarity with regard to mean and variance:
