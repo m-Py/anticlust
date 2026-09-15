@@ -1,4 +1,8 @@
 
+# anticlust 0.8.17
+
+- Fixes an error in the test suite to allow for double imprecision
+
 # anticlust 0.8.16
 
 **User visible changes**
