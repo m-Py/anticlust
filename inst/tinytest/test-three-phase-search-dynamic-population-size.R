@@ -3,11 +3,13 @@ library(tinytest)
 
 set.seed(123)
 
+source("./inst/tinytest/gen_data.R")
+
 N <- 12
 M <- 5
 K <- 2
-dat <- matrix(rnorm(N * M), ncol = M)
-distances <- dist(dat)
+dat <- rnd_data_integer(N, M)
+distances <- dist(dat, method = "manhattan")
 
 result_cluster1 <- three_phase_search_anticlustering(distances, K, N)
 result_cluster2 <- anticlustering(distances, K=K, method="local-maximum", repetitions = 10)
@@ -26,8 +28,8 @@ N <- 12
 M <- 2
 K <- 3
 
-dat <- matrix(rnorm(N * M), ncol = M)
-distances <- dist(dat)
+dat <- rnd_data_integer(N, M)
+distances <- dist(dat, method = "manhattan")
 
 result_cluster1 <- anticlust:::three_phase_search_anticlustering(distances, K, N)
 result_cluster2 <- anticlustering(distances, K=K, method="local-maximum", repetitions = 10)

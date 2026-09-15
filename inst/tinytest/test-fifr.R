@@ -1,13 +1,15 @@
 library(anticlust)
 library(tinytest)
 
+source("./inst/tinytest/gen_data.R")
+
 set.seed(123)
 
 N <- 12
 M <- 5
 K <- 2
-dat <- matrix(rnorm(N * M), ncol = M)
-distances <- dist(dat)
+dat <- rnd_data_integer(N, M)
+distances <- dist(dat, method = "manhattan")
 
 result_cluster1 <- feasible_and_infeasible_region_search_anticlustering(distances, K, N)
 result_cluster2 <- anticlustering(distances, K=K, method="local-maximum", repetitions = 10)
@@ -26,8 +28,8 @@ N <- 12
 M <- 2
 K <- 3
 
-dat <- matrix(rnorm(N * M), ncol = M)
-distances <- dist(dat)
+dat <- rnd_data_integer(N, M)
+distances <- dist(dat, method = "manhattan")
 
 result_cluster1 <- feasible_and_infeasible_region_search_anticlustering(distances, K, N)
 result_cluster2 <- anticlustering(distances, K=K, method="local-maximum", repetitions = 10)
@@ -47,8 +49,8 @@ N2 <- 140
 M2 <- 2
 K2 <- 4
 clusters <- c(20,40,30,50)
-dat2 <- matrix(rnorm(N2 * M2), ncol = M2)
-distances2 <- dist(dat2)
+dat2 <- rnd_data_integer(N2, M2)
+distances2 <- dist(dat2, method = "manhattan")
 
 result_cluster <- feasible_and_infeasible_region_search_anticlustering(distances2, K2, N2, clusters=clusters)
 table_clusters <- table(result_cluster)
@@ -70,7 +72,7 @@ N <- 200
 M <- 5
 K <- 10
 
-data <- matrix(rnorm(N*M), ncol = M)
+data <- rnd_data_integer(N, M)
 
 g1 <- anticlustering(data, K = K)
 g2 <- anticlustering(data, K = K, method = "local-maximum")

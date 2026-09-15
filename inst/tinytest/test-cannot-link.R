@@ -2,6 +2,8 @@
 library(anticlust)
 library(tinytest)
 
+source("./inst/tinytest/gen_data.R")
+
 # Test if cannot_link constraint works
 a <- anticlustering(rnorm(6), K = 2, cannot_link = cbind(1, 2))
 expect_true(a[1] != a[2])
@@ -18,24 +20,25 @@ expect_true(a[1] != a[2])
 
 N <- 14
 M <- 3
-data <- matrix(rnorm(N*M), ncol = M)
-a <- anticlustering(data, K = 2, method = "ilp")
+data <- rnd_data_integer(N, M)
+distances <- dist(data, method = "manhattan")
+a <- anticlustering(distances, K = 2, method = "ilp")
 one <- which(a == 1)[1]
 other <- which(a == 1)[2]
-diversity_objective(data, a)
+diversity_objective(distances, a)
 
-b <- anticlustering(data, K = 2, cannot_link = cbind(one, other))
+b <- anticlustering(distances, K = 2, cannot_link = cbind(one, other))
 expect_true(b[one] != b[other])
-expect_true(diversity_objective(data, a) >= diversity_objective(data, b))
+expect_true(diversity_objective(distances, a) >= diversity_objective(distances, b))
 
-b <- anticlustering(data, K = 2, cannot_link = cbind(one, other), method = "ilp")
+b <- anticlustering(distances, K = 2, cannot_link = cbind(one, other), method = "ilp")
 expect_true(b[one] != b[other])
-expect_true(diversity_objective(data, a) >= diversity_objective(data, b))
+expect_true(diversity_objective(distances, a) >= diversity_objective(distances, b))
 
-b <- anticlustering(data, K = 2, cannot_link = cbind(one, other), method = "brusco")
+b <- anticlustering(distances, K = 2, cannot_link = cbind(one, other), method = "brusco")
 expect_true(b[one] != b[other])
 expect_true(a[one] == a[other]) # this is necessary, but maybe we appreciate the reminder.
-expect_true(diversity_objective(data, a) >= diversity_objective(data, b))
+expect_true(diversity_objective(distances, a) >= diversity_objective(distances, b))
 
 
 
@@ -43,20 +46,21 @@ expect_true(diversity_objective(data, a) >= diversity_objective(data, b))
 
 N <- 14
 M <- 3
-data <- matrix(rnorm(N*M), ncol = M)
-a <- anticlustering(data, K = 2, method = "ilp")
+data <- rnd_data_integer(N, M)
+distances <- dist(data, method = "manhattan")
+a <- anticlustering(distances, K = 2, method = "ilp")
 one <- which(a == 1)[1]
 other <- which(a == 1)[2]
-diversity_objective(data, a)
+diversity_objective(distances, a)
 
-b <- anticlustering(data, K = 2, cannot_link = cbind(one, other), repetitions = 10)
+b <- anticlustering(distances, K = 2, cannot_link = cbind(one, other), repetitions = 10)
 expect_true(b[one] != b[other])
-expect_true(diversity_objective(data, a) >= diversity_objective(data, b))
+expect_true(diversity_objective(distances, a) >= diversity_objective(distances, b))
 
-b <- anticlustering(data, K = 2, cannot_link = cbind(one, other), method = "brusco", repetitions = 10)
+b <- anticlustering(distances, K = 2, cannot_link = cbind(one, other), method = "brusco", repetitions = 10)
 expect_true(b[one] != b[other])
 expect_true(a[one] == a[other]) # this is necessary, but maybe we appreciate the reminder.
-expect_true(diversity_objective(data, a) >= diversity_objective(data, b))
+expect_true(diversity_objective(distances, a) >= diversity_objective(distances, b))
 
 
 ## Test for larger data sets:

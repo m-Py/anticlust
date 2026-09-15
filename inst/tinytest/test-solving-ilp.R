@@ -1,5 +1,7 @@
 
 library("anticlust")
+library(tinytest)
+source("./inst/tinytest/gen_data.R")
 
 # all levels of heuristicism work and that exact approach has best objective
 conditions <- expand.grid(m = 1:4, p = 2)
@@ -26,10 +28,11 @@ for (k in 1:nrow(conditions)) {
 N <- 30
 K <- 3
 M <- 5
-dat <- matrix(rnorm(N*M), ncol = M)
+dat <- rnd_data_integer(N, M)
+distances <- dist(dat, method = "manhattan")
 
-ILP <- anticlustering(dat, K = K, objective = "dispersion", method = "ilp")
-HEURISTIC <- anticlustering(dat, K = K, objective = "dispersion", method = "local-maximum")
+ILP <- anticlustering(distances, K = K, objective = "dispersion", method = "ilp")
+HEURISTIC <- anticlustering(distances, K = K, objective = "dispersion", method = "local-maximum")
 
-expect_true(dispersion_objective(dat, ILP) >= dispersion_objective(dat, HEURISTIC))
+expect_true(dispersion_objective(distances, ILP) >= dispersion_objective(distances, HEURISTIC))
 expect_true(all(table(ILP) == N/K))
