@@ -1,4 +1,8 @@
 
+# anticlust 0.8.18
+
+- Use smaller sample data set in `?kplus_anticlustering`
+
 # anticlust 0.8.17
 
 - Fixes an error in the test suite to allow for double imprecision
