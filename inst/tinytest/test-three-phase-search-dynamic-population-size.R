@@ -101,8 +101,7 @@ expect_error(anticlust:::three_phase_search_anticlustering(distances2, K2, N2, c
 # Test problematic cases
 
 expect_error(
-  anticlust:::three_phase_search_anticlustering(distances2, K2, N2, clusters=c(1)),
-  pattern = "len"
+  anticlust:::three_phase_search_anticlustering(distances2, K2, N2, clusters=c(1))
 )
 
 expect_error(

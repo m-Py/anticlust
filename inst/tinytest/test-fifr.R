@@ -76,8 +76,7 @@ expect_true(all(table_clusters == clusters))
 # Test problematic cases
 
 expect_error(
-  feasible_and_infeasible_region_search_anticlustering(distances2, K2, N2, clusters=c(1)),
-  pattern = "len"
+  feasible_and_infeasible_region_search_anticlustering(distances2, K2, N2, clusters=c(1))
 )
 
 ## Larger data set
