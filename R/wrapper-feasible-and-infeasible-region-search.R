@@ -80,12 +80,16 @@ feasible_and_infeasible_region_search_anticlustering <- function(
 ) {
 
     distances <- convert_to_distances(x)
+    if ((N != nrow(distances))) stop("Argument N is incorrect.")
 
     if (is.null(lower_bound)) {
         lower_bound <- floor(N/K)
     }
     if (is.null(upper_bound)) {
         upper_bound <- ceiling(N/K)
+    }
+    if (!is.null(clusters)) {
+      if (sum(clusters) != nrow(distances)) stop("Sum of cluster sizes does not equal N.")
     }
 
 if (N < 480) {
